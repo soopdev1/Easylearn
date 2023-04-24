@@ -26,27 +26,27 @@ public class Ateco implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @Column(name = "codice")
-    private String codice;
+    @Column(name = "codiceateco")
+    private String codiceateco;
 
     @Column(name = "descrizione", columnDefinition = "LONGTEXT")
     private String descrizione;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "repertorio_professioni",
-            joinColumns = @JoinColumn(name = "codice"),
+            joinColumns = @JoinColumn(name = "codiceateco"),
             inverseJoinColumns = @JoinColumn(name = "idrepertorio"))
     List<Repertorio> repertorio;
 
     public Ateco() {
     }
 
-    public String getCodice() {
-        return codice;
+    public String getCodiceAteco() {
+        return codiceateco;
     }
 
-    public void setCodice(String codice) {
-        this.codice = codice;
+    public void setCodiceAteco(String codiceateco) {
+        this.codiceateco = codiceateco;
     }
 
     public String getDescrizione() {

@@ -20,20 +20,20 @@ public class Livello_Certificazione implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @Column(name = "codice")
-    private String codice;
+    @Column(name = "codicelivellocertificazione")
+    private String codicelivellocertificazione;
     @Column(name = "nome")
     private String nome;
 
     public Livello_Certificazione() {
     }
 
-    public String getCodice() {
-        return codice;
+    public String getCodicelivellocertificazione() {
+        return codicelivellocertificazione;
     }
 
-    public void setCodice(String codice) {
-        this.codice = codice;
+    public void setCodicelivellocertificazione(String codicelivellocertificazione) {
+        this.codicelivellocertificazione = codicelivellocertificazione;
     }
 
     public String getNome() {

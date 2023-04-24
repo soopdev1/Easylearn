@@ -43,14 +43,14 @@ public class Repertorio implements Serializable {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "repertorio_professioni",
             joinColumns = @JoinColumn(name = "idrepertorio"),
-            inverseJoinColumns = @JoinColumn(name = "codice"))
-    List<Professioni> professioni;
+            inverseJoinColumns = @JoinColumn(name = "codiceprofessioni"))
+    private List<Professioni> professioni;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "repertorio_ateco",
             joinColumns = @JoinColumn(name = "idrepertorio"),
-            inverseJoinColumns = @JoinColumn(name = "codice"))
-    List<Ateco> ateco;
+            inverseJoinColumns = @JoinColumn(name = "codiceateco"))
+    private List<Ateco> ateco;
 
     @Column(name = "areaprofessionale")
     private String areaprofessionale;
@@ -62,18 +62,18 @@ public class Repertorio implements Serializable {
     private String descrizione;
 
     @ManyToOne
-    @JoinColumn(name = "codice")
+    @JoinColumn(name = "codicelivellocertificazione")
     private Livello_Certificazione livelloeqf;
 
     @ManyToOne
-    @JoinColumn(name = "codice")
+    @JoinColumn(name = "codicecertificazione")
     private Certificazione qualificarilasciata;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "repertorio_competenze",
             joinColumns = @JoinColumn(name = "idrepertorio"),
             inverseJoinColumns = @JoinColumn(name = "idattivita"))
-    List<Attivita> processolavoro;
+    private List<Attivita> processolavoro;
     
     
     @Column(name = "durataprovafinale")
@@ -84,7 +84,7 @@ public class Repertorio implements Serializable {
 
     @OneToMany
     @JoinColumn(name = "idschedaattivita")
-    List<Scheda_Attivita> attivitadestinatariassociate;
+    private List<Scheda_Attivita> attivitadestinatariassociate;
 
     
     //
@@ -211,7 +211,9 @@ public class Repertorio implements Serializable {
     }
 
     public List<Attivita> getProcessolavoro() {
-        return processolavoro;
+        List<Attivita> at_t = new ArrayList<>();
+        at_t.addAll(processolavoro);
+        return at_t;
     }
 
     public void setProcessolavoro(List<Attivita> processolavoro) {
@@ -235,7 +237,9 @@ public class Repertorio implements Serializable {
     }
 
     public List<Scheda_Attivita> getAttivitadestinatariassociate() {
-        return attivitadestinatariassociate;
+        List<Scheda_Attivita> sch_1 = new ArrayList<>();
+        sch_1.addAll(attivitadestinatariassociate);
+        return sch_1;
     }
 
     public void setAttivitadestinatariassociate(List<Scheda_Attivita> attivitadestinatariassociate) {

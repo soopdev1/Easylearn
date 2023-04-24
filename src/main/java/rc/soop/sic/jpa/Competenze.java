@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Convert;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,6 +18,7 @@ import javax.persistence.Table;
  *
  * @author Administrator
  */
+@Entity
 @Table(name = "competenze")
 public class Competenze implements Serializable {
 
@@ -35,15 +37,14 @@ public class Competenze implements Serializable {
     @Column(name = "abilita", columnDefinition = "LONGTEXT")
     private String abilita;
 
-    @Column(name = "abilita_strings")
+    @Column(name = "abilita_strings", columnDefinition = "LONGTEXT")
     @Convert(converter = StringToListConverter.class)
     private List<String> abilita_strings;
-    
-    
+
     @Column(name = "conoscenze", columnDefinition = "LONGTEXT")
     private String conoscenze;
 
-    @Column(name = "conoscenze_strings")
+    @Column(name = "conoscenze_strings", columnDefinition = "LONGTEXT")
     @Convert(converter = StringToListConverter.class)
     private List<String> conoscenze_strings;
 
@@ -105,9 +106,5 @@ public class Competenze implements Serializable {
     public void setConoscenze_strings(List<String> conoscenze_strings) {
         this.conoscenze_strings = conoscenze_strings;
     }
-    
-    
-    
-    
 
 }

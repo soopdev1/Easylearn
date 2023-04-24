@@ -26,8 +26,8 @@ public class Professioni implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @Column(name = "codice")
-    private String codice;
+    @Column(name = "codiceprofessioni")
+    private String codiceprofessioni;
 
     @Column(name = "nome")
     private String nome;
@@ -37,19 +37,19 @@ public class Professioni implements Serializable {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "repertorio_professioni",
-            joinColumns = @JoinColumn(name = "codice"),
+            joinColumns = @JoinColumn(name = "codiceprofessioni"),
             inverseJoinColumns = @JoinColumn(name = "idrepertorio"))
     List<Repertorio> repertorio;
 
     public Professioni() {
     }
 
-    public String getCodice() {
-        return codice;
+    public String getCodiceProfessioni() {
+        return codiceprofessioni;
     }
 
-    public void setCodice(String codice) {
-        this.codice = codice;
+    public void setCodiceProfessioni(String codiceprofessioni) {
+        this.codiceprofessioni = codiceprofessioni;
     }
 
     public String getNome() {

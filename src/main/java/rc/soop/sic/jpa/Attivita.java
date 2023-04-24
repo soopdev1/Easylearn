@@ -5,8 +5,10 @@
 package rc.soop.sic.jpa;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,6 +23,7 @@ import javax.persistence.Table;
  *
  * @author Administrator
  */
+@Entity
 @Table(name = "attivita")
 public class Attivita implements Serializable {
 
@@ -40,11 +43,10 @@ public class Attivita implements Serializable {
     private String elenco;
     
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "repertorio_ateco",
+    @JoinTable(name = "repertorio_competenze",
             joinColumns = @JoinColumn(name = "idattivita"),
             inverseJoinColumns = @JoinColumn(name = "idrepertorio"))
-    List<Repertorio> repertorio;
-
+    private List<Repertorio> repertorio;
     
     @ManyToOne
     @JoinColumn(name = "idcompetenze")
@@ -87,7 +89,9 @@ public class Attivita implements Serializable {
     }
 
     public List<Repertorio> getRepertorio() {
-        return repertorio;
+        List<Repertorio> rep1 = new ArrayList<>();
+        rep1.addAll(repertorio);
+        return rep1;
     }
 
     public void setRepertorio(List<Repertorio> repertorio) {

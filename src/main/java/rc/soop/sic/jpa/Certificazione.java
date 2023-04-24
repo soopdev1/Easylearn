@@ -20,21 +20,23 @@ public class Certificazione implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @Column(name = "codice")
-    private String codice;
+    @Column(name = "codicecertificazione")
+    private String codicecertificazione;
     @Column(name = "nome")
     private String nome;
 
     public Certificazione() {
     }
 
-    public String getCodice() {
-        return codice;
+    public String getCodicecertificazione() {
+        return codicecertificazione;
     }
 
-    public void setCodice(String codice) {
-        this.codice = codice;
+    public void setCodicecertificazione(String codicecertificazione) {
+        this.codicecertificazione = codicecertificazione;
     }
+
+    
 
     public String getNome() {
         return nome;

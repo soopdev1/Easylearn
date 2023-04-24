@@ -5,7 +5,6 @@
 package rc.soop.sic.jpa;
 
 import java.io.Serializable;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -39,7 +38,7 @@ public class Scheda_Attivita implements Serializable {
     private String titoloattestato;
 
     @ManyToOne
-    @JoinColumn(name = "codice")
+    @JoinColumn(name = "codicecertificazione")
     private Certificazione certificazioneuscita;
 
     @Column(name = "orecorsominime")
