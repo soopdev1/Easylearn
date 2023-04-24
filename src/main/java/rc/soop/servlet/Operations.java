@@ -85,7 +85,7 @@ public class Operations extends HttpServlet {
                         try {
                             item.write(nomefile);
                         } catch (Exception ex) {
-                            LOGGER.severe(estraiEccezione(ex));
+                            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
                             nomefile = null;
                         }
                     }
@@ -112,19 +112,19 @@ public class Operations extends HttpServlet {
                                 request.getSession().setAttribute("is_memory", is);
                                 redirect(request, response, "US_upload.jsp?codice_istanza=" + codiceISTANZA + "&esito=OK");
                             } catch (Exception ex1) {
-                                LOGGER.severe(estraiEccezione(ex1));
+                                EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
                                 redirect(request, response, "US_upload.jsp?codice_istanza=" + codiceISTANZA + "&esito=KO6");
                             }
                         }
                     } catch (Exception ex0) {
-                        LOGGER.severe(estraiEccezione(ex0));
+                        EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex0));
                         redirect(request, response, "US_upload.jsp?codice_istanza=" + codiceISTANZA + "&esito=KO2");
                     }
                 } else {
                     redirect(request, response, "US_upload.jsp?codice_istanza=" + codiceISTANZA + "&esito=KO1");
                 }
             } catch (Exception ex) {
-                LOGGER.severe(estraiEccezione(ex));
+                EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
                 redirect(request, response, "US_upload.jsp?codice_istanza=" + codiceISTANZA + "&esito=KO3");
             }
         } else {
@@ -147,7 +147,7 @@ public class Operations extends HttpServlet {
             request.getSession().setAttribute("is_memory", is);
             redirect(request, response, "US_gestioneistanza.jsp");
         } catch (Exception ex) {
-            Constant.LOGGER.severe(Utils.estraiEccezione(ex));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
             redirect(request, response, "US_gestioneistanza.jsp?esito=KO");
         }
     }
@@ -173,7 +173,7 @@ public class Operations extends HttpServlet {
                 redirect(request, response, "ADM_istanze.jsp?esito=KO1");
             }
         } catch (Exception ex) {
-            Constant.LOGGER.severe(Utils.estraiEccezione(ex));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
             redirect(request, response, "ADM_istanze.jsp?esito=KO");
         }
     }
@@ -194,7 +194,7 @@ public class Operations extends HttpServlet {
             request.getSession().setAttribute("is_memory", is);
             redirect(request, response, "US_gestioneistanza.jsp");
         } catch (Exception ex) {
-            Constant.LOGGER.severe(Utils.estraiEccezione(ex));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
             redirect(request, response, "US_gestioneistanza.jsp?esito=KO");
         }
     }
@@ -219,7 +219,7 @@ public class Operations extends HttpServlet {
             }
 
         } catch (Exception ex) {
-            Constant.LOGGER.severe(Utils.estraiEccezione(ex));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
             redirect(request, response, "ADM_visdco.jsp?esito=KO");
         }
     }
@@ -252,7 +252,7 @@ public class Operations extends HttpServlet {
                 }
             }
         } catch (Exception ex) {
-            Constant.LOGGER.severe(Utils.estraiEccezione(ex));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
             redirect(request, response, "US_gestioneistanza.jsp?esito=KO");
         }
     }
@@ -287,7 +287,7 @@ public class Operations extends HttpServlet {
                 }
             }
         } catch (Exception ex) {
-            Constant.LOGGER.severe(Utils.estraiEccezione(ex));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
             redirect(request, response, "US_gestioneistanza.jsp?esito=KO");
         }
 
@@ -327,7 +327,7 @@ public class Operations extends HttpServlet {
                 redirect(request, response, "US_gestioneistanza.jsp?esito=KO1");
             }
         } catch (Exception ex) {
-            Constant.LOGGER.severe(Utils.estraiEccezione(ex));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
             redirect(request, response, "US_gestioneistanza.jsp?esito=KO");
         }
 
@@ -355,9 +355,8 @@ public class Operations extends HttpServlet {
             } else {
                 redirect(request, response, "US_gestioneistanza.jsp?esito=KO1");
             }
-
         } catch (Exception ex) {
-            Constant.LOGGER.severe(Utils.estraiEccezione(ex));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
             redirect(request, response, "US_gestioneistanza.jsp?esito=KO");
         }
 
@@ -383,7 +382,7 @@ public class Operations extends HttpServlet {
             e.close();
             redirect(request, response, "ADM_commissione.jsp?esito=OK&idcorso=" + idc);
         } catch (Exception ex) {
-            Constant.LOGGER.severe(Utils.estraiEccezione(ex));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
             redirect(request, response, "US_gestionecorsi.jsp?esito=KO");
         }
     }
@@ -401,7 +400,7 @@ public class Operations extends HttpServlet {
             e.close();
             redirect(request, response, "US_gestionecorsi.jsp?esito=OK");
         } catch (Exception ex) {
-            Constant.LOGGER.severe(Utils.estraiEccezione(ex));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
             redirect(request, response, "US_gestionecorsi.jsp?esito=KO");
         }
     }
@@ -436,7 +435,7 @@ public class Operations extends HttpServlet {
             e.close();
             redirect(request, response, "US_nuovocorso.jsp?esito=ADDED");
         } catch (Exception ex) {
-            Constant.LOGGER.severe(Utils.estraiEccezione(ex));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
             redirect(request, response, "US_compilacorsi.jsp?esito=KO");
         }
     }
@@ -489,7 +488,7 @@ public class Operations extends HttpServlet {
             se.setAttribute("is_memory", is);
             redirect(request, response, "US_gestioneistanza.jsp");
         } catch (Exception ex) {
-            Constant.LOGGER.severe(Utils.estraiEccezione(ex));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
             redirect(request, response, "US_compilacorsi.jsp?esito=KO");
         }
 
@@ -553,7 +552,7 @@ public class Operations extends HttpServlet {
                     break;
             }
         } catch (Exception ex) {
-
+            EntityOp.trackingAction("SERVICE", estraiEccezione(ex));
         }
     }
 

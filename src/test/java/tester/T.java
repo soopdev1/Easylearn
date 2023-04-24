@@ -4,33 +4,6 @@
  */
 package tester;
 
-import com.itextpdf.barcodes.BarcodeQRCode;
-import com.itextpdf.forms.PdfAcroForm;
-import static com.itextpdf.forms.PdfAcroForm.getAcroForm;
-import com.itextpdf.forms.fields.PdfFormField;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfReader;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
-import org.joda.time.DateTime;
-import static rc.soop.sic.Constant.LOGGER;
-import static rc.soop.sic.Constant.PATTERNDATE3;
-import static rc.soop.sic.Constant.PATTERNDATE4;
-import static rc.soop.sic.Pdf.checkFirmaQRpdfA;
-import static rc.soop.sic.Pdf.convertPDFA;
-import static rc.soop.sic.Pdf.createDir;
-import static rc.soop.sic.Pdf.printbarcode;
-import static rc.soop.sic.Pdf.setFieldsValue;
-import static rc.soop.sic.Utils.estraiEccezione;
-import rc.soop.sic.jpa.Corso;
-import rc.soop.sic.jpa.EntityOp;
-import rc.soop.sic.jpa.Istanza;
-import rc.soop.sic.jpa.Path;
-
 /**
  *
  * @author Raffaele

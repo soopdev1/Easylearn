@@ -1,11 +1,4 @@
-<%-- 
-    Document   : login
-    Created on : 17-feb-2022, 12.45.21
-    Author     : raf
---%>
-
 <%@page import="rc.soop.sic.Constant"%>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
     <!--begin::Head-->

@@ -64,7 +64,7 @@
                                     <!--begin::Label-->
                                     <label class="form-label fw-bolder text-dark fs-6 mb-0">Password</label>
                                     <!--end::Label-->
-                                    <!--begin::Link-->
+                                    <!--begin::Link
                                     <a href="reset.jsp" class="link-primary fs-6 fw-bolder">Password Dimenticata?</a>
                                     <!--end::Link-->
                                 </div>

@@ -58,16 +58,16 @@
                         <!--end::Input group-->
                         <!--begin::Actions-->
                         <div class="d-flex flex-wrap justify-content-center pb-lg-0">
-                            <button type="button" id="kt_password_reset_submit" class="btn btn-lg btn-primary fw-bolder me-4">
+                            <button type="button" id="kt_password_reset_submit" 
+                                    class="btn btn-lg btn-primary fw-bolder me-4">
                                 <span class="indicator-label">INVIA</span>
                                 <span class="indicator-progress">Attendi...
-                                    <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+                                    <span class="spinner-border spinner-border-sm align-middle ms-2"></span>                                        
+                                </span>
                             </button>
-                            <a href="login.jsp" class="btn btn-lg btn-light-primary fw-bolder">ANNULLA</a>
+                            <a href="login_adpre.jsp" class="btn btn-lg btn-light-primary fw-bolder">ANNULLA</a>
                         </div>
-                        <!--end::Actions-->
                     </form>
-                    <!--end::Form-->
                 </div>
                 <!--end::Wrapper-->
             </div>

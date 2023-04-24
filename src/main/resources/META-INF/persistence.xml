@@ -13,6 +13,7 @@
         <class>rc.soop.sic.jpa.Sede</class>
         <class>rc.soop.sic.jpa.SoggettoProponente</class>
         <class>rc.soop.sic.jpa.TipoSede</class>
+        <class>rc.soop.sic.jpa.Track</class>
         <class>rc.soop.sic.jpa.User</class>
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
         <shared-cache-mode>ALL</shared-cache-mode>
@@ -28,14 +29,10 @@
             <property name="javax.persistence.jdbc.user" value="easylearn"/>
             <property name="javax.persistence.jdbc.password" value="easylearn"/>
             
-            <!-- SVILUPPO/DEMO  LOCAL -->
-            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://127.0.0.1:3306/easylearn_dev?serverTimezone=UTC" />
-            <!-- SVILUPPO/DEMO AWS  FORMEZ
-            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://172.25.1.18:3306/easylearn_dev?serverTimezone=UTC" /> -->
-            <!--    PROD 
-           <property name="javax.persistence.jdbc.url" 
-                     value="jdbc:mysql://clustermicrocredito.cluster-c6m6yfqeypv3.eu-south-1.rds.amazonaws.com:3306/enm_gestione_neet_prod?useSSL=false"/>  
-            -->
+            <!-- SVILUPPO/DEMO  LOCAL 
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://127.0.0.1:3306/easylearn_dev?serverTimezone=UTC" />-->
+            <!-- SVILUPPO/DEMO AWS FORMEZ-->
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://172.25.1.18:3306/easylearn_dev" /> 
         </properties>
     </persistence-unit>
 </persistence>

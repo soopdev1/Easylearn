@@ -27,9 +27,6 @@ public class LoginOperations extends HttpServlet {
 
     //SPID
     //https://github.com/italia/spid-spring
-    
-    
-    
     protected void logout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getSession().invalidate();
         redirect(request, response, "login.jsp");
@@ -45,9 +42,6 @@ public class LoginOperations extends HttpServlet {
             if (!username.trim().equals("") && !password.trim().equals("")) {
                 EntityOp e = new EntityOp();
                 User user = e.getUser(username, password);
-//                List<User> alluser = (List<User>) e.findAll(User.class);
-//                User user = alluser.stream().filter(u1 -> u1.getUsername().equals(username)
-//                        && u1.getPassword().equals(convmd5(password))).findAny().orElse(null);
                 if (user != null) {
 
                     HttpSession se = request.getSession();
@@ -56,27 +50,40 @@ public class LoginOperations extends HttpServlet {
                     se.setAttribute("us_pwd", user.getPassword());
                     se.setAttribute("us_rolecod", user.getTipo());
                     se.setAttribute("us_mail", user.getEmail());
+                    EntityOp.trackingAction(username, "LOGIN OK");
                     Istanza is = e.getIstanzaWaiting(user.getSoggetto());
                     if (is != null) {
                         se.setAttribute("is_memory", is);
                     }
                     switch (user.getTipo()) {
-                        case 1 -> exitredirect.append("ADM_dashboard.jsp");
-                        case 2 -> exitredirect.append("US_dashboard.jsp");
-                        case 3 -> exitredirect.append("PRE_dashboard.jsp");
-                        default -> exitredirect.append("ERROR1");
+                        case 1:
+                            exitredirect.append("ADM_dashboard.jsp");
+                            break;
+                        case 2:
+                            exitredirect.append("US_dashboard.jsp");
+                            break;
+                        case 3:
+                            exitredirect.append("PRE_dashboard.jsp");
+                            break;
+                        default:
+                            EntityOp.trackingAction(username, "LOGIN KO TIPO USER");
+                            exitredirect.append("ERROR1");
+                            break;
                     }
                 } else {
+                    EntityOp.trackingAction(username, "LOGIN KO 1");
                     exitredirect.append("ERROR1");
                 }
             } else {
+                EntityOp.trackingAction(username, "LOGIN KO 2");
                 exitredirect.append("ERROR2");
             }
         } else {
+            EntityOp.trackingAction(username, "LOGIN KO 3");
             exitredirect.append("ERROR3");
         }
 
-        try ( PrintWriter pw = response.getWriter()) {
+        try (PrintWriter pw = response.getWriter()) {
             pw.print(exitredirect.toString());
             pw.flush();
         }
@@ -97,10 +104,12 @@ public class LoginOperations extends HttpServlet {
             response.setContentType("text/html;charset=UTF-8");
             String type = request.getParameter("type");
             switch (type) {
-                case "login" -> login(request, response);
-                case "logout" -> logout(request, response);
-                default -> {
-                }
+                case "login":
+                    login(request, response);
+                    break;
+                case "logout":
+                    logout(request, response);
+                    break;
             }
 //                case "changepassword":
 //                    changepassword(request, response);
@@ -108,7 +117,7 @@ public class LoginOperations extends HttpServlet {
 //                case "forgotPwd":
 //                    forgotPwd(request, response);
 //                    break;
-                    } catch (Exception ex) {
+        } catch (Exception ex) {
             LOGGER.severe(estraiEccezione(ex));
         }
     }

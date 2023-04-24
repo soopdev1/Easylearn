@@ -167,5 +167,21 @@ public class EntityOp {
         q.setParameter("stato", c1);
         return (List<Corsoavviato>) q.getResultList();
     }
+    
+    
+    public static void trackingAction(String user,String azione){
+        try {
+            Track t1 = new Track();
+            t1.setAzione(azione);
+            t1.setUser(user);
+            EntityOp e1 = new EntityOp();
+            e1.begin();
+            e1.persist(t1);
+            e1.flush();
+            e1.close();
+        } catch (Exception ex1) {
+            ex1.printStackTrace();
+        }
+    }
 
 }

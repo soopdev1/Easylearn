@@ -14,16 +14,6 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
-                Istanza i1 = (Istanza) session.getAttribute("is_memory");
-                int corsi_attuali = 0;
-                boolean istanzaok = false;
-                if (i1 != null) {
-                    istanzaok = i1.getStatocorso().getCodice().equals("02");
-                    corsi_attuali = i1.getQuantitarichiesta();
-                } else {
-                    i1 = new Istanza();
-                }
-
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -42,7 +32,7 @@
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
         <%
-        String[] contatori = {"2","6","8","3"};
+        String[] contatori = {"0","0","0","0"};
         %>
         <!--end::Global Stylesheets Bundle-->
     </head>
