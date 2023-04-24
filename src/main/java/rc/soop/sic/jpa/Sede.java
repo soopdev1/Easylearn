@@ -47,6 +47,15 @@ public class Sede implements Serializable {
     public Sede() {
     }
 
+    public SoggettoProponente getSoggetto() {
+        return soggetto;
+    }
+
+    public void setSoggetto(SoggettoProponente soggetto) {
+        this.soggetto = soggetto;
+    }
+
+    
     public Long getIdsede() {
         return idsede;
     }
