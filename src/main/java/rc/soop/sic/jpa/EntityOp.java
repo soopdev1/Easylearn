@@ -155,7 +155,7 @@ public class EntityOp {
     public List<Corsoavviato> getCorsiAvviati_Admin() {
         TypedQuery q = em.createNamedQuery("corsoavviato.stato", Corsoavviato.class);
         CorsoStato c1 = new CorsoStato();
-        c1.setCodice("20");
+        c1.setCodicestatocorso("20");
         q.setParameter("stato", c1);
         return (List<Corsoavviato>) q.getResultList();
     }
@@ -163,7 +163,7 @@ public class EntityOp {
     public List<Corsoavviato> getCorsiConclusi_Admin() {
         TypedQuery q = em.createNamedQuery("corsoavviato.stato", Corsoavviato.class);
         CorsoStato c1 = new CorsoStato();
-        c1.setCodice("21");
+        c1.setCodicestatocorso("21");
         q.setParameter("stato", c1);
         return (List<Corsoavviato>) q.getResultList();
     }

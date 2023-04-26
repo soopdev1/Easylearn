@@ -91,14 +91,14 @@ public class Repertorio implements Serializable {
     @Column(name = "normativarif")
     private String normativarif;
 
-    @Column(name = "tipologia")
-    private String tipologia;
+    @ManyToOne
+    @JoinColumn(name = "tipologia")
+    private Tipologia_Repertorio tipologia;
 
-    @Column(name = "tipologiacategoria")
-    private String tipologiacategoria;
+    @ManyToOne
+    @JoinColumn(name = "tipologiacategoria")
+    private Categoria_Repertorio tipologiacategoria;
 
-    
-    
     public Repertorio() {
     }
 
@@ -142,19 +142,19 @@ public class Repertorio implements Serializable {
         this.sottoareaprofessionale = sottoareaprofessionale;
     }
 
-    public String getTipologia() {
+    public Tipologia_Repertorio getTipologia() {
         return tipologia;
     }
 
-    public void setTipologia(String tipologia) {
+    public void setTipologia(Tipologia_Repertorio tipologia) {
         this.tipologia = tipologia;
     }
 
-    public String getTipologiacategoria() {
+    public Categoria_Repertorio getTipologiacategoria() {
         return tipologiacategoria;
     }
 
-    public void setTipologiacategoria(String tipologiacategoria) {
+    public void setTipologiacategoria(Categoria_Repertorio tipologiacategoria) {
         this.tipologiacategoria = tipologiacategoria;
     }
 

@@ -7,39 +7,37 @@ package rc.soop.sic.jpa;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
  *
- * @author Raffaele
+ * @author Administrator
  */
 @Entity
-@Table(name = "corso_stato")
-public class CorsoStato implements Serializable {
-    
+@Table(name = "categoriarepertorio")
+public class Categoria_Repertorio implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     @Id
-    @Column(name = "codicestatocorso")
-    private String codicestatocorso;
-    
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "idcategoriarepertorio")
+    Long idcategoriarepertorio;
     @Column(name = "nome")
     private String nome;
-    
-    @Column(name = "ordine")
-    private int ordine;
 
-    public CorsoStato() {
+    public Categoria_Repertorio() {
     }
 
-    public String getCodicestatocorso() {
-        return codicestatocorso;
+    public Long getIdcategoriarepertorio() {
+        return idcategoriarepertorio;
     }
 
-    public void setCodicestatocorso(String codicestatocorso) {
-        this.codicestatocorso = codicestatocorso;
+    public void setIdcategoriarepertorio(Long idcategoriarepertorio) {
+        this.idcategoriarepertorio = idcategoriarepertorio;
     }
-
-    
 
     public String getNome() {
         return nome;
@@ -48,14 +46,7 @@ public class CorsoStato implements Serializable {
     public void setNome(String nome) {
         this.nome = nome;
     }
-
-    public int getOrdine() {
-        return ordine;
-    }
-
-    public void setOrdine(int ordine) {
-        this.ordine = ordine;
-    }
+    
     
     
 }
