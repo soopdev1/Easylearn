@@ -4,6 +4,8 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.Scheda_Attivita"%>
+<%@page import="rc.soop.sic.jpa.Repertorio"%>
 <%@page import="rc.soop.sic.jpa.Sede"%>
 <%@page import="rc.soop.sic.jpa.User"%>
 <%@page import="rc.soop.sic.jpa.Livello_Certificazione"%>
@@ -19,9 +21,9 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
+                List<Repertorio> repert = Engine.repertorio_completo();
+                List<Scheda_Attivita> sche1 = Engine.repertorio_completo_scheda();
 
-                List<Certificazione> elc = Engine.elenco_certificazioni();
-                List<Livello_Certificazione> ell = Engine.elenco_livelli_certificazioni();
                 User u1 = (User) session.getAttribute("us_memory");
     %>
     <!--begin::Head-->
@@ -122,6 +124,111 @@
                                                     <!--begin::Table container-->
                                                     <div class="row mb-6">
                                                         <!--begin::Label-->
+                                                        <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                            <span class="required">Seleziona Corso da Repertorio</span>
+                                                            <a onclick="return false;" data-bs-toggle="tooltip" data-bs-placement="top" title="Selezione nuovo codice dall'elenco">
+                                                                <i class="fas fa-exclamation-circle ms-1 fs-7"></i>
+                                                            </a>
+                                                        </label>
+                                                        <!--end::Label-->
+                                                        <!--begin::Col-->
+                                                        <div class="col-lg-8 fv-row">
+                                                            <select aria-label="Scegli..." data-control="select2" 
+                                                                    data-placeholder="Scegli..." 
+                                                                    class="form-select form-select-solid form-select-lg fw-bold" 
+                                                                    name="istat"
+                                                                    id="repertoriochoice"
+                                                                    required onchange="return selezionaCorso();">
+                                                                <option value="">Scegli...</option>                                                                
+                                                                <%for (Scheda_Attivita sa : sche1) {%>
+                                                                <option value="<%=sa.getRepertorio().getIdrepertorio()%>;<%=sa.getIdschedaattivita()%>" >
+                                                                    <%=sa.getRepertorio().getDenominazione()%> - <%=sa.getTipologiapercorso()%>
+                                                                </option>
+                                                                <%}%>
+                                                            </select>
+                                                        </div>
+                                                        <!--end::Col-->
+                                                    </div>
+                                                    <div class="row mb-6" id="detail_corso" style="display: none;">
+                                                        <!--begin::Label-->
+                                                        <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                            <span class="text-danger">Dettagli corso</span>
+                                                        </label>
+                                                        <!--end::Label-->
+                                                        <!--begin::Col-->
+                                                        <div class="col-lg-12 fv-row">
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Area Professionale:
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_area">
+                                                                </label>
+                                                            </div>                                                            
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Sottoarea Professionale:
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_sottoarea">
+                                                                </label>
+                                                            </div>                                                            
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Professioni NUP/ISTAT correlate:
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_professioni">
+                                                                </label>
+                                                            </div>                                                            
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Livello:
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_livello">
+                                                                </label>
+                                                            </div>                                                            
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Certificazione rilasciata:
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_cert">
+                                                                </label>
+                                                            </div>
+                                                            
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Ore di corso (ore):
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_ore">
+                                                                </label>
+                                                            </div>
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Ore di stage (ore):
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_stage">
+                                                                </label>
+                                                            </div>
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Ore di eLearning (perc.):
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_elearn">
+                                                                </label>
+                                                            </div>
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Ore assenza massime consentite (perc.):
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
+                                                                       id="cont_label_assmax">
+                                                                </label>
+                                                            </div>
+                                                            
+                                                        </div>
+                                                        <!--end::Col-->
+                                                    </div>
+                                                    <hr>
+                                                    <div class="row mb-6">
+                                                        <!--begin::Label-->
                                                         <label class="col-lg-4 col-form-label required fw-bold fs-6">Numero Protocollo (S.P.)</label>
                                                         <!--end::Label-->
                                                         <!--begin::Col-->
@@ -139,27 +246,6 @@
                                                                 <!--end::Col-->
                                                             </div>
                                                             <!--end::Row-->
-                                                        </div>
-                                                        <!--end::Col-->
-                                                    </div>
-                                                    <hr>
-                                                    <div class="row mb-6">
-                                                        <!--begin::Label-->
-                                                        <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                            <span class="required">Codice ISTAT Corso</span>
-                                                            <a onclick="return false;" data-bs-toggle="tooltip" data-bs-placement="top" title="Selezione nuovo codice dall'elenco">
-                                                                <i class="fas fa-exclamation-circle ms-1 fs-7"></i>
-                                                            </a>
-                                                        </label>
-                                                        <!--end::Label-->
-                                                        <!--begin::Col-->
-                                                        <div class="col-lg-8 fv-row">
-                                                            <select aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
-                                                                    class="form-select form-select-solid form-select-lg fw-bold" name="istat" required>
-                                                                <option value="">Scegli...</option>
-                                                                <option value="54430">5.4.4.3.0 - Assistente all'autonomia ed alla comunicazione dei disabili</option>
-                                                                <option value="31721">3.1.7.2.1 - Tecnico di produzione Video</option>
-                                                            </select>
                                                         </div>
                                                         <!--end::Col-->
                                                     </div>
@@ -188,27 +274,6 @@
                                                     </div>                                                
                                                     <div class="row mb-6">
                                                         <!--begin::Label-->
-                                                        <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                            <span class="required">Tipo Certificazione</span>
-                                                            <a onclick="return false;" data-bs-toggle="tooltip" data-bs-placement="top" title="Selezione nuovo codice dall'elenco">
-                                                                <i class="fas fa-exclamation-circle ms-1 fs-7"></i>
-                                                            </a>
-                                                        </label>
-                                                        <!--end::Label-->
-                                                        <!--begin::Col-->
-                                                        <div class="col-lg-8 fv-row">
-                                                            <select name="certif" aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
-                                                                    class="form-select form-select-solid form-select-lg fw-bold" required>
-                                                                <option value="">Scegli...</option>
-                                                                <%for (Certificazione ce : elc) {%>
-                                                                <option value="<%=ce.getCodice()%>"><%=ce.getNome()%></option>
-                                                                <%}%>
-                                                            </select>
-                                                        </div>
-                                                        <!--end::Col-->
-                                                    </div>
-                                                    <div class="row mb-6">
-                                                        <!--begin::Label-->
                                                         <label class="col-lg-4 col-form-label required fw-bold fs-6">Durata Complessiva in Giorni</label>
                                                         <!--end::Label-->
                                                         <!--begin::Col-->
@@ -217,7 +282,7 @@
                                                             <div class="row">
                                                                 <!--begin::Col-->
                                                                 <div class="col-lg-12 fv-row">
-                                                                    <input type="text" name="duratagiorni" 
+                                                                    <input type="text" name="duratagiorni" id="duratagiorni"
                                                                            class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 numbR" 
                                                                            placeholder="000" required/>
                                                                 </div>
@@ -239,7 +304,7 @@
                                                             <div class="row">
                                                                 <!--begin::Col-->
                                                                 <div class="col-lg-12 fv-row">
-                                                                    <input type="text" name="stageore" 
+                                                                    <input type="text" name="stageore" id="stageore"
                                                                            class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 numbR" 
                                                                            placeholder="000" required/>
                                                                 </div>
@@ -404,43 +469,7 @@
         <script src="assets/js/custom/utilities/modals/create-campaign.js"></script>
         <script src="assets/js/custom/utilities/modals/users-search.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
-
-        <script type="text/javascript">
-            Inputmask({
-                "placeholder": "000",
-                "mask": "9",
-                "repeat": 4,
-                "greedy": false
-            }).mask(".numbR");
-
-            function controllaINS() {
-                const errorMessageEL =
-                        '<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Attenzione</strong> La percentuale di ore in eLearning non rientra nel range previsto dal corso (0-30%). Inserire un valore in questo range.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi avviso"></div>';
-                const errorMessageAL =
-                        '<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Attenzione</strong> Il Numero allievi indicato non rientra nel range previsto (1-20). Inserire un valore in questo range.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi avviso"></div>';
-
-                var elearning = $("#stageore").val();
-                var numeroallievi = $("#numeroallievi").val();
-                if (elearning > 30) {
-                    $('errorMsgContainer').alert();
-                    const errorWrapper = document.querySelector('#errorMsgContainer');
-                    errorWrapper.innerHTML = '';
-                    errorWrapper.innerHTML = errorMessageEL;
-                    errorWrapper.scrollIntoView();
-                    return false;
-                } else if (numeroallievi > 20) {
-                    $('errorMsgContainer').alert();
-                    const errorWrapper = document.querySelector('#errorMsgContainer');
-                    errorWrapper.innerHTML = '';
-                    errorWrapper.innerHTML = errorMessageAL;
-                    errorWrapper.scrollIntoView();
-                    return false;
-                }
-
-                return true;
-
-            }
-        </script>
+        <script src="assets/js/US_nuovocorso.js"></script>
         <!--end::Page Custom Javascript-->
         <!--end::Javascript-->
     </body>

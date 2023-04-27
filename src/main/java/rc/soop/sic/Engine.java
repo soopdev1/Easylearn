@@ -11,6 +11,8 @@ import rc.soop.sic.jpa.Certificazione;
 import rc.soop.sic.jpa.EntityOp;
 import static rc.soop.sic.jpa.EntityOp.trackingAction;
 import rc.soop.sic.jpa.Livello_Certificazione;
+import rc.soop.sic.jpa.Repertorio;
+import rc.soop.sic.jpa.Scheda_Attivita;
 
 /**
  *
@@ -18,6 +20,16 @@ import rc.soop.sic.jpa.Livello_Certificazione;
  */
 public class Engine {
 
+    public static List<Repertorio> repertorio_completo() {
+        List<Repertorio> all = (List<Repertorio>) new EntityOp().findAll(Repertorio.class);
+        return all;
+    }
+    
+    public static List<Scheda_Attivita> repertorio_completo_scheda() {
+        List<Scheda_Attivita> all = (List<Scheda_Attivita>) new EntityOp().findAll(Scheda_Attivita.class);
+        return all;
+    }
+    
     public static List<Certificazione> elenco_certificazioni() {
         List<Certificazione> all = (List<Certificazione>) new EntityOp().findAll(Certificazione.class);
         return all;

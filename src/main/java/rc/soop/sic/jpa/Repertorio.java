@@ -19,6 +19,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import net.bytebuddy.build.ToStringPlugin;
 
 /**
  *
@@ -44,6 +45,7 @@ public class Repertorio implements Serializable {
     @JoinTable(name = "repertorio_professioni",
             joinColumns = @JoinColumn(name = "idrepertorio"),
             inverseJoinColumns = @JoinColumn(name = "codiceprofessioni"))
+    @ToStringPlugin.Exclude
     private List<Professioni> professioni;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -74,8 +76,7 @@ public class Repertorio implements Serializable {
             joinColumns = @JoinColumn(name = "idrepertorio"),
             inverseJoinColumns = @JoinColumn(name = "idattivita"))
     private List<Attivita> processolavoro;
-    
-    
+
     @Column(name = "durataprovafinale")
     private String durataprovafinale;
 
@@ -86,7 +87,6 @@ public class Repertorio implements Serializable {
     @JoinColumn(name = "idschedaattivita")
     private List<Scheda_Attivita> attivitadestinatariassociate;
 
-    
     //
     @Column(name = "normativarif")
     private String normativarif;
@@ -245,7 +245,21 @@ public class Repertorio implements Serializable {
     public void setAttivitadestinatariassociate(List<Scheda_Attivita> attivitadestinatariassociate) {
         this.attivitadestinatariassociate = attivitadestinatariassociate;
     }
-    
-    
 
+    @Override
+    public String toString() {
+        StringBuilder prof_string = new StringBuilder();
+        this.professioni.forEach(p1 -> {
+            prof_string.append(p1.getCodiceProfessioni()).append(" - ").append(p1.getNome()).append("<br>");
+        });
+        return new StringBuilder()
+                .append("{")
+                .append("\"").append("area").append("\"").append(":").append("\"").append(this.areaprofessionale).append("\"").append(",")
+                .append("\"").append("sottoarea").append("\"").append(":").append("\"").append(this.sottoareaprofessionale).append("\"").append(",")
+                .append("\"").append("livelloeqf").append("\"").append(":").append("\"").append(this.livelloeqf.getNome()).append("\"").append(",")
+                .append("\"").append("certificazione").append("\"").append(":").append("\"").append(this.qualificarilasciata.getNome()).append("\"").append(",")
+                .append("\"").append("professioni").append("\"").append(":").append("\"").append(prof_string.toString()).append("\"")
+                .append("}")
+                .toString();
+    }
 }

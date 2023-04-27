@@ -21,10 +21,12 @@
                 boolean istanzaaccettata = false;
                 boolean istanzarigettata = false;
                 if (i1 != null) {
-                    istanzaok = i1.getStatocorso().getCodice().equals("02");
-                    istanzapresentata = i1.getStatocorso().getCodice().equals("07") || i1.getStatocorso().getCodice().equals("08") || i1.getStatocorso().getCodice().equals("09");
-                    istanzaaccettata = i1.getStatocorso().getCodice().equals("08");
-                    istanzarigettata = i1.getStatocorso().getCodice().equals("09");
+                    istanzaok = i1.getStatocorso().getCodicestatocorso().equals("02");
+                    istanzapresentata = i1.getStatocorso().getCodicestatocorso().equals("07") 
+                || i1.getStatocorso().getCodicestatocorso().equals("08") 
+                || i1.getStatocorso().getCodicestatocorso().equals("09");
+                    istanzaaccettata = i1.getStatocorso().getCodicestatocorso().equals("08");
+                    istanzarigettata = i1.getStatocorso().getCodicestatocorso().equals("09");
                     corsi_attuali = i1.getQuantitarichiesta();
                 } else {
                     i1 = new Istanza();

@@ -4,9 +4,14 @@
  */
 package rc.soop.servlet;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import static java.lang.String.format;
 import java.nio.file.Files;
 import java.util.Iterator;
@@ -47,6 +52,8 @@ import rc.soop.sic.jpa.EntityOp;
 import rc.soop.sic.jpa.Istanza;
 import rc.soop.sic.jpa.Livello_Certificazione;
 import rc.soop.sic.jpa.Path;
+import rc.soop.sic.jpa.Repertorio;
+import rc.soop.sic.jpa.Scheda_Attivita;
 import rc.soop.sic.jpa.Sede;
 import rc.soop.sic.jpa.SoggettoProponente;
 import rc.soop.sic.jpa.User;
@@ -440,6 +447,24 @@ public class Operations extends HttpServlet {
         }
     }
 
+    protected void SCELTAREPERTORIO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Repertorio re = new EntityOp().getEm().find(Repertorio.class, Long.valueOf(getRequestValue(request, "val")));
+        if (re != null) {
+
+            Scheda_Attivita sa = new EntityOp().getEm().find(Scheda_Attivita.class, Long.valueOf(getRequestValue(request, "val_att")));
+            if (sa != null) {
+                try (PrintWriter pw = response.getWriter()) {
+                    pw.print(re.toString() + "@@@" + sa.toString());
+                }
+            } else {
+
+            }
+        } else {
+
+        }
+
+    }
+
     protected void ADDCORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         try {
@@ -509,6 +534,9 @@ public class Operations extends HttpServlet {
             response.setContentType("text/html;charset=UTF-8");
             String type = request.getParameter("type");
             switch (type) {
+                case "SCELTAREPERTORIO":
+                    SCELTAREPERTORIO(request, response);
+                    break;
                 case "ADDCORSO":
                     ADDCORSO(request, response);
                     break;

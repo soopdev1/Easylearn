@@ -173,5 +173,45 @@ public class Scheda_Attivita implements Serializable {
         this.repertorio = repertorio;
     }
 
-    
+    @Override
+    public String toString() {
+
+        StringBuilder elelabel = new StringBuilder();
+
+        if (this.oreelearningemassime_perc > 0) {
+            elelabel.append("\"").append("MIN ")
+                    .append(this.oreelearningeminime_perc).append(" - MAX ").append(this.oreelearningemassime_perc)
+                    .append("\"");
+        } else {
+            elelabel.append("\"").append("NO")
+                    .append("\"");
+        }
+
+        StringBuilder stagelabel = new StringBuilder();
+
+        if (this.orestagemassime_num > 0) {
+            stagelabel.append("\"").append("MIN ")
+                    .append(this.orestageminime_num).append(" - MAX ").append(this.orestagemassime_num)
+                    .append("\"");
+        } else {
+            stagelabel.append("\"").append("NO")
+                    .append("\"");
+        }
+
+        return new StringBuilder()
+                .append("{")
+                .append("\"").append("oremax").append("\"").append(":").append(this.orecorsomassime_num).append(",")
+                .append("\"").append("oremin").append("\"").append(":").append(this.orecorsominime_num).append(",")
+                .append("\"").append("elemax").append("\"").append(":").append(this.oreelearningemassime_perc).append(",")
+                .append("\"").append("elemin").append("\"").append(":").append(this.oreelearningeminime_perc).append(",")
+                .append("\"").append("stagemax").append("\"").append(":").append(this.orestagemassime_num).append(",")
+                .append("\"").append("stagemin").append("\"").append(":").append(this.orestageminime_num).append(",")
+                .append("\"").append("assenzemax").append("\"").append(":").append(this.oreassenzamassime_perc).append(",")
+                .append("\"").append("orelabel").append("\"").append(":").append("\"").append("MIN ").append(this.orecorsominime_num).append(" - MAX ").append(this.orecorsomassime_num).append("\"").append(",")
+                .append("\"").append("stagelabel").append("\"").append(":").append(stagelabel.toString()).append(",")
+                .append("\"").append("elelabel").append("\"").append(":").append(elelabel.toString())
+                .append("}")
+                .toString();
+    }
+
 }
