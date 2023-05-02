@@ -4,10 +4,6 @@
  */
 package rc.soop.servlet;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -28,8 +24,6 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.joda.time.DateTime;
-import rc.soop.sic.Constant;
-import static rc.soop.sic.Constant.LOGGER;
 import static rc.soop.sic.Constant.PATTERNDATE3;
 import static rc.soop.sic.Constant.PATTERNDATE4;
 import static rc.soop.sic.Constant.PATTERNDATE5;
@@ -483,7 +477,7 @@ public class Operations extends HttpServlet {
                 is = new Istanza();
                 is.setProtocollosoggetto(getRequestValue(request, "protnum"));
                 is.setProtocollosoggettodata(new DateTime().toString(PATTERNDATE4));
-                is.setCodice(codiceis);
+                is.setCodiceistanza(codiceis);
                 is.setSoggetto(so);
                 is.setStatocorso(e.getEm().find(CorsoStato.class, "01"));
                 is.setQuantitarichiesta(parseIntR(getRequestValue(request, "quantitarichiesta")));
@@ -497,14 +491,16 @@ public class Operations extends HttpServlet {
             c.setNumeroallievi(parseIntR(getRequestValue(request, "numeroallievi")));
             c.setElearningperc(parseIntR(getRequestValue(request, "stageore")));
             c.setReq1(getRequestValue(request, "req1"));
-            c.setIstat(getRequestValue(request, "istat"));
+            String splitvalue_rep = getRequestValue(request, "istat");
+            c.setRepertorio(e.getEm().find(Repertorio.class, Long.valueOf(splitvalue_rep.split(";")[0])));
+            c.setSchedaattivita(e.getEm().find(Scheda_Attivita.class, Long.valueOf(splitvalue_rep.split(";")[1])));
             c.setSoggetto(so);
             c.setCertif(e.getEm().find(Certificazione.class, getRequestValue(request, "certif")));
             c.setLivellocertif(e.getEm().find(Livello_Certificazione.class, getRequestValue(request, "levelcertif")));
             c.setSedescelta(e.getEm().find(Sede.class, parseLongR(getRequestValue(request, "sedescelta"))));
             c.setQuantitarichiesta(parseIntR(getRequestValue(request, "quantitarichiesta")));
             c.setStatocorso(e.getEm().find(CorsoStato.class, "01"));
-            c.setCodiceistanza(codiceis);
+            c.setIstanza(is);
             e.persist(c);
             e.flush();
             e.commit();

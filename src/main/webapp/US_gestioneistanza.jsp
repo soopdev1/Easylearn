@@ -4,6 +4,10 @@
     Author     : raf
 --%>
 
+<%@page import="java.util.ArrayList"%>
+<%@page import="rc.soop.sic.jpa.Corso"%>
+<%@page import="java.util.List"%>
+<%@page import="rc.soop.sic.jpa.EntityOp"%>
 <%@page import="rc.soop.sic.jpa.Istanza"%>
 <%@page import="rc.soop.sic.Utils"%>
 <%@page import="rc.soop.sic.Constant"%>
@@ -15,16 +19,19 @@
         switch (verifysession) {
             case 1: {
                 Istanza i1 = (Istanza) session.getAttribute("is_memory");
+
                 int corsi_attuali = 0;
                 boolean istanzaok = false;
                 boolean istanzapresentata = false;
                 boolean istanzaaccettata = false;
                 boolean istanzarigettata = false;
+                List<Corso> c1 = new ArrayList<>();
                 if (i1 != null) {
+                    c1 = new EntityOp().getCorsiIstanza(i1);
                     istanzaok = i1.getStatocorso().getCodicestatocorso().equals("02");
-                    istanzapresentata = i1.getStatocorso().getCodicestatocorso().equals("07") 
-                || i1.getStatocorso().getCodicestatocorso().equals("08") 
-                || i1.getStatocorso().getCodicestatocorso().equals("09");
+                    istanzapresentata = i1.getStatocorso().getCodicestatocorso().equals("07")
+                            || i1.getStatocorso().getCodicestatocorso().equals("08")
+                            || i1.getStatocorso().getCodicestatocorso().equals("09");
                     istanzaaccettata = i1.getStatocorso().getCodicestatocorso().equals("08");
                     istanzarigettata = i1.getStatocorso().getCodicestatocorso().equals("09");
                     corsi_attuali = i1.getQuantitarichiesta();
@@ -126,11 +133,13 @@
                                                                 <td>
                                                                     <a href="#" class="text-dark fw-bolder text-hover-primary mb-1 fs-6" 
                                                                        data-bs-toggle="tooltip" data-bs-placement="top" 
-                                                                       title="Aggiungi Nuovo Corso">
+                                                                       title="Istanza pronta - Clicca per aggiungere nuovo corso">
                                                                         1) Elenco Corsi di Formazione
                                                                     </a>
                                                                 </td>                                                                
-                                                                <td class="text-end fw-bold" colspan="2">ISTANZA PRONTA: Corsi Attuali - <%=corsi_attuali%></td>                                                                
+                                                                <td class="text-end fw-bold" colspan="2">
+                                                                    ISTANZA PRONTA: Corsi Attualmente presenti: <%=c1.size()%><br/>
+                                                                </td>
                                                             </tr>
 
                                                             <%if (i1.getPathfirmato() == null) {%>
@@ -152,12 +161,12 @@
                                                                 <td class="text-end text-muted fw-bold" colspan="1">
                                                                     <form action="Operations" method="POST" target="_blank">
                                                                         <input type="hidden" name="type" value="GENERAISTANZA" />
-                                                                        <input type="hidden" name="codice_istanza" value="<%=i1.getCodice()%>" />
+                                                                        <input type="hidden" name="codice_istanza" value="<%=i1.getCodiceistanza()%>" />
                                                                         <button type="submit" class="btn btn-sm btn-bg-light btn-primary"><i class="fa fa-file-download"></i> GENERA DOCUMENTO</button>
                                                                     </form>
                                                                 </td>
                                                                 <td class="text-end text-muted fw-bold" colspan="1">
-                                                                    <a href="US_upload.jsp?codice_istanza=<%=i1.getCodice()%>" data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%' 
+                                                                    <a href="US_upload.jsp?codice_istanza=<%=i1.getCodiceistanza()%>" data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%' 
                                                                        class="btn btn-sm btn-bg-light btn-danger fan1">
                                                                         <i class="fa fa-file-upload"></i> CARICA DOCUMENTO FIRMATO</a>
                                                                 </td>
@@ -187,7 +196,7 @@
                                                                     <%}%>
                                                                     <form action="Operations" method="POST" target="_blank">
                                                                         <input type="hidden" name="type" value="SCARICAISTANZAFIRMATA" />
-                                                                        <input type="hidden" name="codice_istanza" value="<%=i1.getCodice()%>" />
+                                                                        <input type="hidden" name="codice_istanza" value="<%=i1.getCodiceistanza()%>" />
                                                                         <button type="submit" class="btn btn-sm btn-bg-light btn-primary"><i class="fa fa-file-download"></i> VISUALIZZA DOCUMENTO FIRMATO</button>
                                                                     </form>
                                                                 </td>
@@ -195,7 +204,7 @@
                                                                 <td class="text-end text-muted fw-bold" colspan="1">
                                                                     <form action="Operations" method="POST" >
                                                                         <input type="hidden" name="type" value="ELIMINAISTANZAFIRMATA" />
-                                                                        <input type="hidden" name="codice_istanza" value="<%=i1.getCodice()%>" />
+                                                                        <input type="hidden" name="codice_istanza" value="<%=i1.getCodiceistanza()%>" />
                                                                         <button type="submit" class="btn btn-sm btn-bg-light btn-danger"><i class="fa fa-remove"></i> ELIMINA DOCUMENTO FIRMATO</button>
                                                                     </form>
                                                                 </td>
@@ -218,7 +227,7 @@
                                                                 <td colspan="4">
                                                                     <form action="Operations" method="POST">
                                                                         <input type="hidden" name="type" value="SENDISTANZA" />
-                                                                        <input type="hidden" name="codice_istanza" value="<%=i1.getCodice()%>" />
+                                                                        <input type="hidden" name="codice_istanza" value="<%=i1.getCodiceistanza()%>" />
                                                                         <button type="submit" 
                                                                                 class="btn btn-bg-light btn-success" style="width: 100%;"><i class="fa fa-arrow-right"></i> INVIA ISTANZA</button>
                                                                     </form>
@@ -232,11 +241,11 @@
                                                                     <div class="alert alert-success">
                                                                         <i class="fa fa-info-circle"></i> Istanza <b>ACCETTATA</b> in data <b><%=i1.getDatagestione()%></b> &nbsp;
                                                                         <a href="#" class="btn btn-sm btn-bg-light btn-success" data-bs-toggle='tooltip' title='VISUALIZZA DECRETO' 
-                                                                           onclick="return document.forms['decr_<%=i1.getCodice()%>'].submit();">
+                                                                           onclick="return document.forms['decr_<%=i1.getCodiceistanza()%>'].submit();">
                                                                             <i class="fa fa-file-pdf"></i></a>
-                                                                        <form action="Operations" method="POST" target="_blank" name="decr_<%=i1.getCodice()%>">
+                                                                        <form action="Operations" method="POST" target="_blank" name="decr_<%=i1.getCodiceistanza()%>">
                                                                             <input type="hidden" name="type" value="SCARICADECRETOISTANZA" />
-                                                                            <input type="hidden" name="codice_istanza" value="<%=i1.getCodice()%>" />
+                                                                            <input type="hidden" name="codice_istanza" value="<%=i1.getCodiceistanza()%>" />
                                                                         </form>
                                                                     </div>
                                                                 </td>
@@ -259,17 +268,41 @@
                                                                 <td>
                                                                     <a href="US_compilacorsi.jsp" class="text-dark fw-bolder text-hover-primary mb-1 fs-6" 
                                                                        data-bs-toggle="tooltip" data-bs-placement="top" 
-                                                                       title="Istanza Pronta">
+                                                                       title="Aggiungi Nuovo Corso">
                                                                         1) Elenco Corsi di Formazione
                                                                     </a>
                                                                 </td>                                                                
-                                                                <td class="text-end text-muted fw-bold" colspan="2">Corsi Attuali - <%=corsi_attuali%></td>
+                                                                <td class="text-end text-muted fw-bold" colspan="2">Corsi Attualmente presenti (max 5):
+                                                                    <%for (Corso cor : c1) {%>
+                                                                    <br/><%=cor.getRepertorio().getDenominazione()%> - <%=cor.getSchedaattivita().getTipologiapercorso()%> - Richiesti: <%=cor.getQuantitarichiesta()%>
+                                                                    <%}%>
+                                                                </td>
                                                                 <td class="text-end text-muted fw-bold" colspan="1">
                                                                     <%if (corsi_attuali > 0) {%>
-                                                                    <form action="Operations" method="POST">
+
+                                                                    <a onclick="return $('#save_inst').submit();"
+                                                                        class="btn btn-icon btn-bg-light btn-success"
+                                                                            data-bs-toggle="tooltip" data-bs-placement="top" 
+                                                                            title="Salva Istanza"
+                                                                            ><i class="fa fa-save"></i>
+                                                                    </a>
+                                                                    
+                                                                    <a onclick="return $('#del_inst').submit();"
+                                                                       class="btn btn-icon btn-bg-light btn-danger"
+                                                                            data-bs-toggle="tooltip" data-bs-placement="top" 
+                                                                            title="Elimina dati inseriti Istanza"
+                                                                            ><i class="fa fa-remove"></i>
+                                                                    </a>
+
+
+
+                                                                    <form action="Operations" method="POST" id="save_inst">
                                                                         <input type="hidden" name="type" value="SALVACORSI" />
-                                                                        <input type="hidden" name="codice_istanza" value="<%=i1.getCodice()%>" />
-                                                                        <button type="submit" class="btn btn-sm btn-bg-light btn-success"><i class="fa fa-save"></i> Salva </button>
+                                                                        <input type="hidden" name="codice_istanza" value="<%=i1.getCodiceistanza()%>" />
+                                                                    </form>
+                                                                    <form action="Operations" method="POST" id="del_inst">
+                                                                        <input type="hidden" name="type" value="DELISTANZA" />
+                                                                        <input type="hidden" name="codice_istanza" value="<%=i1.getCodiceistanza()%>" />
                                                                     </form>
                                                                     <%} else {%>
                                                                     <a onclick="return false;" 

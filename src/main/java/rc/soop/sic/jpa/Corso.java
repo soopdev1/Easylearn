@@ -22,7 +22,7 @@ import javax.persistence.Table;
  */
 
 @NamedQueries(value = {
-    @NamedQuery(name = "corso.istanza", query = "SELECT c FROM Corso c WHERE c.soggetto=:soggetto AND c.codiceistanza=:codiceistanza"),
+    @NamedQuery(name = "corso.istanza", query = "SELECT c FROM Corso c WHERE c.istanza=:codiceistanza"),
 })
 @Entity
 @Table(name = "corso")
@@ -39,8 +39,16 @@ public class Corso implements Serializable {
     @ManyToOne
     @JoinColumn(name = "stato")
     private CorsoStato statocorso;
-    @Column(name = "istat")
-    private String istat;
+    
+    
+    @ManyToOne
+    @JoinColumn(name = "repertorio")
+    private Repertorio repertorio;
+    
+    @ManyToOne
+    @JoinColumn(name = "schedaattivita")
+    private Scheda_Attivita schedaattivita;
+    
     @ManyToOne
     @JoinColumn(name = "codicecertif")
     private Certificazione certif;
@@ -69,8 +77,9 @@ public class Corso implements Serializable {
     @JoinColumn(name = "idsede")
     private Sede sedescelta;
 
-    @Column(name = "codiceistanza")
-    private String codiceistanza;
+    @ManyToOne
+    @JoinColumn(name = "istanza")
+    private Istanza istanza;
 
     public Corso() {
     }
@@ -99,14 +108,24 @@ public class Corso implements Serializable {
         this.statocorso = statocorso;
     }
 
-    public String getIstat() {
-        return istat;
+    public Repertorio getRepertorio() {
+        return repertorio;
     }
 
-    public void setIstat(String istat) {
-        this.istat = istat;
+    public void setRepertorio(Repertorio repertorio) {
+        this.repertorio = repertorio;
     }
 
+    public Scheda_Attivita getSchedaattivita() {
+        return schedaattivita;
+    }
+
+    public void setSchedaattivita(Scheda_Attivita schedaattivita) {
+        this.schedaattivita = schedaattivita;
+    }
+
+    
+    
     public Certificazione getCertif() {
         return certif;
     }
@@ -179,13 +198,17 @@ public class Corso implements Serializable {
         this.quantitarichiesta = quantitarichiesta;
     }
 
-    public String getCodiceistanza() {
-        return codiceistanza;
+    public Istanza getIstanza() {
+        return istanza;
     }
 
-    public void setCodiceistanza(String codiceistanza) {
-        this.codiceistanza = codiceistanza;
+    public void setIstanza(Istanza istanza) {
+        this.istanza = istanza;
     }
+
+    
+
+    
 
     public int getElearningperc() {
         return elearningperc;

@@ -4,6 +4,10 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.EntityOp"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="rc.soop.sic.jpa.Corso"%>
+<%@page import="rc.soop.sic.jpa.Istanza"%>
 <%@page import="rc.soop.sic.jpa.Scheda_Attivita"%>
 <%@page import="rc.soop.sic.jpa.Repertorio"%>
 <%@page import="rc.soop.sic.jpa.Sede"%>
@@ -21,10 +25,19 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
-                List<Repertorio> repert = Engine.repertorio_completo();
                 List<Scheda_Attivita> sche1 = Engine.repertorio_completo_scheda();
 
                 User u1 = (User) session.getAttribute("us_memory");
+
+                Istanza i1 = (Istanza) session.getAttribute("is_memory");
+
+                int maxrichiesta = 5;
+                List<Corso> c1 = new ArrayList<>();
+                if (i1 != null) {
+                    c1 = new EntityOp().getCorsiIstanza(i1);
+                    maxrichiesta = maxrichiesta - i1.getQuantitarichiesta();
+                }
+
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -60,38 +73,7 @@
                     <!--begin::Content wrapper-->
                     <div class="d-flex flex-column-fluid">
                         <!--begin::Aside-->
-                        <div id="kt_aside" class="aside card" data-kt-drawer="true" data-kt-drawer-name="aside" 
-                             data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="{default:'200px', '300px': '250px'}" data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_aside_toggle">
-                            <!--begin::Aside menu-->
-                            <div class="aside-menu flex-column-fluid px-5">
-                                <!--begin::Aside Menu-->
-                                <div class="hover-scroll-overlay-y my-5 pe-4 me-n4" id="kt_aside_menu_wrapper" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-height="auto" data-kt-scroll-dependencies="#kt_header, #kt_aside_footer" data-kt-scroll-wrappers="#kt_aside, #kt_aside_menu" data-kt-scroll-offset="{lg: '75px'}">
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-column menu-rounded fw-bold fs-6" id="#kt_aside_menu" data-kt-menu="true">
-                                        <div data-kt-menu-trigger="click" class="menu-item here show menu-accordion">
-                                            <span class="menu-link">
-                                                <span class="menu-icon">
-                                                    <!--begin::Svg Icon | path: icons/duotune/general/gen025.svg-->
-                                                    <span class="svg-icon svg-icon-2">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                                        <rect x="2" y="2" width="9" height="9" rx="2" fill="black" />
-                                                        <rect opacity="0.3" x="13" y="2" width="9" height="9" rx="2" fill="black" />
-                                                        <rect opacity="0.3" x="13" y="13" width="9" height="9" rx="2" fill="black" />
-                                                        <rect opacity="0.3" x="2" y="13" width="9" height="9" rx="2" fill="black" />
-                                                        </svg>
-                                                    </span>
-                                                    <!--end::Svg Icon-->
-                                                </span>
-                                                <span class="menu-title" >Dashboard</span>
-                                                </aspan>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!--end::Aside menu-->
-                            <!--begin::Footer-->
-                            <!--end::Footer-->
-                        </div>
+                        <jsp:include page="menu/menuUS2.jsp" /> 
                         <!--end::Aside-->
                         <!--begin::Container-->
                         <div class="d-flex flex-column flex-column-fluid container-fluid">
@@ -113,7 +95,6 @@
                                                     <span class="card-label fw-bolder fs-3 mb-1">Compila nuovo corso di formazione</span>
                                                     <span class="text-muted mt-1 fw-bold fs-7">Istanza di autorizzazione allo svolgimento di corsi di formazione professionale autofinanziati</span>
                                                 </h3>
-
                                             </div>
                                             <!--end::Header-->
                                             <!--begin::Body-->
@@ -126,7 +107,8 @@
                                                         <!--begin::Label-->
                                                         <label class="col-lg-4 col-form-label fw-bold fs-6" >
                                                             <span class="required">Seleziona Corso da Repertorio</span>
-                                                            <a onclick="return false;" data-bs-toggle="tooltip" data-bs-placement="top" title="Selezione nuovo codice dall'elenco">
+                                                            <a onclick="return false;" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                                               title="Selezione nuovo corso dall'elenco">
                                                                 <i class="fas fa-exclamation-circle ms-1 fs-7"></i>
                                                             </a>
                                                         </label>
@@ -140,10 +122,19 @@
                                                                     id="repertoriochoice"
                                                                     required onchange="return selezionaCorso();">
                                                                 <option value="">Scegli...</option>                                                                
-                                                                <%for (Scheda_Attivita sa : sche1) {%>
+                                                                <%for (Scheda_Attivita sa : sche1) {
+                                                                        boolean ok = true;
+                                                                        for (Corso cor : c1) {
+                                                                            if (cor.getSchedaattivita().getIdschedaattivita().equals(sa.getIdschedaattivita())) {
+                                                                                ok = false;
+                                                                            }
+                                                                        }
+                                                                        if (ok) {
+                                                                %>
                                                                 <option value="<%=sa.getRepertorio().getIdrepertorio()%>;<%=sa.getIdschedaattivita()%>" >
                                                                     <%=sa.getRepertorio().getDenominazione()%> - <%=sa.getTipologiapercorso()%>
                                                                 </option>
+                                                                <%}%>
                                                                 <%}%>
                                                             </select>
                                                         </div>
@@ -192,7 +183,7 @@
                                                                 <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_cert">
                                                                 </label>
                                                             </div>
-                                                            
+
                                                             <div class="row col-lg-12">
                                                                 <label class="col-lg-4 col-form-label fw-bold fs-6" >
                                                                     Ore di corso (ore):
@@ -222,7 +213,7 @@
                                                                        id="cont_label_assmax">
                                                                 </label>
                                                             </div>
-                                                            
+
                                                         </div>
                                                         <!--end::Col-->
                                                     </div>
@@ -253,7 +244,8 @@
                                                         <!--begin::Label-->
                                                         <label class="col-lg-4 col-form-label fw-bold fs-6" >
                                                             <span class="required">Numero Edizioni</span>
-                                                            <a onclick="return false;" data-bs-toggle="tooltip" data-bs-placement="top" title="Selezione nuovo codice dall'elenco">
+                                                            <a onclick="return false;" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                                               title="Selezione il numero di edizioni richieste (Max 5 ad istanza)">
                                                                 <i class="fas fa-exclamation-circle ms-1 fs-7"></i>
                                                             </a>
                                                         </label>
@@ -263,11 +255,10 @@
                                                             <select name="quantitarichiesta" aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
                                                                     class="form-select form-select-solid form-select-lg fw-bold" required>
                                                                 <option value="">Scegli...</option>
-                                                                <option value="1">1</option>
-                                                                <option value="2">2</option>
-                                                                <option value="3">3</option>
-                                                                <option value="4">4</option>
-                                                                <option value="5">5</option>
+
+                                                                <%for (int i = 1; i <= maxrichiesta; i++) {%>
+                                                                <option value="<%=i%>"><%=i%></option>
+                                                                <%}%>
                                                             </select>
                                                         </div>
                                                         <!--end::Col-->
@@ -365,7 +356,8 @@
                                                         <!--begin::Label-->
                                                         <label class="col-lg-4 col-form-label fw-bold fs-6" >
                                                             <span class="required">Sede formativa scelta</span>
-                                                            <a onclick="return false;" data-bs-toggle="tooltip" data-bs-placement="top" title="Selezione nuovo codice dall'elenco">
+                                                            <a onclick="return false;" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                                               title="Selezione sede dall'elenco">
                                                                 <i class="fas fa-exclamation-circle ms-1 fs-7"></i>
                                                             </a>
                                                         </label>
@@ -393,6 +385,9 @@
                                                     </div>
                                                     <hr>
                                                     <p class="mb-0">
+                                                        <a href="US_gestioneistanza.jsp" class="btn btn-dark btn-circled btn-hover-rise" >
+                                                            <i class="fa fa-backward"></i> Indietro
+                                                        </a>
                                                         <button type="submit" class="btn btn-primary btn-circled btn-hover-rise">
                                                             <i class="fa fa-save"></i> SALVA DATI
                                                         </button>

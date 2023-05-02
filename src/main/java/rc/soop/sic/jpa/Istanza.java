@@ -21,8 +21,8 @@ import javax.persistence.Table;
  * @author Raffaele
  */
 @NamedQueries(value = {
-    @NamedQuery(name = "istanza.codice", query = "SELECT i FROM Istanza i WHERE i.soggetto=:soggetto AND i.codice=:codice"),
-    @NamedQuery(name = "istanza.onlycodice", query = "SELECT i FROM Istanza i WHERE i.codice=:codice"),
+    @NamedQuery(name = "istanza.codice", query = "SELECT i FROM Istanza i WHERE i.soggetto=:soggetto AND i.codiceistanza=:codice"),
+    @NamedQuery(name = "istanza.onlycodice", query = "SELECT i FROM Istanza i WHERE i.codiceistanza=:codice"),
     @NamedQuery(name = "istanza.soggettowaiting", query = "SELECT i FROM Istanza i WHERE i.soggetto=:soggetto AND i.statocorso.codicestatocorso IN('01','02','07','08','09') ORDER BY i.idistanza DESC"),
     @NamedQuery(name = "istanza.listaaccettate", query = "SELECT i FROM Istanza i WHERE i.soggetto=:soggetto AND i.statocorso.codicestatocorso IN('08') ORDER BY i.idistanza DESC"),
     @NamedQuery(name = "istanza.dagestire", query = "SELECT i FROM Istanza i WHERE i.statocorso.codicestatocorso IN('07') ORDER BY i.idistanza DESC"),
@@ -38,8 +38,8 @@ public class Istanza implements Serializable {
     @Column(name = "idistanza")
     Long idistanza;
 
-    @Column(name = "codice")
-    private String codice;
+    @Column(name = "codiceistanza")
+    private String codiceistanza;
 
     @ManyToOne
     @JoinColumn(name = "idsoggetto")
@@ -78,12 +78,12 @@ public class Istanza implements Serializable {
         this.idistanza = idistanza;
     }
 
-    public String getCodice() {
-        return codice;
+    public String getCodiceistanza() {
+        return codiceistanza;
     }
 
-    public void setCodice(String codice) {
-        this.codice = codice;
+    public void setCodiceistanza(String codiceistanza) {
+        this.codiceistanza = codiceistanza;
     }
 
     public SoggettoProponente getSoggetto() {

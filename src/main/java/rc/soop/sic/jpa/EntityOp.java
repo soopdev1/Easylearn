@@ -113,8 +113,7 @@ public class EntityOp {
 
     public List<Corso> getCorsiIstanza(Istanza is) {
         TypedQuery q = em.createNamedQuery("corso.istanza", Istanza.class);
-        q.setParameter("soggetto", is.getSoggetto());
-        q.setParameter("codiceistanza", is.getCodice());
+        q.setParameter("codiceistanza", is);
         return (List<Corso>) q.getResultList();
     }
 

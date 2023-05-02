@@ -512,10 +512,10 @@ public class Pdf {
 
             createDir(pathtemp.getDescrizione());
 
-            File pdfOut_part1 = new File(pathtemp.getDescrizione() + "ISTANZA" + "_" + ista1.getCodice() + "_" + datael.toString(PATTERNDATE3) + ".I1.pdf");
-            File pdfOut_part2 = new File(pathtemp.getDescrizione() + "ISTANZA" + "_" + ista1.getCodice() + "_" + datael.toString(PATTERNDATE3) + ".I2.pdf");
-            File pdfOut_part3 = new File(pathtemp.getDescrizione() + "ISTANZA" + "_" + ista1.getCodice() + "_" + datael.toString(PATTERNDATE3) + ".I3.pdf");
-            File pdfOut_part4 = new File(pathtemp.getDescrizione() + "ISTANZA" + "_" + ista1.getCodice() + "_" + datael.toString(PATTERNDATE3) + ".I4.pdf");
+            File pdfOut_part1 = new File(pathtemp.getDescrizione() + "ISTANZA" + "_" + ista1.getCodiceistanza()+ "_" + datael.toString(PATTERNDATE3) + ".I1.pdf");
+            File pdfOut_part2 = new File(pathtemp.getDescrizione() + "ISTANZA" + "_" + ista1.getCodiceistanza() + "_" + datael.toString(PATTERNDATE3) + ".I2.pdf");
+            File pdfOut_part3 = new File(pathtemp.getDescrizione() + "ISTANZA" + "_" + ista1.getCodiceistanza() + "_" + datael.toString(PATTERNDATE3) + ".I3.pdf");
+            File pdfOut_part4 = new File(pathtemp.getDescrizione() + "ISTANZA" + "_" + ista1.getCodiceistanza() + "_" + datael.toString(PATTERNDATE3) + ".I4.pdf");
             try (InputStream is = new FileInputStream(template_part1.getDescrizione()); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut_part1); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
                 form.setGenerateAppearance(true);
@@ -618,7 +618,7 @@ public class Pdf {
 
             }
 
-            File pdfOut_FINAL = new File(pathtemp.getDescrizione() + "ISTANZA" + "_" + ista1.getCodice() + "_" + datael.toString(PATTERNDATE3) + ".IF.pdf");
+            File pdfOut_FINAL = new File(pathtemp.getDescrizione() + "ISTANZA" + "_" + ista1.getCodiceistanza() + "_" + datael.toString(PATTERNDATE3) + ".IF.pdf");
             try (PdfDocument pdf = new PdfDocument(new PdfWriter(pdfOut_FINAL))) {
                 PdfMerger merger = new PdfMerger(pdf);
                 PdfDocument firstSourcePdf = new PdfDocument(new PdfReader(pdfOut_part1));
@@ -630,7 +630,7 @@ public class Pdf {
                 PdfDocument foSourcePdf = new PdfDocument(new PdfReader(pdfOut_part4));
                 merger.merge(foSourcePdf, 1, foSourcePdf.getNumberOfPages());
 
-                BarcodeQRCode barcode = new BarcodeQRCode(ista1.getCodice() + " / ISTANZA / "
+                BarcodeQRCode barcode = new BarcodeQRCode(ista1.getCodiceistanza() + " / ISTANZA / "
                         + ista1.getSoggetto().getRap_cf() + "_" + datael.toString(PATTERNDATE3));
                 printbarcode(barcode, pdf);
 
@@ -647,7 +647,7 @@ public class Pdf {
             pdfOut_part4.delete();
 
             try {
-                File fdef = convertPDFA(pdfOut_FINAL, "ISTANZA " + ista1.getCodice());
+                File fdef = convertPDFA(pdfOut_FINAL, "ISTANZA " + ista1.getCodiceistanza());
                 if (fdef != null) {
                     pdfOut_FINAL.delete();
                     return fdef;
@@ -675,7 +675,7 @@ public class Pdf {
 
             createDir(pathtemp.getDescrizione());
 
-            File pdfOut_part1 = new File(pathtemp.getDescrizione() + "DECRETO_APP_" + "_" + ista1.getCodice() + "_" + datael.toString(PATTERNDATE3) + ".D1.pdf");
+            File pdfOut_part1 = new File(pathtemp.getDescrizione() + "DECRETO_APP_" + "_" + ista1.getCodiceistanza() + "_" + datael.toString(PATTERNDATE3) + ".D1.pdf");
 
             try (InputStream is = new FileInputStream(template.getDescrizione()); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut_part1); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
@@ -693,14 +693,14 @@ public class Pdf {
                 });
                 form.flattenFields();
 
-                BarcodeQRCode barcode = new BarcodeQRCode(ista1.getCodice() + " / DECRETOAPPROVATIVO / "
+                BarcodeQRCode barcode = new BarcodeQRCode(ista1.getCodiceistanza() + " / DECRETOAPPROVATIVO / "
                         + ista1.getSoggetto().getRap_cf() + "_" + datael.toString(PATTERNDATE3));
                 printbarcode(barcode, pdfDoc);
 
             }
 
             try {
-                File fdef = convertPDFA(pdfOut_part1, "DECRETOAPPROVATIVO ISTANZA " + ista1.getCodice());
+                File fdef = convertPDFA(pdfOut_part1, "DECRETOAPPROVATIVO ISTANZA " + ista1.getCodiceistanza());
                 if (fdef != null) {
                     pdfOut_part1.delete();
                     System.out.println("tester.T.GENERADECRETOAPPROVATIVO() " + fdef.getPath());
