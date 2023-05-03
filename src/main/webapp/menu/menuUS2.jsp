@@ -56,7 +56,15 @@
                         </span>
                         <span class="menu-title">ISTANZA</span>
                     </span>
-                    <div class="menu-sub menu-sub-accordion  menu-active-bg">
+                    <div class="menu-sub menu-sub-accordion menu-active-bg">
+                        <div class="menu-item">
+                            <a class="menu-link active" href="US_nuovaistanza.jsp">
+                                <span class="menu-bullet ">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title">Nuova Istanza</span>
+                            </a>
+                        </div>
                         <div class="menu-item">
                             <a class="menu-link" href="US_gestioneistanza.jsp">
                                 <span class="menu-bullet">
