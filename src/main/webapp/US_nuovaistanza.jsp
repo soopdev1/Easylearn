@@ -35,6 +35,7 @@
         <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+        <link href="assets/css/plus.css" rel="stylesheet" type="text/css" />
 
         <!--end::Global Stylesheets Bundle-->
     </head>
@@ -67,13 +68,78 @@
                                     <!--begin::Col-->
                                     <div class="col-xl-12">
                                         <!--begin::Tables Widget 3-->
-                                        <div class="card h-xl-100">
-                                            <!--begin::Header-->
-                                            
-                                            <!--end::Header-->
-                                            <!--begin::Body-->
-                                            <!--begin::Body-->
-                                        </div>
+                                        <h1 class="text-center fs-4">Creazione nuova Istanza</h1>
+                                        <form id="signUpForm" action="#!">
+                                            <!-- start step indicators -->
+                                            <div class="form-header d-flex mb-4">
+                                                <span class="stepIndicator">Tipologia Percorso</span>
+                                                <span class="stepIndicator">Seleziona Percorso</span>
+                                                <span class="stepIndicator">Dettagli</span>
+                                            </div>
+                                            <!-- end step indicators -->
+
+                                            <!-- step one -->
+                                            <div class="step">
+                                                <p class="text-center mb-4">Istanza di autorizzazione allo svolgimento di corsi di formazione professionale</p>
+                                                <div class="mb-3">
+                                                    <select aria-label="Scegli..." data-control="select2" 
+                                                            data-placeholder="Scegli Tipologia percorso" 
+                                                            class="form-select form-select-solid form-select-lg fw-bold" 
+                                                            name="scelta"
+                                                            id="scelta"
+                                                            required>
+                                                        <option value="">Scegli...</option>  
+                                                        <option value="A">Percorsi Auto-Finanziati</option>  
+                                                        <option value="B">Percorsi Finanziati Avviso 23/A</option>  
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- step two -->
+                                            <div class="step">
+                                                <p class="text-center mb-4">Your presence on the social network</p>
+                                                <div class="mb-3">
+                                                    <input type="text" placeholder="Linked In" oninput="this.className = ''" name="linkedin">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <input type="text" placeholder="Twitter" oninput="this.className = ''" name="twitter">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <input type="text" placeholder="Facebook" oninput="this.className = ''" name="facebook">
+                                                </div>
+                                            </div>
+
+                                            <!-- step three -->
+                                            <div class="step">
+                                                <p class="text-center mb-4">We will never sell it</p>
+                                                <div class="mb-3">
+                                                    <input type="text" placeholder="Full name" oninput="this.className = ''" name="fullname">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <input type="text" placeholder="Mobile" oninput="this.className = ''" name="mobile">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <input type="text" placeholder="Address" oninput="this.className = ''" name="address">
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <div aria-live="polite" id="errorMsgContainer"></div>
+                                            </div>
+
+                                            <!-- start previous / next buttons -->
+                                            <div class="form-footer d-flex">
+                                                <button type="button" id="prevBtn" onclick="nextPrev(-1)"
+
+                                                        class="btn btn-circled btn-hover-rise"
+                                                        ><i class="fa fa-backward-step"></i> INDIETRO</button>
+                                                <button type="button" id="nextBtn" 
+                                                        onclick="nextPrev(1)" 
+                                                        class="btn btn-circled btn-hover-rise"
+                                                        ><i class="fa fa-forward-step"></i> AVANTI</button>
+                                            </div>
+                                            <!-- end previous / next buttons -->
+                                        </form>
                                         <!--end::Tables Widget 3-->
                                     </div>
                                     <!--end::Col-->
@@ -144,6 +210,7 @@
 
         <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
         <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
+        <script type="text/javascript" src="assets/js/wiz_1.js"></script>
 
 
         <script type="text/javascript">
