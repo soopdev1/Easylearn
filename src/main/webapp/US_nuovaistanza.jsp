@@ -392,7 +392,7 @@
                                                         <div class="row">
                                                             <!--begin::Col-->
                                                             <div class="col-lg-12 fv-row">
-                                                                <input type="text" name="stageore"  id="stageore"
+                                                                <input type="text" name="elearning"  id="elearning"
                                                                        class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 numbR" 
                                                                        placeholder="0-100" required />
                                                             </div>

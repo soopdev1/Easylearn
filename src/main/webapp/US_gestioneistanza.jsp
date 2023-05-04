@@ -74,7 +74,7 @@
                     <!--end::Header-->
                     <!--begin::Content wrapper-->
                     <div class="d-flex flex-column-fluid">
-                        <jsp:include page="menu/menuUS2.jsp" /> 
+                        <jsp:include page="menu/menuUS2_b.jsp" /> 
                         <!--begin::Container-->
                         <div class="d-flex flex-column flex-column-fluid container-fluid">
                             <!--begin::Post-->

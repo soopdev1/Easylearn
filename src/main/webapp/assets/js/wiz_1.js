@@ -110,6 +110,9 @@ function nextPrev(n) {
 }
 
 function validateForm() {
+    var errorWrapper = document.querySelector('#errorMsgContainer');
+    errorWrapper.innerHTML = '';
+    errorWrapper.scrollIntoView();
     var x, y, i, z, valid = true;
     x = document.getElementsByClassName("step");
     y = x[currentTab].getElementsByTagName("input");
@@ -119,9 +122,8 @@ function validateForm() {
             valid = false;
         }
     }
-
     z = x[currentTab].getElementsByTagName("select");
-    for (i = 0; i < z.length; i++) {        
+    for (i = 0; i < z.length; i++) {
         if (z[i].value === "") {
             $('errorMsgContainer').alert();
             var errorWrapper = document.querySelector('#errorMsgContainer');
@@ -134,14 +136,22 @@ function validateForm() {
 
     if (currentTab === 2) { //ULTIMO STEP
 
-        var elearning = $("#stageore").val();
+        var elearning = parseInt($("#elearning").val());
         var numeroallievi = $("#numeroallievi").val();
+        var stageore = parseInt($("#stageore").val());
 
-        if (elearning < eler_min || elearning > eler_max) {
+        if (stageore < stage_min || stageore > stage_max) {
             $('errorMsgContainer').alert();
             const errorWrapper = document.querySelector('#errorMsgContainer');
             errorWrapper.innerHTML = '';
-            errorWrapper.innerHTML = '<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Attenzione</strong> La percentuale di ore in eLearning non rientra nel range previsto dal corso (0-30%). Inserire un valore in questo range.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi avviso"></div>';
+            errorWrapper.innerHTML = '<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Attenzione</strong> La percentuale di ore in stage non rientra nel range previsto dal corso (' + stage_min + ' - ' + stage_max + '). Inserire un valore in questo range.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi avviso"></div>';
+            errorWrapper.scrollIntoView();
+            valid = false;
+        } else if (elearning < eler_min || elearning > eler_max) {
+            $('errorMsgContainer').alert();
+            const errorWrapper = document.querySelector('#errorMsgContainer');
+            errorWrapper.innerHTML = '';
+            errorWrapper.innerHTML = '<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Attenzione</strong> La percentuale di ore in eLearning non rientra nel range previsto dal corso (' + eler_min + '% - ' + eler_max + '%). Inserire un valore in questo range.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi avviso"></div>';
             errorWrapper.scrollIntoView();
             valid = false;
         } else if (numeroallievi > 20) {
