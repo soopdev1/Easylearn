@@ -252,8 +252,10 @@
                                                         <!--end::Label-->
                                                         <!--begin::Col-->
                                                         <div class="col-lg-8 fv-row">
-                                                            <select name="quantitarichiesta" aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
-                                                                    class="form-select form-select-solid form-select-lg fw-bold" required>
+                                                            <select name="quantitarichiesta" aria-label="Scegli..." 
+                                                                    data-control="select2" data-placeholder="Scegli..." 
+                                                                    class="form-select form-select-solid form-select-lg fw-bold" 
+                                                                    required>
                                                                 <option value="">Scegli...</option>
 
                                                                 <%for (int i = 1; i <= maxrichiesta; i++) {%>

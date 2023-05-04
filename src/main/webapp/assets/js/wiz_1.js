@@ -1,54 +1,119 @@
+var ore_min = 0;
+var ore_max = 0;
+var stage_min = 0;
+var stage_max = 0;
+var eler_min = 0;
+var eler_max = 0;
+
+//ON CHANGE SELEZIONA CORSO REPERTORIO
+function selezionaCorso() {
+    var scelta_rep = $("#repertoriochoice").val().split(";")[0];
+    var scelta_att = $("#repertoriochoice").val().split(";")[1];
+    $("#detail_corso").hide();
+    $("#detail_corso_s3").hide();
+    $.ajax({
+        type: "POST",
+        url: "Operations",
+        async: false,
+        data: {
+            "type": "SCELTAREPERTORIO",
+            "val": scelta_rep,
+            "val_att": scelta_att
+        },
+        success: function (data) {
+            var content = JSON.parse(data.split("@@@")[0]);
+            $("#cont_label_area").html(content.area);
+            $("#cont_label_sottoarea").html(content.sottoarea);
+            $("#cont_label_professioni").html(content.professioni);
+            $("#cont_label_livello").html(content.livelloeqf);
+            $("#cont_label_cert").html(content.certificazione);
+
+            $("#cont_label_area_s3").html(content.area);
+            $("#cont_label_sottoarea_s3").html(content.sottoarea);
+            $("#cont_label_professioni_s3").html(content.professioni);
+            $("#cont_label_livello_s3").html(content.livelloeqf);
+            $("#cont_label_cert_s3").html(content.certificazione);
+
+            var content_att = JSON.parse(data.split("@@@")[1]);
+            $("#cont_label_ore").html(content_att.orelabel);
+            $("#cont_label_stage").html(content_att.stagelabel);
+            $("#cont_label_elearn").html(content_att.elelabel);
+            $("#cont_label_assmax").html(content_att.assenzemax);
+            $("#cont_label_ore_s3").html(content_att.orelabel);
+            $("#cont_label_stage_s3").html(content_att.stagelabel);
+            $("#cont_label_elearn_s3").html(content_att.elelabel);
+            $("#cont_label_assmax_s3").html(content_att.assenzemax);
+
+            $("#detail_corso").show();
+            $("#detail_corso_s3").show();
+
+            ore_min = content_att.oremin;
+            ore_max = content_att.oremax;
+            stage_min = content_att.stagemin;
+            stage_max = content_att.stagemax;
+            eler_min = content_att.elemin;
+            eler_max = content_att.elemax;
+
+            var errorWrapper = document.querySelector('#errorMsgContainer');
+            errorWrapper.innerHTML = '';
+            errorWrapper.scrollIntoView();
+
+        },
+        error: function (error) {
+            var errorWrapper = document.querySelector('#errorMsgContainer');
+            errorWrapper.innerHTML = '';
+            errorWrapper.innerHTML = 'Error: ' + error;
+            errorWrapper.scrollIntoView();
+        }
+    });
+
+}
+
+
+
+
+
+
+//WIZARD
+
 var currentTab = 0; // Current tab is set to be the first tab (0)
 showTab(currentTab); // Display the current tab
 
 function showTab(n) {
-    // This function will display the specified tab of the form...
     var x = document.getElementsByClassName("step");
     x[n].style.display = "block";
-    //... and fix the Previous/Next buttons:
     if (n === 0) {
         document.getElementById("prevBtn").style.display = "none";
     } else {
         document.getElementById("prevBtn").style.display = "inline";
     }
     if (n === (x.length - 1)) {
-        document.getElementById("nextBtn").innerHTML = "<i class='fa fa-save'></i> Salva";
+        document.getElementById("nextBtn").innerHTML = "<i class='fa fa-save'></i> SALVA DATI";
     } else {
-        document.getElementById("nextBtn").innerHTML = "<i class='fa fa-forward-step'></i> Avanti";
+        document.getElementById("nextBtn").innerHTML = "<i class='fa fa-forward-step'></i> AVANTI";
     }
     fixStepIndicator(n);
 }
 
 function nextPrev(n) {
-    // This function will figure out which tab to display
     var x = document.getElementsByClassName("step");
-    alert(currentTab);
-    // Exit the function if any field in the current tab is invalid:
     if (n === 1 && !validateForm()) {
         return false;
     }
-    // Hide the current tab:
     x[currentTab].style.display = "none";
-    // Increase or decrease the current tab by 1:
     currentTab = currentTab + n;
-    // if you have reached the end of the form...
     if (currentTab >= x.length) {
-        // ... the form gets submitted:
         document.getElementById("signUpForm").submit();
         return false;
     }
-    // Otherwise, display the correct tab:
     showTab(currentTab);
 }
 
 function validateForm() {
-    // This function deals with validation of the form fields
     var x, y, i, z, valid = true;
     x = document.getElementsByClassName("step");
     y = x[currentTab].getElementsByTagName("input");
-    // A loop that checks every input field in the current tab:
     for (i = 0; i < y.length; i++) {
-        // If a field is empty...
         if (y[i].value === "") {
             y[i].className += " invalid";
             valid = false;
@@ -56,19 +121,38 @@ function validateForm() {
     }
 
     z = x[currentTab].getElementsByTagName("select");
-
-    for (i = 0; i < z.length; i++) {
-        // If a field is empty...
+    for (i = 0; i < z.length; i++) {        
         if (z[i].value === "") {
-
-            var errorMessageEL = '<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Attenzione</strong> Compilare tutti i campi!<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi avviso"></div>';
             $('errorMsgContainer').alert();
             var errorWrapper = document.querySelector('#errorMsgContainer');
             errorWrapper.innerHTML = '';
-            errorWrapper.innerHTML = errorMessageEL;
+            errorWrapper.innerHTML = '<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Attenzione</strong> Compilare tutti i campi!<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi avviso"></div>';
             errorWrapper.scrollIntoView();
             valid = false;
         }
+    }
+
+    if (currentTab === 2) { //ULTIMO STEP
+
+        var elearning = $("#stageore").val();
+        var numeroallievi = $("#numeroallievi").val();
+
+        if (elearning < eler_min || elearning > eler_max) {
+            $('errorMsgContainer').alert();
+            const errorWrapper = document.querySelector('#errorMsgContainer');
+            errorWrapper.innerHTML = '';
+            errorWrapper.innerHTML = '<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Attenzione</strong> La percentuale di ore in eLearning non rientra nel range previsto dal corso (0-30%). Inserire un valore in questo range.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi avviso"></div>';
+            errorWrapper.scrollIntoView();
+            valid = false;
+        } else if (numeroallievi > 20) {
+            $('errorMsgContainer').alert();
+            const errorWrapper = document.querySelector('#errorMsgContainer');
+            errorWrapper.innerHTML = '';
+            errorWrapper.innerHTML = '<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Attenzione</strong> Il Numero allievi indicato non rientra nel range previsto (1-20). Inserire un valore in questo range.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi avviso"></div>';
+            errorWrapper.scrollIntoView();
+            valid = false;
+        }
+
     }
 
     // If the valid status is true, mark the step as finished and valid:
@@ -79,11 +163,18 @@ function validateForm() {
 }
 
 function fixStepIndicator(n) {
-    // This function removes the "active" class of all steps...
     var i, x = document.getElementsByClassName("stepIndicator");
     for (i = 0; i < x.length; i++) {
         x[i].className = x[i].className.replace(" active", "");
     }
-    //... and adds the "active" class on the current step:
     x[n].className += " active";
 }
+
+$(document).ready(function () {
+    Inputmask({
+        "placeholder": "000",
+        "mask": "9",
+        "repeat": 4,
+        "greedy": false
+    }).mask(".numbR");
+});
