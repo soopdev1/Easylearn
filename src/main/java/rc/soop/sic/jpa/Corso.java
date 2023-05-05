@@ -81,6 +81,12 @@ public class Corso implements Serializable {
     @JoinColumn(name = "istanza")
     private Istanza istanza;
 
+    @ManyToOne
+    @JoinColumn(name = "tipologiapercorso")
+    private Tipologia_Percorso tipologiapercorso;
+    
+    
+    
     public Corso() {
     }
 
@@ -218,4 +224,12 @@ public class Corso implements Serializable {
         this.elearningperc = elearningperc;
     }
 
+    public Tipologia_Percorso getTipologiapercorso() {
+        return tipologiapercorso;
+    }
+
+    public void setTipologiapercorso(Tipologia_Percorso tipologiapercorso) {
+        this.tipologiapercorso = tipologiapercorso;
+    }
+    
 }

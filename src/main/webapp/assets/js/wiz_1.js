@@ -139,6 +139,7 @@ function validateForm() {
         var elearning = parseInt($("#elearning").val());
         var numeroallievi = $("#numeroallievi").val();
         var stageore = parseInt($("#stageore").val());
+        var maxallievi = parseInt($("#maxallievi").val());
 
         if (stageore < stage_min || stageore > stage_max) {
             $('errorMsgContainer').alert();
@@ -154,11 +155,11 @@ function validateForm() {
             errorWrapper.innerHTML = '<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Attenzione</strong> La percentuale di ore in eLearning non rientra nel range previsto dal corso (' + eler_min + '% - ' + eler_max + '%). Inserire un valore in questo range.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi avviso"></div>';
             errorWrapper.scrollIntoView();
             valid = false;
-        } else if (numeroallievi > 20) {
+        } else if (numeroallievi > maxallievi) {
             $('errorMsgContainer').alert();
             const errorWrapper = document.querySelector('#errorMsgContainer');
             errorWrapper.innerHTML = '';
-            errorWrapper.innerHTML = '<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Attenzione</strong> Il Numero allievi indicato non rientra nel range previsto (1-20). Inserire un valore in questo range.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi avviso"></div>';
+            errorWrapper.innerHTML = '<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Attenzione</strong> Il Numero allievi indicato non rientra nel range previsto (1 - ' + maxallievi + '). Inserire un valore in questo range.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi avviso"></div>';
             errorWrapper.scrollIntoView();
             valid = false;
         }
@@ -169,6 +170,7 @@ function validateForm() {
     if (valid) {
         document.getElementsByClassName("stepIndicator")[currentTab].className += " finish";
     }
+
     return valid; // return the valid status
 }
 

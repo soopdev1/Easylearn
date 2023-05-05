@@ -45,7 +45,8 @@
     <!--begin::Body-->
     <%
         List<Scheda_Attivita> sche1 = Engine.repertorio_completo_scheda();
-        int maxrichiesta = 5;
+        int maxrichiesta = Utils.parseIntR(Engine.getPath("conf.max.edizioni"));
+        int maxallievi = Utils.parseIntR(Engine.getPath("conf.max.allievi"));
         User u1 = (User) session.getAttribute("us_memory");
     %>
     <body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed">
@@ -81,11 +82,10 @@
                                             <!-- start step indicators -->
                                             <div class="form-header d-flex mb-4">
                                                 <span class="stepIndicator">Tipologia Percorso</span>
-                                                <span class="stepIndicator">Seleziona Percorso</span>
-                                                <span class="stepIndicator">Dettagli</span>
+                                                <span class="stepIndicator">Scelta Percorso</span>
+                                                <span class="stepIndicator">Dettagli Percorso</span>
                                             </div>
                                             <!-- end step indicators -->
-
                                             <!-- step one -->
                                             <div class="step">
                                                 <p class="text-center mb-4">Istanza di autorizzazione allo svolgimento di corsi di formazione professionale</p>
@@ -212,7 +212,7 @@
 
                                             <!-- step three -->
                                             <div class="step">
-                                                <p class="text-center mb-4">We will never sell it</p>
+                                                <p class="text-center mb-4">Istanza di autorizzazione allo svolgimento di corsi di formazione professionale</p>
                                                 <div class="mb-3" id="detail_corso_s3" style="display: none;">
                                                     <!--begin::Label-->
                                                     <label class="col-lg-4 col-form-label fw-bold fs-6" >
@@ -399,10 +399,10 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
+                                                <input type="hidden" name="maxallievi" id="maxallievi" value="<%=maxallievi%>" />
                                                 <div class="row mb-6">
                                                     <!--begin::Label-->
-                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Numero Allievi (Max 20)</label>
+                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Numero Allievi (Max <%=maxallievi%>)</label>
                                                     <!--end::Label-->
                                                     <!--begin::Col-->
                                                     <div class="col-lg-8">
@@ -458,6 +458,7 @@
 
                                                         class="btn btn-circled btn-hover-rise"
                                                         ><i class="fa fa-backward-step"></i> INDIETRO</button>
+                                                        
                                                 <button type="button" id="nextBtn" 
                                                         onclick="nextPrev(1)" 
                                                         class="btn btn-circled btn-hover-rise"
