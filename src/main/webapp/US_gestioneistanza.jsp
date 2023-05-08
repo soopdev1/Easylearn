@@ -4,6 +4,8 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.User"%>
+<%@page import="rc.soop.sic.jpa.SoggettoProponente"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="rc.soop.sic.jpa.Corso"%>
 <%@page import="java.util.List"%>
@@ -18,27 +20,9 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
-                Istanza i1 = (Istanza) session.getAttribute("is_memory");
-
-                int corsi_attuali = 0;
-                boolean istanzaok = false;
-                boolean istanzapresentata = false;
-                boolean istanzaaccettata = false;
-                boolean istanzarigettata = false;
-                List<Corso> c1 = new ArrayList<>();
-                if (i1 != null) {
-                    c1 = new EntityOp().getCorsiIstanza(i1);
-                    istanzaok = i1.getStatocorso().getCodicestatocorso().equals("02");
-                    istanzapresentata = i1.getStatocorso().getCodicestatocorso().equals("07")
-                            || i1.getStatocorso().getCodicestatocorso().equals("08")
-                            || i1.getStatocorso().getCodicestatocorso().equals("09");
-                    istanzaaccettata = i1.getStatocorso().getCodicestatocorso().equals("08");
-                    istanzarigettata = i1.getStatocorso().getCodicestatocorso().equals("09");
-                    corsi_attuali = i1.getQuantitarichiesta();
-                } else {
-                    i1 = new Istanza();
-                }
-
+                EntityOp eo = new EntityOp();
+                SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
+                List<Istanza> ist_l = eo.getIstanzeSoggetto(so);
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -107,17 +91,19 @@
                                                         <!--begin::Table head-->
                                                         <thead>
                                                             <tr>
-                                                                <th class="p-0 w-50px"></th>
-                                                                <th class="p-0 min-w-150px"></th>
-                                                                <th class="p-0 min-w-140px"></th>
-                                                                <th class="p-0 min-w-120px"></th>
-                                                                <th class="p-0 min-w-40px"></th>
+                                                                <th class="p-0 w-50px">1</th>
+                                                                <th class="p-0 min-w-150px">2</th>
+                                                                <th class="p-0 min-w-140px">3</th>
+                                                                <th class="p-0 min-w-120px">4</th>
+                                                                <th class="p-0 min-w-40px">5</th>
                                                             </tr>
                                                         </thead>
                                                         <!--end::Table head-->
                                                         <!--begin::Table body-->
                                                         <tbody>
-                                                            <%if (istanzaok || istanzapresentata) {%>
+                                                            
+                                                            <%for(Istanza is1 : ist_l){%>
+                                                            
                                                             <tr>
                                                                 <td>
                                                                     <div class="symbol symbol-50px me-2">
@@ -134,200 +120,14 @@
                                                                     <a href="#" class="text-dark fw-bolder text-hover-primary mb-1 fs-6" 
                                                                        data-bs-toggle="tooltip" data-bs-placement="top" 
                                                                        title="Istanza pronta - Clicca per aggiungere nuovo corso">
-                                                                        1) Elenco Corsi di Formazione
+                                                                        <%=is1.getCodiceistanza()%>
                                                                     </a>
-                                                                </td>                                                                
+                                                                </td>                                    
                                                                 <td class="text-end fw-bold" colspan="2">
-                                                                    ISTANZA PRONTA: Corsi Attualmente presenti: <%=c1.size()%><br/>
+                                                                    ISTANZA PRONTA: Corsi Attualmente presenti:<br/>
                                                                 </td>
                                                             </tr>
-
-                                                            <%if (i1.getPathfirmato() == null) {%>
-                                                            <tr>
-                                                                <td>
-                                                                    <div class="symbol symbol-50px me-2">
-                                                                        <span class="symbol-label bg-light-primary">
-                                                                            <!--begin::Svg Icon | path: icons/duotune/ecommerce/ecm002.svg-->
-                                                                            <span class="symbol-label text-primary bg-light-primary">
-                                                                                <i class="fa fa-hourglass-2 fa-2x"></i>
-                                                                            </span>
-                                                                            <!--end::Svg Icon-->
-                                                                        </span>
-                                                                    </div>
-                                                                </td>
-                                                                <td>
-                                                                    <a href="#" class="text-dark fw-bolder text-hover-primary mb-1 fs-6">2) Istanza</a>
-                                                                </td>
-                                                                <td class="text-end text-muted fw-bold" colspan="1">
-                                                                    <form action="Operations" method="POST" target="_blank">
-                                                                        <input type="hidden" name="type" value="GENERAISTANZA" />
-                                                                        <input type="hidden" name="codice_istanza" value="<%=i1.getCodiceistanza()%>" />
-                                                                        <button type="submit" class="btn btn-sm btn-bg-light btn-primary"><i class="fa fa-file-download"></i> GENERA DOCUMENTO</button>
-                                                                    </form>
-                                                                </td>
-                                                                <td class="text-end text-muted fw-bold" colspan="1">
-                                                                    <a href="US_upload.jsp?codice_istanza=<%=i1.getCodiceistanza()%>" data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%' 
-                                                                       class="btn btn-sm btn-bg-light btn-danger fan1">
-                                                                        <i class="fa fa-file-upload"></i> CARICA DOCUMENTO FIRMATO</a>
-                                                                </td>
-                                                            </tr>
-                                                            <%} else {%>
-                                                            <tr>
-                                                                <td>
-                                                                    <div class="symbol symbol-50px me-2">
-                                                                        <div class="symbol symbol-50px me-2">
-                                                                            <span class="symbol-label bg-success">
-                                                                                <!--begin::Svg Icon | path: icons/duotune/ecommerce/ecm002.svg-->
-                                                                                <span class="symbol-label text-white bg-success">
-                                                                                    <i class="fa fa-check-circle fa-2x"></i>
-                                                                                </span>
-                                                                                <!--end::Svg Icon-->
-                                                                            </span>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td>
-                                                                    <a href="#" class="text-dark fw-bolder text-hover-primary mb-1 fs-6">2) Istanza</a>
-                                                                </td>
-                                                                <%if (!istanzapresentata) {%>WW
-                                                                <td class="text-end text-muted fw-bold" colspan="1">
-                                                                    <%} else {%>
-                                                                <td class="text-end text-muted fw-bold" colspan="2">
-                                                                    <%}%>
-                                                                    <form action="Operations" method="POST" target="_blank">
-                                                                        <input type="hidden" name="type" value="SCARICAISTANZAFIRMATA" />
-                                                                        <input type="hidden" name="codice_istanza" value="<%=i1.getCodiceistanza()%>" />
-                                                                        <button type="submit" class="btn btn-sm btn-bg-light btn-primary"><i class="fa fa-file-download"></i> VISUALIZZA DOCUMENTO FIRMATO</button>
-                                                                    </form>
-                                                                </td>
-                                                                <%if (!istanzapresentata) {%>
-                                                                <td class="text-end text-muted fw-bold" colspan="1">
-                                                                    <form action="Operations" method="POST" >
-                                                                        <input type="hidden" name="type" value="ELIMINAISTANZAFIRMATA" />
-                                                                        <input type="hidden" name="codice_istanza" value="<%=i1.getCodiceistanza()%>" />
-                                                                        <button type="submit" class="btn btn-sm btn-bg-light btn-danger"><i class="fa fa-remove"></i> ELIMINA DOCUMENTO FIRMATO</button>
-                                                                    </form>
-                                                                </td>
-
-                                                                <%}%>
-                                                            </tr>
-
-                                                            <%
-                                                                if (istanzapresentata) {%>
-                                                            <tr>
-                                                                <td colspan="4">
-                                                                    <div class="alert alert-success">
-                                                                        <i class="fa fa-info-circle"></i> Istanza presentata correttamente in data <b><%=i1.getDatainvio()%></b>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                            <%} else {
-                                                            %>
-                                                            <tr>
-                                                                <td colspan="4">
-                                                                    <form action="Operations" method="POST">
-                                                                        <input type="hidden" name="type" value="SENDISTANZA" />
-                                                                        <input type="hidden" name="codice_istanza" value="<%=i1.getCodiceistanza()%>" />
-                                                                        <button type="submit" 
-                                                                                class="btn btn-bg-light btn-success" style="width: 100%;"><i class="fa fa-arrow-right"></i> INVIA ISTANZA</button>
-                                                                    </form>
-                                                                </td>
-                                                            </tr>
-                                                            <%}%>
-
-                                                            <%if (istanzaaccettata) {%>
-                                                            <tr>
-                                                                <td colspan="4">
-                                                                    <div class="alert alert-success">
-                                                                        <i class="fa fa-info-circle"></i> Istanza <b>ACCETTATA</b> in data <b><%=i1.getDatagestione()%></b> &nbsp;
-                                                                        <a href="#" class="btn btn-sm btn-bg-light btn-success" data-bs-toggle='tooltip' title='VISUALIZZA DECRETO' 
-                                                                           onclick="return document.forms['decr_<%=i1.getCodiceistanza()%>'].submit();">
-                                                                            <i class="fa fa-file-pdf"></i></a>
-                                                                        <form action="Operations" method="POST" target="_blank" name="decr_<%=i1.getCodiceistanza()%>">
-                                                                            <input type="hidden" name="type" value="SCARICADECRETOISTANZA" />
-                                                                            <input type="hidden" name="codice_istanza" value="<%=i1.getCodiceistanza()%>" />
-                                                                        </form>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                            <%}%>
-                                                            <%}%>
-                                                            <%} else {%>
-                                                            <tr>
-                                                                <td>
-                                                                    <div class="symbol symbol-50px me-2">
-                                                                        <span class="symbol-label bg-light-primary">
-                                                                            <!--begin::Svg Icon | path: icons/duotune/ecommerce/ecm002.svg-->
-                                                                            <span class="symbol-label text-primary bg-light-primary">
-                                                                                <i class="fa fa-hourglass-2 fa-2x"></i>
-                                                                            </span>
-                                                                            <!--end::Svg Icon-->
-                                                                        </span>
-                                                                    </div>
-                                                                </td>
-                                                                <td>
-                                                                    <a href="US_compilacorsi.jsp" class="text-dark fw-bolder text-hover-primary mb-1 fs-6" 
-                                                                       data-bs-toggle="tooltip" data-bs-placement="top" 
-                                                                       title="Aggiungi Nuovo Corso">
-                                                                        1) Elenco Corsi di Formazione
-                                                                    </a>
-                                                                </td>                                                                
-                                                                <td class="text-end text-muted fw-bold" colspan="2">Corsi Attualmente presenti (max 5):
-                                                                    <%for (Corso cor : c1) {%>
-                                                                    <br/><%=cor.getRepertorio().getDenominazione()%> - <%=cor.getSchedaattivita().getTipologiapercorso()%> - Richiesti: <%=cor.getQuantitarichiesta()%>
-                                                                    <%}%>
-                                                                </td>
-                                                                <td class="text-end text-muted fw-bold" colspan="1">
-                                                                    <%if (corsi_attuali > 0) {%>
-
-                                                                    <a onclick="return $('#save_inst').submit();"
-                                                                        class="btn btn-icon btn-bg-light btn-success"
-                                                                            data-bs-toggle="tooltip" data-bs-placement="top" 
-                                                                            title="Salva Istanza"
-                                                                            ><i class="fa fa-save"></i>
-                                                                    </a>
-                                                                    
-                                                                    <a onclick="return $('#del_inst').submit();"
-                                                                       class="btn btn-icon btn-bg-light btn-danger"
-                                                                            data-bs-toggle="tooltip" data-bs-placement="top" 
-                                                                            title="Elimina dati inseriti Istanza"
-                                                                            ><i class="fa fa-remove"></i>
-                                                                    </a>
-
-
-
-                                                                    <form action="Operations" method="POST" id="save_inst">
-                                                                        <input type="hidden" name="type" value="SALVACORSI" />
-                                                                        <input type="hidden" name="codice_istanza" value="<%=i1.getCodiceistanza()%>" />
-                                                                    </form>
-                                                                    <form action="Operations" method="POST" id="del_inst">
-                                                                        <input type="hidden" name="type" value="DELISTANZA" />
-                                                                        <input type="hidden" name="codice_istanza" value="<%=i1.getCodiceistanza()%>" />
-                                                                    </form>
-                                                                    <%} else {%>
-                                                                    <a onclick="return false;" 
-                                                                       class="btn btn-sm btn-bg-light btn-color-muted"><i class="fa fa-save"></i> Salva</a>
-                                                                    <%}%>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>
-                                                                    <div class="symbol symbol-50px me-2">
-                                                                        <span class="symbol-label bg-light-danger">
-                                                                            <!--begin::Svg Icon | path: icons/duotune/ecommerce/ecm002.svg-->
-                                                                            <span class="symbol-label text-danger bg-light-danger">
-                                                                                <i class="fa fa-exclamation-triangle fa-2x"></i>
-                                                                            </span>
-                                                                            <!--end::Svg Icon-->
-                                                                        </span>
-                                                                    </div>
-                                                                </td>
-                                                                <td>
-                                                                    <a href="#" class="text-dark fw-bolder text-hover-primary mb-1 fs-6">2) Istanza</a>
-                                                                </td>
-                                                                <td class="text-end text-muted fw-bold" colspan="3">Necessaria compilazione di una o pi&#249; fasi precedenti</td>
-                                                            </tr>
-                                                            <%}%>
+                                                            <%}%>        
                                                         </tbody>
                                                         <!--end::Table body-->
                                                     </table>
