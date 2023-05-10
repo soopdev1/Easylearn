@@ -91,11 +91,11 @@
                                                         <!--begin::Table head-->
                                                         <thead>
                                                             <tr>
-                                                                <th class="p-0 w-50px">1</th>
-                                                                <th class="p-0 min-w-150px">2</th>
-                                                                <th class="p-0 min-w-140px">3</th>
-                                                                <th class="p-0 min-w-120px">4</th>
-                                                                <th class="p-0 min-w-40px">5</th>
+                                                                <th class="p-0 w-50px">Stato</th>
+                                                                <th class="p-0 min-w-150px">Codice</th>
+                                                                <th class="p-0 min-w-140px">Data Creazione</th>
+                                                                <th class="p-0 min-w-120px">Corsi</th>
+                                                                <th class="p-0 min-w-40px">Azioni</th>
                                                             </tr>
                                                         </thead>
                                                         <!--end::Table head-->
