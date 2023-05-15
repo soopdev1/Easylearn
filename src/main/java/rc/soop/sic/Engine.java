@@ -54,9 +54,17 @@ public class Engine {
     }
 
     public static String getPath(String id) {
-
         try {
             Path res = new EntityOp().getEm().find(Path.class, id);
+            return res.getDescrizione();
+        } catch (Exception ex) {
+            trackingAction("service", estraiEccezione(ex));
+        }
+        return "";
+    }
+    public static String getPath(String id,EntityOp eo) {
+        try {
+            Path res = eo.getEm().find(Path.class, id);
             return res.getDescrizione();
         } catch (Exception ex) {
             trackingAction("service", estraiEccezione(ex));

@@ -4,6 +4,7 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.Engine"%>
 <%@page import="rc.soop.sic.jpa.User"%>
 <%@page import="rc.soop.sic.jpa.SoggettoProponente"%>
 <%@page import="java.util.ArrayList"%>
@@ -23,6 +24,8 @@
                 EntityOp eo = new EntityOp();
                 SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
                 List<Istanza> ist_l = eo.getIstanzeSoggetto(so);
+                int maxcorsi = Utils.parseIntR(Engine.getPath("conf.max.numcorsi", eo));
+
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -33,8 +36,6 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" />
         <!--end::Fonts-->
         <!--begin::Page Vendor Stylesheets(used by this page)-->
-        <link href="assets/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet" type="text/css" />
-        <link href="assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />
         <!--end::Page Vendor Stylesheets-->
         <!--begin::Global Stylesheets Bundle(used by all pages)-->
         <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
@@ -85,46 +86,78 @@
                                             <!--begin::Body-->
                                             <div class="card-body py-3">
                                                 <!--begin::Table container-->
-                                                <div class="table-responsive">
+                                                <div class="table-responsive ">
                                                     <!--begin::Table-->
-                                                    <table class="table align-middle gs-0 gy-3">
+                                                    <table class="table align-middle gy-3 table-bordered table-hover">
                                                         <!--begin::Table head-->
                                                         <thead>
                                                             <tr>
-                                                                <th class="p-0 w-50px">Stato</th>
-                                                                <th class="p-0 min-w-150px">Codice</th>
-                                                                <th class="p-0 min-w-140px">Data Creazione</th>
-                                                                <th class="p-0 min-w-120px">Corsi</th>
-                                                                <th class="p-0 min-w-40px">Azioni</th>
+                                                                <th class="p-2 w-50px">Stato</th>
+                                                                <th class="p-2 w-50px">Codice</th>
+                                                                <th class="p-2 min-w-120px">Corsi</th>
+                                                                <th class="p-2 w-80px">Data Creazione</th>
+                                                                <th class="p-2 min-w-120px">Azioni</th>
                                                             </tr>
                                                         </thead>
                                                         <!--end::Table head-->
                                                         <!--begin::Table body-->
                                                         <tbody>
-                                                            
-                                                            <%for(Istanza is1 : ist_l){%>
-                                                            
+
+                                                            <%for (Istanza is1 : ist_l) {
+                                                                    List<Corso> c1 = new EntityOp().getCorsiIstanza(is1);
+                                                                    boolean addcorso = (maxcorsi > c1.size());
+                                                                    boolean salvaistanza = true;
+                                                                    boolean eliminaistanza = true;
+                                                            %>
                                                             <tr>
-                                                                <td>
-                                                                    <div class="symbol symbol-50px me-2">
-                                                                        <span class="symbol-label bg-success">
-                                                                            <!--begin::Svg Icon | path: icons/duotune/ecommerce/ecm002.svg-->
-                                                                            <span class="symbol-label text-white bg-success">
-                                                                                <i class="fa fa-check-circle fa-2x"></i>
-                                                                            </span>
-                                                                            <!--end::Svg Icon-->
-                                                                        </span>
-                                                                    </div>
+                                                                <td class="p-2 w-50px">
+                                                                    <%=is1.getStatocorso().getHtmlicon()%>
                                                                 </td>
-                                                                <td>
-                                                                    <a href="#" class="text-dark fw-bolder text-hover-primary mb-1 fs-6" 
-                                                                       data-bs-toggle="tooltip" data-bs-placement="top" 
-                                                                       title="Istanza pronta - Clicca per aggiungere nuovo corso">
-                                                                        <%=is1.getCodiceistanza()%>
-                                                                    </a>
+                                                                <td class="p-2 w-50px">
+                                                                    <%=is1.getCodiceistanza()%>
                                                                 </td>                                    
-                                                                <td class="text-end fw-bold" colspan="2">
-                                                                    ISTANZA PRONTA: Corsi Attualmente presenti:<br/>
+                                                                <td class="p-2 min-w-120px">
+                                                                    <%for (Corso cor : c1) {%>
+                                                                    <b><%=cor.getRepertorio().getDenominazione()%> - <%=cor.getSchedaattivita().getTipologiapercorso()%></b> 
+                                                                    - Edizioni: <%=cor.getQuantitarichiesta()%><br/><hr>
+                                                                    <%}%>
+                                                                </td>
+                                                                <td class="p-2 w-80px">
+                                                                    <%=is1.getDatacreazione()%>
+                                                                </td> 
+                                                                <td class="p-2 min-w-120px" style="white-space: nowrap; overflow: hidden; text-overflow:ellipsis;">
+                                                                    <a href="ADM_visdco.jsp?idcorso=" data-fancybox data-type='iframe' 
+                                                                       data-bs-toggle="tooltip" title="VISUALIZZA/MODIFICA DETTAGLIO CORSI" 
+                                                                       data-preload='false' data-width='75%' data-height='75%' 
+                                                                       class="btn btn-sm btn-bg-light btn-dark fan1">
+                                                                        <i class="fa fa-list-dots"></i>
+                                                                    </a>
+                                                                    <%if (addcorso) {%>
+                                                                    <a href="US_addcorsoistanza.jsp?idist=<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>"
+                                                                       data-fancybox data-type='iframe' 
+                                                                       data-bs-toggle="tooltip" title="AGGIUNGI CORSO AD ISTANZA" 
+                                                                       data-preload='false' data-width='100%' data-height='100%' 
+                                                                       class="btn btn-sm btn-bg-light btn-primary fan1">
+                                                                        <i class="fa fa-plus-circle"></i>
+                                                                    </a>
+                                                                    <%}%>
+                                                                    <%if (salvaistanza) {%>
+                                                                    <a href="US_verificaistanza.jsp?idist=<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>"
+                                                                       data-fancybox data-type='iframe' 
+                                                                       data-bs-toggle="tooltip" title="VERIFICA E SALVA ISTANZA" 
+                                                                       data-preload='false' data-width='75%' data-height='75%' 
+                                                                       class="btn btn-sm btn-bg-light btn-success fan1">
+                                                                        <i class="fa fa-save"></i>
+                                                                    </a>
+                                                                    <%}%>
+                                                                    <%if (eliminaistanza) {%>
+                                                                    <a href="ADM_commissione.jsp?idcorso=" data-fancybox data-type='iframe' 
+                                                                       data-bs-toggle="tooltip" title="ELIMINA ISTANZA" 
+                                                                       data-preload='false' data-width='75%' data-height='75%' 
+                                                                       class="btn btn-sm btn-bg-light btn-danger fan1">
+                                                                        <i class="fa fa-remove"></i>
+                                                                    </a>
+                                                                    <%}%>
                                                                 </td>
                                                             </tr>
                                                             <%}%>        
@@ -199,26 +232,10 @@
         <!--begin::Page Custom Javascript(used by this page)-->
         <script src="assets/js/widgets.bundle.js"></script>
         <script src="assets/js/custom/widgets.js"></script>
-        <script src="assets/js/custom/apps/chat/chat.js"></script>
-        <script src="assets/js/custom/utilities/modals/create-app.js"></script>
-        <script src="assets/js/custom/utilities/modals/create-campaign.js"></script>
-        <script src="assets/js/custom/utilities/modals/users-search.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
-
         <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
         <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
-
-
-        <script type="text/javascript">
-            $(document).ready(Fancybox.bind(".fan1", {
-                groupAll: false, // Group all items
-                on: {
-                    closing: (fancybox) => {
-                        window.location.reload();
-                    }
-                }
-            }));
-        </script>
+        <script type="text/javascript" src="assets/js/common.js"></script>
         <!--end::Page Custom Javascript-->
         <!--end::Javascript-->
     </body>

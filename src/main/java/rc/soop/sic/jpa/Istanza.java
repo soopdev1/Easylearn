@@ -15,6 +15,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -23,6 +25,7 @@ import javax.persistence.Table;
 @NamedQueries(value = {
     @NamedQuery(name = "istanza.codice", query = "SELECT i FROM Istanza i WHERE i.soggetto=:soggetto AND i.codiceistanza=:codice"),
     @NamedQuery(name = "istanza.onlycodice", query = "SELECT i FROM Istanza i WHERE i.codiceistanza=:codice"),
+    @NamedQuery(name = "istanza.soggetto", query = "SELECT i FROM Istanza i WHERE i.soggetto=:soggetto ORDER BY i.idistanza DESC"),
     @NamedQuery(name = "istanza.soggettowaiting", query = "SELECT i FROM Istanza i WHERE i.soggetto=:soggetto AND i.statocorso.codicestatocorso IN('01','02','07','08','09') ORDER BY i.idistanza DESC"),
     @NamedQuery(name = "istanza.listaaccettate", query = "SELECT i FROM Istanza i WHERE i.soggetto=:soggetto AND i.statocorso.codicestatocorso IN('08') ORDER BY i.idistanza DESC"),
     @NamedQuery(name = "istanza.dagestire", query = "SELECT i FROM Istanza i WHERE i.statocorso.codicestatocorso IN('07') ORDER BY i.idistanza DESC"),
@@ -62,14 +65,14 @@ public class Istanza implements Serializable {
     @Column(name = "datainvio")
     private String datainvio;
 
-    
     @Column(name = "decreto")
     private String decreto;
     @Column(name = "datagestione")
     private String datagestione;
-    
-    
-    
+
+    @Transient
+    private String datacreazione;
+
     public Long getIdistanza() {
         return idistanza;
     }
@@ -157,5 +160,18 @@ public class Istanza implements Serializable {
     public void setDatagestione(String datagestione) {
         this.datagestione = datagestione;
     }
-        
+
+    public String getDatacreazione() {
+        if (this.codiceistanza != null && !this.codiceistanza.equals("")) {
+            this.datacreazione = StringUtils.substring(this.codiceistanza, 4, 6) + "/" + StringUtils.substring(this.codiceistanza, 2, 4) + "/20" + StringUtils.substring(this.codiceistanza, 0, 2);
+        } else {
+            this.datacreazione = "NON PRESENTE";
+        }
+        return this.datacreazione;
+    }
+
+    public void setDatacreazione(String datacreazione) {
+        this.datacreazione = datacreazione;
+    }
+
 }

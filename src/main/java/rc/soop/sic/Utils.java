@@ -7,9 +7,13 @@ package rc.soop.sic;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import java.security.Key;
 import java.security.MessageDigest;
+import java.util.Base64;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -18,6 +22,9 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -30,6 +37,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import static org.apache.commons.fileupload.servlet.ServletFileUpload.isMultipartContent;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+import org.jasypt.util.text.StrongTextEncryptor;
 import org.joda.time.DateTime;
 import static rc.soop.sic.Constant.PATTERNDATE2;
 import static rc.soop.sic.Constant.PATTERNDATE3;
@@ -209,4 +217,62 @@ public class Utils {
         return new DateTime().toString(PATTERNDATE3) + random;
     }
 
+    
+
+    public static String enc_string(String plainText) {
+        try {
+            
+            return Base64.getUrlEncoder().encodeToString(plainText.getBytes());
+//            String IV = "AAAAAAAAAAAAAAAA";
+//            String _plaintText_16 = covertto16Byte(plainText);
+//            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+//            SecretKeySpec key = new SecretKeySpec(Engine.getPath("pass.vers.1").getBytes("UTF-8"), "AES");
+//            cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(IV.getBytes("UTF-8")));
+//            return new String(cipher.doFinal(_plaintText_16.getBytes("UTF-8")));
+//
+//            Key aesKey = new SecretKeySpec(Engine.getPath("pass.vers.1").getBytes(), "AES");
+//            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+//            // encrypt the text
+//            cipher.init(Cipher.ENCRYPT_MODE, aesKey);
+//            byte[] encrypted = cipher.doFinal(ing.getBytes());
+//            byte[] encoded = Base64.getEncoder().encode(new String(encrypted).getBytes(StandardCharsets.UTF_8));
+//            return new String(encoded);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+
+//        StrongTextEncryptor textEncryptor = new StrongTextEncryptor();
+//        textEncryptor.setPassword(Engine.getPath("pass.vers.1"));
+//        return textEncryptor.encrypt(ing);
+    }
+
+    public static String dec_string(String ing) {
+        try {
+            
+            
+            return new String(Base64.getUrlDecoder().decode(ing));
+//            String IV = "AAAAAAAAAAAAAAAA";
+//
+//            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+//            SecretKeySpec key = new SecretKeySpec(Engine.getPath("pass.vers.1").getBytes("UTF-8"), "AES");
+//            cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(IV.getBytes("UTF-8")));
+//            return removePadding(new String(cipher.doFinal(ing.getBytes()), "UTF-8"));
+
+//            Key aesKey = new SecretKeySpec(Engine.getPath("pass.vers.1").getBytes(), "AES");
+//            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+//            cipher.init(Cipher.DECRYPT_MODE, aesKey);
+//            byte[] decrypted = cipher.doFinal(ing.getBytes());
+//            byte[] decoded = Base64.getDecoder().decode(new String(decrypted).getBytes(StandardCharsets.UTF_8));
+//            return new String(decoded);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+//
+//    
+//    public static String dec_string(String ing){
+//        
+//    }
 }

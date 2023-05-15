@@ -85,51 +85,51 @@ public class EntityOp {
     }
 
     public User getUser(String user, String pwd) {
-        TypedQuery q = em.createNamedQuery("user.UsernamePwd", User.class);
+        TypedQuery q = this.em.createNamedQuery("user.UsernamePwd", User.class);
         q.setParameter("username", user);
         q.setParameter("password", convmd5(pwd));
         return q.getResultList().isEmpty() ? null : (User) q.getSingleResult();
     }
 
     public Istanza getIstanza(SoggettoProponente s, String codice) {
-        TypedQuery q = em.createNamedQuery("istanza.codice", Istanza.class);
+        TypedQuery q = this.em.createNamedQuery("istanza.codice", Istanza.class);
         q.setParameter("soggetto", s);
         q.setParameter("codice", codice);
         return q.getResultList().isEmpty() ? null : (Istanza) q.getSingleResult();
     }
 
     public Istanza getIstanza(String codice) {
-        TypedQuery q = em.createNamedQuery("istanza.onlycodice", Istanza.class);
+        TypedQuery q = this.em.createNamedQuery("istanza.onlycodice", Istanza.class);
         q.setParameter("codice", codice);
         return q.getResultList().isEmpty() ? null : (Istanza) q.getSingleResult();
     }
 
     public Istanza getIstanzaWaiting(SoggettoProponente s) {
-        TypedQuery q = em.createNamedQuery("istanza.soggettowaiting", Istanza.class);
+        TypedQuery q = this.em.createNamedQuery("istanza.soggettowaiting", Istanza.class);
         q.setParameter("soggetto", s);
         q.setMaxResults(1);
         return q.getResultList().isEmpty() ? null : (Istanza) q.getSingleResult();
     }
 
     public List<Corso> getCorsiIstanza(Istanza is) {
-        TypedQuery q = em.createNamedQuery("corso.istanza", Istanza.class);
+        TypedQuery q = this.em.createNamedQuery("corso.istanza", Istanza.class);
         q.setParameter("codiceistanza", is);
         return (List<Corso>) q.getResultList();
     }
 
     public List<Istanza> getIstanzedaGestire() {
-        TypedQuery q = em.createNamedQuery("istanza.dagestire", Istanza.class);
+        TypedQuery q = this.em.createNamedQuery("istanza.dagestire", Istanza.class);
         return (List<Istanza>) q.getResultList();
     }
 
     public List<Istanza> getIstanzeGestite() {
-        TypedQuery q = em.createNamedQuery("istanza.gestite", Istanza.class);
+        TypedQuery q = this.em.createNamedQuery("istanza.gestite", Istanza.class);
         return (List<Istanza>) q.getResultList();
     }
 
     public List<Istanza> getIstanzeAccettateAvvioCorsi(HttpSession session) {
         SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
-        TypedQuery q = em.createNamedQuery("istanza.listaaccettate", Istanza.class);
+        TypedQuery q = this.em.createNamedQuery("istanza.listaaccettate", Istanza.class);
         q.setParameter("soggetto", so);
         return (List<Istanza>) q.getResultList();
     }
@@ -146,13 +146,13 @@ public class EntityOp {
 
     public List<Corsoavviato> getCorsiAvviati(HttpSession session) {
         SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
-        TypedQuery q = em.createNamedQuery("corsoavviato.soggetto", Corsoavviato.class);
+        TypedQuery q = this.em.createNamedQuery("corsoavviato.soggetto", Corsoavviato.class);
         q.setParameter("soggetto", so);
         return (List<Corsoavviato>) q.getResultList();
     }
 
     public List<Corsoavviato> getCorsiAvviati_Admin() {
-        TypedQuery q = em.createNamedQuery("corsoavviato.stato", Corsoavviato.class);
+        TypedQuery q = this.em.createNamedQuery("corsoavviato.stato", Corsoavviato.class);
         CorsoStato c1 = new CorsoStato();
         c1.setCodicestatocorso("20");
         q.setParameter("stato", c1);
@@ -160,15 +160,14 @@ public class EntityOp {
     }
 
     public List<Corsoavviato> getCorsiConclusi_Admin() {
-        TypedQuery q = em.createNamedQuery("corsoavviato.stato", Corsoavviato.class);
+        TypedQuery q = this.em.createNamedQuery("corsoavviato.stato", Corsoavviato.class);
         CorsoStato c1 = new CorsoStato();
         c1.setCodicestatocorso("21");
         q.setParameter("stato", c1);
         return (List<Corsoavviato>) q.getResultList();
     }
-    
-    
-    public static void trackingAction(String user,String azione){
+
+    public static void trackingAction(String user, String azione) {
         try {
             Track t1 = new Track();
             t1.setAzione(azione);
@@ -181,6 +180,25 @@ public class EntityOp {
         } catch (Exception ex1) {
             ex1.printStackTrace();
         }
+    }
+
+    public List<Istanza> getIstanzeSoggetto(SoggettoProponente s) {
+        TypedQuery q = this.em.createNamedQuery("istanza.soggetto", Istanza.class);
+        q.setParameter("soggetto", s);
+        return (List<Istanza>) q.getResultList();
+    }
+
+    public Tipologia_Percorso getTipoPercorsoIstanza(Istanza is) {
+        try {
+            TypedQuery q = this.em.createNamedQuery("corso.istanza", Istanza.class);
+            q.setParameter("codiceistanza", is);
+            List<Corso> lc = (List<Corso>) q.getResultList();
+            for (Corso c1 : lc) {
+                return c1.getTipologiapercorso();
+            }
+        } catch (Exception e) {
+        }
+        return null;
     }
 
 }

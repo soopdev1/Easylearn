@@ -28,6 +28,9 @@ public class CorsoStato implements Serializable {
     @Column(name = "ordine")
     private int ordine;
 
+    @Column(name = "htmlicon")
+    private String htmlicon;
+    
     public CorsoStato() {
     }
 
@@ -56,6 +59,13 @@ public class CorsoStato implements Serializable {
     public void setOrdine(int ordine) {
         this.ordine = ordine;
     }
-    
+
+    public String getHtmlicon() {
+        return htmlicon;
+    }
+
+    public void setHtmlicon(String htmlicon) {
+        this.htmlicon = htmlicon;
+    }
     
 }

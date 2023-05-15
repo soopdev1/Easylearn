@@ -460,8 +460,11 @@ public class Operations extends HttpServlet {
     }
 
     protected void ADDCORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        String closewindow = getRequestValue(request, "closewindow");
         try {
+
+            
+
             SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
             Istanza is = (Istanza) request.getSession().getAttribute("is_memory");
             String codiceis = generaId(30);
@@ -507,10 +510,21 @@ public class Operations extends HttpServlet {
             e.close();
             HttpSession se = request.getSession();
             se.setAttribute("is_memory", is);
-            redirect(request, response, "US_gestioneistanza.jsp");
+
+            if (closewindow.equals("YES")) {
+                redirect(request, response, "Page_message.jsp?esito=OK_CL");
+            } else {
+                redirect(request, response, "US_gestioneistanza.jsp");
+            }
+
         } catch (Exception ex) {
             EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
-            redirect(request, response, "US_compilacorsi.jsp?esito=KO");
+            if (closewindow.equals("YES")) {
+                redirect(request, response, "Page_message.jsp?esito=OK_CL");
+            } else {
+                redirect(request, response, "US_compilacorsi.jsp?esito=KO");
+            }
+            
         }
 
     }
