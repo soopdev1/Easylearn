@@ -16,16 +16,6 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
-                Istanza i1 = (Istanza) session.getAttribute("is_memory");
-                int corsi_attuali = 0;
-                boolean istanzaok = false;
-                if (i1 != null) {
-                    istanzaok = i1.getStatocorso().getCodice().equals("02");
-                    corsi_attuali = i1.getQuantitarichiesta();
-                } else {
-                    i1 = new Istanza();
-                }
-
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -33,7 +23,7 @@
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" />
+        <link rel="stylesheet" href="assets/css/gfont.css" />
         <!--end::Fonts-->
         <!--begin::Page Vendor Stylesheets(used by this page)-->
         <link href="assets/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet" type="text/css" />
@@ -60,7 +50,7 @@
                     <!--end::Header-->
                     <!--begin::Content wrapper-->
                     <div class="d-flex flex-column-fluid">
-                        <jsp:include page="menu/menuUS3.jsp" /> 
+                        <jsp:include page="menu/menuUS1.jsp" /> 
                         <!--begin::Container-->
                         <div class="d-flex flex-column flex-column-fluid container-fluid">
                             <!--begin::Post-->
@@ -113,7 +103,7 @@
                                                                     <select aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
                                                                             class="form-select form-select-solid form-select-lg fw-bold" name="codiceistanza" required>
                                                                         <%for (Istanza is1 : accettate) {%>
-                                                                        <option value="<%=is1.getCodice()%>">PROTOCOLLO <%=is1.getProtocollosoggetto()%> DEL <%=is1.getProtocollosoggettodata()%> - DECRETO n. 100 DEL  12/12/2022</option>
+                                                                        <option value="<%=is1.getCodiceistanza()%>">PROTOCOLLO <%=is1.getProtocollosoggetto()%> DEL <%=is1.getProtocollosoggettodata()%> - DECRETO n. 100 DEL  12/12/2022</option>
                                                                         <%}%>
                                                                     </select>
                                                                 </div>

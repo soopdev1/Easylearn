@@ -33,7 +33,7 @@
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" />
+        <link rel="stylesheet" href="assets/css/gfont.css" />
         <!--end::Fonts-->
         <!--begin::Page Vendor Stylesheets(used by this page)-->
         <!--end::Page Vendor Stylesheets-->
@@ -41,6 +41,7 @@
         <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+        <link href="assets/css/plus.css" rel="stylesheet" type="text/css" />
 
         <!--end::Global Stylesheets Bundle-->
     </head>
@@ -59,7 +60,7 @@
                     <!--end::Header-->
                     <!--begin::Content wrapper-->
                     <div class="d-flex flex-column-fluid">
-                        <jsp:include page="menu/menuUS2_b.jsp" /> 
+                        <jsp:include page="menu/menuUS1.jsp" /> 
                         <!--begin::Container-->
                         <div class="d-flex flex-column flex-column-fluid container-fluid">
                             <!--begin::Post-->

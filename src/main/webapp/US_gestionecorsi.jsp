@@ -25,7 +25,7 @@
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" />
+        <link rel="stylesheet" href="assets/css/gfont.css" />
         <!--end::Fonts-->
         <!--begin::Page Vendor Stylesheets(used by this page)-->
         <link href="assets/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet" type="text/css" />
@@ -52,7 +52,7 @@
                     <!--end::Header-->
                     <!--begin::Content wrapper-->
                     <div class="d-flex flex-column-fluid">
-                        <jsp:include page="menu/menuUS4.jsp" /> 
+                        <jsp:include page="menu/menuUS1.jsp" /> 
                         <!--begin::Container-->
                         <div class="d-flex flex-column flex-column-fluid container-fluid">
                             <!--begin::Post-->
@@ -92,7 +92,7 @@
 
                                                     <%for (Corsoavviato co1 : corsi) {
 
-                                                            String stato = co1.getStatocorso().getCodice().equals("20")
+                                                            String stato = co1.getStatocorso().getCodicestatocorso().equals("20")
                                                                     ? "<span class='badge badge-warning'>AVVIATO</span>"
                                                                     : "<span class='badge badge-success'>CONCLUSO</span>";
                                                     %>
@@ -107,7 +107,7 @@
                                                                onclick="return document.forms['sca_<%=co1.getIdcorso()%>'].submit();" >
                                                                 <i class="fa fa-file-pdf"></i></a>
 
-                                                            <a href="US_uploadgeneric.jsp?codice_istanza=<%=co1.getIstanza().getCodice()%>" data-fancybox data-type='iframe' 
+                                                            <a href="US_uploadgeneric.jsp?codice_istanza=<%=co1.getIstanza().getCodiceistanza()%>" data-fancybox data-type='iframe' 
                                                                data-bs-toggle="tooltip" title="CARICA DOCUMENTI CORSO" 
                                                                data-preload='false' data-width='75%' data-height='75%' 
                                                                class="btn btn-sm btn-bg-light btn-primary fan1">
@@ -132,7 +132,8 @@
 
                                                             <form action="Operations" method="POST" target="_blank" name="sca_<%=co1.getIdcorso()%>">
                                                                 <input type="hidden" name="type" value="SCARICAISTANZAFIRMATA" />
-                                                                <input type="hidden" name="codice_istanza" value="<%=co1.getIstanza().getCodice()%>" />
+                                                                <input type="hidden" name="codice_istanza" 
+                                                                       value="<%=co1.getIstanza().getCodiceistanza()%>" />
                                                             </form>
 
                                                             <form action="Operations" method="POST" name="concl_<%=co1.getIdcorso()%>">

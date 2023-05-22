@@ -36,6 +36,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import static org.apache.commons.fileupload.servlet.ServletFileUpload.isMultipartContent;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import org.apache.commons.lang3.StringUtils;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import org.jasypt.util.text.StrongTextEncryptor;
 import org.joda.time.DateTime;
@@ -217,11 +218,9 @@ public class Utils {
         return new DateTime().toString(PATTERNDATE3) + random;
     }
 
-    
-
     public static String enc_string(String plainText) {
         try {
-            
+
             return Base64.getUrlEncoder().encodeToString(plainText.getBytes());
 //            String IV = "AAAAAAAAAAAAAAAA";
 //            String _plaintText_16 = covertto16Byte(plainText);
@@ -237,8 +236,8 @@ public class Utils {
 //            byte[] encrypted = cipher.doFinal(ing.getBytes());
 //            byte[] encoded = Base64.getEncoder().encode(new String(encrypted).getBytes(StandardCharsets.UTF_8));
 //            return new String(encoded);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
         }
         return null;
 
@@ -249,8 +248,7 @@ public class Utils {
 
     public static String dec_string(String ing) {
         try {
-            
-            
+
             return new String(Base64.getUrlDecoder().decode(ing));
 //            String IV = "AAAAAAAAAAAAAAAA";
 //
@@ -265,11 +263,21 @@ public class Utils {
 //            byte[] decrypted = cipher.doFinal(ing.getBytes());
 //            byte[] decoded = Base64.getDecoder().decode(new String(decrypted).getBytes(StandardCharsets.UTF_8));
 //            return new String(decoded);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
         }
         return null;
     }
+
+    public static String getPagename(HttpServletRequest req) {
+        try {
+            return StringUtils.substringAfterLast(req.getRequestURI(), "/");
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+        }
+        return "";
+    }
+
 //
 //    
 //    public static String dec_string(String ing){
