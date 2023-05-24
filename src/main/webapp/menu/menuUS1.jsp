@@ -24,6 +24,20 @@
     String m_3A = "";
     String m_3B = "";
 
+    String m_4s = "";
+    String m_4 = "";
+    String m_4A = "";
+    
+    String m_5s = "";
+    String m_5 = "";
+    String m_5A = "";
+    String m_5B = "";
+    
+    String m_6s = "";
+    String m_6 = "";
+    String m_6A = "";
+    String m_6B = "";
+
     switch (pageName) {
         case "US_dashboard.jsp": {
             m_1s = "show";
@@ -54,6 +68,24 @@
             m_3s = "show";
             m_3 = "menu-active-bg";
             m_3B = "active";
+            break;
+        }
+        case "US_gestionedocenti.jsp": {
+            m_4s = "show";
+            m_4= "menu-active-bg";
+            m_4A = "active";
+            break;
+        }
+        case "US_gestioneallievi.jsp": {
+            m_5s = "show";
+            m_5= "menu-active-bg";
+            m_5B = "active";
+            break;
+        }
+        case "US_gestionesedi.jsp": {
+            m_6s = "show";
+            m_6= "menu-active-bg";
+            m_6A = "active";
             break;
         }
         default: {
@@ -171,7 +203,7 @@
                                                         </div>                          
                                                     </div>
                                                 </div>
-                                                <div data-kt-menu-trigger="click" class="menu-item here menu-accordion">
+                                                <div data-kt-menu-trigger="click" class="menu-item here <%=m_4s%> menu-accordion">
                                                     <span class="menu-link">
                                                         <span class="menu-icon">
                                                             <!--begin::Svg Icon | path: icons/duotune/general/gen025.svg-->
@@ -206,9 +238,9 @@
                                                         </span>
                                                         <span class="menu-title">DOCENTI</span>
                                                     </span>
-                                                    <div class="menu-sub menu-sub-accordion">                        
+                                                    <div class="menu-sub menu-sub-accordion <%=m_4%>">                        
                                                         <div class="menu-item">
-                                                            <a class="menu-link" href="US_gestionecorsi.jsp">
+                                                            <a class="menu-link <%=m_4A%>" href="US_gestionedocenti.jsp">
                                                                 <span class="menu-bullet">
                                                                     <span class="bullet bullet-dot"></span>
                                                                 </span>
@@ -217,7 +249,7 @@
                                                         </div>                          
                                                     </div>
                                                 </div>
-                                                <div data-kt-menu-trigger="click" class="menu-item here menu-accordion">
+                                                <div data-kt-menu-trigger="click" class="menu-item here <%=m_5s%> menu-accordion">
                                                     <span class="menu-link">
                                                         <span class="menu-icon">
                                                             <span class="svg-icon svg-icon-2">
@@ -232,17 +264,19 @@
                                                         </span>
                                                         <span class="menu-title">ALLIEVI</span>
                                                     </span>
-                                                    <div class="menu-sub menu-sub-accordion">                        
+                                                    <div class="menu-sub menu-sub-accordion <%=m_5%>">  
+                                                        <!--
                                                         <div class="menu-item">
-                                                            <a class="menu-link" href="US_nuovocorso.jsp">
+                                                            <a class="menu-link <%=m_5A%>" href="US_nuovocorso.jsp">
                                                                 <span class="menu-bullet">
                                                                     <span class="bullet bullet-dot"></span>
                                                                 </span>
                                                                 <span class="menu-title">Aggiungi Nuovo Allievo</span>
                                                             </a>
-                                                        </div>                          
+                                                        </div>
+                                                        -->
                                                         <div class="menu-item">
-                                                            <a class="menu-link" href="US_gestionecorsi.jsp">
+                                                            <a class="menu-link <%=m_5B%>" href="US_gestioneallievi.jsp">
                                                                 <span class="menu-bullet">
                                                                     <span class="bullet bullet-dot"></span>
                                                                 </span>
@@ -251,7 +285,7 @@
                                                         </div>                          
                                                     </div>
                                                 </div>
-                                                <div data-kt-menu-trigger="click" class="menu-item here menu-accordion">
+                                                <div data-kt-menu-trigger="click" class="menu-item here <%=m_6s%> menu-accordion">
                                                     <span class="menu-link">
                                                         <span class="menu-icon">
                                                             <!--begin::Svg Icon | path: icons/duotune/general/gen025.svg-->
@@ -264,9 +298,9 @@
                                                         </span>
                                                         <span class="menu-title">SEDI</span>
                                                     </span>
-                                                    <div class="menu-sub menu-sub-accordion">                        
+                                                    <div class="menu-sub menu-sub-accordion <%=m_6%>">                        
                                                         <div class="menu-item">
-                                                            <a class="menu-link" href="US_gestionecorsi.jsp">
+                                                            <a class="menu-link <%=m_6A%>" href="US_gestionesedi.jsp">
                                                                 <span class="menu-bullet">
                                                                     <span class="bullet bullet-dot"></span>
                                                                 </span>

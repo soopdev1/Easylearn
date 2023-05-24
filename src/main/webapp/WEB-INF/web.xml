@@ -10,6 +10,10 @@
         <servlet-name>Operations</servlet-name>
         <servlet-class>rc.soop.servlet.Operations</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Search</servlet-name>
+        <servlet-class>rc.soop.servlet.Search</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginOperations</servlet-name>
         <url-pattern>/LoginOperations</url-pattern>
@@ -17,6 +21,10 @@
     <servlet-mapping>
         <servlet-name>Operations</servlet-name>
         <url-pattern>/Operations</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Search</servlet-name>
+        <url-pattern>/Search</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>login.jsp</welcome-file>

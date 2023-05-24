@@ -40,6 +40,7 @@
         <!--begin::Global Stylesheets Bundle(used by all pages)-->
         <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
+        <link href="assets/plugins/DataTables/datatables.min.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/plus.css" rel="stylesheet" type="text/css" />
 
@@ -89,14 +90,14 @@
                                                 <!--begin::Table container-->
                                                 <div class="table-responsive ">
                                                     <!--begin::Table-->
-                                                    <table class="table align-middle gy-3 table-bordered table-hover">
+                                                    <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt1">
                                                         <!--begin::Table head-->
                                                         <thead>
                                                             <tr>
                                                                 <th class="p-2 w-50px">Stato</th>
                                                                 <th class="p-2 w-50px">Codice</th>
                                                                 <th class="p-2 min-w-120px">Corsi</th>
-                                                                <th class="p-2 w-80px">Data Creazione</th>
+                                                                <th class="p-2 w-80px">Data</th>
                                                                 <th class="p-2 min-w-120px">Azioni</th>
                                                             </tr>
                                                         </thead>
@@ -228,7 +229,10 @@
         <!--end::Global Javascript Bundle-->
         <!--begin::Page Vendors Javascript(used by this page)-->
         <script src="assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
-        <script src="assets/plugins/custom/datatables/datatables.bundle.js"></script>
+        <script src="assets/plugins/DataTables/jquery-3.5.1.js"></script>
+        <script src="assets/plugins/DataTables/jquery.dataTables.min.js"></script>
+        <script src="assets/plugins/DataTables/datatables.min.js"></script>
+        <script src="assets/plugins/DataTables/date-eu.js"></script>
         <!--end::Page Vendors Javascript-->
         <!--begin::Page Custom Javascript(used by this page)-->
         <script src="assets/js/widgets.bundle.js"></script>
@@ -237,7 +241,11 @@
         <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
         <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
         <script type="text/javascript" src="assets/js/common.js"></script>
+        <script type="text/javascript" src="assets/js/US_gestioneistanza.js"></script>
         <!--end::Page Custom Javascript-->
+        
+        
+        
         <!--end::Javascript-->
     </body>
     <!--end::Body-->

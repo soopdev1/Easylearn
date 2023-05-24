@@ -8,12 +8,18 @@ import java.io.Serializable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import static rc.soop.sic.jpa.Stati.ABILITATO;
+import static rc.soop.sic.jpa.Stati.CHECK;
+import static rc.soop.sic.jpa.Stati.DISABILITATO;
 
 /**
  *
@@ -44,7 +50,46 @@ public class Sede implements Serializable {
     @JoinColumn(name = "idsoggetto")
     SoggettoProponente soggetto;
             
+    @Enumerated(EnumType.STRING)
+    @Column(name = "statosede")
+    private Stati statosede;
+
+        @Transient
+    private String etichettastato;
+
+    public String getEtichettastato() {
+        switch (this.statosede) {
+            case ABILITATO:
+                this.etichettastato = "<i class='fa fa-check'></i> Abilitata";
+                break;
+            case DISABILITATO:
+                this.etichettastato = "<i class='fa fa-lock'></i> Disabilitata";
+                break;
+            case CHECK:
+                this.etichettastato = "<i class='fa fa-warning'></i> Da Verificare";
+                break;
+            default:
+                this.etichettastato = "";
+                break;
+        }
+        return etichettastato;
+    }
+
+    public void setEtichettastato(String etichettastato) {
+        this.etichettastato = etichettastato;
+    }
+    
+    
+    
     public Sede() {
+    }
+
+    public Stati getStatosede() {
+        return statosede;
+    }
+
+    public void setStatosede(Stati statosede) {
+        this.statosede = statosede;
     }
 
     public SoggettoProponente getSoggetto() {
