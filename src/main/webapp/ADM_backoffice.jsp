@@ -4,7 +4,8 @@
     Author     : raf
 --%>
 
-<%@page import="rc.soop.sic.Engine"%>
+<%@page import="rc.soop.sic.jpa.EntityOp"%>
+<%@page import="java.util.List"%>
 <%@page import="rc.soop.sic.jpa.Istanza"%>
 <%@page import="rc.soop.sic.Utils"%>
 <%@page import="rc.soop.sic.Constant"%>
@@ -15,16 +16,7 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
-                Istanza i1 = (Istanza) session.getAttribute("is_memory");
-                int corsi_attuali = 0;
-                boolean istanzaok = false;
-                if (i1 != null) {
-                    istanzaok = i1.getStatocorso().getCodicestatocorso().equals("02");
-                    corsi_attuali = i1.getQuantitarichiesta();
-                } else {
-                    i1 = new Istanza();
-                }
-
+                EntityOp e = new EntityOp();
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -42,10 +34,6 @@
         <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
-                <%
-        String[] contatori = Engine.contatori_home_ADMIN(session);
-        %>
-
         <!--end::Global Stylesheets Bundle-->
     </head>
     <!--end::Head-->
@@ -76,74 +64,59 @@
                                 <div class="row g-10">
                                     <!--begin::Col-->
                                     <div class="row g-5 g-lg-10">
-                                        <!--begin::Col-->
-                                        <div class="col-lg-3">
-                                            <!--begin::Tiles Widget 1-->
-                                            <!--end::Tiles Widget 1-->
-                                            <!--begin::Tiles Widget 5-->
-                                            <a href="#" class="card bg-body h-150px">
-                                                <!--begin::Body-->
-                                                <div class="card-body d-flex flex-column justify-content-between">
-                                                    <!--begin::Svg Icon | path: icons/duotune/general/gen025.svg-->
-                                                    <span class="svg-icon svg-icon-dark svg-icon-2hx ms-n1 flex-grow-1">
-                                                        <i class="fa fa-file-archive"></i>
-                                                    </span>
-                                                    <!--end::Svg Icon-->
-                                                    <div class="d-flex flex-column">
-                                                        <div class="text-dark fw-bolder fs-1 mb-0 mt-5"><%=contatori[0]%></div>
-                                                        <div class="text-muted fw-bold fs-6">Istanze In Attesa</div>
+                                        <div class="col-xl-12">
+                                            <!--begin::Mixed Widget 18-->
+                                            <div class="card">
+                                                <!--begin::Beader-->
+                                                <div class="card-header border-0 py-5">
+                                                    <h3 class="card-title align-items-start flex-column">
+                                                        <span class="card-label fw-bolder fs-3 mb-1">TIPOLOGIA PERCORSO</span>
+                                                    </h3>
+                                                    <div class="card-toolbar">
+                                                        <!--begin::Menu-->
+                                                        <button type="button" 
+                                                                class="btn btn-sm btn-bg-light btn-primary">
+                                                            <i class="fa fa-plus-circle"></i> AGGIUNGI NUOVO
+                                                        </button>
                                                     </div>
                                                 </div>
-                                                <!--end::Body-->
-                                            </a>
-                                            <!--end::Tiles Widget 5-->
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <!--begin::Tiles Widget 1-->
-                                            <!--end::Tiles Widget 1-->
-                                            <!--begin::Tiles Widget 5-->
-                                            <a href="#" class="card bg-body h-150px">
+                                                <!--end::Header-->
                                                 <!--begin::Body-->
-                                                <div class="card-body d-flex flex-column justify-content-between">
-                                                    <!--begin::Svg Icon | path: icons/duotune/general/gen025.svg-->
-                                                    <span class="svg-icon svg-icon-success svg-icon-2hx ms-n1 flex-grow-1">
-                                                        <i class="fa fa-file-archive"></i>
-                                                    </span>
-                                                    <!--end::Svg Icon-->
-                                                    <div class="d-flex flex-column">
-                                                        <div class="text-success fw-bolder fs-1 mb-0 mt-5"><%=contatori[1]%></div>
-                                                        <div class="text-muted fw-bold fs-6">Istanze Accettate</div>
-                                                    </div>
+                                                <div class="card-body p-0 d-flex flex-column">
+                                                    <!--begin::Items-->
+                                                    <div class="card-px pt-5 pb-10 flex-grow-1">
+                                                        <!--begin::Item-->
+                                                                <div class="table-responsive">
+                                                                    <!--begin::Table-->
+                                                                    <table class="table align-middle table-bordered table-hover" id="tab_dt1">
+                                                                        <!--begin::Table head-->
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th class="p-2">Tipologia</th>
+                                                                                <th class="p-2">Descrizione</th>
+                                                                                <th class="p-2">Data Inizio</th>
+                                                                                <th class="p-2">Data Fine</th>
+                                                                                <th class="p-2">Stato</th>
+                                                                                <th class="p-2">Azioni</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <!--end::Table head-->
+                                                                        <!--begin::Table body-->
+                                                                        <tbody></tbody>
+                                                                        <!--end::Table body-->
+                                                                    </table>
+                                                                    <!--end::Table-->
+                                                                </div>
+                                                            </div>
+                                                            <!--end::Section-->
                                                 </div>
                                                 <!--end::Body-->
-                                            </a>
-                                            <!--end::Tiles Widget 5-->
+                                            </div>
+                                            <!--end::Mixed Widget 18-->
                                         </div>
-                                        <div class="col-lg-3">
-                                            <!--begin::Tiles Widget 1-->
-                                            <!--end::Tiles Widget 1-->
-                                            <!--begin::Tiles Widget 5-->
-                                            <a href="#" class="card bg-body h-150px">
-                                                <!--begin::Body-->
-                                                <div class="card-body d-flex flex-column justify-content-between">
-                                                    <!--begin::Svg Icon | path: icons/duotune/general/gen025.svg-->
-                                                    <span class="svg-icon svg-icon-primary svg-icon-2hx ms-n1 flex-grow-1">
-                                                        <i class="fa fa-graduation-cap"></i>
-                                                    </span>
-                                                    <!--end::Svg Icon-->
-                                                    <div class="d-flex flex-column">
-                                                        <div class="text-primary fw-bolder fs-1 mb-0 mt-5"><%=contatori[3]%></div>
-                                                        <div class="text-muted fw-bold fs-6">Corsi attualmente attivi</div>
-                                                    </div>
-                                                </div>
-                                                <!--end::Body-->
-                                            </a>
-                                            <!--end::Tiles Widget 5-->
-                                        </div>
+
                                     </div>
                                     <!--end::Col-->
-
-
                                 </div>
                                 <!--end::Row-->
                             </div>
@@ -196,17 +169,19 @@
         <!--end::Global Javascript Bundle-->
         <!--begin::Page Vendors Javascript(used by this page)-->
         <script src="assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
+        <script src="assets/plugins/DataTables/jquery-3.5.1.js"></script>
+        <script src="assets/plugins/DataTables/jquery.dataTables.min.js"></script>
         <script src="assets/plugins/DataTables/datatables.min.js"></script>
+        <script src="assets/plugins/DataTables/date-eu.js"></script>
         <!--end::Page Vendors Javascript-->
         <!--begin::Page Custom Javascript(used by this page)-->
         <script src="assets/js/widgets.bundle.js"></script>
         <script src="assets/js/custom/widgets.js"></script>
-        <script src="assets/js/custom/apps/chat/chat.js"></script>
-        <script src="assets/js/custom/utilities/modals/create-app.js"></script>
-        <script src="assets/js/custom/utilities/modals/create-campaign.js"></script>
-        <script src="assets/js/custom/utilities/modals/users-search.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
-
+        <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
+        <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
+        <script type="text/javascript" src="assets/js/common.js"></script>
+        <script type="text/javascript" src="assets/js/ADM_backoffice.js"></script>
         <!--end::Page Custom Javascript-->
         <!--end::Javascript-->
     </body>

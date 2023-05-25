@@ -55,7 +55,7 @@
                     <!--end::Header-->
                     <!--begin::Content wrapper-->
                     <div class="d-flex flex-column-fluid">
-                        <jsp:include page="menu/menuADM3.jsp" /> 
+                        <jsp:include page="menu/menuADM1.jsp" /> 
                         <!--begin::Container-->
                         <div class="d-flex flex-column flex-column-fluid container-fluid">
                             <!--begin::Post-->

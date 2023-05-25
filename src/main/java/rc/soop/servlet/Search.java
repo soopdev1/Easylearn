@@ -52,9 +52,6 @@ public class Search extends HttpServlet {
             jMembers.addProperty(SCOLUMS, "");
             AtomicInteger at = new AtomicInteger(1);
             result.forEach(res -> {
-
-                String stato = "";
-
 //                String pdf
 //                        = "<a href='javascript:void(0)' onclick='return $(\"#frm\").submit();' class='btn btn-sm btn-outline-primary m-btn m-btn--icon m-btn--icon-only m-btn--custom m-btn--pill m-btn--air' "
 //                        + "data-toggle='popover' data-placement='right' title='Visualizza File' data-content='Visualizza file documento.'><i class='far fa-file-pdf'></i></a>"
@@ -99,8 +96,6 @@ public class Search extends HttpServlet {
             jMembers.addProperty(SCOLUMS, "");
             AtomicInteger at = new AtomicInteger(1);
             result.forEach(res -> {
-
-                String stato = "";
 
 //                String pdf
 //                        = "<a href='javascript:void(0)' onclick='return $(\"#frm\").submit();' class='btn btn-sm btn-outline-primary m-btn m-btn--icon m-btn--icon-only m-btn--custom m-btn--pill m-btn--air' "

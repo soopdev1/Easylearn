@@ -11,5 +11,7 @@ package rc.soop.sic.jpa;
 public enum Stati {
     ABILITATO,
     DISABILITATO,
-    CHECK
+    CHECK,
+    ATTIVO,
+    INATTIVO
 }

@@ -4,6 +4,7 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.Engine"%>
 <%@page import="rc.soop.sic.jpa.Istanza"%>
 <%@page import="rc.soop.sic.Utils"%>
 <%@page import="rc.soop.sic.Constant"%>
@@ -32,7 +33,7 @@
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
         <%
-        String[] contatori = {"0","0","0","0"};
+        String[] contatori = Engine.contatori_home_SA(session);
         %>
         <!--end::Global Stylesheets Bundle-->
     </head>

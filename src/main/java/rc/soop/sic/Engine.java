@@ -52,6 +52,17 @@ public class Engine {
 
         return contatori;
     }
+    public static String[] contatori_home_ADMIN(HttpSession se) {
+        String[] contatori = {"0", "0", "0", "0"};
+
+        try {
+
+        } catch (Exception ex) {
+            trackingAction(se.getAttribute("us_cod").toString(), estraiEccezione(ex));
+        }
+
+        return contatori;
+    }
 
     public static String getPath(String id) {
         try {

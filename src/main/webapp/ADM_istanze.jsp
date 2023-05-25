@@ -53,7 +53,7 @@
                     <!--end::Header-->
                     <!--begin::Content wrapper-->
                     <div class="d-flex flex-column-fluid">
-                        <jsp:include page="menu/menuADM2.jsp" /> 
+                        <jsp:include page="menu/menuADM1.jsp" /> 
                         <!--begin::Container-->
                         <div class="d-flex flex-column flex-column-fluid container-fluid">
                             <!--begin::Post-->
@@ -98,26 +98,26 @@
                                                         <td><%=is1.getDatainvio()%></td>
                                                         <td>
                                                             <a href="#" class="btn btn-sm btn-bg-light btn-primary" data-bs-toggle="tooltip" title="PROTOCOLLA ISTANZA" 
-                                                               onclick="return document.forms['sca_<%=is1.getCodice()%>'].submit();" >
+                                                               onclick="return document.forms['sca_<%=is1.getCodiceistanza()%>'].submit();" >
                                                                 <i class="fa fa-file-archive"></i></a>
                                                             <a href="#" class="btn btn-sm btn-bg-light btn-dark" data-bs-toggle="tooltip" title="VISUALIZZA ISTANZA" 
-                                                               onclick="return document.forms['sca_<%=is1.getCodice()%>'].submit();" >
+                                                               onclick="return document.forms['sca_<%=is1.getCodiceistanza()%>'].submit();" >
                                                                 <i class="fa fa-file-pdf"></i></a>
                                                             <a href="#" class="btn btn-sm btn-bg-light btn-warning" data-bs-toggle='tooltip' title='SOCCORSO ISTRUTTORIO' 
-                                                               onclick="return document.forms['soc_<%=is1.getCodice()%>'].submit();">
+                                                               onclick="return document.forms['soc_<%=is1.getCodiceistanza()%>'].submit();">
                                                                 <i class="fa fa-warning"></i></a>
                                                             <a href="#" class="btn btn-sm btn-bg-light btn-success" data-bs-toggle='tooltip' title='APPROVA ISTANZA' 
-                                                               onclick="return document.forms['apprist_<%=is1.getCodice()%>'].submit();">
+                                                               onclick="return document.forms['apprist_<%=is1.getCodiceistanza()%>'].submit();">
                                                                 <i class="fa fa-check-circle"></i></a>
                                                             <a href="#" class="btn btn-sm btn-bg-light btn-danger fan1" data-bs-toggle='tooltip' title="RIGETTA ISTANZA">
                                                                 <i class="fa fa-cancel"></i></a>
-                                                            <form action="Operations" method="POST" target="_blank" name="sca_<%=is1.getCodice()%>">
+                                                            <form action="Operations" method="POST" target="_blank" name="sca_<%=is1.getCodiceistanza()%>">
                                                                 <input type="hidden" name="type" value="SCARICAISTANZAFIRMATA" />
-                                                                <input type="hidden" name="codice_istanza" value="<%=is1.getCodice()%>" />
+                                                                <input type="hidden" name="codice_istanza" value="<%=is1.getCodiceistanza()%>" />
                                                             </form>
-                                                            <form action="Operations" method="POST" name="apprist_<%=is1.getCodice()%>">
+                                                            <form action="Operations" method="POST" name="apprist_<%=is1.getCodiceistanza()%>">
                                                                 <input type="hidden" name="type" value="APPROVAISTANZA" />
-                                                                <input type="hidden" name="codice_istanza" value="<%=is1.getCodice()%>" />
+                                                                <input type="hidden" name="codice_istanza" value="<%=is1.getCodiceistanza()%>" />
                                                             </form>
                                                         </td>
                                                     </tr>  
@@ -145,7 +145,7 @@
                                                 <tbody>
                                                     <%for (Istanza is1 : gestite) {
 
-                                                            String stato = !is1.getStatocorso().getCodice().equals("08")
+                                                            String stato = !is1.getStatocorso().getCodicestatocorso().equals("08")
                                                                     ? "<span class='badge badge-danger'>RIGETTATA</span> "
                                                                     : "<span class='badge badge-success'>APPROVATA</span> ";
 
@@ -160,18 +160,18 @@
                                                         <td><%=stato%></td>
                                                         <td>
                                                             <a href="#" class="btn btn-sm btn-bg-light btn-dark" data-bs-toggle="tooltip" title="VISUALIZZA ISTANZA" 
-                                                               onclick="return document.forms['sca_<%=is1.getCodice()%>'].submit();" >
+                                                               onclick="return document.forms['sca_<%=is1.getCodiceistanza()%>'].submit();" >
                                                                 <i class="fa fa-file-pdf"></i></a>
                                                             <a href="#" class="btn btn-sm btn-bg-light btn-success" data-bs-toggle='tooltip' title='VISUALIZZA DECRETO' 
-                                                               onclick="return document.forms['decr_<%=is1.getCodice()%>'].submit();">
+                                                               onclick="return document.forms['decr_<%=is1.getCodiceistanza()%>'].submit();">
                                                                 <i class="fa fa-check-circle"></i></a>
-                                                            <form action="Operations" method="POST" target="_blank" name="sca_<%=is1.getCodice()%>">
+                                                            <form action="Operations" method="POST" target="_blank" name="sca_<%=is1.getCodiceistanza()%>">
                                                                 <input type="hidden" name="type" value="SCARICAISTANZAFIRMATA" />
-                                                                <input type="hidden" name="codice_istanza" value="<%=is1.getCodice()%>" />
+                                                                <input type="hidden" name="codice_istanza" value="<%=is1.getCodiceistanza()%>" />
                                                             </form>
-                                                            <form action="Operations" method="POST" target="_blank" name="decr_<%=is1.getCodice()%>">
+                                                            <form action="Operations" method="POST" target="_blank" name="decr_<%=is1.getCodiceistanza()%>">
                                                                 <input type="hidden" name="type" value="SCARICADECRETOISTANZA" />
-                                                                <input type="hidden" name="codice_istanza" value="<%=is1.getCodice()%>" />
+                                                                <input type="hidden" name="codice_istanza" value="<%=is1.getCodiceistanza()%>" />
                                                             </form>
                                                         </td>
 
