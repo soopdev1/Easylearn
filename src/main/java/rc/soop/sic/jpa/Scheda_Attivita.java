@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -65,6 +66,35 @@ public class Scheda_Attivita implements Serializable {
     @ManyToOne
     @JoinColumn(name = "idrepertorio")
     private Repertorio repertorio;
+    
+    @Lob
+    @Column(name = "tipologiaprovafinale")
+    private String tipologiaprovafinale;
+
+    @Column(name = "durataprovafinale")
+    private int durataprovafinale;
+
+    @Lob
+    @Column(name = "normativa")
+    private String normativa;
+
+    @Lob
+    @Column(name = "prerequisiti")
+    private String prerequisiti;
+
+    @Lob
+    @Column(name = "ulterioriindicazioni")
+    private String ulterioriindicazioni;
+
+    @Column(name = "etaminima")
+    private int etaminima;
+    
+    @Column(name = "livellomassimoscolarita")
+    private String livellomassimoscolarita;
+
+    
+    @Column(name = "livellominimoscolarita")
+    private String livellominimoscolarita;
 
     public Scheda_Attivita() {
     }
@@ -173,6 +203,70 @@ public class Scheda_Attivita implements Serializable {
         this.repertorio = repertorio;
     }
 
+    public String getTipologiaprovafinale() {
+        return tipologiaprovafinale;
+    }
+
+    public void setTipologiaprovafinale(String tipologiaprovafinale) {
+        this.tipologiaprovafinale = tipologiaprovafinale;
+    }
+
+    public int getDurataprovafinale() {
+        return durataprovafinale;
+    }
+
+    public void setDurataprovafinale(int durataprovafinale) {
+        this.durataprovafinale = durataprovafinale;
+    }
+
+    public String getNormativa() {
+        return normativa;
+    }
+
+    public void setNormativa(String normativa) {
+        this.normativa = normativa;
+    }
+
+    public String getPrerequisiti() {
+        return prerequisiti;
+    }
+
+    public void setPrerequisiti(String prerequisiti) {
+        this.prerequisiti = prerequisiti;
+    }
+
+    public String getUlterioriindicazioni() {
+        return ulterioriindicazioni;
+    }
+
+    public void setUlterioriindicazioni(String ulterioriindicazioni) {
+        this.ulterioriindicazioni = ulterioriindicazioni;
+    }
+
+    public int getEtaminima() {
+        return etaminima;
+    }
+
+    public void setEtaminima(int etaminima) {
+        this.etaminima = etaminima;
+    }
+
+    public String getLivellomassimoscolarita() {
+        return livellomassimoscolarita;
+    }
+
+    public void setLivellomassimoscolarita(String livellomassimoscolarita) {
+        this.livellomassimoscolarita = livellomassimoscolarita;
+    }
+
+    public String getLivellominimoscolarita() {
+        return livellominimoscolarita;
+    }
+
+    public void setLivellominimoscolarita(String livellominimoscolarita) {
+        this.livellominimoscolarita = livellominimoscolarita;
+    }
+    
     @Override
     public String toString() {
 
