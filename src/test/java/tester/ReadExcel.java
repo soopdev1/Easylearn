@@ -15,6 +15,13 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import rc.soop.sic.jpa.Categoria_Repertorio;
+import rc.soop.sic.jpa.Certificazione;
+import rc.soop.sic.jpa.EntityOp;
+import rc.soop.sic.jpa.Livello_Certificazione;
+import rc.soop.sic.jpa.Repertorio;
+import rc.soop.sic.jpa.Tipologia_Percorso;
+import rc.soop.sic.jpa.Tipologia_Repertorio;
 
 /**
  *
@@ -37,11 +44,15 @@ public class ReadExcel {
                             Cell cell = cellIterator.next();
                             switch (cell.getCellType()) {
                                 case STRING: {
-                                    l_v.add(new ExcelValues(i, cell.getRowIndex(), cell.getColumnIndex(), cell.getStringCellValue().trim()));
+                                    if (cell.getStringCellValue().trim().equals("\\N")) {
+                                        l_v.add(new ExcelValues(i, cell.getRowIndex(), cell.getColumnIndex(), ""));
+                                    } else {
+                                        l_v.add(new ExcelValues(i, cell.getRowIndex(), cell.getColumnIndex(), cell.getStringCellValue().trim()));
+                                    }
                                     break;
                                 }
                                 case NUMERIC: {
-                                    l_v.add(new ExcelValues(i, cell.getRowIndex(), cell.getColumnIndex(), String.valueOf(cell.getNumericCellValue()).trim()));
+                                    l_v.add(new ExcelValues(i, cell.getRowIndex(), cell.getColumnIndex(), String.valueOf(Double.valueOf(cell.getNumericCellValue()).intValue()).trim()));
                                     break;
                                 }
                                 case BLANK: {
@@ -57,11 +68,103 @@ public class ReadExcel {
                     }
                 }
             }
+            EntityOp e = new EntityOp();
+            List<Integer> righe = l_v.stream().filter(c -> c.getFoglio() == 0).map(c1 -> c1.getRiga()).distinct().collect(Collectors.toList());
+            List<Tipologia_Repertorio> all_tipologia = e.findAll(Tipologia_Repertorio.class);
+            List<Categoria_Repertorio> all_cat = e.findAll(Categoria_Repertorio.class);
+            List<Certificazione> all_cert = e.findAll(Certificazione.class);
 
-            List<ExcelValues> foglio1_index = l_v.stream().filter(c -> c.getFoglio() == 0 && c.getRiga()== 0).collect(Collectors.toList());
+            righe.forEach(f1 -> {
 
-            foglio1_index.forEach(f1 -> {
-                System.out.println(f1.toString());
+                List<ExcelValues> contentfoglio1 = l_v.stream().filter(c -> c.getFoglio() == 0 && c.getRiga() == f1).distinct().collect(Collectors.toList());
+
+                if (f1 > 0) {
+                    Repertorio r1 = new Repertorio();
+                    r1.setProvaingresso("NON PREVISTA");
+                    contentfoglio1.forEach(f2 -> {
+
+                        switch (f2.getColonna()) {
+                            case 0: {
+                                r1.setIdrepertorio(Long.valueOf(f2.getValue()));
+                                break;
+                            }
+                            case 1: {
+                                r1.setEdizione(f2.getValue());
+                                break;
+                            }
+                            case 2: {
+                                r1.setDenominazione(f2.getValue());
+                                r1.setDescrizione(f2.getValue());
+                                break;
+                            }
+                            case 3: {
+                                try {
+                                    r1.setTipologiacategoria(all_cat.stream().filter(t1 -> t1.getNome().equalsIgnoreCase(f2.getValue())).findAny().get());
+                                } catch (Exception ex1) {
+                                    System.out.println("NOT FOUND () " + f2.getValue());
+                                }
+                                break;
+                            }
+                            case 4: {
+                                try {
+                                    r1.setLivelloeqf(e.getEm().find(Livello_Certificazione.class, "EHF" + Integer.valueOf(f2.getValue())));
+                                } catch (Exception ex1) {
+                                    r1.setLivelloeqf(e.getEm().find(Livello_Certificazione.class, "0"));
+                                }
+
+                                break;
+                            }
+                            case 6: {
+                                try {
+                                    r1.setQualificarilasciata(all_cert.stream().filter(t1 -> t1.getNome().equalsIgnoreCase(f2.getValue())).findAny().get());
+                                } catch (Exception ex1) {
+                                    r1.setQualificarilasciata(e.getEm().find(Certificazione.class, "00"));
+                                }
+                                break;
+                            }
+                            case 7: {
+                                try {
+                                    r1.setTipologia(all_tipologia.stream().filter(t1 -> t1.getNome().equalsIgnoreCase(f2.getValue())).findAny().get());
+                                } catch (Exception ex1) {
+                                    System.out.println("NOT FOUND () " + f2.getValue());
+                                }
+                                break;
+                            }
+                            case 8: {
+                                r1.setAreaprofessionale(f2.getValue());
+                                break;
+                            }
+                            case 9: {
+                                r1.setSottoareaprofessionale(f2.getValue());
+                                break;
+                            }
+                            case 15: {
+                                try {
+                                    r1.setDurataprovafinale(Integer.valueOf(f2.getValue()) + " ORE");
+                                } catch (Exception ex1) {
+                                    r1.setDurataprovafinale("NON INDICATA");
+                                }
+
+                                break;
+                            }
+                            case 25: {
+                                r1.setNormativarif(f2.getValue());
+                                break;
+                            }
+                            default:
+                                break;
+                        }
+
+                    });
+                    System.out.println("tester.ReadExcel.main( ) " + r1.toString());
+//                    System.out.println("tester.ReadExcel.main( ) " + r1.getQualificarilasciata().getNome());
+//                    System.out.println("----------------------------------------------------------------------------------");
+                } else {
+                    contentfoglio1.forEach(f2 -> {
+                        System.out.println("tester.ReadExcel.main() " + f2.toString());
+
+                    });
+                }
             });
 
         } catch (Exception ex) {
