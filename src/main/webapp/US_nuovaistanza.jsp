@@ -4,6 +4,8 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.Lingua"%>
+<%@page import="rc.soop.sic.jpa.Competenze_Trasversali"%>
 <%@page import="rc.soop.sic.jpa.User"%>
 <%@page import="rc.soop.sic.jpa.Sede"%>
 <%@page import="rc.soop.sic.Engine"%>
@@ -36,6 +38,7 @@
         <!--begin::Global Stylesheets Bundle(used by all pages)-->
         <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
+        <link href="assets/plugins/DataTables/datatables.min.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/plus.css" rel="stylesheet" type="text/css" />
 
@@ -45,6 +48,8 @@
     <!--begin::Body-->
     <%
         List<Scheda_Attivita> sche1 = Engine.repertorio_completo_scheda();
+        List<Competenze_Trasversali> comp_tr = Engine.elenco_competenze_trasversali();
+        List<Lingua> language = Engine.elenco_lingua();
         int maxrichiesta = Utils.parseIntR(Engine.getPath("conf.max.edizioni"));
         int maxallievi = Utils.parseIntR(Engine.getPath("conf.max.allievi"));
         User u1 = (User) session.getAttribute("us_memory");
@@ -84,387 +89,493 @@
                                                 <span class="stepIndicator">Tipologia Percorso</span>
                                                 <span class="stepIndicator">Scelta Percorso</span>
                                                 <span class="stepIndicator">Dettagli Percorso</span>
-                                            </div>
-                                            <!-- end step indicators -->
-                                            <!-- step one -->
-                                            <div class="step">
-                                                <p class="text-center mb-4">Istanza di autorizzazione allo svolgimento di corsi di formazione professionale</p>
-                                                <div class="mb-3">
-                                                    <select aria-label="Scegli..." data-control="select2" 
-                                                            data-placeholder="Scegli Tipologia percorso" 
-                                                            class="form-select form-select-solid form-select-lg fw-bold" 
-                                                            name="scelta"
-                                                            id="scelta"
-                                                            required>
-                                                        <option value="">Scegli...</option>  
-                                                        <option value="A">Percorsi Auto-Finanziati</option>  
-                                                        <option value="B">Percorsi Finanziati Avviso 03/2022</option>  
-                                                    </select>
-                                                </div>
+                                                <span class="stepIndicator">Progettazione di Dettaglio ed Unità Formative</span>
                                             </div>
 
-                                            <!-- step two -->
+
                                             <div class="step">
-                                                <p class="text-center mb-4">Istanza di autorizzazione allo svolgimento di corsi di formazione professionale</p>
-                                                <div class="mb-3">
-                                                    <select aria-label="Scegli..." data-control="select2" 
-                                                            data-placeholder="Scegli..." 
-                                                            class="form-select form-select-solid form-select-lg fw-bold" 
-                                                            name="istat"
-                                                            id="repertoriochoice"
-                                                            required onchange="return selezionaCorso();">
-                                                        <option value="">Scegli...</option>                                                                
-                                                        <%for (Scheda_Attivita sa : sche1) {
-                                                                boolean ok = true;
-//                                                                for (Corso cor : c1) {
-                                                                //                                                                  if (cor.getSchedaattivita().getIdschedaattivita().equals(
-                                                                //                                                                sa.getIdschedaattivita())) {
-                                                                //                                                                  ok = false;
-                                                                //                                                            }
-                                                                //                                                      }
-                                                                if (ok) {
-                                                        %>
-                                                        <option value="<%=sa.getRepertorio().getIdrepertorio()%>;<%=sa.getIdschedaattivita()%>" >
-                                                            <%=sa.getRepertorio().getDenominazione()%> - <%=sa.getTipologiapercorso()%>
-                                                        </option>
-                                                        <%}%>
-                                                        <%}%>
-                                                    </select>
+                                                <p class="text-center mb-4">Progettazione di Dettaglio ed Unità Formative</p>
+
+                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                    <span class="text-danger">Competenze Trasversali</span>
+                                                </label>
+                                                <hr>
+                                                <div class="row col-md-12">
+                                                    <label class="col-md-4 col-form-label fw-bold">
+                                                        <span class="text-dark">Titolo del modulo / Competenza</span>
+                                                    </label>
+                                                    <label class="col-md-2 col-form-label fw-bold">
+                                                        <span class="text-dark">Requisito Ingresso</span>
+                                                    </label>
+                                                    <label class="col-md-5 col-form-label fw-bold">
+                                                        <span class="text-dark">Descrizione</span>
+                                                    </label>
+                                                    <label class="col-md-1 col-form-label fw-bold">
+                                                        <span class="text-dark">Ore</span>
+                                                    </label>
                                                 </div>
-                                                <div class="mb-3" id="detail_corso" style="display: none;">
+                                                <%
+                                                    for (Competenze_Trasversali ct : comp_tr) {%>
+                                                <div class="row row-border col-md-12 p-5">
                                                     <!--begin::Label-->
-                                                    <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                        <span class="text-danger">Dettagli corso</span>
+                                                    <label class="col-md-4">
+                                                        <span class="required"><%=ct.getDescrizione()%></span>
                                                     </label>
                                                     <!--end::Label-->
                                                     <!--begin::Col-->
-                                                    <div class="col-lg-12 fv-row">
-                                                        <div class="row col-lg-12">
-                                                            <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                                Area Professionale:
-                                                            </label>
-                                                            <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_area">
-                                                            </label>
-                                                        </div>                                                            
-                                                        <div class="row col-lg-12">
-                                                            <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                                Sottoarea Professionale:
-                                                            </label>
-                                                            <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_sottoarea">
-                                                            </label>
-                                                        </div>                                                            
-                                                        <div class="row col-lg-12">
-                                                            <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                                Professioni NUP/ISTAT correlate:
-                                                            </label>
-                                                            <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_professioni">
-                                                            </label>
-                                                        </div>                                                            
-                                                        <div class="row col-lg-12">
-                                                            <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                                Livello:
-                                                            </label>
-                                                            <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_livello">
-                                                            </label>
-                                                        </div>                                                            
-                                                        <div class="row col-lg-12">
-                                                            <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                                Certificazione rilasciata:
-                                                            </label>
-                                                            <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_cert">
-                                                            </label>
-                                                        </div>
-
-                                                        <div class="row col-lg-12">
-                                                            <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                                Ore di corso (ore):
-                                                            </label>
-                                                            <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_ore">
-                                                            </label>
-                                                        </div>
-                                                        <div class="row col-lg-12">
-                                                            <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                                Ore di stage (ore):
-                                                            </label>
-                                                            <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_stage">
-                                                            </label>
-                                                        </div>
-                                                        <div class="row col-lg-12">
-                                                            <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                                Ore di eLearning (perc.):
-                                                            </label>
-                                                            <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_elearn">
-                                                            </label>
-                                                        </div>
-                                                        <div class="row col-lg-12">
-                                                            <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                                Ore assenza massime consentite (perc.):
-                                                            </label>
-                                                            <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
-                                                                   id="cont_label_assmax">
-                                                            </label>
-                                                        </div>
-
-                                                    </div>
-                                                    <!--end::Col-->
-                                                </div>    
-                                            </div>
-
-                                            <!-- step three -->
-                                            <div class="step">
-                                                <p class="text-center mb-4">Istanza di autorizzazione allo svolgimento di corsi di formazione professionale</p>
-                                                <div class="mb-3" id="detail_corso_s3" style="display: none;">
-                                                    <!--begin::Label-->
-                                                    <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                        <span class="text-danger">Dettagli corso</span>
-                                                    </label>
-                                                    <!--end::Label-->
-                                                    <!--begin::Col-->
-                                                    <div class="col-lg-12 fv-row">
-                                                        <div class="row col-lg-12">
-                                                            <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                                Area Professionale:
-                                                            </label>
-                                                            <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
-                                                                   id="cont_label_area_s3">
-                                                            </label>
-                                                        </div>                                                            
-                                                        <div class="row col-lg-12">
-                                                            <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                                Sottoarea Professionale:
-                                                            </label>
-                                                            <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
-                                                                   id="cont_label_sottoarea_s3">
-                                                            </label>
-                                                        </div>                                                            
-                                                        <div class="row col-lg-12">
-                                                            <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                                Professioni NUP/ISTAT correlate:
-                                                            </label>
-                                                            <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
-                                                                   id="cont_label_professioni_s3">
-                                                            </label>
-                                                        </div>                                                            
-                                                        <div class="row col-lg-12">
-                                                            <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                                Livello:
-                                                            </label>
-                                                            <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
-                                                                   id="cont_label_livello_s3">
-                                                            </label>
-                                                        </div>                                                            
-                                                        <div class="row col-lg-12">
-                                                            <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                                Certificazione rilasciata:
-                                                            </label>
-                                                            <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
-                                                                   id="cont_label_cert_s3">
-                                                            </label>
-                                                        </div>
-
-                                                        <div class="row col-lg-12">
-                                                            <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                                Ore di corso (ore):
-                                                            </label>
-                                                            <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
-                                                                   id="cont_label_ore_s3">
-                                                            </label>
-                                                        </div>
-                                                        <div class="row col-lg-12">
-                                                            <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                                Ore di stage (ore):
-                                                            </label>
-                                                            <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
-                                                                   id="cont_label_stage_s3">
-                                                            </label>
-                                                        </div>
-                                                        <div class="row col-lg-12">
-                                                            <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                                Ore di eLearning (perc.):
-                                                            </label>
-                                                            <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
-                                                                   id="cont_label_elearn_s3">
-                                                            </label>
-                                                        </div>
-                                                        <div class="row col-lg-12">
-                                                            <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                                Ore assenza massime consentite (perc.):
-                                                            </label>
-                                                            <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
-                                                                   id="cont_label_assmax_s3">
-                                                            </label>
-                                                        </div>
-
-                                                    </div>
-                                                    <!--end::Col-->
-                                                </div>
-                                                <div class="row mb-6">
-                                                    <!--begin::Label-->
-                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Numero Protocollo (S.P.)</label>
-                                                    <!--end::Label-->
-                                                    <!--begin::Col-->
-                                                    <div class="col-lg-8">
-                                                        <!--begin::Row-->
-                                                        <div class="row">
-                                                            <!--begin::Col-->
-                                                            <div class="col-lg-12 fv-row">
-                                                                <input type="text" name="protnum" 
-                                                                       class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" 
-                                                                       placeholder="..." required/>
-                                                            </div>
-                                                            <!--end::Col-->
-                                                            <!--begin::Col-->
-                                                            <!--end::Col-->
-                                                        </div>
-                                                        <!--end::Row-->
-                                                    </div>
-                                                    <!--end::Col-->
-                                                </div>
-                                                <div class="row mb-6">
-                                                    <!--begin::Label-->
-                                                    <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                        <span class="required">Numero Edizioni</span>
-                                                        <a onclick="return false;" data-bs-toggle="tooltip" data-bs-placement="top" 
-                                                           title="Selezione il numero di edizioni richieste (Max 5 ad istanza)">
-                                                            <i class="fas fa-exclamation-circle ms-1 fs-7"></i>
-                                                        </a>
-                                                    </label>
-                                                    <!--end::Label-->
-                                                    <!--begin::Col-->
-                                                    <div class="col-lg-8 fv-row">
-                                                        <select name="quantitarichiesta" aria-label="Scegli..." 
+                                                    <div class="col-md-2 fv-row">
+                                                        <select name="ctreqing_<%=ct.getIdcompetenze()%>" aria-label="Scegli..." 
                                                                 data-control="select2" data-placeholder="Scegli..." 
-                                                                class="form-select form-select-solid form-select-lg fw-bold" 
+                                                                class="form-select" onchange="return selezionaCT('<%=ct.getIdcompetenze()%>');"
                                                                 required>
+                                                            <%if (ct.isRequisito_ingresso()) {%>
                                                             <option value="">Scegli...</option>
-                                                            <%for (int i = 1; i <= maxrichiesta; i++) {%>
-                                                            <option value="<%=i%>"><%=i%></option>
+                                                            <option value="1">SI</option>
+                                                            <%}%>
+                                                            <option value="0">NO</option>
+                                                        </select>
+                                                    </div>
+                                                    <%if (ct.getDescrizione().toLowerCase().startsWith("ling")) {%>
+
+                                                    <div class="col-md-2 fv-row">   
+                                                        <select name="ctlingua_<%=ct.getIdcompetenze()%>" aria-label="Scegli..." 
+                                                                data-control="select2" data-placeholder="Lingua Straniera" 
+                                                                class="form-select"
+                                                                required>
+                                                            <option value="">Scegli Lingua</option>
+                                                            <%for (Lingua l1 : language) {%>
+                                                            <option value="<%=l1.getCodicelingua()%>"><%=l1.getNome()%></option>
                                                             <%}%>
                                                         </select>
                                                     </div>
-                                                    <!--end::Col-->
-                                                </div>                                                
-                                                <div class="row mb-6">
-                                                    <!--begin::Label-->
-                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Durata Complessiva in Giorni</label>
-                                                    <!--end::Label-->
-                                                    <!--begin::Col-->
-                                                    <div class="col-lg-8">
-                                                        <!--begin::Row-->
-                                                        <div class="row">
-                                                            <!--begin::Col-->
-                                                            <div class="col-lg-12 fv-row">
-                                                                <input type="text" name="duratagiorni" id="duratagiorni"
-                                                                       class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 numbR" 
-                                                                       placeholder="000" required/>
-                                                            </div>
+                                                    <div class="col-md-3 fv-row">
+                                                        <%} else {%>
+
+                                                        <div class="col-md-5 fv-row">
+                                                            <%}%>
+                                                            <input type="text" name="ctdescr_<%=ct.getIdcompetenze()%>" id="ctdescr_<%=ct.getIdcompetenze()%>"
+                                                                   class="form-control" 
+                                                                   placeholder="..." required/>
                                                         </div>
-                                                        <!--end::Row-->
-                                                    </div>
-                                                    <!--end::Col-->
-                                                </div>
-                                                <div class="row mb-6">
-                                                    <!--begin::Label-->
-                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Durata Stage in Ore</label>
-                                                    <!--end::Label-->
-                                                    <!--begin::Col-->
-                                                    <div class="col-lg-8">
-                                                        <!--begin::Row-->
-                                                        <div class="row">
-                                                            <!--begin::Col-->
-                                                            <div class="col-lg-12 fv-row">
-                                                                <input type="text" name="stageore" id="stageore"
-                                                                       class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 numbR" 
-                                                                       placeholder="000" required/>
-                                                            </div>
-                                                        </div>
-                                                        <!--end::Row-->
-                                                    </div>
-                                                    <!--end::Col-->
-                                                </div>
-                                                <div class="row mb-6">
-                                                    <!--begin::Label-->
-                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Percentuale Ore eLearning (%)</label>
-                                                    <!--end::Label-->
-                                                    <!--begin::Col-->
-                                                    <div class="col-lg-8">
-                                                        <!--begin::Row-->
-                                                        <div class="row">
-                                                            <!--begin::Col-->
-                                                            <div class="col-lg-12 fv-row">
-                                                                <input type="text" name="elearning"  id="elearning"
-                                                                       class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 numbR" 
-                                                                       placeholder="0-100" required />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <input type="hidden" name="maxallievi" id="maxallievi" value="<%=maxallievi%>" />
-                                                <div class="row mb-6">
-                                                    <!--begin::Label-->
-                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Numero Allievi (Max <%=maxallievi%>)</label>
-                                                    <!--end::Label-->
-                                                    <!--begin::Col-->
-                                                    <div class="col-lg-8">
-                                                        <!--begin::Row-->
-                                                        <div class="row">
-                                                            <!--begin::Col-->
-                                                            <div class="col-lg-12 fv-row">
-                                                                <input type="text" name="numeroallievi" id="numeroallievi" 
-                                                                       class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 numbR" 
-                                                                       placeholder="000" required/>
-                                                            </div>
-                                                            <!--end::Col-->
-                                                            <!--begin::Col-->
-                                                            <!--end::Col-->
-                                                        </div>
-                                                        <!--end::Row-->
-                                                    </div>
-                                                    <!--end::Col-->
-                                                </div>
-                                                <div class="row mb-6">
-                                                    <!--begin::Label-->
+
+                                                        <label class="col-md-1 col-form-label">
+                                                            <span id="ctdurata_<%=ct.getIdcompetenze()%>"><%=ct.getDurataore()%></span>
+                                                        </label>
+                                                    </div> 
+                                                    <%}%>
+                                                    <hr>
                                                     <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                        <span class="required">Sede formativa scelta</span>
-                                                        <a onclick="return false;" data-bs-toggle="tooltip" data-bs-placement="top" 
-                                                           title="Selezione sede dall'elenco">
-                                                            <i class="fas fa-exclamation-circle ms-1 fs-7"></i>
-                                                        </a>
+                                                        <span class="text-primary">Unità Didattiche / Moduli del percorso</span>
                                                     </label>
-                                                    <!--end::Label-->
-                                                    <!--begin::Col-->
-                                                    <div class="col-lg-8 fv-row">
-                                                        <select name="sedescelta" aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
-                                                                class="form-select form-select-solid form-select-lg fw-bold" required>
-                                                            <option value="">Scegli...</option>
-                                                            <%
-                                                                for (Sede s1 : u1.getSoggetto().getSediformazione()) {%>
-                                                            <option value="<%=s1.getIdsede()%>"><%=s1.getIndirizzo()%> <%=s1.getCap()%> - <%=s1.getComune()%>, <%=s1.getProvincia()%></option>
-                                                            <%}
-                                                            %>
+                                                    <div class="row">
+                                                        <div class="table-responsive">
+                                                            <!--begin::Table-->
+                                                            <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt1">
+                                                                <!--begin::Table head-->
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="p-2">Stato</th>
+                                                                        <th class="p-2">Cognome</th>
+                                                                        <th class="p-2">Nome</th>
+                                                                        <th class="p-2">Codice Fiscale</th>
+                                                                        <th class="p-2">Email</th>
+                                                                        <th class="p-2">Telefono</th>
+                                                                        <th class="p-2">Azioni</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <!--end::Table head-->
+                                                                <!--begin::Table body-->
+                                                                <tbody></tbody>
+                                                                <!--end::Table body-->
+                                                            </table>
+                                                            <!--end::Table-->
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- end step indicators -->
+                                                <!-- step 1 -->
+                                                <div class="step">
+                                                    <p class="text-center mb-4">Istanza di autorizzazione allo svolgimento di corsi di formazione professionale</p>
+                                                    <div class="mb-3">
+                                                        <select aria-label="Scegli..." data-control="select2" 
+                                                                data-placeholder="Scegli Tipologia percorso" 
+                                                                class="form-select form-select-solid form-select-lg fw-bold" 
+                                                                name="scelta"
+                                                                id="scelta"
+                                                                required>
+                                                            <option value="">Scegli...</option>  
+                                                            <option value="A">Percorsi Auto-Finanziati</option>  
+                                                            <option value="B">Percorsi Finanziati Avviso 03/2022</option>  
                                                         </select>
                                                     </div>
-                                                    <!--end::Col-->
                                                 </div>
-                                            </div>
 
-                                            <div class="mb-3">
-                                                <div aria-live="polite" id="errorMsgContainer"></div>
-                                            </div>
+                                                <!-- step 2 -->
+                                                <div class="step">
+                                                    <p class="text-center mb-4">Istanza di autorizzazione allo svolgimento di corsi di formazione professionale</p>
+                                                    <div class="mb-3">
+                                                        <select aria-label="Scegli..." data-control="select2" 
+                                                                data-placeholder="Scegli..." 
+                                                                class="form-select form-select-solid form-select-lg fw-bold" 
+                                                                name="istat"
+                                                                id="repertoriochoice"
+                                                                required onchange="return selezionaCorso();">
+                                                            <option value="">Scegli...</option>                                                                
+                                                            <%for (Scheda_Attivita sa : sche1) {
+                                                                    boolean ok = true;
+                                                                    //                                                                for (Corso cor : c1) {
+                                                                    //                                                                  if (cor.getSchedaattivita().getIdschedaattivita().equals(
+                                                                    //                                                                sa.getIdschedaattivita())) {
+                                                                    //                                                                  ok = false;
+                                                                    //                                                            }
+                                                                    //                                                      }
+                                                                    if (ok) {
+                                                            %>
+                                                            <option value="<%=sa.getRepertorio().getIdrepertorio()%>;<%=sa.getIdschedaattivita()%>" >
+                                                                <%=sa.getRepertorio().getDenominazione()%> - <%=sa.getTipologiapercorso()%>
+                                                            </option>
+                                                            <%}%>
+                                                            <%}%>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-3" id="detail_corso" style="display: none;">
+                                                        <!--begin::Label-->
+                                                        <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                            <span class="text-danger">Dettagli corso</span>
+                                                        </label>
+                                                        <!--end::Label-->
+                                                        <!--begin::Col-->
+                                                        <div class="col-lg-12 fv-row">
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Area Professionale:
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_area">
+                                                                </label>
+                                                            </div>                                                            
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Sottoarea Professionale:
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_sottoarea">
+                                                                </label>
+                                                            </div>                                                            
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Professioni NUP/ISTAT correlate:
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_professioni">
+                                                                </label>
+                                                            </div>                                                            
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Livello:
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_livello">
+                                                                </label>
+                                                            </div>                                                            
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Certificazione rilasciata:
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_cert">
+                                                                </label>
+                                                            </div>
 
-                                            <!-- start previous / next buttons -->
-                                            <div class="form-footer d-flex">
-                                                <button type="button" id="prevBtn" onclick="nextPrev(-1)"
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Ore di corso (ore):
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_ore">
+                                                                </label>
+                                                            </div>
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Ore di stage (ore):
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_stage">
+                                                                </label>
+                                                            </div>
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Ore di eLearning (perc.):
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" id="cont_label_elearn">
+                                                                </label>
+                                                            </div>
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Ore assenza massime consentite (perc.):
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
+                                                                       id="cont_label_assmax">
+                                                                </label>
+                                                            </div>
 
-                                                        class="btn btn-circled btn-hover-rise"
-                                                        ><i class="fa fa-backward-step"></i> INDIETRO</button>
-                                                        
-                                                <button type="button" id="nextBtn" 
-                                                        onclick="nextPrev(1)" 
-                                                        class="btn btn-circled btn-hover-rise"
-                                                        ><i class="fa fa-forward-step"></i> AVANTI</button>
-                                            </div>
-                                            <!-- end previous / next buttons -->
+                                                        </div>
+                                                        <!--end::Col-->
+                                                    </div>    
+                                                </div>
+
+                                                <!-- step 3 -->
+                                                <div class="step">
+                                                    <p class="text-center mb-4">Istanza di autorizzazione allo svolgimento di corsi di formazione professionale</p>
+                                                    <div class="mb-3" id="detail_corso_s3" style="display: none;">
+                                                        <!--begin::Label-->
+                                                        <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                            <span class="text-danger">Dettagli corso</span>
+                                                        </label>
+                                                        <!--end::Label-->
+                                                        <!--begin::Col-->
+                                                        <div class="col-lg-12 fv-row">
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Area Professionale:
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
+                                                                       id="cont_label_area_s3">
+                                                                </label>
+                                                            </div>                                                            
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Sottoarea Professionale:
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
+                                                                       id="cont_label_sottoarea_s3">
+                                                                </label>
+                                                            </div>                                                            
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Professioni NUP/ISTAT correlate:
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
+                                                                       id="cont_label_professioni_s3">
+                                                                </label>
+                                                            </div>                                                            
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Livello:
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
+                                                                       id="cont_label_livello_s3">
+                                                                </label>
+                                                            </div>                                                            
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Certificazione rilasciata:
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
+                                                                       id="cont_label_cert_s3">
+                                                                </label>
+                                                            </div>
+
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Ore di corso (ore):
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
+                                                                       id="cont_label_ore_s3">
+                                                                </label>
+                                                            </div>
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Ore di stage (ore):
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
+                                                                       id="cont_label_stage_s3">
+                                                                </label>
+                                                            </div>
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Ore di eLearning (perc.):
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
+                                                                       id="cont_label_elearn_s3">
+                                                                </label>
+                                                            </div>
+                                                            <div class="row col-lg-12">
+                                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                                    Ore assenza massime consentite (perc.):
+                                                                </label>
+                                                                <label class="col-lg-8 col-form-label fw-bold fs-6 text-info" 
+                                                                       id="cont_label_assmax_s3">
+                                                                </label>
+                                                            </div>
+
+                                                        </div>
+                                                        <!--end::Col-->
+                                                    </div>
+
+                                                    <div class="row mb-6">
+                                                        <!--begin::Label-->
+                                                        <label class="col-lg-4 col-form-label required fw-bold fs-6">Numero Protocollo (S.P.)</label>
+                                                        <!--end::Label-->
+                                                        <!--begin::Col-->
+                                                        <div class="col-lg-8">
+                                                            <!--begin::Row-->
+                                                            <div class="row">
+                                                                <!--begin::Col-->
+                                                                <div class="col-lg-12 fv-row">
+                                                                    <input type="text" name="protnum" 
+                                                                           class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" 
+                                                                           placeholder="..." required/>
+                                                                </div>
+                                                                <!--end::Col-->
+                                                                <!--begin::Col-->
+                                                                <!--end::Col-->
+                                                            </div>
+                                                            <!--end::Row-->
+                                                        </div>
+                                                        <!--end::Col-->
+                                                    </div>
+                                                    <div class="row mb-6">
+                                                        <!--begin::Label-->
+                                                        <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                            <span class="required">Numero Edizioni</span>
+                                                            <a onclick="return false;" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                                               title="Selezione il numero di edizioni richieste (Max 5 ad istanza)">
+                                                                <i class="fas fa-exclamation-circle ms-1 fs-7"></i>
+                                                            </a>
+                                                        </label>
+                                                        <!--end::Label-->
+                                                        <!--begin::Col-->
+                                                        <div class="col-lg-8 fv-row">
+                                                            <select name="quantitarichiesta" aria-label="Scegli..." 
+                                                                    data-control="select2" data-placeholder="Scegli..." 
+                                                                    class="form-select form-select-solid form-select-lg fw-bold" 
+                                                                    required>
+                                                                <option value="">Scegli...</option>
+                                                                <%for (int i = 1; i <= maxrichiesta; i++) {%>
+                                                                <option value="<%=i%>"><%=i%></option>
+                                                                <%}%>
+                                                            </select>
+                                                        </div>
+                                                        <!--end::Col-->
+                                                    </div>                                                
+                                                    <div class="row mb-6">
+                                                        <!--begin::Label-->
+                                                        <label class="col-lg-4 col-form-label required fw-bold fs-6">Durata Complessiva in Giorni</label>
+                                                        <!--end::Label-->
+                                                        <!--begin::Col-->
+                                                        <div class="col-lg-8">
+                                                            <!--begin::Row-->
+                                                            <div class="row">
+                                                                <!--begin::Col-->
+                                                                <div class="col-lg-12 fv-row">
+                                                                    <input type="text" name="duratagiorni" id="duratagiorni"
+                                                                           class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 numbR" 
+                                                                           placeholder="000" required/>
+                                                                </div>
+                                                            </div>
+                                                            <!--end::Row-->
+                                                        </div>
+                                                        <!--end::Col-->
+                                                    </div>
+                                                    <div class="row mb-6">
+                                                        <!--begin::Label-->
+                                                        <label class="col-lg-4 col-form-label required fw-bold fs-6">Durata Stage in Ore</label>
+                                                        <!--end::Label-->
+                                                        <!--begin::Col-->
+                                                        <div class="col-lg-8">
+                                                            <!--begin::Row-->
+                                                            <div class="row">
+                                                                <!--begin::Col-->
+                                                                <div class="col-lg-12 fv-row">
+                                                                    <input type="text" name="stageore" id="stageore"
+                                                                           class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 numbR" 
+                                                                           placeholder="000" required/>
+                                                                </div>
+                                                            </div>
+                                                            <!--end::Row-->
+                                                        </div>
+                                                        <!--end::Col-->
+                                                    </div>
+                                                    <div class="row mb-6">
+                                                        <!--begin::Label-->
+                                                        <label class="col-lg-4 col-form-label required fw-bold fs-6">Percentuale Ore eLearning (%)</label>
+                                                        <!--end::Label-->
+                                                        <!--begin::Col-->
+                                                        <div class="col-lg-8">
+                                                            <!--begin::Row-->
+                                                            <div class="row">
+                                                                <!--begin::Col-->
+                                                                <div class="col-lg-12 fv-row">
+                                                                    <input type="text" name="elearning"  id="elearning"
+                                                                           class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 numbR" 
+                                                                           placeholder="0-100" required />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <input type="hidden" name="maxallievi" id="maxallievi" value="<%=maxallievi%>" />
+                                                    <div class="row mb-6">
+                                                        <!--begin::Label-->
+                                                        <label class="col-lg-4 col-form-label required fw-bold fs-6">Numero Allievi (Max <%=maxallievi%>)</label>
+                                                        <!--end::Label-->
+                                                        <!--begin::Col-->
+                                                        <div class="col-lg-8">
+                                                            <!--begin::Row-->
+                                                            <div class="row">
+                                                                <!--begin::Col-->
+                                                                <div class="col-lg-12 fv-row">
+                                                                    <input type="text" name="numeroallievi" id="numeroallievi" 
+                                                                           class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 numbR" 
+                                                                           placeholder="000" required/>
+                                                                </div>
+                                                                <!--end::Col-->
+                                                                <!--begin::Col-->
+                                                                <!--end::Col-->
+                                                            </div>
+                                                            <!--end::Row-->
+                                                        </div>
+                                                        <!--end::Col-->
+                                                    </div>
+                                                    <div class="row mb-6">
+                                                        <!--begin::Label-->
+                                                        <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                            <span class="required">Sede formativa scelta</span>
+                                                            <a onclick="return false;" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                                               title="Selezione sede dall'elenco">
+                                                                <i class="fas fa-exclamation-circle ms-1 fs-7"></i>
+                                                            </a>
+                                                        </label>
+                                                        <!--end::Label-->
+                                                        <!--begin::Col-->
+                                                        <div class="col-lg-8 fv-row">
+                                                            <select name="sedescelta" aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
+                                                                    class="form-select form-select-solid form-select-lg fw-bold" required>
+                                                                <option value="">Scegli...</option>
+                                                                <%
+                                                                    for (Sede s1 : u1.getSoggetto().getSediformazione()) {%>
+                                                                <option value="<%=s1.getIdsede()%>"><%=s1.getIndirizzo()%> <%=s1.getCap()%> - <%=s1.getComune()%>, <%=s1.getProvincia()%></option>
+                                                                <%}
+                                                                %>
+                                                            </select>
+                                                        </div>
+                                                        <!--end::Col-->
+                                                    </div>
+                                                </div>
+
+
+
+
+                                                <div class="mb-3">
+                                                    <div aria-live="polite" id="errorMsgContainer"></div>
+                                                </div>
+
+                                                <!-- start previous / next buttons -->
+                                                <div class="form-footer d-flex">
+                                                    <button type="button" id="prevBtn" onclick="nextPrev(-1)"
+
+                                                            class="btn btn-circled btn-hover-rise"
+                                                            ><i class="fa fa-backward-step"></i> INDIETRO</button>
+
+                                                    <button type="button" id="nextBtn" 
+                                                            onclick="nextPrev(1)" 
+                                                            class="btn btn-circled btn-hover-rise"
+                                                            ><i class="fa fa-forward-step"></i> AVANTI</button>
+                                                </div>
+                                                <!-- end previous / next buttons -->
                                         </form>
                                         <!--end::Tables Widget 3-->
                                     </div>
@@ -522,6 +633,11 @@
         <script src="assets/js/scripts.bundle.js"></script>
         <script src="assets/js/widgets.bundle.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
+        <script src="assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
+        <script src="assets/plugins/DataTables/jquery-3.5.1.js"></script>
+        <script src="assets/plugins/DataTables/jquery.dataTables.min.js"></script>
+        <script src="assets/plugins/DataTables/datatables.min.js"></script>
+        <script src="assets/plugins/DataTables/date-eu.js"></script>
 
         <script type="text/javascript" src="assets/js/wiz_1.js"></script>
         <!--end::Page Custom Javascript-->

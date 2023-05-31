@@ -56,7 +56,7 @@ function selezionaCorso() {
 
             var errorWrapper = document.querySelector('#errorMsgContainer');
             errorWrapper.innerHTML = '';
-            errorWrapper.scrollIntoView();
+//            errorWrapper.scrollIntoView();
 
         },
         error: function (error) {
@@ -70,8 +70,38 @@ function selezionaCorso() {
 }
 
 
+//ON CHANGE COMPETENZE TRASVERSALI
+function selezionaCT(idcompetenza){
+    alert(idcompetenza);
+}
 
 
+$(document).ready(function () {
+    $('#tab_dt1').DataTable({
+        dom: '<t>',
+        lengthMenu: [[10, 50, 100, -1], [10, 50, 100, "Tutto"]],
+        order: [[1, 'asc']],
+        language: {
+            url: 'assets/plugins/DataTables/it-IT.json'
+        },
+        responsive: true,
+        processing: true,
+        ajax: {
+            url: 'Search',
+            type: 'POST',
+            data: {'type': 'list_allievi'}
+        },
+        columns: [
+            {data: 'stato', orderable: false},
+            {data: 'cognome'},
+            {data: 'nome'},
+            {data: 'cf'},
+            {data: 'email'},
+            {data: 'telefono'},
+            {data: 'azioni', orderable: false}
+        ]
+    });
+});
 
 
 //WIZARD

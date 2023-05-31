@@ -8,8 +8,10 @@ import java.util.List;
 import javax.servlet.http.HttpSession;
 import static rc.soop.sic.Utils.estraiEccezione;
 import rc.soop.sic.jpa.Certificazione;
+import rc.soop.sic.jpa.Competenze_Trasversali;
 import rc.soop.sic.jpa.EntityOp;
 import static rc.soop.sic.jpa.EntityOp.trackingAction;
+import rc.soop.sic.jpa.Lingua;
 import rc.soop.sic.jpa.Livello_Certificazione;
 import rc.soop.sic.jpa.Path;
 import rc.soop.sic.jpa.Repertorio;
@@ -29,6 +31,15 @@ public class Engine {
     public static List<Scheda_Attivita> repertorio_completo_scheda() {
         List<Scheda_Attivita> all = (List<Scheda_Attivita>) new EntityOp().findAll(Scheda_Attivita.class);
         return all;
+    }
+
+    public static List<Competenze_Trasversali> elenco_competenze_trasversali() {
+        List<Competenze_Trasversali> all = (List<Competenze_Trasversali>) new EntityOp().findAll(Competenze_Trasversali.class);
+        return all;
+    }
+
+    public static List<Lingua> elenco_lingua() {
+        return new EntityOp().getLingue();
     }
 
     public static List<Certificazione> elenco_certificazioni() {
@@ -52,6 +63,7 @@ public class Engine {
 
         return contatori;
     }
+
     public static String[] contatori_home_ADMIN(HttpSession se) {
         String[] contatori = {"0", "0", "0", "0"};
 
@@ -73,7 +85,8 @@ public class Engine {
         }
         return "";
     }
-    public static String getPath(String id,EntityOp eo) {
+
+    public static String getPath(String id, EntityOp eo) {
         try {
             Path res = eo.getEm().find(Path.class, id);
             return res.getDescrizione();

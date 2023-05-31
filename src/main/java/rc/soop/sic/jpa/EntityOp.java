@@ -200,5 +200,10 @@ public class EntityOp {
         }
         return null;
     }
+    
+    public List<Lingua> getLingue() {
+        TypedQuery q = this.em.createNamedQuery("lingua.order", Lingua.class);
+        return (List<Lingua>) q.getResultList();
+    }
 
 }
