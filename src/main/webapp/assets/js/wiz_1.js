@@ -76,34 +76,6 @@ function selezionaCT(idcompetenza){
 }
 
 
-$(document).ready(function () {
-    $('#tab_dt1').DataTable({
-        dom: '<t>',
-        lengthMenu: [[10, 50, 100, -1], [10, 50, 100, "Tutto"]],
-        order: [[1, 'asc']],
-        language: {
-            url: 'assets/plugins/DataTables/it-IT.json'
-        },
-        responsive: true,
-        processing: true,
-        ajax: {
-            url: 'Search',
-            type: 'POST',
-            data: {'type': 'list_allievi'}
-        },
-        columns: [
-            {data: 'stato', orderable: false},
-            {data: 'cognome'},
-            {data: 'nome'},
-            {data: 'cf'},
-            {data: 'email'},
-            {data: 'telefono'},
-            {data: 'azioni', orderable: false}
-        ]
-    });
-});
-
-
 //WIZARD
 
 var currentTab = 0; // Current tab is set to be the first tab (0)
@@ -163,9 +135,8 @@ function validateForm() {
             valid = false;
         }
     }
-
-    if (currentTab === 2) { //ULTIMO STEP
-
+    
+    if (currentTab === 2) { //STEP
         var elearning = parseInt($("#elearning").val());
         var numeroallievi = $("#numeroallievi").val();
         var stageore = parseInt($("#stageore").val());

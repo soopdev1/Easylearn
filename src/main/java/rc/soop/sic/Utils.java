@@ -7,11 +7,8 @@ package rc.soop.sic;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import java.security.Key;
 import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.Enumeration;
@@ -22,9 +19,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -35,10 +29,11 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import static org.apache.commons.fileupload.servlet.ServletFileUpload.isMultipartContent;
+import org.apache.commons.lang3.RandomStringUtils;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import org.apache.commons.lang3.StringUtils;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import org.jasypt.util.text.StrongTextEncryptor;
 import org.joda.time.DateTime;
 import static rc.soop.sic.Constant.PATTERNDATE2;
 import static rc.soop.sic.Constant.PATTERNDATE3;
@@ -218,6 +213,12 @@ public class Utils {
         return new DateTime().toString(PATTERNDATE3) + random;
     }
 
+    public static String generateIdentifier(int length) {
+        return randomAlphabetic(length).trim();
+    }
+    
+    
+    
     public static String enc_string(String plainText) {
         try {
 

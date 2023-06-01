@@ -42,7 +42,7 @@ public class Edit extends HttpServlet {
             JsonObject jMembers = new JsonObject();
             JsonArray data = new JsonArray();
 
-            List<Tipologia_Percorso> result = new EntityOp().findAll(Tipologia_Percorso.class);
+            List<Tipologia_Percorso> result = (List<Tipologia_Percorso>) new EntityOp().findAll(Tipologia_Percorso.class);
 
             jMembers.addProperty(ITOTALRECORDS, result.size());
             jMembers.addProperty(ITOTALDISPLAY, result.size());

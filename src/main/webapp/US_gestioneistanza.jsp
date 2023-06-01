@@ -121,8 +121,19 @@
                                                                 <td class="p-2 min-w-120px">
                                                                     <%for (Corso cor : c1) {%>
                                                                     <b><%=cor.getRepertorio().getDenominazione()%> - <%=cor.getSchedaattivita().getTipologiapercorso()%></b> 
-                                                                    - Edizioni: <%=cor.getQuantitarichiesta()%><br/><hr>
+                                                                    - Edizioni: <%=cor.getQuantitarichiesta()%><br/>
+                                                                    <a href="ADM_visdco.jsp?idcorso=<%=cor.getIdcorso()%>" 
+                                                                       data-fancybox data-type='iframe' 
+                                                                       data-bs-toggle="tooltip" 
+                                                                       title="VISUALIZZA/MODIFICA CORSO" 
+                                                                       data-preload='false' data-width='95%' data-height='95%' 
+                                                                       class="btn btn-sm btn-primary fan1">
+                                                                        <i class="fa fa-list-dots"></i> Modifica Corso
+                                                                    </a>
+                                                                    <hr>
                                                                     <%}%>
+                                                                    
+                                                                    
                                                                 </td>
                                                                 <td class="p-2 w-80px">
                                                                     <%=is1.getDatacreazione()%>

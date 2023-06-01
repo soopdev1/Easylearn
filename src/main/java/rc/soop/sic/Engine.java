@@ -5,6 +5,7 @@
 package rc.soop.sic;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpSession;
 import static rc.soop.sic.Utils.estraiEccezione;
 import rc.soop.sic.jpa.Certificazione;
@@ -16,6 +17,8 @@ import rc.soop.sic.jpa.Livello_Certificazione;
 import rc.soop.sic.jpa.Path;
 import rc.soop.sic.jpa.Repertorio;
 import rc.soop.sic.jpa.Scheda_Attivita;
+import rc.soop.sic.jpa.Stati;
+import rc.soop.sic.jpa.Tipologia_Percorso;
 
 /**
  *
@@ -23,6 +26,11 @@ import rc.soop.sic.jpa.Scheda_Attivita;
  */
 public class Engine {
 
+    public static List<Tipologia_Percorso> tipo_percorso_attivi() {
+        List<Tipologia_Percorso> result = (List<Tipologia_Percorso>) new EntityOp().findAll(Tipologia_Percorso.class);
+        return result.stream().filter(p1 -> p1.getStatotipologiapercorso().equals(Stati.ATTIVO)).collect(Collectors.toList());
+        
+    }
     public static List<Repertorio> repertorio_completo() {
         List<Repertorio> all = (List<Repertorio>) new EntityOp().findAll(Repertorio.class);
         return all;
@@ -94,6 +102,20 @@ public class Engine {
             trackingAction("service", estraiEccezione(ex));
         }
         return "";
+    }
+
+    public static String getIdNewIstance(HttpSession se) {
+        String out = Utils.generateIdentifier(50);
+        try {
+            if (se.getAttribute("ses.newinstancecode") != null) {
+                out = se.getAttribute("ses.newinstancecode").toString();
+            } else {
+                se.setAttribute("ses.newinstancecode", out);
+            }
+        } catch (Exception ex) {
+            trackingAction("service", estraiEccezione(ex));
+        }
+        return out;
     }
 
 }
