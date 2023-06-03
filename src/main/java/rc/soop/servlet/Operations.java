@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package rc.soop.servlet;
 
 import java.io.File;
@@ -50,6 +46,7 @@ import rc.soop.sic.jpa.Repertorio;
 import rc.soop.sic.jpa.Scheda_Attivita;
 import rc.soop.sic.jpa.Sede;
 import rc.soop.sic.jpa.SoggettoProponente;
+import rc.soop.sic.jpa.Tipologia_Percorso;
 import rc.soop.sic.jpa.User;
 
 /**
@@ -466,18 +463,18 @@ public class Operations extends HttpServlet {
             
 
             SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
-            Istanza is = (Istanza) request.getSession().getAttribute("is_memory");
+//            Istanza is = (Istanza) request.getSession().getAttribute("is_memory");
             String codiceis = generaId(30);
             EntityOp e = new EntityOp();
             e.begin();
 
-            if (is != null) {
-                is.setQuantitarichiesta(is.getQuantitarichiesta() + parseIntR(getRequestValue(request, "quantitarichiesta")));
-                is.setProtocollosoggetto(getRequestValue(request, "protnum"));
-                is.setProtocollosoggettodata(new DateTime().toString(PATTERNDATE4));
-                e.merge(is);
-            } else {
-                is = new Istanza();
+//            if (is != null) {
+//                is.setQuantitarichiesta(is.getQuantitarichiesta() + parseIntR(getRequestValue(request, "quantitarichiesta")));
+//                is.setProtocollosoggetto(getRequestValue(request, "protnum"));
+//                is.setProtocollosoggettodata(new DateTime().toString(PATTERNDATE4));
+//                e.merge(is);
+//            } else {
+                Istanza is = new Istanza();
                 is.setProtocollosoggetto(getRequestValue(request, "protnum"));
                 is.setProtocollosoggettodata(new DateTime().toString(PATTERNDATE4));
                 is.setCodiceistanza(codiceis);
@@ -485,32 +482,31 @@ public class Operations extends HttpServlet {
                 is.setStatocorso(e.getEm().find(CorsoStato.class, "01"));
                 is.setQuantitarichiesta(parseIntR(getRequestValue(request, "quantitarichiesta")));
                 e.persist(is);
-            }
+//            }
+
+
 
             Corso c = new Corso();
             c.setDuratagiorni(parseIntR(getRequestValue(request, "duratagiorni")));
-            c.setDurataore(180);
+            c.setDurataore(parseIntR(getRequestValue(request, "durataore")));
             c.setStageore(parseIntR(getRequestValue(request, "stageore")));
             c.setNumeroallievi(parseIntR(getRequestValue(request, "numeroallievi")));
-            c.setElearningperc(parseIntR(getRequestValue(request, "stageore")));
-            c.setReq1(getRequestValue(request, "req1"));
+            c.setElearningperc(parseIntR(getRequestValue(request, "stageore")));            
+            c.setTipologiapercorso(e.getEm().find(Tipologia_Percorso.class, Long.valueOf(getRequestValue(request, "scelta"))));
             String splitvalue_rep = getRequestValue(request, "istat");
             c.setRepertorio(e.getEm().find(Repertorio.class, Long.valueOf(splitvalue_rep.split(";")[0])));
             c.setSchedaattivita(e.getEm().find(Scheda_Attivita.class, Long.valueOf(splitvalue_rep.split(";")[1])));
             c.setSoggetto(so);
-            c.setCertif(e.getEm().find(Certificazione.class, getRequestValue(request, "certif")));
-            c.setLivellocertif(e.getEm().find(Livello_Certificazione.class, getRequestValue(request, "levelcertif")));
             c.setSedescelta(e.getEm().find(Sede.class, parseLongR(getRequestValue(request, "sedescelta"))));
             c.setQuantitarichiesta(parseIntR(getRequestValue(request, "quantitarichiesta")));
-            c.setStatocorso(e.getEm().find(CorsoStato.class, "01"));
+            c.setStatocorso(e.getEm().find(CorsoStato.class, "20"));
             c.setIstanza(is);
             e.persist(c);
             e.flush();
             e.commit();
             e.close();
-            HttpSession se = request.getSession();
-            se.setAttribute("is_memory", is);
-
+//            HttpSession se = request.getSession();
+//            se.setAttribute("is_memory", is);
             if (closewindow.equals("YES")) {
                 redirect(request, response, "Page_message.jsp?esito=OK_CL");
             } else {
@@ -518,6 +514,7 @@ public class Operations extends HttpServlet {
             }
 
         } catch (Exception ex) {
+            ex.printStackTrace();
             EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
             if (closewindow.equals("YES")) {
                 redirect(request, response, "Page_message.jsp?esito=OK_CL");

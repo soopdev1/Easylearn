@@ -526,12 +526,12 @@ public class Pdf {
 
                 lista_corsi.forEach(co1 -> {
 
-                    setFieldsValue(form, fields, "A_TIPOCORSO", co1.getCertif().getNome());
+                    setFieldsValue(form, fields, "A_TIPOCORSO", co1.getSchedaattivita().getCertificazioneuscita().getNome());
                     setFieldsValue(form, fields, "A_EDIZIONI", String.valueOf(co1.getQuantitarichiesta()));
                     setFieldsValue(form, fields, "A_DURATASTAGE", String.valueOf(co1.getStageore()));
                     setFieldsValue(form, fields, "A_NUMEROGIORNI", String.valueOf(co1.getDuratagiorni()));
                     setFieldsValue(form, fields, "A_NUMEROALLIEVI", String.valueOf(co1.getNumeroallievi()));
-                    setFieldsValue(form, fields, "A_TIPOCERT", co1.getCertif().getNome());
+                    setFieldsValue(form, fields, "A_TIPOCERT", co1.getSchedaattivita().getCertificazioneuscita().getNome());
 
                     setFieldsValue(form, fields, "A_SEDEINDIRIZZO", co1.getSedescelta().getIndirizzo());
                     setFieldsValue(form, fields, "A_SEDECAP", co1.getSedescelta().getCap());
@@ -562,7 +562,7 @@ public class Pdf {
                 setFieldsValue(form2, fields2, "Titolo Conseguito", "Assistente all'autonomia ed alla comunicazione dei disabili");
 
                 lista_corsi.forEach(co1 -> {
-                    setFieldsValue(form2, fields2, "Tipo", co1.getCertif().getNome());
+                    setFieldsValue(form2, fields2, "Tipo", co1.getSchedaattivita().getCertificazioneuscita().getNome());
                     setFieldsValue(form2, fields2, "A_EDIZIONI", String.valueOf(co1.getQuantitarichiesta()));
                     setFieldsValue(form2, fields2, "A_DURATASTAGE", String.valueOf(co1.getStageore()));
                     setFieldsValue(form2, fields2, "A_NUMEROGIORNI", String.valueOf(co1.getDuratagiorni()));

@@ -53,7 +53,6 @@
         int maxallievi = Utils.parseIntR(Engine.getPath("conf.max.allievi"));
         User u1 = (User) session.getAttribute("us_memory");
 
-        
     %>
     <body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed">
         <!--begin::Main-->
@@ -103,7 +102,7 @@
                                                             id="scelta"
                                                             required>
                                                         <option value="">Scegli...</option>  
-                                                        <%for(Tipologia_Percorso t1 : per1){%>
+                                                        <%for (Tipologia_Percorso t1 : per1) {%>
                                                         <option value="<%=t1.getIdtipopercorso()%>"><%=t1.getNometipologia()%></option>  
                                                         <%}%>
                                                     </select>
@@ -351,10 +350,29 @@
                                                         </select>
                                                     </div>
                                                     <!--end::Col-->
-                                                </div>                                                
+                                                </div>
                                                 <div class="row mb-6">
                                                     <!--begin::Label-->
-                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Durata Complessiva in Giorni</label>
+                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Durata Corso (ORE)</label>
+                                                    <!--end::Label-->
+                                                    <!--begin::Col-->
+                                                    <div class="col-lg-8">
+                                                        <!--begin::Row-->
+                                                        <div class="row">
+                                                            <!--begin::Col-->
+                                                            <div class="col-lg-12 fv-row">
+                                                                <input type="text" name="durataore" id="durataore"
+                                                                       class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 numbR" 
+                                                                       placeholder="000" required/>
+                                                            </div>
+                                                        </div>
+                                                        <!--end::Row-->
+                                                    </div>
+                                                    <!--end::Col-->
+                                                </div>
+                                                <div class="row mb-6">
+                                                    <!--begin::Label-->
+                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Durata Corso (GIORNI)</label>
                                                     <!--end::Label-->
                                                     <!--begin::Col-->
                                                     <div class="col-lg-8">
@@ -373,7 +391,7 @@
                                                 </div>
                                                 <div class="row mb-6">
                                                     <!--begin::Label-->
-                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Durata Stage in Ore</label>
+                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Durata Stage (ORE)</label>
                                                     <!--end::Label-->
                                                     <!--begin::Col-->
                                                     <div class="col-lg-8">
@@ -392,7 +410,7 @@
                                                 </div>
                                                 <div class="row mb-6">
                                                     <!--begin::Label-->
-                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Percentuale Ore eLearning (%)</label>
+                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Ore eLearning (%)</label>
                                                     <!--end::Label-->
                                                     <!--begin::Col-->
                                                     <div class="col-lg-8">
@@ -456,7 +474,7 @@
                                                 </div>
                                             </div>
 
-                                            
+
 
                                             <div class="mb-3">
                                                 <div aria-live="polite" id="errorMsgContainer"></div>
@@ -532,7 +550,7 @@
         <script src="assets/js/scripts.bundle.js"></script>
         <script src="assets/js/widgets.bundle.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
-        
+
 
         <script type="text/javascript" src="assets/js/wiz_1.js"></script>
         <!--end::Page Custom Javascript-->

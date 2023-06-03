@@ -90,7 +90,7 @@
                                                 <!--begin::Table container-->
                                                 <div class="table-responsive ">
                                                     <!--begin::Table-->
-                                                    <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt1">
+                                                    <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt1" style="border-bottom: 2px;">
                                                         <!--begin::Table head-->
                                                         <thead>
                                                             <tr>
@@ -122,13 +122,14 @@
                                                                     <%for (Corso cor : c1) {%>
                                                                     <b><%=cor.getRepertorio().getDenominazione()%> - <%=cor.getSchedaattivita().getTipologiapercorso()%></b> 
                                                                     - Edizioni: <%=cor.getQuantitarichiesta()%><br/>
-                                                                    <a href="ADM_visdco.jsp?idcorso=<%=cor.getIdcorso()%>" 
+                                                                    <%=cor.getStatocorso().getHtmlicon()%>
+                                                                    <a href="US_programmacorsi.jsp?idcorso=<%=Utils.enc_string(String.valueOf(cor.getIdcorso()))%>"
                                                                        data-fancybox data-type='iframe' 
                                                                        data-bs-toggle="tooltip" 
                                                                        title="VISUALIZZA/MODIFICA CORSO" 
                                                                        data-preload='false' data-width='95%' data-height='95%' 
-                                                                       class="btn btn-sm btn-primary fan1">
-                                                                        <i class="fa fa-list-dots"></i> Modifica Corso
+                                                                       class="btn btn-sm btn-warning fan1">
+                                                                        <i class="fa fa-edit"></i> Modifica Corso
                                                                     </a>
                                                                     <hr>
                                                                     <%}%>
@@ -139,8 +140,8 @@
                                                                     <%=is1.getDatacreazione()%>
                                                                 </td> 
                                                                 <td class="p-2 min-w-120px" style="white-space: nowrap; overflow: hidden; text-overflow:ellipsis;">
-                                                                    <a href="ADM_visdco.jsp?idcorso=" data-fancybox data-type='iframe' 
-                                                                       data-bs-toggle="tooltip" title="VISUALIZZA/MODIFICA DETTAGLIO CORSI" 
+                                                                    <a href="ADM_visdco.jsp?idist=<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>" data-fancybox data-type='iframe' 
+                                                                       data-bs-toggle="tooltip" title="VISUALIZZA/MODIFICA DETTAGLI ISTANZA" 
                                                                        data-preload='false' data-width='75%' data-height='75%' 
                                                                        class="btn btn-sm btn-bg-light btn-dark fan1">
                                                                         <i class="fa fa-list-dots"></i>

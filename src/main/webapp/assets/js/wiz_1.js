@@ -71,7 +71,7 @@ function selezionaCorso() {
 
 
 //ON CHANGE COMPETENZE TRASVERSALI
-function selezionaCT(idcompetenza){
+function selezionaCT(idcompetenza) {
     alert(idcompetenza);
 }
 
@@ -135,18 +135,26 @@ function validateForm() {
             valid = false;
         }
     }
-    
+
     if (currentTab === 2) { //STEP
+        var durataore = parseInt($("#durataore").val());
         var elearning = parseInt($("#elearning").val());
         var numeroallievi = $("#numeroallievi").val();
         var stageore = parseInt($("#stageore").val());
         var maxallievi = parseInt($("#maxallievi").val());
 
-        if (stageore < stage_min || stageore > stage_max) {
+        if (durataore < ore_min || durataore > ore_max) {
             $('errorMsgContainer').alert();
             const errorWrapper = document.querySelector('#errorMsgContainer');
             errorWrapper.innerHTML = '';
-            errorWrapper.innerHTML = '<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Attenzione</strong> La percentuale di ore in stage non rientra nel range previsto dal corso (' + stage_min + ' - ' + stage_max + '). Inserire un valore in questo range.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi avviso"></div>';
+            errorWrapper.innerHTML = '<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Attenzione</strong> La durata in ore non rientra nel range previsto dal corso (' + ore_min + ' - ' + ore_max + '). Inserire un valore in questo range.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi avviso"></div>';
+            errorWrapper.scrollIntoView();
+            valid = false;
+        } else if (stageore < stage_min || stageore > stage_max) {
+            $('errorMsgContainer').alert();
+            const errorWrapper = document.querySelector('#errorMsgContainer');
+            errorWrapper.innerHTML = '';
+            errorWrapper.innerHTML = '<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Attenzione</strong> La durata di ore in stage non rientra nel range previsto dal corso (' + stage_min + ' - ' + stage_max + '). Inserire un valore in questo range.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi avviso"></div>';
             errorWrapper.scrollIntoView();
             valid = false;
         } else if (elearning < eler_min || elearning > eler_max) {

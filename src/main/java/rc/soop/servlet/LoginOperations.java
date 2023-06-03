@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package rc.soop.servlet;
 
 import java.io.IOException;
@@ -51,10 +47,10 @@ public class LoginOperations extends HttpServlet {
                     se.setAttribute("us_rolecod", user.getTipo());
                     se.setAttribute("us_mail", user.getEmail());
                     EntityOp.trackingAction(username, "LOGIN OK");
-                    Istanza is = e.getIstanzaWaiting(user.getSoggetto());
-                    if (is != null) {
-                        se.setAttribute("is_memory", is);
-                    }
+//                    Istanza is = e.getIstanzaWaiting(user.getSoggetto());
+//                    if (is != null) {
+//                        se.setAttribute("is_memory", is);
+//                    }
                     switch (user.getTipo()) {
                         case 1:
                             exitredirect.append("ADM_dashboard.jsp");

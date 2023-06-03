@@ -62,7 +62,7 @@
 
         Tipologia_Percorso tp1 = eo.getTipoPercorsoIstanza(is1);
         List<Corso> c1 = new EntityOp().getCorsiIstanza(is1);
-        
+
     %>
     <body id="kt_body">
         <!--begin::Main-->
@@ -95,7 +95,7 @@
                                         <form id="signUpForm" action="Operations" method="POST">
                                             <input type="hidden" name="type" value="ADDCORSO" />
                                             <input type="hidden" name="closewindow" value="YES" />
-                                            
+
                                             <!-- start step indicators -->
                                             <div class="form-header d-flex mb-4">
                                                 <span class="stepIndicator">Tipologia Percorso</span>
@@ -361,10 +361,29 @@
                                                         </select>
                                                     </div>
                                                     <!--end::Col-->
-                                                </div>                                                
+                                                </div>
                                                 <div class="row mb-6">
                                                     <!--begin::Label-->
-                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Durata Complessiva in Giorni</label>
+                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Durata Corso (ORE)</label>
+                                                    <!--end::Label-->
+                                                    <!--begin::Col-->
+                                                    <div class="col-lg-8">
+                                                        <!--begin::Row-->
+                                                        <div class="row">
+                                                            <!--begin::Col-->
+                                                            <div class="col-lg-12 fv-row">
+                                                                <input type="text" name="durataore" id="durataore"
+                                                                       class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 numbR" 
+                                                                       placeholder="000" required/>
+                                                            </div>
+                                                        </div>
+                                                        <!--end::Row-->
+                                                    </div>
+                                                    <!--end::Col-->
+                                                </div>
+                                                <div class="row mb-6">
+                                                    <!--begin::Label-->
+                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Durata Complessiva Corso (GIORNI)</label>
                                                     <!--end::Label-->
                                                     <!--begin::Col-->
                                                     <div class="col-lg-8">
@@ -383,7 +402,7 @@
                                                 </div>
                                                 <div class="row mb-6">
                                                     <!--begin::Label-->
-                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Durata Stage in Ore</label>
+                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Durata Stage (ORE)</label>
                                                     <!--end::Label-->
                                                     <!--begin::Col-->
                                                     <div class="col-lg-8">
@@ -402,7 +421,7 @@
                                                 </div>
                                                 <div class="row mb-6">
                                                     <!--begin::Label-->
-                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Percentuale Ore eLearning (%)</label>
+                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Ore eLearning (%)</label>
                                                     <!--end::Label-->
                                                     <!--begin::Col-->
                                                     <div class="col-lg-8">
@@ -420,7 +439,7 @@
                                                 <input type="hidden" name="maxallievi" id="maxallievi" value="<%=maxallievi%>" />
                                                 <div class="row mb-6">
                                                     <!--begin::Label-->
-                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Numero Allievi (Max <%=maxallievi%>)</label>
+                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Numero Allievi (MAX <%=maxallievi%>)</label>
                                                     <!--end::Label-->
                                                     <!--begin::Col-->
                                                     <div class="col-lg-8">

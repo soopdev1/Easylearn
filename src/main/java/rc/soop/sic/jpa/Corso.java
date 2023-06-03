@@ -49,13 +49,6 @@ public class Corso implements Serializable {
     @JoinColumn(name = "schedaattivita")
     private Scheda_Attivita schedaattivita;
     
-    @ManyToOne
-    @JoinColumn(name = "codicecertif")
-    private Certificazione certif;
-    @ManyToOne
-    @JoinColumn(name = "codicelivellocertif")
-    private Livello_Certificazione livellocertif;
-
     @Column(name = "durataore")
     private int durataore;
     @Column(name = "stageore")
@@ -67,8 +60,6 @@ public class Corso implements Serializable {
     private int elearningperc;
     @Column(name = "numeroallievi")
     private int numeroallievi;
-    @Column(name = "req1")
-    private String req1;
 
     @Column(name = "quantitarichiesta")
     private int quantitarichiesta;
@@ -130,16 +121,6 @@ public class Corso implements Serializable {
         this.schedaattivita = schedaattivita;
     }
 
-    
-    
-    public Certificazione getCertif() {
-        return certif;
-    }
-
-    public void setCertif(Certificazione certif) {
-        this.certif = certif;
-    }
-
     public int getDurataore() {
         return durataore;
     }
@@ -172,28 +153,12 @@ public class Corso implements Serializable {
         this.numeroallievi = numeroallievi;
     }
 
-    public String getReq1() {
-        return req1;
-    }
-
-    public void setReq1(String req1) {
-        this.req1 = req1;
-    }
-
     public Sede getSedescelta() {
         return sedescelta;
     }
 
     public void setSedescelta(Sede sedescelta) {
         this.sedescelta = sedescelta;
-    }
-
-    public Livello_Certificazione getLivellocertif() {
-        return livellocertif;
-    }
-
-    public void setLivellocertif(Livello_Certificazione livellocertif) {
-        this.livellocertif = livellocertif;
     }
 
     public int getQuantitarichiesta() {
