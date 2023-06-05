@@ -124,17 +124,19 @@
                                                                     - Edizioni: <%=cor.getQuantitarichiesta()%><br/>
                                                                     <%=cor.getStatocorso().getHtmlicon()%>
                                                                     <a href="US_programmacorsi.jsp?idcorso=<%=Utils.enc_string(String.valueOf(cor.getIdcorso()))%>"
-                                                                       data-fancybox data-type='iframe' 
-                                                                       data-bs-toggle="tooltip" 
-                                                                       title="VISUALIZZA/MODIFICA CORSO" 
-                                                                       data-preload='false' data-width='95%' data-height='95%' 
-                                                                       class="btn btn-sm btn-warning fan1">
+                                                                       target="_blank"
+                                                                       class="btn btn-sm btn-warning">
                                                                         <i class="fa fa-edit"></i> Modifica Corso
                                                                     </a>
+                                                                    <!-- data-fancybox data-type='iframe' data-bs-toggle="tooltip" 
+title="VISUALIZZA/MODIFICA CORSO" 
+data-preload='false' data-width='95%' data-height='95%' 
+class="btn btn-sm btn-warning fan1" -->
+
                                                                     <hr>
                                                                     <%}%>
-                                                                    
-                                                                    
+
+
                                                                 </td>
                                                                 <td class="p-2 w-80px">
                                                                     <%=is1.getDatacreazione()%>
@@ -255,9 +257,9 @@
         <script type="text/javascript" src="assets/js/common.js"></script>
         <script type="text/javascript" src="assets/js/US_gestioneistanza.js"></script>
         <!--end::Page Custom Javascript-->
-        
-        
-        
+
+
+
         <!--end::Javascript-->
     </body>
     <!--end::Body-->

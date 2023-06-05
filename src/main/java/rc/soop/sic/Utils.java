@@ -7,6 +7,8 @@ package rc.soop.sic;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import static java.math.BigDecimal.ROUND_HALF_DOWN;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import java.security.MessageDigest;
@@ -33,6 +35,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.replace;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import org.joda.time.DateTime;
 import static rc.soop.sic.Constant.PATTERNDATE2;
@@ -277,6 +280,47 @@ public class Utils {
             Constant.LOGGER.severe(estraiEccezione(ex));
         }
         return "";
+    }
+    
+    
+    public static String getPercentuale(int totale,int percentuale){
+        try {
+            double p1 = calcolaPercentuale(String.valueOf(totale),String.valueOf(percentuale));
+            return roundDoubleandFormat(p1, 2);
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+        }
+        return "0";
+    }
+    
+    private static double calcolaPercentuale(String total, String perc){
+        try {
+            double t1 = fd(total);
+            double p1 = fd(perc);
+            double r1  = t1 * p1 / 100.0;
+            return r1;
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+        }
+        return 0.0;
+    }
+    
+    private static String roundDoubleandFormat(double d, int scale) {
+        return replace(BigDecimal.valueOf(BigDecimal.valueOf(d).setScale(scale + 1, ROUND_HALF_DOWN).doubleValue()).setScale(scale, ROUND_HALF_DOWN).toPlainString(), ",", ".");
+    }
+    
+    private static double fd(String si_t_old) {
+        if (si_t_old == null) {
+            return 0.0D;
+        }
+        double d1;
+        si_t_old = si_t_old.replace(",", "").trim();
+        try {
+            d1 = Double.parseDouble(si_t_old);
+        } catch (Exception e) {
+            d1 = 0.0D;
+        }
+        return d1;
     }
 
 //

@@ -491,7 +491,7 @@ public class Operations extends HttpServlet {
             c.setDurataore(parseIntR(getRequestValue(request, "durataore")));
             c.setStageore(parseIntR(getRequestValue(request, "stageore")));
             c.setNumeroallievi(parseIntR(getRequestValue(request, "numeroallievi")));
-            c.setElearningperc(parseIntR(getRequestValue(request, "stageore")));            
+            c.setElearningperc(parseIntR(getRequestValue(request, "elearning")));            
             c.setTipologiapercorso(e.getEm().find(Tipologia_Percorso.class, Long.valueOf(getRequestValue(request, "scelta"))));
             String splitvalue_rep = getRequestValue(request, "istat");
             c.setRepertorio(e.getEm().find(Repertorio.class, Long.valueOf(splitvalue_rep.split(";")[0])));

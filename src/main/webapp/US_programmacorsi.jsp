@@ -4,6 +4,8 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.Lingua"%>
+<%@page import="rc.soop.sic.jpa.Competenze_Trasversali"%>
 <%@page import="rc.soop.sic.jpa.Tipologia_Percorso"%>
 <%@page import="rc.soop.sic.jpa.EntityOp"%>
 <%@page import="java.util.ArrayList"%>
@@ -30,7 +32,9 @@
                 Long idc1 = Long.valueOf(Utils.dec_string(Utils.getRequestValue(request, "idcorso")));
                 Corso co1 = eo.getEm().find(Corso.class, idc1);
                 User u1 = (User) session.getAttribute("us_memory");
-                Tipologia_Percorso tp1 = eo.getTipoPercorsoIstanza(co1.getIstanza());
+                List<Competenze_Trasversali> comp_tr = Engine.elenco_competenze_trasversali();
+                List<Lingua> language = Engine.elenco_lingua();
+                double el_perc = 0.0D;
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -86,20 +90,96 @@
                                 <span><%=co1.getSchedaattivita().getTipologiapercorso()%></span>
                             </label>
                         </div>
-                        <hr>
                         <div class="row">
                             <label class="col-lg-4 col-form-label fw-bold fs-6">
-                                <span><b>Tipologia Percorso</b></span><br/>
-                                <span><%=co1.getTipologiapercorso().getNometipologia()%></span>
+                                <span><b>Durata in Ore (Iniziale - Complessiva)</b></span><br/>
+                                <span><%=co1.getDurataore()%> - <b id="completeduration"><%=co1.getDurataore()%></b></span>
                             </label>
                             <label class="col-lg-4 col-form-label fw-bold fs-6">
-                                <span><b>Nome Percorso</b></span><br/>
-                                <span><%=co1.getRepertorio().getDenominazione()%></span>
+                                <span><b>Ore di Stage</b></span><br/>
+                                <span><%=co1.getStageore()%></span>
                             </label>
                             <label class="col-lg-4 col-form-label fw-bold fs-6">
-                                <span><b>Dati Percorso</b></span><br/>
-                                <span><%=co1.getSchedaattivita().getTipologiapercorso()%></span>
+                                <span><b>eLearning Percentuale - Ore</b></span><br/>
+                                <span><%=co1.getElearningperc()%> - <%=Utils.getPercentuale(co1.getDurataore(),co1.getElearningperc())%></span>
                             </label>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <p class="text-center mb-4">Progettazione di Dettaglio ed Unità Formative</p>
+                            <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                <span class="text-danger">Competenze Trasversali</span>
+                            </label>
+                            <hr>
+                            <div class="row col-md-12">
+                                <label class="col-md-4 col-form-label fw-bold">
+                                    <span class="text-dark">Titolo del modulo / Competenza</span>
+                                </label>
+                                <label class="col-md-2 col-form-label fw-bold">
+                                    <span class="text-dark">Requisito Ingresso</span>
+                                </label>
+                                <label class="col-md-5 col-form-label fw-bold">
+                                    <span class="text-dark">Descrizione</span>
+                                </label>
+                                <label class="col-md-1 col-form-label fw-bold">
+                                    <span class="text-dark">Ore</span>
+                                </label>
+                            </div>
+                            <%
+                                for (Competenze_Trasversali ct : comp_tr) {%>
+                            <div class="row row-border col-md-12 p-5">
+                                <!--begin::Label-->
+                                <label class="col-md-4">
+                                    <span class="required"><%=ct.getDescrizione()%></span>
+                                </label>
+                                <!--end::Label-->
+                                <!--begin::Col-->
+                                <div class="col-md-2 fv-row">
+                                    <select name="ctreqing_<%=ct.getIdcompetenze()%>" aria-label="Scegli..." 
+                                            data-control="select2" data-placeholder="Scegli..." 
+                                            class="form-select" onchange="return selezionaCT('<%=ct.getIdcompetenze()%>');"
+                                            required>
+                                        <%if (ct.isRequisito_ingresso()) {%>
+                                        <option value="">Scegli...</option>
+                                        <option value="1">SI</option>
+                                        <%}%>
+                                        <option value="0">NO</option>
+                                    </select>
+                                </div>
+                                <%if (ct.getDescrizione().toLowerCase().startsWith("ling")) {%>
+
+                                <div class="col-md-2 fv-row">   
+                                    <select name="ctlingua_<%=ct.getIdcompetenze()%>" aria-label="Scegli..." 
+                                            data-control="select2" data-placeholder="Lingua Straniera" 
+                                            class="form-select"
+                                            required>
+                                        <option value="">Scegli Lingua</option>
+                                        <%for (Lingua l1 : language) {%>
+                                        <option value="<%=l1.getCodicelingua()%>"><%=l1.getNome()%></option>
+                                        <%}%>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 fv-row">
+                                    <input type="text" name="ctdescr_<%=ct.getIdcompetenze()%>" id="ctdescr_<%=ct.getIdcompetenze()%>"
+                                           class="form-control" 
+                                           placeholder="..." required/>
+                                </div>
+                                <label class="col-md-1 col-form-label">
+                                    <span id="ctdurata_<%=ct.getIdcompetenze()%>"><%=ct.getDurataore()%></span>
+                                </label>
+                                <%} else {%>
+                                <div class="col-md-5 fv-row">
+                                    <input type="text" name="ctdescr_<%=ct.getIdcompetenze()%>" id="ctdescr_<%=ct.getIdcompetenze()%>"
+                                           class="form-control" 
+                                           placeholder="..." required/>
+                                </div>
+
+                                <label class="col-md-1 col-form-label">
+                                    <span id="ctdurata_<%=ct.getIdcompetenze()%>"><%=ct.getDurataore()%></span>
+                                </label>
+                                <%}%>
+                            </div>
+                            <%}%>
                         </div>
                     </div>
                 </div>
