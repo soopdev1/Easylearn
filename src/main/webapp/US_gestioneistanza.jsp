@@ -122,17 +122,12 @@
                                                                     <%for (Corso cor : c1) {%>
                                                                     <b><%=cor.getRepertorio().getDenominazione()%> - <%=cor.getSchedaattivita().getTipologiapercorso()%></b> 
                                                                     - Edizioni: <%=cor.getQuantitarichiesta()%><br/>
-                                                                    <%=cor.getStatocorso().getHtmlicon()%>
-                                                                    <a href="US_programmacorsi.jsp?idcorso=<%=Utils.enc_string(String.valueOf(cor.getIdcorso()))%>"
-                                                                       target="_blank"
-                                                                       class="btn btn-sm btn-warning">
-                                                                        <i class="fa fa-edit"></i> Modifica Corso
-                                                                    </a>
-                                                                    <!-- data-fancybox data-type='iframe' data-bs-toggle="tooltip" 
-title="VISUALIZZA/MODIFICA CORSO" 
-data-preload='false' data-width='95%' data-height='95%' 
-class="btn btn-sm btn-warning fan1" -->
-
+                                                                    
+                                                                    <form action="US_programmacorsi.jsp" method="POST" target="_blank">
+                                                                        <input type="hidden" name="idcorso" value="<%=Utils.enc_string(String.valueOf(cor.getIdcorso()))%>"/>
+                                                                        <%=cor.getStatocorso().getHtmlicon()%>
+                                                                        <button type="submit"class="btn btn-sm btn-warning"><i class="fa fa-edit"></i> Modifica Corso</button>
+                                                                    </form>
                                                                     <hr>
                                                                     <%}%>
 

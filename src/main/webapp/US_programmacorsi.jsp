@@ -56,7 +56,7 @@
     </head>
     <!--end::Head-->
     <!--begin::Body-->
-    <body id="kt_body">
+    <body id="kt_body" onload="competenzetrasv();">
         <!--begin::Main-->
         <!--begin::Root-->
         <!--begin::Row-->
@@ -72,8 +72,9 @@
                     <!--begin::Header-->
                     <div class="card-header border-0 pt-5">
                         <h3 class="card-title align-items-start flex-column">
-                            <span class="card-label fw-bolder fs-3 mb-1">Corso di formazione</span>
+                            <span class="card-label fw-bolder fs-3 mb-1">Corso di formazione - <%=co1.getStatocorso().getHtmlicon()%></span>
                         </h3>
+                        <button class="btn btn-lg btn-success"><i class="fa fa-save"></i> SALVA DATI</button>
                     </div>
                     <div class="card-body py-3">
                         <div class="row">
@@ -90,10 +91,11 @@
                                 <span><%=co1.getSchedaattivita().getTipologiapercorso()%></span>
                             </label>
                         </div>
+                            <input type="hidden" id="startduration" value="<%=co1.getDurataore()%>" />
                         <div class="row">
                             <label class="col-lg-4 col-form-label fw-bold fs-6">
                                 <span><b>Durata in Ore (Iniziale - Complessiva)</b></span><br/>
-                                <span><%=co1.getDurataore()%> - <b id="completeduration"><%=co1.getDurataore()%></b></span>
+                                <span><%=co1.getDurataore()%> - <b id="completeduration" class="text-success"><%=co1.getDurataore()%></b></span>
                             </label>
                             <label class="col-lg-4 col-form-label fw-bold fs-6">
                                 <span><b>Ore di Stage</b></span><br/>
@@ -101,7 +103,7 @@
                             </label>
                             <label class="col-lg-4 col-form-label fw-bold fs-6">
                                 <span><b>eLearning Percentuale - Ore</b></span><br/>
-                                <span><%=co1.getElearningperc()%> - <%=Utils.getPercentuale(co1.getDurataore(),co1.getElearningperc())%></span>
+                                <span><%=co1.getElearningperc()%> - <%=Utils.getPercentuale(co1.getDurataore(), co1.getElearningperc())%></span>
                             </label>
                         </div>
                         <hr>
@@ -135,7 +137,9 @@
                                 <!--end::Label-->
                                 <!--begin::Col-->
                                 <div class="col-md-2 fv-row">
-                                    <select name="ctreqing_<%=ct.getIdcompetenze()%>" aria-label="Scegli..." 
+                                    <select 
+                                        id="ctreqing_<%=ct.getIdcompetenze()%>"
+                                        name="ctreqing_<%=ct.getIdcompetenze()%>" aria-label="Scegli..." 
                                             data-control="select2" data-placeholder="Scegli..." 
                                             class="form-select" onchange="return selezionaCT('<%=ct.getIdcompetenze()%>');"
                                             required>
@@ -165,7 +169,7 @@
                                            placeholder="..." required/>
                                 </div>
                                 <label class="col-md-1 col-form-label">
-                                    <span id="ctdurata_<%=ct.getIdcompetenze()%>"><%=ct.getDurataore()%></span>
+                                    <span id="htmlctdurata_<%=ct.getIdcompetenze()%>"><%=ct.getDurataore()%></span>
                                 </label>
                                 <%} else {%>
                                 <div class="col-md-5 fv-row">
@@ -175,9 +179,10 @@
                                 </div>
 
                                 <label class="col-md-1 col-form-label">
-                                    <span id="ctdurata_<%=ct.getIdcompetenze()%>"><%=ct.getDurataore()%></span>
+                                    <span class="ctdurata" id="htmlctdurata_<%=ct.getIdcompetenze()%>"><%=ct.getDurataore()%></span>
                                 </label>
                                 <%}%>
+                                <input type="hidden" id="ctdurata_<%=ct.getIdcompetenze()%>" value="<%=ct.getDurataore()%>" />
                             </div>
                             <%}%>
                         </div>
@@ -219,6 +224,7 @@
         <script src="assets/js/custom/utilities/modals/create-campaign.js"></script>
         <script src="assets/js/custom/utilities/modals/users-search.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
+        <script src="assets/js/US_programmacorsi.js"></script>
 
         <!--end::Page Custom Javascript-->
         <!--end::Javascript-->
