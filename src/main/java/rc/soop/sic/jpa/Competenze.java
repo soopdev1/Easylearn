@@ -6,12 +6,16 @@ package rc.soop.sic.jpa;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -24,7 +28,7 @@ public class Competenze implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "idcompetenze")
     private Long idcompetenze;
 
@@ -34,21 +38,25 @@ public class Competenze implements Serializable {
     @Column(name = "descrizione", columnDefinition = "LONGTEXT")
     private String descrizione;
 
-    @Column(name = "abilita", columnDefinition = "LONGTEXT")
-    private String abilita;
-
-    @Column(name = "abilita_strings", columnDefinition = "LONGTEXT")
-    @Convert(converter = StringToListConverter.class)
-    private List<String> abilita_strings;
-
-    @Column(name = "conoscenze", columnDefinition = "LONGTEXT")
-    private String conoscenze;
-
-    @Column(name = "conoscenze_strings", columnDefinition = "LONGTEXT")
-    @Convert(converter = StringToListConverter.class)
-    private List<String> conoscenze_strings;
-
+    @ManyToOne
+    @JoinColumn(name = "idrepertorio")
+    private Repertorio repertorio;
+    
+    @OneToMany(mappedBy = "competenza",fetch = FetchType.LAZY)
+    private List<Abilita> abilita;
+    
+    @OneToMany(mappedBy = "competenza",fetch = FetchType.LAZY)
+    private List<Conoscenze> conoscenze;
+    
     public Competenze() {
+    }
+
+    public Repertorio getRepertorio() {
+        return repertorio;
+    }
+
+    public void setRepertorio(Repertorio repertorio) {
+        this.repertorio = repertorio;
     }
 
     public Long getIdcompetenze() {
@@ -75,36 +83,43 @@ public class Competenze implements Serializable {
         this.descrizione = descrizione;
     }
 
-    public String getAbilita() {
+    public List<Abilita> getAbilita() {
         return abilita;
     }
 
-    public void setAbilita(String abilita) {
+    public void setAbilita(List<Abilita> abilita) {
         this.abilita = abilita;
     }
 
-    public List<String> getAbilita_strings() {
-        return abilita_strings;
-    }
-
-    public void setAbilita_strings(List<String> abilita_strings) {
-        this.abilita_strings = abilita_strings;
-    }
-
-    public String getConoscenze() {
+    public List<Conoscenze> getConoscenze() {
         return conoscenze;
     }
 
-    public void setConoscenze(String conoscenze) {
+    public void setConoscenze(List<Conoscenze> conoscenze) {
         this.conoscenze = conoscenze;
     }
 
-    public List<String> getConoscenze_strings() {
-        return conoscenze_strings;
+    
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Competenze other = (Competenze) obj;
+        return Objects.equals(idcompetenze, other.idcompetenze);
     }
 
-    public void setConoscenze_strings(List<String> conoscenze_strings) {
-        this.conoscenze_strings = conoscenze_strings;
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + Objects.hashCode(this.idcompetenze);
+        return hash;
     }
-
+    
 }

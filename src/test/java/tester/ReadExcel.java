@@ -18,6 +18,7 @@ import rc.soop.sic.jpa.Abilita;
 import rc.soop.sic.jpa.Categoria_Repertorio;
 import rc.soop.sic.jpa.Certificazione;
 import rc.soop.sic.jpa.Competenze;
+import rc.soop.sic.jpa.Conoscenze;
 import rc.soop.sic.jpa.EntityOp;
 import rc.soop.sic.jpa.Livello_Certificazione;
 import rc.soop.sic.jpa.Repertorio;
@@ -144,6 +145,87 @@ public class ReadExcel {
 
     }
 
+    public static void inserisci_abilita(List<ExcelValues> l_v) {
+        EntityOp e = new EntityOp();
+        e.begin();
+        List<Integer> righe = l_v.stream().filter(c -> c.getFoglio() == 1).map(c1 -> c1.getRiga()).distinct().collect(Collectors.toList());
+
+        List<Competenze> clist = new ArrayList<>();
+        List<Abilita> alist = new ArrayList<>();
+
+        righe.forEach(f1 -> {
+
+            List<ExcelValues> contentfoglio1 = l_v.stream().filter(c -> c.getFoglio() == 1 && c.getRiga() == f1).distinct().collect(Collectors.toList());
+
+            Competenze c1 = new Competenze();
+
+            Abilita a1 = new Abilita();
+
+            Repertorio r1 = new Repertorio();
+
+            if (f1 > 0) {
+
+                contentfoglio1.forEach(f2 -> {
+//                        System.out.println(f2.toString());
+                    switch (f2.getColonna()) {
+                        case 0: {
+                            r1.setIdrepertorio(Long.valueOf(f2.getValue()));
+                            break;
+                        }
+                        case 2: {
+                            c1.setIdcompetenze(Long.valueOf(f2.getValue()));
+                            break;
+                        }
+                        case 3: {
+                            c1.setNumero(Integer.parseInt(f2.getValue()));
+                            break;
+                        }
+                        case 4: {
+                            c1.setDescrizione(f2.getValue());
+                            break;
+                        }
+                        case 5: {
+                            a1.setIdabilita(Long.valueOf(f2.getValue()));
+                            break;
+                        }
+                        case 6: {
+                            a1.setDescrizione(f2.getValue());
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+
+                });
+
+                Repertorio rf = e.getEm().find(Repertorio.class, r1.getIdrepertorio());
+                c1.setRepertorio(rf);
+                clist.add(c1);
+
+                a1.setCompetenza(c1);
+                alist.add(a1);
+            }
+        });
+
+        List<Competenze> clist_F = clist.stream().distinct().collect(Collectors.toList());
+        List<Abilita> alist_F = alist.stream().distinct().collect(Collectors.toList());
+
+        clist_F.forEach(c1 -> {
+            if (e.getEm().find(Competenze.class, c1.getIdcompetenze()) == null) {
+                e.persist(c1);
+            }
+        });
+
+        alist_F.forEach(a1 -> {
+            if (e.getEm().find(Abilita.class, a1.getIdabilita()) == null) {
+                e.persist(a1);
+            }
+        });
+
+        e.commit();
+        e.close();
+    }
+
     public static void main(String[] args) {
         try {
             List<ExcelValues> l_v = new ArrayList<>();
@@ -185,12 +267,14 @@ public class ReadExcel {
 
             //FOGLIO 1 - ELENCO REPERTORIO
 //            inserisci_repertorio(l_v);
+            //FOGLIO 2 - ELENCO ABILITA
+//            inserisci_abilita(l_v);
             EntityOp e = new EntityOp();
             e.begin();
-            List<Integer> righe = l_v.stream().filter(c -> c.getFoglio() == 1).map(c1 -> c1.getRiga()).distinct().collect(Collectors.toList());
+            List<Integer> righe = l_v.stream().filter(c -> c.getFoglio() == 2).map(c1 -> c1.getRiga()).distinct().collect(Collectors.toList());
 
             List<Competenze> clist = new ArrayList<>();
-            List<Abilita> alist = new ArrayList<>();
+            List<Conoscenze> colist = new ArrayList<>();
 
             righe.forEach(f1 -> {
 
@@ -198,15 +282,14 @@ public class ReadExcel {
 
                 Competenze c1 = new Competenze();
 
-                Abilita a1 = new Abilita();
+                Conoscenze co1 = new Conoscenze();
 
                 Repertorio r1 = new Repertorio();
 
                 if (f1 > 0) {
 
-//                Id_abilita	Descrizione_abilita
                     contentfoglio1.forEach(f2 -> {
-                        System.out.println(f2.toString());
+//                        System.out.println(f2.toString());
                         switch (f2.getColonna()) {
                             case 0: {
                                 r1.setIdrepertorio(Long.valueOf(f2.getValue()));
@@ -225,27 +308,43 @@ public class ReadExcel {
                                 break;
                             }
                             case 5: {
-                                a1.setIdabilita(Long.valueOf(f2.getValue()));
+                                co1.setIdconoscenze(Long.valueOf(f2.getValue()));
                                 break;
                             }
                             case 6: {
-                                a1.setDescrizione(f2.getValue());
+                                co1.setDescrizione(f2.getValue());
                                 break;
-                            }                            
+                            }
                             default:
                                 break;
                         }
 
                     });
-                    
-                    a1.setCompetenza(c1);
-                    
-                    
-                    
-                    
+
+                    Repertorio rf = e.getEm().find(Repertorio.class, r1.getIdrepertorio());
+                    c1.setRepertorio(rf);
+                    clist.add(c1);
+//
+                    co1.setCompetenza(c1);
+                    colist.add(co1);
                 }
             });
 
+            List<Competenze> clist_F = clist.stream().distinct().collect(Collectors.toList());
+            List<Conoscenze> colist_F = colist.stream().distinct().collect(Collectors.toList());
+
+            clist_F.forEach(c1 -> {
+                if (e.getEm().find(Competenze.class, c1.getIdcompetenze()) == null) {
+                    e.persist(c1);
+                }
+            });
+
+            colist_F.forEach(a1 -> {
+                if (e.getEm().find(Conoscenze.class, a1.getIdconoscenze()) == null) {
+                    e.persist(a1);
+                }
+            });
+            e.commit();
             e.close();
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -35,7 +35,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.15.0</version>
+            <version>2.15.2</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -134,6 +134,13 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
             <version>2.20.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>18-ea+4</version>
+            <scope>test</scope>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>javax</groupId>

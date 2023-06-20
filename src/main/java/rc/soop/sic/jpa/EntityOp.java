@@ -47,7 +47,11 @@ public class EntityOp {
     }
 
     public void commit() {
-        this.em.getTransaction().commit();
+        try {
+            this.em.getTransaction().commit();
+        } catch (Exception ex0) {
+            ex0.printStackTrace();
+        }
     }
 
     public void rollBack() {
@@ -200,7 +204,7 @@ public class EntityOp {
         }
         return null;
     }
-    
+
     public List<Lingua> getLingue() {
         TypedQuery q = this.em.createNamedQuery("lingua.order", Lingua.class);
         return (List<Lingua>) q.getResultList();

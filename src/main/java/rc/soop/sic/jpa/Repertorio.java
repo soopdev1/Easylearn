@@ -7,6 +7,7 @@ package rc.soop.sic.jpa;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -19,7 +20,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import net.bytebuddy.build.ToStringPlugin;
 
 /**
  *
@@ -31,7 +31,7 @@ public class Repertorio implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "idrepertorio")
     Long idrepertorio;
 
@@ -45,7 +45,6 @@ public class Repertorio implements Serializable {
     @JoinTable(name = "repertorio_professioni",
             joinColumns = @JoinColumn(name = "idrepertorio"),
             inverseJoinColumns = @JoinColumn(name = "codiceprofessioni"))
-    @ToStringPlugin.Exclude
     private List<Professioni> professioni;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -88,7 +87,7 @@ public class Repertorio implements Serializable {
     private List<Scheda_Attivita> attivitadestinatariassociate;
 
     //
-    @Column(name = "normativarif")
+    @Column(name = "normativarif", columnDefinition = "LONGTEXT")
     private String normativarif;
 
     @ManyToOne
@@ -247,13 +246,38 @@ public class Repertorio implements Serializable {
     }
 
     @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Repertorio other = (Repertorio) obj;
+        return Objects.equals(idrepertorio, other.idrepertorio);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + Objects.hashCode(this.idrepertorio);
+        return hash;
+    }
+
+    @Override
     public String toString() {
         StringBuilder prof_string = new StringBuilder();
-        this.professioni.forEach(p1 -> {
-            prof_string.append(p1.getCodiceProfessioni()).append(" - ").append(p1.getNome()).append("<br>");
-        });
+        if (this.processolavoro != null) {
+            this.professioni.forEach(p1 -> {
+                prof_string.append(p1.getCodiceProfessioni()).append(" - ").append(p1.getNome()).append("<br>");
+            });
+        }
         return new StringBuilder()
                 .append("{")
+                .append("\"").append("idrepertorio").append("\"").append(":").append("\"").append(this.idrepertorio).append("\"").append(",")
                 .append("\"").append("area").append("\"").append(":").append("\"").append(this.areaprofessionale).append("\"").append(",")
                 .append("\"").append("sottoarea").append("\"").append(":").append("\"").append(this.sottoareaprofessionale).append("\"").append(",")
                 .append("\"").append("livelloeqf").append("\"").append(":").append("\"").append(this.livelloeqf.getNome()).append("\"").append(",")
