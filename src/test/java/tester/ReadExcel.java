@@ -9,7 +9,9 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -21,6 +23,7 @@ import rc.soop.sic.jpa.Competenze;
 import rc.soop.sic.jpa.Conoscenze;
 import rc.soop.sic.jpa.EntityOp;
 import rc.soop.sic.jpa.Livello_Certificazione;
+import rc.soop.sic.jpa.Professioni;
 import rc.soop.sic.jpa.Repertorio;
 import rc.soop.sic.jpa.Tipologia_Repertorio;
 
@@ -145,6 +148,86 @@ public class ReadExcel {
 
     }
 
+    public static void inserisci_conoscenze(List<ExcelValues> l_v) {
+        EntityOp e = new EntityOp();
+        e.begin();
+        List<Integer> righe = l_v.stream().filter(c -> c.getFoglio() == 2).map(c1 -> c1.getRiga()).distinct().collect(Collectors.toList());
+
+        List<Competenze> clist = new ArrayList<>();
+        List<Conoscenze> colist = new ArrayList<>();
+
+        righe.forEach(f1 -> {
+
+            List<ExcelValues> contentfoglio1 = l_v.stream().filter(c -> c.getFoglio() == 1 && c.getRiga() == f1).distinct().collect(Collectors.toList());
+
+            Competenze c1 = new Competenze();
+
+            Conoscenze co1 = new Conoscenze();
+
+            Repertorio r1 = new Repertorio();
+
+            if (f1 > 0) {
+
+                contentfoglio1.forEach(f2 -> {
+//                        System.out.println(f2.toString());
+                    switch (f2.getColonna()) {
+                        case 0: {
+                            r1.setIdrepertorio(Long.valueOf(f2.getValue()));
+                            break;
+                        }
+                        case 2: {
+                            c1.setIdcompetenze(Long.valueOf(f2.getValue()));
+                            break;
+                        }
+                        case 3: {
+                            c1.setNumero(Integer.parseInt(f2.getValue()));
+                            break;
+                        }
+                        case 4: {
+                            c1.setDescrizione(f2.getValue());
+                            break;
+                        }
+                        case 5: {
+                            co1.setIdconoscenze(Long.valueOf(f2.getValue()));
+                            break;
+                        }
+                        case 6: {
+                            co1.setDescrizione(f2.getValue());
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+
+                });
+
+                Repertorio rf = e.getEm().find(Repertorio.class, r1.getIdrepertorio());
+                c1.setRepertorio(rf);
+                clist.add(c1);
+//
+                co1.setCompetenza(c1);
+                colist.add(co1);
+            }
+        });
+
+        List<Competenze> clist_F = clist.stream().distinct().collect(Collectors.toList());
+        List<Conoscenze> colist_F = colist.stream().distinct().collect(Collectors.toList());
+
+        clist_F.forEach(c1 -> {
+            if (e.getEm().find(Competenze.class, c1.getIdcompetenze()) == null) {
+                e.persist(c1);
+            }
+        });
+
+        colist_F.forEach(a1 -> {
+            if (e.getEm().find(Conoscenze.class, a1.getIdconoscenze()) == null) {
+                e.persist(a1);
+            }
+        });
+        e.commit();
+        e.close();
+    }
+
     public static void inserisci_abilita(List<ExcelValues> l_v) {
         EntityOp e = new EntityOp();
         e.begin();
@@ -226,12 +309,109 @@ public class ReadExcel {
         e.close();
     }
 
+    public static void elenco_professioni() {
+        String fileLocation = "C:\\mnt\\demo\\CP2021.xlsx";
+        List<ExcelValues> l_v = new ArrayList<>();
+
+        AtomicInteger maxfogli = new AtomicInteger(0);
+        try (FileInputStream file = new FileInputStream(new File(fileLocation)); XSSFWorkbook workbook = new XSSFWorkbook(file)) {
+//                System.out.println("tester.ReadExcel.main() " + workbook.getNumberOfSheets());
+            maxfogli.set(workbook.getNumberOfSheets());
+            for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                XSSFSheet sheet = workbook.getSheetAt(i);
+                for (Row row : sheet) {
+                    Iterator<Cell> cellIterator = row.cellIterator();   //iterating over each column
+                    while (cellIterator.hasNext()) {
+                        Cell cell = cellIterator.next();
+                        switch (cell.getCellType()) {
+                            case STRING: {
+                                if (cell.getStringCellValue().trim().equals("\\N")) {
+                                    l_v.add(new ExcelValues(i, cell.getRowIndex(), cell.getColumnIndex(), ""));
+                                } else {
+                                    l_v.add(new ExcelValues(i, cell.getRowIndex(), cell.getColumnIndex(), cell.getStringCellValue().trim()));
+                                }
+                                break;
+                            }
+                            case NUMERIC: {
+                                l_v.add(new ExcelValues(i, cell.getRowIndex(), cell.getColumnIndex(), String.valueOf(Double.valueOf(cell.getNumericCellValue()).intValue()).trim()));
+                                break;
+                            }
+                            case BLANK: {
+                                l_v.add(new ExcelValues(i, cell.getRowIndex(), cell.getColumnIndex(), ""));
+                                break;
+                            }
+                            default: {
+                                l_v.add(new ExcelValues(i, cell.getRowIndex(), cell.getColumnIndex(), ""));
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            EntityOp eo = new EntityOp();
+            eo.begin();
+
+            AtomicInteger foglio = new AtomicInteger(0);
+
+            while (foglio.get() < maxfogli.get()) {
+                List<ExcelValues> perfoglio = l_v.stream().filter(v1 -> v1.getFoglio() == foglio.get()).collect(Collectors.toList());
+
+                List<Integer> righe = perfoglio.stream().map(c1 -> c1.getRiga()).distinct().collect(Collectors.toList());
+
+                righe.forEach(f1 -> {
+
+                    List<ExcelValues> contentfoglio1 = perfoglio.stream().filter(c -> c.getRiga() == f1).distinct().collect(Collectors.toList());
+
+                    if (f1 > 0) {
+
+                        Professioni pr = new Professioni();
+
+                        contentfoglio1.forEach(f2 -> {
+                            switch (f2.getColonna()) {
+                                case 0: {
+                                    pr.setCodiceProfessioni(formatcodeNUP(f2.getValue().trim()));
+                                    break;
+                                }
+                                case 1: {
+                                    pr.setNome(f2.getValue().trim());
+                                    break;
+                                }
+                                case 2: {
+                                    pr.setDescrizione(f2.getValue().trim());
+                                    break;
+                                }
+                                default:
+                                    break;
+                            }
+
+                        });
+
+                        if (pr.getCodiceProfessioni() != null && eo.getEm().find(Professioni.class, pr.getCodiceProfessioni()) == null) {
+                            eo.persist(pr);
+                        }
+
+                    }
+
+                });
+
+                foglio.addAndGet(1);
+            }
+
+            eo.commit();
+            eo.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
         try {
             List<ExcelValues> l_v = new ArrayList<>();
             String fileLocation = "C:\\mnt\\demo\\ESTRAZIONE_REPERTORIO_v2.xlsx";
+            AtomicInteger maxfogli = new AtomicInteger(0);
             try (FileInputStream file = new FileInputStream(new File(fileLocation)); XSSFWorkbook workbook = new XSSFWorkbook(file)) {
-//                System.out.println("tester.ReadExcel.main() " + workbook.getNumberOfSheets());
+                maxfogli.set(workbook.getNumberOfSheets());
                 for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                     XSSFSheet sheet = workbook.getSheetAt(i);
                     for (Row row : sheet) {
@@ -269,87 +449,141 @@ public class ReadExcel {
 //            inserisci_repertorio(l_v);
             //FOGLIO 2 - ELENCO ABILITA
 //            inserisci_abilita(l_v);
-            EntityOp e = new EntityOp();
-            e.begin();
-            List<Integer> righe = l_v.stream().filter(c -> c.getFoglio() == 2).map(c1 -> c1.getRiga()).distinct().collect(Collectors.toList());
+            //FOGLIO 3 - ELENCO CONOSCENZE
+//            inserisci_abilita(l_v);
+            EntityOp eo = new EntityOp();
+            eo.begin();
 
-            List<Competenze> clist = new ArrayList<>();
-            List<Conoscenze> colist = new ArrayList<>();
+            List<ExcelValues> perfoglio = l_v.stream().filter(v1 -> v1.getFoglio() == 3).collect(Collectors.toList());
+
+            List<Integer> righe = perfoglio.stream().map(c1 -> c1.getRiga()).distinct().collect(Collectors.toList());
 
             righe.forEach(f1 -> {
 
-                List<ExcelValues> contentfoglio1 = l_v.stream().filter(c -> c.getFoglio() == 1 && c.getRiga() == f1).distinct().collect(Collectors.toList());
-
-                Competenze c1 = new Competenze();
-
-                Conoscenze co1 = new Conoscenze();
-
-                Repertorio r1 = new Repertorio();
+                List<ExcelValues> contentfoglio1 = perfoglio.stream().filter(c -> c.getRiga() == f1).distinct().collect(Collectors.toList());
 
                 if (f1 > 0) {
 
+                    Repertorio r0 = new Repertorio();
+
+                    Professioni p0 = new Professioni();
+
                     contentfoglio1.forEach(f2 -> {
+
 //                        System.out.println(f2.toString());
                         switch (f2.getColonna()) {
                             case 0: {
-                                r1.setIdrepertorio(Long.valueOf(f2.getValue()));
-                                break;
-                            }
-                            case 2: {
-                                c1.setIdcompetenze(Long.valueOf(f2.getValue()));
+                                r0.setIdrepertorio(Long.valueOf(f2.getValue().trim()));
                                 break;
                             }
                             case 3: {
-                                c1.setNumero(Integer.parseInt(f2.getValue()));
+                                r0.setDescrizione(f2.getValue().trim());
                                 break;
                             }
                             case 4: {
-                                c1.setDescrizione(f2.getValue());
+                                p0.setCodiceProfessioni(formatcodeNUP(f2.getValue().trim()));
                                 break;
                             }
-                            case 5: {
-                                co1.setIdconoscenze(Long.valueOf(f2.getValue()));
-                                break;
-                            }
-                            case 6: {
-                                co1.setDescrizione(f2.getValue());
-                                break;
-                            }
-                            default:
-                                break;
                         }
+//                            case 0: {
+//                                pr.setCodiceProfessioni(formatcodeNUP(f2.getValue().trim()));
+//                                break;
+//                            }
+//                            case 1: {
+//                                pr.setNome(f2.getValue().trim());
+//                                break;
+//                            }
+//                            case 2: {
+//                                pr.setDescrizione(f2.getValue().trim());
+//                                break;
+//                            }
+//                            default:
+//                                break;
+//                        }
 
                     });
 
-                    Repertorio rf = e.getEm().find(Repertorio.class, r1.getIdrepertorio());
-                    c1.setRepertorio(rf);
-                    clist.add(c1);
+//                    System.out.println("tester.ReadExcel.main() "+r0.getIdrepertorio());
+//                    System.out.println("tester.ReadExcel.main() "+r0.getDescrizione());
+//                    System.out.println("tester.ReadExcel.main() "+p0.getCodiceProfessioni());
+                    Repertorio r1 = eo.getEm().find(Repertorio.class, r0.getIdrepertorio());
+                    if (r1 == null) {
+                        System.out.println(r0.getIdrepertorio() + " REPERTORIO NON TROVATO");
+                    } else {
+                        Professioni p1 = eo.getEm().find(Professioni.class, p0.getCodiceProfessioni());
+                        if (p1 == null) {
+                            System.out.println(p0.getCodiceProfessioni() + " PROFESSIONE NON TROVATA");
+                        } else if (!r1.getProfessioni().contains(p1)) {
+                            List<Professioni> l1 = r1.getProfessioni();
+                            l1.add(p1);
+                            r1.setProfessioni(l1);
+                            eo.merge(p1);
+                        }
+                    }
+//                    if (pr.getCodiceProfessioni() != null && eo.getEm().find(Professioni.class, pr.getCodiceProfessioni()) == null) {
+//                        eo.persist(pr);
+//                    }
+                }
+
+            });
+
+//            l_v.forEach(v1 -> {
 //
-                    co1.setCompetenza(c1);
-                    colist.add(co1);
-                }
-            });
-
-            List<Competenze> clist_F = clist.stream().distinct().collect(Collectors.toList());
-            List<Conoscenze> colist_F = colist.stream().distinct().collect(Collectors.toList());
-
-            clist_F.forEach(c1 -> {
-                if (e.getEm().find(Competenze.class, c1.getIdcompetenze()) == null) {
-                    e.persist(c1);
-                }
-            });
-
-            colist_F.forEach(a1 -> {
-                if (e.getEm().find(Conoscenze.class, a1.getIdconoscenze()) == null) {
-                    e.persist(a1);
-                }
-            });
-            e.commit();
-            e.close();
+//                Professioni pr = new Professioni();
+//                switch (v1.getColonna()) {
+//                    case 0: {
+//                        pr.setCodiceProfessioni(formatcodeNUP(v1.getValue().trim()));
+//                        break;
+//                    }
+//                    case 1: {
+//                        pr.setNome(v1.getValue().trim());
+//                        break;
+//                    }
+//                    case 2: {
+//                        pr.setDescrizione(v1.getValue().trim());
+//                        break;
+//                    }
+//                    default:
+//                        break;
+//                }
+//
+//                System.out.println("tester.ReadExcel.main() " + pr.getCodiceProfessioni());
+//                System.out.println("tester.ReadExcel.main() " + pr.getNome());
+//                System.out.println("tester.ReadExcel.main() " + pr.getDescrizione());
+////                if (pr.getCodiceProfessioni()!= null && eo.getEm().find(Professioni.class, pr.getCodiceProfessioni()) == null) {
+////                     eo.persist(pr);
+////                }
+//            });
+            eo.commit();
+            eo.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
+
+    private static String formatcodeNUP(String ing) {
+        try {
+            ing = StringUtils.replace(ing, ",", "\\.");
+
+            int occur = ing.length() - ing.replaceAll("[.!?]+", "").length();
+            switch (occur) {
+                case 0:
+                    return ing + ".0.0.0.0";
+                case 1:
+                    return ing + ".0.0.0";
+                case 2:
+                    return ing + ".0.0";
+                case 3:
+                    return ing + ".0";
+                default:
+                    return ing;
+            }
+        } catch (Exception ex0) {
+            ex0.printStackTrace();
+        }
+        return ing;
+    }
+
 }
 
 class ExcelValues {

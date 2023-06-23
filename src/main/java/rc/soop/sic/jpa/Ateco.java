@@ -33,7 +33,7 @@ public class Ateco implements Serializable {
     private String descrizione;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "repertorio_professioni",
+    @JoinTable(name = "repertorio_ateco",
             joinColumns = @JoinColumn(name = "codiceateco"),
             inverseJoinColumns = @JoinColumn(name = "idrepertorio"))
     List<Repertorio> repertorio;

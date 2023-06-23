@@ -70,12 +70,6 @@ public class Repertorio implements Serializable {
     @JoinColumn(name = "codicecertificazione")
     private Certificazione qualificarilasciata;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "repertorio_competenze",
-            joinColumns = @JoinColumn(name = "idrepertorio"),
-            inverseJoinColumns = @JoinColumn(name = "idattivita"))
-    private List<Attivita> processolavoro;
-
     @Column(name = "durataprovafinale")
     private String durataprovafinale;
 
@@ -85,6 +79,10 @@ public class Repertorio implements Serializable {
     @OneToMany
     @JoinColumn(name = "idschedaattivita")
     private List<Scheda_Attivita> attivitadestinatariassociate;
+
+    @OneToMany
+    @JoinColumn(name = "idcompetenze")
+    private List<Competenze> competenzeassociate;
 
     //
     @Column(name = "normativarif", columnDefinition = "LONGTEXT")
@@ -209,16 +207,6 @@ public class Repertorio implements Serializable {
         this.qualificarilasciata = qualificarilasciata;
     }
 
-    public List<Attivita> getProcessolavoro() {
-        List<Attivita> at_t = new ArrayList<>();
-        at_t.addAll(processolavoro);
-        return at_t;
-    }
-
-    public void setProcessolavoro(List<Attivita> processolavoro) {
-        this.processolavoro = processolavoro;
-    }
-
     public String getDurataprovafinale() {
         return durataprovafinale;
     }
@@ -270,7 +258,7 @@ public class Repertorio implements Serializable {
     @Override
     public String toString() {
         StringBuilder prof_string = new StringBuilder();
-        if (this.processolavoro != null) {
+        if (this.professioni != null) {
             this.professioni.forEach(p1 -> {
                 prof_string.append(p1.getCodiceProfessioni()).append(" - ").append(p1.getNome()).append("<br>");
             });

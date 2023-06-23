@@ -77,5 +77,5 @@ public class Professioni implements Serializable {
     public void setRepertorio(List<Repertorio> repertorio) {
         this.repertorio = repertorio;
     }
-
+    
 }

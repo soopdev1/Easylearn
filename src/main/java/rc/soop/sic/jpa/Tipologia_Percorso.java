@@ -33,6 +33,7 @@ public class Tipologia_Percorso implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "idtipopercorso")
     Long idtipopercorso;
+    
     @Column(name = "nometipologia")
     private String nometipologia;
 
@@ -48,6 +49,12 @@ public class Tipologia_Percorso implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date dataend;
 
+    @Column(name = "maxcorsi")
+    private int maxcorsi;
+    
+    @Column(name = "maxedizioni")
+    private int maxedizioni;
+    
     @Transient
     private Stati statotipologiapercorso;
 
@@ -134,6 +141,22 @@ public class Tipologia_Percorso implements Serializable {
 
     public void setDataend(Date dataend) {
         this.dataend = dataend;
+    }
+
+    public int getMaxcorsi() {
+        return maxcorsi;
+    }
+
+    public void setMaxcorsi(int maxcorsi) {
+        this.maxcorsi = maxcorsi;
+    }
+
+    public int getMaxedizioni() {
+        return maxedizioni;
+    }
+
+    public void setMaxedizioni(int maxedizioni) {
+        this.maxedizioni = maxedizioni;
     }
 
 }
