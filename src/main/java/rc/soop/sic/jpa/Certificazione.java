@@ -8,12 +8,17 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
  *
  * @author Raffaele
  */
+@NamedQueries(value = {
+    @NamedQuery(name = "cert.name", query = "SELECT u FROM Certificazione u WHERE u.nome=:nome"),
+})
 @Entity
 @Table(name = "certification")
 public class Certificazione implements Serializable {

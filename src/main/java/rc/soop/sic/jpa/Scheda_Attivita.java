@@ -25,7 +25,7 @@ public class Scheda_Attivita implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "idschedaattivita")
     private Long idschedaattivita;
 
@@ -89,10 +89,11 @@ public class Scheda_Attivita implements Serializable {
     @Column(name = "etaminima")
     private int etaminima;
     
+    @Lob
     @Column(name = "livellomassimoscolarita")
     private String livellomassimoscolarita;
 
-    
+    @Lob
     @Column(name = "livellominimoscolarita")
     private String livellominimoscolarita;
 

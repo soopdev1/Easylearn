@@ -209,5 +209,14 @@ public class EntityOp {
         TypedQuery q = this.em.createNamedQuery("lingua.order", Lingua.class);
         return (List<Lingua>) q.getResultList();
     }
+    
+    public Certificazione getCertif(String nome) {
+        TypedQuery q = this.em.createNamedQuery("cert.name", Certificazione.class);
+        q.setParameter("nome", nome);
+        q.setMaxResults(1);        
+        return q.getResultList().isEmpty() ? null : (Certificazione) q.getSingleResult();
+    }
 
+    
+    
 }
