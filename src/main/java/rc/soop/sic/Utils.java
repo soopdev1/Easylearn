@@ -12,9 +12,12 @@ import static java.math.BigDecimal.ROUND_HALF_DOWN;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import java.security.MessageDigest;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Base64;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -306,7 +309,8 @@ public class Utils {
     }
     
     private static String roundDoubleandFormat(double d, int scale) {
-        return replace(BigDecimal.valueOf(BigDecimal.valueOf(d).setScale(scale + 1, ROUND_HALF_DOWN).doubleValue()).setScale(scale, ROUND_HALF_DOWN).toPlainString(), ",", ".");
+        return new DecimalFormat("###,###.00",DecimalFormatSymbols.getInstance(Locale.ITALIAN))
+                .format(BigDecimal.valueOf(d).setScale(scale, ROUND_HALF_DOWN).doubleValue());
     }
     
     private static double fd(String si_t_old) {

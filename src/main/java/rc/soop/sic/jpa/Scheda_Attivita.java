@@ -13,12 +13,17 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
  *
  * @author Administrator
  */
+@NamedQueries(value = {
+    @NamedQuery(name = "schedaattivita.all", query = "SELECT u FROM Scheda_Attivita u ORDER BY u.titoloattestato"),
+})
 @Entity
 @Table(name = "schedaattivita")
 public class Scheda_Attivita implements Serializable {

@@ -37,8 +37,7 @@ public class Engine {
     }
 
     public static List<Scheda_Attivita> repertorio_completo_scheda() {
-        List<Scheda_Attivita> all = (List<Scheda_Attivita>) new EntityOp().findAll(Scheda_Attivita.class);
-        return all;
+        return new EntityOp().repertorio_completo_scheda();
     }
 
     public static List<Competenze_Trasversali> elenco_competenze_trasversali() {

@@ -210,6 +210,11 @@ public class EntityOp {
         return (List<Lingua>) q.getResultList();
     }
     
+    public List<Scheda_Attivita> repertorio_completo_scheda() {
+        TypedQuery q = this.em.createNamedQuery("schedaattivita.all", Scheda_Attivita.class);
+        return (List<Scheda_Attivita>) q.getResultList();
+    }
+    
     public Certificazione getCertif(String nome) {
         TypedQuery q = this.em.createNamedQuery("cert.name", Certificazione.class);
         q.setParameter("nome", nome);

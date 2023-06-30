@@ -31,10 +31,8 @@
                 EntityOp eo = new EntityOp();
                 Long idc1 = Long.valueOf(Utils.dec_string(Utils.getRequestValue(request, "idcorso")));
                 Corso co1 = eo.getEm().find(Corso.class, idc1);
-                User u1 = (User) session.getAttribute("us_memory");
                 List<Competenze_Trasversali> comp_tr = Engine.elenco_competenze_trasversali();
                 List<Lingua> language = Engine.elenco_lingua();
-                double el_perc = 0.0D;
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -45,13 +43,11 @@
         <link rel="stylesheet" href="assets/css/gfont.css" />
         <!--end::Fonts-->
         <!--begin::Page Vendor Stylesheets(used by this page)-->
-        <link href="assets/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet" type="text/css" />
-        <link href="assets/plugins/DataTables/datatables.min.css" rel="stylesheet" type="text/css" />
-        <!--end::Page Vendor Stylesheets-->
-        <!--begin::Global Stylesheets Bundle(used by all pages)-->
         <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
+        <link href="assets/plugins/DataTables/datatables.min.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+
         <!--end::Global Stylesheets Bundle-->
     </head>
     <!--end::Head-->
@@ -91,19 +87,24 @@
                                 <span><%=co1.getSchedaattivita().getTipologiapercorso()%></span>
                             </label>
                         </div>
-                            <input type="hidden" id="startduration" value="<%=co1.getDurataore()%>" />
+                        <input type="hidden" id="startduration" value="<%=co1.getDurataore()%>" />
+                        <input type="hidden" id="stageduration" value="<%=co1.getStageore()%>" />
                         <div class="row">
-                            <label class="col-lg-4 col-form-label fw-bold fs-6">
-                                <span><b>Durata in Ore (Iniziale - Complessiva)</b></span><br/>
-                                <span><%=co1.getDurataore()%> - <b id="completeduration" class="text-success"><%=co1.getDurataore()%></b></span>
+                            <label class="col-lg-3 col-form-label fw-bold fs-6">
+                                <span><b>Durata in Ore AULA (Iniziale - Complessiva)</b></span><br/>
+                                <span><%=co1.getDurataore()%> ORE - <b id="completeduration" class="text-primary"><%=co1.getDurataore()%></b><b class="text-primary">&nbsp;ORE</b></span>
                             </label>
-                            <label class="col-lg-4 col-form-label fw-bold fs-6">
-                                <span><b>Ore di Stage</b></span><br/>
-                                <span><%=co1.getStageore()%></span>
+                            <label class="col-lg-3 col-form-label fw-bold fs-6">
+                                <span><b>Stage</b></span><br/>
+                                <span><%=co1.getStageore()%> ORE</span>
                             </label>
-                            <label class="col-lg-4 col-form-label fw-bold fs-6">
-                                <span><b>eLearning Percentuale - Ore</b></span><br/>
-                                <span><%=co1.getElearningperc()%> - <%=Utils.getPercentuale(co1.getDurataore(), co1.getElearningperc())%></span>
+                            <label class="col-lg-3 col-form-label fw-bold fs-6">
+                                <span><b>eLearning</b></span><br/>
+                                <span><%=co1.getElearningperc()%> % - <%=Utils.getPercentuale(co1.getDurataore(), co1.getElearningperc())%> ORE</span>
+                            </label>
+                            <label class="col-lg-3 col-form-label fw-bold fs-6">
+                                <span><b>TOTALE ORE (AULA + STAGE)</b></span><br/>
+                                <span class="text-success" id="totaleorecompl">0</span>
                             </label>
                         </div>
                         <hr>
@@ -140,9 +141,9 @@
                                     <select 
                                         id="ctreqing_<%=ct.getIdcompetenze()%>"
                                         name="ctreqing_<%=ct.getIdcompetenze()%>" aria-label="Scegli..." 
-                                            data-control="select2" data-placeholder="Scegli..." 
-                                            class="form-select" onchange="return selezionaCT('<%=ct.getIdcompetenze()%>');"
-                                            required>
+                                        data-control="select2" data-placeholder="Scegli..." 
+                                        class="form-select" onchange="return selezionaCT('<%=ct.getIdcompetenze()%>');"
+                                        required>
                                         <%if (ct.isRequisito_ingresso()) {%>
                                         <option value="">Scegli...</option>
                                         <option value="1">SI</option>
@@ -186,6 +187,43 @@
                             </div>
                             <%}%>
                         </div>
+                        <hr>
+                        <div class="row">
+                            <label class="col-form-label fw-bold fs-6">
+                                <span class="text-primary">Calendario Formativo</span>
+                                |
+                                <span class="text-primary">ORE PIANIFICATE: <span id="orepianificate">0</span></span>
+                                |
+                                <span class="text-primary">ORE DA PIANIFICARE: <span id="oredapianificare">0</span></span>
+                                |
+                                <a class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Aggiungi</a>
+                            </label>
+
+                            <hr>
+                            <div class="card-body py-3">
+                                <!--begin::Table container-->
+                                <div class="table-responsive ">
+                                    <!--begin::Table-->
+                                    <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt1" style="border-bottom: 2px;">
+                                        <!--begin::Table head-->
+                                        <thead>
+                                            <tr>
+                                                <th class="p-2 w-50px">#</th>
+                                                <th class="p-2 w-120px">Tipologia</th>
+                                                <th class="p-2 w-50px">Ore</th>
+                                                <th class="p-2 w-50px">ID Competenze</th>
+                                                <th class="p-2 w-50px">ID Conoscenze</th>
+                                                <th class="p-2 min-w-120px">Azioni</th>
+                                            </tr>
+                                        </thead>
+                                        <!--end::Table head-->
+                                        <!--begin::Table body-->
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!--end::Tables Widget 3-->
@@ -208,22 +246,25 @@
         <!--end::Scrolltop-->
         <!--begin::Javascript-->
         <script>var hostUrl = "assets/";</script>
+
         <!--begin::Global Javascript Bundle(used by all pages)-->
-        <script src="assets/plugins/global/plugins.bundle.js"></script>
-        <script src="assets/js/scripts.bundle.js"></script>
+
         <!--end::Global Javascript Bundle-->
         <!--begin::Page Vendors Javascript(used by this page)-->
-        <script src="assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
-        <script src="assets/plugins/DataTables/datatables.min.js"></script>
         <!--end::Page Vendors Javascript-->
         <!--begin::Page Custom Javascript(used by this page)-->
-        <script src="assets/js/widgets.bundle.js"></script>
-        <script src="assets/js/custom/widgets.js"></script>
-        <script src="assets/js/custom/apps/chat/chat.js"></script>
-        <script src="assets/js/custom/utilities/modals/create-app.js"></script>
-        <script src="assets/js/custom/utilities/modals/create-campaign.js"></script>
-        <script src="assets/js/custom/utilities/modals/users-search.js"></script>
+        <script src="assets/plugins/global/plugins.bundle.js"></script>
+        <script src="assets/js/scripts.bundle.js"></script>
+        <script src="assets/plugins/DataTables/jquery-3.5.1.js"></script>
+        <script src="assets/plugins/DataTables/jquery.dataTables.min.js"></script>
+        <script src="assets/plugins/DataTables/datatables.min.js"></script>
+        <script src="assets/plugins/DataTables/date-eu.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
+        <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
+        <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
+        <script type="text/javascript" src="assets/js/common.js"></script>
+        <script src="assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
+
         <script src="assets/js/US_programmacorsi.js"></script>
 
         <!--end::Page Custom Javascript-->

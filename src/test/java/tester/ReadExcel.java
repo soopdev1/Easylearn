@@ -597,7 +597,6 @@ public class ReadExcel {
                             }
                             case 11: {
                                 if (!f2.getValue().trim().equals("")) {
-                                    sa1.setTitolopercorso(f2.getValue().trim());
                                     sa1.setTipologiapercorso(f2.getValue().trim());
                                 }
                                 break;
@@ -605,6 +604,7 @@ public class ReadExcel {
                             case 12: {
                                 if (!f2.getValue().trim().equals("")) {
                                     sa1.setTitoloattestato(f2.getValue().trim());
+                                    sa1.setTitolopercorso(f2.getValue().trim());
                                 }
                                 break;
                             }
@@ -731,7 +731,7 @@ public class ReadExcel {
 //                        System.out.println(r1.getIdrepertorio() + " REPERTORIO NON TROVATO");
                     } else if (sa1.getIdschedaattivita() != null) {
                         sa1.setRepertorio(r2);
-                        
+                        sa1.setTitolopercorso(r2.getDenominazione());
                         e.persist(sa1);
 //                        System.out.println(r1.getIdrepertorio() + " SCHEDA -> " + sa1.getIdschedaattivita());
                     }

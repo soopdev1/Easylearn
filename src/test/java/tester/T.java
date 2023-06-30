@@ -4,16 +4,23 @@
  */
 package tester;
 
+import java.math.BigDecimal;
+import static java.math.BigDecimal.ROUND_HALF_DOWN;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+
 /**
  *
  * @author Raffaele
  */
 public class T {
 
-    
-
     public static void main(String[] args) {
-
+        double d = 23.599;
+        int scale = 2;
+               
+        
 //        EntityOp e = new EntityOp();
 //        GENERADECRETOAPPROVATIVO(e.getEm().find(Istanza.class, 8L));
 

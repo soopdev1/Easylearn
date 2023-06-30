@@ -11,13 +11,35 @@ function selezionaCT(idc) {
 
 
 function competenzetrasv() {
+    var stage_dur = parseInt($("#stageduration").val());
     var inizio_ore = parseInt($("#startduration").val());
-
-    //alert($("#completeduration").html());
     $('.ctdurata').each(function () {
         inizio_ore += parseInt($(this).html());
     });
     $("#completeduration").html(inizio_ore);
-
+    var orepian = parseInt($("#orepianificate").html());
+    $("#totaleorecompl").html(inizio_ore + stage_dur);
+    $("#oredapianificare").html(inizio_ore + stage_dur - orepian);
+    var oredapian = parseInt($("#oredapianificare").html());
 
 }
+
+
+$(document).ready(function () {
+    $('#tab_dt1').DataTable({
+        dom: '<<t>fp>',
+        lengthMenu: [[10, 50, 100, -1], [10, 50, 100, "Tutto"]],
+        columnDefs: [
+            {orderable: false, targets: 0},
+            {orderable: false, targets: 1},
+            {orderable: false, targets: 2},
+            {orderable: false, targets: 3},
+            {orderable: false, targets: 4},
+            {orderable: false, targets: 5}
+        ],
+        order: [[1, 'asc']],
+        language: {
+            url: 'assets/plugins/DataTables/it-IT.json'
+        }
+    });
+});
