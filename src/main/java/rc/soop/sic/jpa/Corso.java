@@ -30,7 +30,7 @@ public class Corso implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE)
     @Column(name = "idcorso")
     private Long idcorso;
     @ManyToOne
@@ -38,45 +38,34 @@ public class Corso implements Serializable {
     private SoggettoProponente soggetto;
     @ManyToOne
     @JoinColumn(name = "stato")
-    private CorsoStato statocorso;
-    
-    
+    private CorsoStato statocorso;    
     @ManyToOne
     @JoinColumn(name = "repertorio")
     private Repertorio repertorio;
-    
     @ManyToOne
     @JoinColumn(name = "schedaattivita")
     private Scheda_Attivita schedaattivita;
-    
     @Column(name = "durataore")
     private int durataore;
     @Column(name = "stageore")
     private int stageore;
     @Column(name = "duratagiorni")
     private int duratagiorni;
-
     @Column(name = "elearningperc")
     private int elearningperc;
     @Column(name = "numeroallievi")
     private int numeroallievi;
-
     @Column(name = "quantitarichiesta")
     private int quantitarichiesta;
-
     @ManyToOne
     @JoinColumn(name = "idsede")
     private Sede sedescelta;
-
     @ManyToOne
     @JoinColumn(name = "istanza")
     private Istanza istanza;
-
     @ManyToOne
     @JoinColumn(name = "tipologiapercorso")
     private Tipologia_Percorso tipologiapercorso;
-    
-    
     
     public Corso() {
     }
@@ -176,10 +165,6 @@ public class Corso implements Serializable {
     public void setIstanza(Istanza istanza) {
         this.istanza = istanza;
     }
-
-    
-
-    
 
     public int getElearningperc() {
         return elearningperc;
