@@ -319,7 +319,7 @@
                         </div>                          
                     </div>
                 </div>
-                <div data-kt-menu-trigger="click" class="menu-item here <%=m_7s%> menu-accordion">
+                            <div data-kt-menu-trigger="click" class="menu-item here <%=m_7s%> menu-accordion" style="display: none;">
                     <span class="menu-link">
                         <span class="menu-icon">
                             <!--begin::Svg Icon | path: icons/duotune/general/gen025.svg-->

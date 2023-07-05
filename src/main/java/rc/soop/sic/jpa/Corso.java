@@ -67,6 +67,10 @@ public class Corso implements Serializable {
     @JoinColumn(name = "tipologiapercorso")
     private Tipologia_Percorso tipologiapercorso;
     
+    @Column(name = "costostimatoallievo")
+    private double costostimatoallievo;
+    
+    
     public Corso() {
     }
 
@@ -180,6 +184,14 @@ public class Corso implements Serializable {
 
     public void setTipologiapercorso(Tipologia_Percorso tipologiapercorso) {
         this.tipologiapercorso = tipologiapercorso;
+    }
+
+    public double getCostostimatoallievo() {
+        return costostimatoallievo;
+    }
+
+    public void setCostostimatoallievo(double costostimatoallievo) {
+        this.costostimatoallievo = costostimatoallievo;
     }
     
 }

@@ -17,12 +17,31 @@ function competenzetrasv() {
         inizio_ore += parseInt($(this).html());
     });
     $("#completeduration").html(inizio_ore);
+
+    //  calcolo ore pian
+    var pianificate = 0;
+
+    $(".value_ore").each(function () {
+        pianificate += parseInt($(this).val());
+    });
+
+    $("#orepianificate").html(pianificate);
+
     var orepian = parseInt($("#orepianificate").html());
     $("#totaleorecompl").html(inizio_ore + stage_dur);
     $("#oredapianificare").html(inizio_ore + stage_dur - orepian);
-    var oredapian = parseInt($("#oredapianificare").html());
+    
+    //var oredapian = parseInt($("#oredapianificare").html());
+
 
 }
+
+function verificasalvataggiodati() {
+    return true;
+}
+
+
+
 
 
 $(document).ready(function () {
@@ -35,9 +54,11 @@ $(document).ready(function () {
             {orderable: false, targets: 2},
             {orderable: false, targets: 3},
             {orderable: false, targets: 4},
-            {orderable: false, targets: 5}
+            {orderable: false, targets: 5},
+            {orderable: false, targets: 6},
+            {orderable: false, targets: 7}
         ],
-        order: [[1, 'asc']],
+        order: [[0, 'asc']],
         language: {
             url: 'assets/plugins/DataTables/it-IT.json'
         }

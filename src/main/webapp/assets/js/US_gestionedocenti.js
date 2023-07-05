@@ -19,8 +19,7 @@ $(document).ready(function () {
             {data: 'nome'},
             {data: 'cf'},
             {data: 'titolo'},
-            {data: 'email'},
-            {data: 'telefono'},
+            {data: 'profiloprof'},
             {data: 'azioni', orderable: false}
         ]
     });

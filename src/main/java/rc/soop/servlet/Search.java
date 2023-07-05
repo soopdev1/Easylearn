@@ -64,8 +64,8 @@ public class Search extends HttpServlet {
                 data_value.addProperty("nome", res.getNome());
                 data_value.addProperty("cf", res.getCodicefiscale());
                 data_value.addProperty("titolo", res.getTitolostudio());
-                data_value.addProperty("email", res.getEmail());
-                data_value.addProperty("telefono", res.getTelefono());
+                data_value.addProperty("tipologia", res.getTipologia());
+                data_value.addProperty("profiloprof", res.getProfiloprof());
                 data_value.addProperty("azioni", "<i class='fa fa-hourglass'></i>");
                 data.add(data_value);
 

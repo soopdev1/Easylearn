@@ -1,0 +1,276 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package rc.soop.sic.jpa;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+
+/**
+ *
+ * @author Administrator
+ */
+
+@NamedQueries(value = {
+    @NamedQuery(name = "calendarioformativo.corso", query = "SELECT u FROM Calendario_Formativo u WHERE u.corsodiriferimento=:corsodiriferimento ORDER BY u.idcalendarioformativo"),
+})
+@Entity
+@Table(name = "calendarioformativo")
+public class Calendario_Formativo implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "idcalendarioformativo")
+    private Long idcalendarioformativo;
+
+    @Column(name = "codicemodulo")
+    private String codicemodulo;
+    
+    @Column(name = "tipomodulo")
+    private String tipomodulo;
+    
+    @Column(name = "nomemodulo", columnDefinition = "LONGTEXT")
+    private String nomemodulo;
+
+    @ManyToOne
+    @JoinColumn(name = "idcorso")
+    private Corso corsodiriferimento;
+    
+    @Column(name = "oreteoricaaula")
+    private int ore_teorica_aula;
+    
+    @Column(name = "oreteoricael")
+    private int ore_teorica_el;
+    
+    @Column(name = "oretecnicaoperat")
+    private int ore_tecnica_operativa;
+    
+    @Column(name = "oreaula")
+    private int ore_aula;
+    
+    @Column(name = "ore")
+    private int ore;
+    
+    @ManyToOne
+    @JoinColumn(name = "idcompetenze")
+    private Competenze_Trasversali competenzetrasversali;
+    
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "moduli_competenze",
+            joinColumns = @JoinColumn(name = "idcalendarioformativo"),
+            inverseJoinColumns = @JoinColumn(name = "idcompetenze"))
+    List<Competenze> elencocompetenze;
+    
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "moduli_abilita",
+            joinColumns = @JoinColumn(name = "idcalendarioformativo"),
+            inverseJoinColumns = @JoinColumn(name = "idabilita"))
+    List<Abilita> elencoabilita;
+    
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "moduli_conoscenze",
+            joinColumns = @JoinColumn(name = "idcalendarioformativo"),
+            inverseJoinColumns = @JoinColumn(name = "idconoscenze"))
+    List<Conoscenze> elencoconoscenze;
+    
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "moduli_docenti",
+            joinColumns = @JoinColumn(name = "idcalendarioformativo"),
+            inverseJoinColumns = @JoinColumn(name = "iddocente"))
+    List<Docente> elencodocenti;
+    
+    @Column(name = "ctcodicelingua")
+    private String ctcodicelingua;
+    
+    @Column(name = "ctdescrizione", columnDefinition = "LONGTEXT")
+    private String ctdescrizione;
+
+    public String getCtcodicelingua() {
+        return ctcodicelingua;
+    }
+
+    public void setCtcodicelingua(String ctcodicelingua) {
+        this.ctcodicelingua = ctcodicelingua;
+    }
+
+    public String getCtdescrizione() {
+        return ctdescrizione;
+    }
+
+    public void setCtdescrizione(String ctdescrizione) {
+        this.ctdescrizione = ctdescrizione;
+    }
+    
+    public Calendario_Formativo() {
+    }
+    
+    public Long getIdcalendarioformativo() {
+        return idcalendarioformativo;
+    }
+
+    public void setIdcalendarioformativo(Long idcalendarioformativo) {
+        this.idcalendarioformativo = idcalendarioformativo;
+    }
+
+    public String getNomemodulo() {
+        return nomemodulo;
+    }
+
+    public void setNomemodulo(String nomemodulo) {
+        this.nomemodulo = nomemodulo;
+    }
+
+    public String getTipomodulo() {
+        return tipomodulo;
+    }
+
+    public void setTipomodulo(String tipomodulo) {
+        this.tipomodulo = tipomodulo;
+    }
+    
+    public Corso getCorsodiriferimento() {
+        return corsodiriferimento;
+    }
+
+    public void setCorsodiriferimento(Corso corsodiriferimento) {
+        this.corsodiriferimento = corsodiriferimento;
+    }
+
+    public int getOre_teorica_aula() {
+        return ore_teorica_aula;
+    }
+
+    public void setOre_teorica_aula(int ore_teorica_aula) {
+        this.ore_teorica_aula = ore_teorica_aula;
+    }
+
+    public int getOre_teorica_el() {
+        return ore_teorica_el;
+    }
+
+    public void setOre_teorica_el(int ore_teorica_el) {
+        this.ore_teorica_el = ore_teorica_el;
+    }
+
+    public int getOre_tecnica_operativa() {
+        return ore_tecnica_operativa;
+    }
+
+    public void setOre_tecnica_operativa(int ore_tecnica_operativa) {
+        this.ore_tecnica_operativa = ore_tecnica_operativa;
+    }
+
+    public int getOre_aula() {
+        return ore_aula;
+    }
+
+    public void setOre_aula(int ore_aula) {
+        this.ore_aula = ore_aula;
+    }
+
+    public int getOre() {
+        return ore;
+    }
+
+    public void setOre(int ore) {
+        this.ore = ore;
+    }
+
+    public String getCodicemodulo() {
+        return codicemodulo;
+    }
+
+    public void setCodicemodulo(String codicemodulo) {
+        this.codicemodulo = codicemodulo;
+    }
+
+    public Competenze_Trasversali getCompetenzetrasversali() {
+        return competenzetrasversali;
+    }
+
+    public void setCompetenzetrasversali(Competenze_Trasversali competenzetrasversali) {
+        this.competenzetrasversali = competenzetrasversali;
+    }
+
+    public List<Competenze> getElencocompetenze() {
+        return elencocompetenze;
+    }
+
+    public void setElencocompetenze(List<Competenze> elencocompetenze) {
+        this.elencocompetenze = elencocompetenze;
+    }
+
+    public List<Abilita> getElencoabilita() {
+        return elencoabilita;
+    }
+
+    public void setElencoabilita(List<Abilita> elencoabilita) {
+        this.elencoabilita = elencoabilita;
+    }
+
+    public List<Conoscenze> getElencoconoscenze() {
+        return elencoconoscenze;
+    }
+
+    public void setElencoconoscenze(List<Conoscenze> elencoconoscenze) {
+        this.elencoconoscenze = elencoconoscenze;
+    }
+
+    public List<Docente> getElencodocenti() {
+        return elencodocenti;
+    }
+
+    public void setElencodocenti(List<Docente> elencodocenti) {
+        this.elencodocenti = elencodocenti;
+    }
+
+    
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Calendario_Formativo other = (Calendario_Formativo) obj;
+        return Objects.equals(idcalendarioformativo, other.idcalendarioformativo);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + Objects.hashCode(this.idcalendarioformativo);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+
+        return new StringBuilder()
+                .append("{")
+                .append("\"").append("idcalendarioformativo").append("\"").append(":").append("\"").append(this.idcalendarioformativo).append("\"").append(",")
+                .append("}")
+                .toString();
+    }
+    
+}

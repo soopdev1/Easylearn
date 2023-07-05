@@ -215,6 +215,12 @@ public class EntityOp {
         return (List<Scheda_Attivita>) q.getResultList();
     }
     
+    public List<Calendario_Formativo> calendario_formativo_corso(Corso c) {
+        TypedQuery q = this.em.createNamedQuery("calendarioformativo.corso", Calendario_Formativo.class);
+        q.setParameter("corsodiriferimento", c);
+        return (List<Calendario_Formativo>) q.getResultList();
+    }
+    
     public Certificazione getCertif(String nome) {
         TypedQuery q = this.em.createNamedQuery("cert.name", Certificazione.class);
         q.setParameter("nome", nome);

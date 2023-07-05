@@ -5,6 +5,7 @@
 package rc.soop.sic.jpa;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -37,10 +38,10 @@ public class Competenze_Trasversali implements Serializable {
 
     @Column(name = "abilitato", nullable = false, columnDefinition = "TINYINT(1)")
     private boolean abilitato;
-    
+
     @Column(name = "tooltip", columnDefinition = "LONGTEXT")
     private String tooltip;
-     
+
     public Competenze_Trasversali() {
     }
 
@@ -51,8 +52,6 @@ public class Competenze_Trasversali implements Serializable {
     public void setTooltip(String tooltip) {
         this.tooltip = tooltip;
     }
-    
-    
 
     public boolean isAbilitato() {
         return abilitato;
@@ -61,7 +60,7 @@ public class Competenze_Trasversali implements Serializable {
     public void setAbilitato(boolean abilitato) {
         this.abilitato = abilitato;
     }
-    
+
     public boolean isRequisito_ingresso() {
         return requisito_ingresso;
     }
@@ -77,7 +76,7 @@ public class Competenze_Trasversali implements Serializable {
     public void setDurataore(int durataore) {
         this.durataore = durataore;
     }
-    
+
     public Long getIdcompetenze() {
         return idcompetenze;
     }
@@ -92,6 +91,38 @@ public class Competenze_Trasversali implements Serializable {
 
     public void setDescrizione(String descrizione) {
         this.descrizione = descrizione;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Competenze_Trasversali other = (Competenze_Trasversali) obj;
+        return Objects.equals(idcompetenze, other.idcompetenze);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + Objects.hashCode(this.idcompetenze);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+
+        return new StringBuilder()
+                .append("{")
+                .append("\"").append("idcompetenze").append("\"").append(":").append("\"").append(this.idcompetenze).append("\"").append(",")
+                .append("}")
+                .toString();
     }
 
 }

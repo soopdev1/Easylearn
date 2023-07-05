@@ -44,8 +44,14 @@ public class Docente implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date datanascita;
 
-    @Column(name = "titolostudio")
+    @Column(name = "titolostudio", columnDefinition = "LONGTEXT")
     private String titolostudio;
+
+    @Column(name = "profiloprof", columnDefinition = "LONGTEXT")
+    private String profiloprof;
+
+    @Column(name = "tipologia")
+    private String tipologia;
 
     @Column(name = "anniesperienzaprof", nullable = false, columnDefinition = "integer default 0")
     private int anniesperienzaprof;
@@ -56,12 +62,6 @@ public class Docente implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "statodocente")
     private Stati statodocente;
-
-    @Column(name = "email")
-    private String email;
-    
-    @Column(name = "telefono")
-    private String telefono;
 
     @Transient
     private String etichettastato;
@@ -160,21 +160,20 @@ public class Docente implements Serializable {
         this.anniesperienzadid = anniesperienzadid;
     }
 
-    public String getEmail() {
-        return email;
+    public String getProfiloprof() {
+        return profiloprof;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setProfiloprof(String profiloprof) {
+        this.profiloprof = profiloprof;
     }
 
-    public String getTelefono() {
-        return telefono;
+    public String getTipologia() {
+        return tipologia;
     }
 
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
+    public void setTipologia(String tipologia) {
+        this.tipologia = tipologia;
     }
 
-    
 }

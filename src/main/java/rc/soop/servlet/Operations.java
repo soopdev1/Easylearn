@@ -8,6 +8,7 @@ import static java.lang.String.format;
 import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -34,13 +35,14 @@ import static rc.soop.sic.Utils.getRequestValue;
 import static rc.soop.sic.Utils.parseIntR;
 import static rc.soop.sic.Utils.parseLongR;
 import static rc.soop.sic.Utils.redirect;
-import rc.soop.sic.jpa.Certificazione;
+import rc.soop.sic.jpa.Calendario_Formativo;
+import rc.soop.sic.jpa.Competenze_Trasversali;
 import rc.soop.sic.jpa.Corso;
 import rc.soop.sic.jpa.CorsoStato;
 import rc.soop.sic.jpa.Corsoavviato;
 import rc.soop.sic.jpa.EntityOp;
 import rc.soop.sic.jpa.Istanza;
-import rc.soop.sic.jpa.Livello_Certificazione;
+import rc.soop.sic.jpa.Lingua;
 import rc.soop.sic.jpa.Path;
 import rc.soop.sic.jpa.Repertorio;
 import rc.soop.sic.jpa.Scheda_Attivita;
@@ -438,11 +440,79 @@ public class Operations extends HttpServlet {
         }
     }
 
+    protected void SALVAPIANIFICAZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Utils.printRequest(request);
+
+        EntityOp ep1 = new EntityOp();
+        List<Lingua> language = ep1.getLingue();
+        List<Competenze_Trasversali> comp_tr = (List<Competenze_Trasversali>) ep1.findAll(Competenze_Trasversali.class);
+        Corso co1 = ep1.getEm().find(Corso.class, Long.valueOf(getRequestValue(request, "idcorsodasalvare")));
+        if (co1 != null) {
+            ep1.begin();
+            List<Calendario_Formativo> calendar = ep1.calendario_formativo_corso(co1);
+            AtomicInteger indexmod = new AtomicInteger(1);
+            if (calendar.isEmpty()) {//PRIMO INSERIMENTO
+                comp_tr.forEach(competenzatras -> {
+//                    String id = getRequestValue(request, "idct_" + competenzatras.getIdcompetenze());
+                    String reqing = getRequestValue(request, "ctreqing_" + competenzatras.getIdcompetenze());
+                    String descr = getRequestValue(request, "ctdescr_" + competenzatras.getIdcompetenze());
+                    String lingua = getRequestValue(request, "ctlingua_" + competenzatras.getIdcompetenze());
+                    String nomemod = competenzatras.getDescrizione();
+                    if (!lingua.equals("")) {
+                        try {
+                            String lan1 = language.stream().filter(l1 -> l1.getCodicelingua().equals(lingua)).findAny().get().getNome();
+                            nomemod = nomemod + " - " + lan1;
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                    nomemod = nomemod + " - " + descr;
+                    if (reqing.equals("0")) {
+                        Calendario_Formativo ct = new Calendario_Formativo();
+                        ct.setCompetenzetrasversali(competenzatras);
+                        ct.setCodicemodulo("MOD" + indexmod.get());
+                        indexmod.addAndGet(1);
+                        ct.setCorsodiriferimento(co1);
+                        ct.setNomemodulo(nomemod);
+                        ct.setOre(competenzatras.getDurataore());
+                        ct.setOre_aula(competenzatras.getDurataore());
+                        ct.setOre_teorica_aula(competenzatras.getDurataore());
+                        ct.setTipomodulo("BASE");
+                        ct.setCtcodicelingua(lingua);
+                        ct.setCtdescrizione(descr);
+                        ep1.persist(ct);
+                    } else {
+                        Calendario_Formativo ct = new Calendario_Formativo();
+                        ct.setCompetenzetrasversali(competenzatras);
+                        ct.setCodicemodulo("BASE1"); //
+                        ct.setCorsodiriferimento(co1);
+                        ct.setNomemodulo(nomemod);
+                        ct.setTipomodulo("REQ");
+                        ct.setCtcodicelingua(lingua);
+                        ct.setCtdescrizione(descr);
+                        ep1.persist(ct);
+                    }
+                });
+            } else {
+
+            }//UPDATE
+
+        }
+        ep1.commit();
+        ep1.close();
+
+        request.getSession().setAttribute("ses_idcorso", Utils.enc_string(getRequestValue(request, "idcorsodasalvare")));
+        redirect(request, response, "US_programmacorsi.jsp");
+
+    }
+
     protected void SCELTAREPERTORIO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Repertorio re = new EntityOp().getEm().find(Repertorio.class, Long.valueOf(getRequestValue(request, "val")));
+        EntityOp ep1 = new EntityOp();
+
+        Repertorio re = ep1.getEm().find(Repertorio.class, Long.valueOf(getRequestValue(request, "val")));
         if (re != null) {
 
-            Scheda_Attivita sa = new EntityOp().getEm().find(Scheda_Attivita.class, Long.valueOf(getRequestValue(request, "val_att")));
+            Scheda_Attivita sa = ep1.getEm().find(Scheda_Attivita.class, Long.valueOf(getRequestValue(request, "val_att")));
             if (sa != null) {
                 try (PrintWriter pw = response.getWriter()) {
                     pw.print(re.toString() + "@@@" + sa.toString());
@@ -460,8 +530,6 @@ public class Operations extends HttpServlet {
         String closewindow = getRequestValue(request, "closewindow");
         try {
 
-            
-
             SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
 //            Istanza is = (Istanza) request.getSession().getAttribute("is_memory");
             String codiceis = generaId(30);
@@ -474,24 +542,22 @@ public class Operations extends HttpServlet {
 //                is.setProtocollosoggettodata(new DateTime().toString(PATTERNDATE4));
 //                e.merge(is);
 //            } else {
-                Istanza is = new Istanza();
-                is.setProtocollosoggetto(getRequestValue(request, "protnum"));
-                is.setProtocollosoggettodata(new DateTime().toString(PATTERNDATE4));
-                is.setCodiceistanza(codiceis);
-                is.setSoggetto(so);
-                is.setStatocorso(e.getEm().find(CorsoStato.class, "01"));
-                is.setQuantitarichiesta(parseIntR(getRequestValue(request, "quantitarichiesta")));
-                e.persist(is);
+            Istanza is = new Istanza();
+            is.setProtocollosoggetto(getRequestValue(request, "protnum"));
+            is.setProtocollosoggettodata(new DateTime().toString(PATTERNDATE4));
+            is.setCodiceistanza(codiceis);
+            is.setSoggetto(so);
+            is.setStatocorso(e.getEm().find(CorsoStato.class, "01"));
+            is.setQuantitarichiesta(parseIntR(getRequestValue(request, "quantitarichiesta")));
+            e.persist(is);
 //            }
-
-
 
             Corso c = new Corso();
             c.setDuratagiorni(parseIntR(getRequestValue(request, "duratagiorni")));
             c.setDurataore(parseIntR(getRequestValue(request, "durataore")));
             c.setStageore(parseIntR(getRequestValue(request, "stageore")));
             c.setNumeroallievi(parseIntR(getRequestValue(request, "numeroallievi")));
-            c.setElearningperc(parseIntR(getRequestValue(request, "elearning")));            
+            c.setElearningperc(parseIntR(getRequestValue(request, "elearning")));
             c.setTipologiapercorso(e.getEm().find(Tipologia_Percorso.class, Long.valueOf(getRequestValue(request, "scelta"))));
             String splitvalue_rep = getRequestValue(request, "istat");
             c.setRepertorio(e.getEm().find(Repertorio.class, Long.valueOf(splitvalue_rep.split(";")[0])));
@@ -521,7 +587,7 @@ public class Operations extends HttpServlet {
             } else {
                 redirect(request, response, "US_compilacorsi.jsp?esito=KO");
             }
-            
+
         }
 
     }
@@ -543,6 +609,9 @@ public class Operations extends HttpServlet {
             switch (type) {
                 case "SCELTAREPERTORIO":
                     SCELTAREPERTORIO(request, response);
+                    break;
+                case "SALVAPIANIFICAZIONE":
+                    SALVAPIANIFICAZIONE(request, response);
                     break;
                 case "ADDCORSO":
                     ADDCORSO(request, response);
