@@ -29,7 +29,7 @@ function competenzetrasv() {
 
     var orepian = parseInt($("#orepianificate").html());
     $("#totaleorecompl").html(inizio_ore + stage_dur);
-    $("#oredapianificare").html(inizio_ore + stage_dur - orepian);
+    $("#oredapianificare").html(inizio_ore - orepian);
     
     //var oredapian = parseInt($("#oredapianificare").html());
 

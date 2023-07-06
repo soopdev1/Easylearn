@@ -222,9 +222,7 @@ public class Utils {
     public static String generateIdentifier(int length) {
         return randomAlphabetic(length).trim();
     }
-    
-    
-    
+
     public static String enc_string(String plainText) {
         try {
 
@@ -284,36 +282,35 @@ public class Utils {
         }
         return "";
     }
-    
-    
-    public static String getPercentuale(int totale,int percentuale){
+
+    public static String getPercentuale(int totale, int percentuale) {
         try {
-            double p1 = calcolaPercentuale(String.valueOf(totale),String.valueOf(percentuale));
+            double p1 = calcolaPercentuale(String.valueOf(totale), String.valueOf(percentuale));
             return roundDoubleandFormat(p1, 2);
         } catch (Exception ex) {
             Constant.LOGGER.severe(estraiEccezione(ex));
         }
         return "0";
     }
-    
-    private static double calcolaPercentuale(String total, String perc){
+
+    public static double calcolaPercentuale(String total, String perc) {
         try {
             double t1 = fd(total);
             double p1 = fd(perc);
-            double r1  = t1 * p1 / 100.0;
+            double r1 = t1 * p1 / 100.0;
             return r1;
         } catch (Exception ex) {
             Constant.LOGGER.severe(estraiEccezione(ex));
         }
         return 0.0;
     }
-    
+
     private static String roundDoubleandFormat(double d, int scale) {
-        return new DecimalFormat("###,###.00",DecimalFormatSymbols.getInstance(Locale.ITALIAN))
+        return new DecimalFormat("###,###.00", DecimalFormatSymbols.getInstance(Locale.ITALIAN))
                 .format(BigDecimal.valueOf(d).setScale(scale, ROUND_HALF_DOWN).doubleValue());
     }
-    
-    private static double fd(String si_t_old) {
+
+    public static double fd(String si_t_old) {
         if (si_t_old == null) {
             return 0.0D;
         }
@@ -325,6 +322,33 @@ public class Utils {
             d1 = 0.0D;
         }
         return d1;
+    }
+
+    public static String formatDoubleforMysql(String value) {
+        if (value == null) {
+            return "0.00";
+        }
+        if (value.equals("-") || value.equals("")) {
+            return "0.00";
+        }
+        String add = "";
+        if (value.contains("-")) {
+            add = "-";
+            value = value.replaceAll("-", "").trim();
+        }
+
+        if (!value.equals("0.00")) {
+            if (value.contains(",")) {
+                value = value.replaceAll("\\.", "");
+                value = value.replaceAll(",", ".");
+            } else {
+                value = value.replaceAll("\\.", "");
+
+                return value + ".00";
+            }
+        }
+        return add + value;
+
     }
 
 //

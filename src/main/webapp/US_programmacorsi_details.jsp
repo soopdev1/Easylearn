@@ -4,6 +4,9 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.Conoscenze"%>
+<%@page import="rc.soop.sic.jpa.Abilita"%>
+<%@page import="rc.soop.sic.jpa.Competenze"%>
 <%@page import="rc.soop.sic.jpa.Calendario_Formativo"%>
 <%@page import="rc.soop.sic.jpa.Lingua"%>
 <%@page import="rc.soop.sic.jpa.Competenze_Trasversali"%>
@@ -33,9 +36,7 @@
                 EntityOp eo = new EntityOp();
                 Long idc1 = Long.valueOf(Utils.dec_string(idcorso));
                 Corso co1 = eo.getEm().find(Corso.class, idc1);
-                List<Competenze_Trasversali> comp_tr = (List<Competenze_Trasversali>) eo.findAll(Competenze_Trasversali.class);
-                List<Lingua> language = eo.getLingue();
-                List<Calendario_Formativo> calendar = eo.calendario_formativo_corso(co1);
+                List<Competenze> comp = eo.competenze_correlate(co1.getRepertorio());
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -66,8 +67,8 @@
         <div class="row">
             <!--begin::Col-->
             <form method="POST" action="Operations" onsubmit="return verificasalvataggiodati();">
-                <input type="hidden" name="type" value="SALVAPIANIFICAZIONE"/>
-                <input type="hidden" name="idcorsodasalvare" value="<%=co1.getIdcorso()%>"/>
+                <input type="hidden" name="type" value="MODIFICAPIANIFICAZIONE"/>
+                <input type="hidden" id="idcorsodasalvare" name="idcorsodasalvare" value="<%=co1.getIdcorso()%>"/>
                 <div class="col-xl-12">
                     <!--begin::Tables Widget 3-->
                     <div class="card h-xl-100">
@@ -79,11 +80,15 @@
                             <button class="btn btn-lg btn-success"><i class="fa fa-save"></i> SALVA DATI</button>
                         </div>
                         <div class="card-body py-3">
+
                             <div class="row">
+                                <label class="col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>Dati Modulo Formativo</b></span>
+                                </label>
                                 <div class="row row-border col-md-12 p-5">
                                     <!--begin::Label-->
                                     <label class="col-lg-2 col-form-label fw-bold fs-6" >
-                                        <span class="text-primary"><b>NOME MODULO</b></span>
+                                        <span class="text-info"><b>NOME MODULO</b></span>
                                     </label>
                                     <div class="col-md-6 fv-row">
                                         <input type="text" name="NOMEMODULO" id="NOMEMODULO"
@@ -92,57 +97,79 @@
                                     </div>
                                     <!--begin::Label-->
                                     <label class="col-lg-2 col-form-label fw-bold fs-6" >
-                                        <span class="text-primary"><b>ORE TOTALI</b></span>
+                                        <span class="text-info"><b>ORE TOTALI</b></span>
                                     </label>
                                     <div class="col-md-2 fv-row">
                                         <input type="text" name="ORETOTALI" id="ORETOTALI"
-                                               class="form-control" 
-                                               placeholder="..." required />
+                                               class="form-control decimalvalue" 
+                                               required onchange="return checkmaskdecimal(this);"/>
                                     </div>
                                 </div>
                                 <div class="row row-border col-md-12 p-5">
                                     <!--begin::Label-->
                                     <label class="col-lg-2 col-form-label fw-bold fs-6" >
-                                        <span class="text-primary"><b>ORE AULA TEORICA</b></span>
+                                        <span class="text-info"><b>ORE AULA TEORICA</b></span>
                                     </label>
                                     <div class="col-md-2 fv-row">
-                                        <input type="text" name="NOMEMODULO" id="NOMEMODULO"
-                                               class="form-control" 
-                                               placeholder="..." required />
+                                        <input type="text" name="OREAULATEO" id="OREAULATEO"
+                                               class="form-control decimalvalue" 
+                                               required />
                                     </div>
                                     <!--begin::Label-->
                                     <label class="col-lg-2 col-form-label fw-bold fs-6" >
-                                        <span class="text-primary"><b>ORE AULA TECNICO/OPERATIVA</b></span>
+                                        <span class="text-info"><b>ORE AULA TECNICO/OPERATIVA</b></span>
                                     </label>
                                     <div class="col-md-2 fv-row">
-                                        <input type="text" name="ORETOTALI" id="ORETOTALI"
-                                               class="form-control" 
-                                               placeholder="..." required />
+                                        <input type="text" name="OREAULATEC" id="OREAULATEC"
+                                               class="form-control decimalvalue" 
+                                               required />
                                     </div>
                                     <label class="col-lg-2 col-form-label fw-bold fs-6" >
-                                        <span class="text-dark"><b>ORE E-LEARNING</b></span>
+                                        <span class="text-info"><b>ORE E-LEARNING</b></span>
                                     </label>
                                     <div class="col-md-2 fv-row">
-                                        <input type="text" name="ORETOTALI" id="ORETOTALI"
-                                               class="form-control" 
-                                               placeholder="..." required />
+                                        <input type="text" name="OREELE" id="OREELE"
+                                               class="form-control decimalvalue" 
+                                               required />
                                     </div>
                                 </div>
-                                <div class="row row-border col-md-12 p-5">
+                                <hr>
+                                <label class="col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>Competenze correlate</b></span>
+                                </label>
+                                <div class="row row-border col-md-12 p-5 checkboxesr">
 
-                                    <div class="col-md-2 fv-row">   
-                                        <select name="ctlingua_" aria-label="Scegli..." 
-                                                data-control="select2" data-placeholder="Lingua Straniera" 
-                                                class="form-select"
-                                                required>
-                                            <option value="">Scegli Lingua</option>
-                                        </select>
+                                    <%for (Competenze cmp : comp) {
+                                    %>
+                                    <label class="col-form-label fw-bold fs-6">
+                                        <span class="text-dark"><b>COMPETENZA <%=cmp.getNumero()%> - <%=cmp.getDescrizione()%></b>
+                                            <i class="text-success fa fa-2x fa-check-circle compicon"
+                                               id="comp_<%=cmp.getIdcompetenze()%>" style="display: none;"></i>
+                                        </span>
+                                    </label>
+                                    <label class="col-form-label">
+                                        <span class="text-dark"><b>SELEZIONE ABILITA'</b></span>
+                                    </label>
+                                    <%for (Abilita ab : cmp.getAbilita()) {%>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch" 
+                                               id="AB_<%=ab.getIdabilita()%>_<%=cmp.getIdcompetenze()%>" onchange="return check_abilita_competenze();">
+                                        <label class="form-check-label" for="AB_<%=ab.getIdabilita()%>"><%=ab.getIdabilita()%> - <%=ab.getDescrizione()%></label>
                                     </div>
-                                    <div class="col-md-3 fv-row">
-                                        <input type="text" name="ctdescr_" id="ctdescr_"
-                                               class="form-control" 
-                                               placeholder="..." required />
+                                    <%}%> 
+                                    <label class="col-form-label">
+                                        <span class="text-dark"><b>SELEZIONA CONOSCENZA</b></span>
+                                    </label>
+                                    <%for (Conoscenze ab : cmp.getConoscenze()) {%>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch" 
+                                               id="CO_<%=ab.getIdconoscenze()%>_<%=cmp.getIdcompetenze()%>" onchange="return check_abilita_competenze();">
+                                        <label class="form-check-label" for="CO_<%=ab.getIdconoscenze()%>"><%=ab.getIdconoscenze()%> - <%=ab.getDescrizione()%></label>
                                     </div>
+                                    <%}%>    
+
+                                    <hr>
+                                    <%}%>
                                 </div>
 
                             </div>
@@ -180,8 +207,8 @@
         <script src="assets/plugins/global/plugins.bundle.js"></script>
         <script src="assets/js/scripts.bundle.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
-        <script type="text/javascript" src="assets/js/common.js"></script>
         <script src="assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
+        <script src="assets/js/US_programmacorsi_details.js"></script>
 
         <!--end::Page Custom Javascript-->
         <!--end::Javascript-->

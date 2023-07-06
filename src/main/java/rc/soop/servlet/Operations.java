@@ -1,5 +1,7 @@
 package rc.soop.servlet;
 
+import com.google.common.util.concurrent.AtomicDouble;
+import com.google.gson.JsonObject;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,7 +31,10 @@ import rc.soop.sic.Pdf;
 import static rc.soop.sic.Pdf.GENERADECRETOAPPROVATIVO;
 import static rc.soop.sic.Pdf.checkFirmaQRpdfA;
 import rc.soop.sic.Utils;
+import static rc.soop.sic.Utils.calcolaPercentuale;
 import static rc.soop.sic.Utils.estraiEccezione;
+import static rc.soop.sic.Utils.fd;
+import static rc.soop.sic.Utils.formatDoubleforMysql;
 import static rc.soop.sic.Utils.generaId;
 import static rc.soop.sic.Utils.getRequestValue;
 import static rc.soop.sic.Utils.parseIntR;
@@ -440,8 +445,69 @@ public class Operations extends HttpServlet {
         }
     }
 
+    protected void CHECKMODULO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+//        Utils.printRequest(request);
+
+        JsonObject resp_out = new JsonObject();
+
+        EntityOp ep1 = new EntityOp();
+        Corso co1 = ep1.getEm().find(Corso.class, Long.valueOf(getRequestValue(request, "IDOCORSO")));
+
+        if (co1 != null) {
+
+            double oremaxlearn = calcolaPercentuale(String.valueOf(co1.getDurataore()), String.valueOf(co1.getElearningperc()));
+
+            double ORETOTALI = fd(formatDoubleforMysql(Utils.getRequestValue(request, "ORETOTALI")));
+            double OREELE = fd(formatDoubleforMysql(Utils.getRequestValue(request, "OREELE")));
+
+            List<Calendario_Formativo> calendar = ep1.calendario_formativo_corso(co1);
+            AtomicDouble orepian = new AtomicDouble(0.0);
+            AtomicDouble orelearning = new AtomicDouble(0.0);
+            calendar.forEach(c1 -> {
+                orepian.addAndGet(Double.parseDouble(String.valueOf(c1.getOre())));
+                orelearning.addAndGet(Double.parseDouble(String.valueOf(c1.getOre_teorica_el())));
+            });
+
+            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(1) " + co1.getDurataore());
+            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(2) " + oremaxlearn);
+            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(3) " + orepian.get());
+            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(4) " + orelearning.get());
+            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(5) " + ORETOTALI);
+            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(6) " + OREELE);
+
+            double dapian = fd(String.valueOf(co1.getDurataore())) - orepian.get();
+            double dapianEL = oremaxlearn - orelearning.get();
+
+            boolean check_oretotali = orepian.get() + ORETOTALI <= fd(String.valueOf(co1.getDurataore()));
+            boolean check_elearning = orelearning.get() + OREELE <= oremaxlearn;
+
+            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(7) " + check_oretotali);
+            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(8) " + check_elearning);
+
+            if (!check_oretotali) {
+                resp_out.addProperty("result", false);
+                resp_out.addProperty("message", "Ore superiori a quelle consentite.<br>Ore residue da pianificare: " + dapian);
+            } else if (!check_elearning) {
+                resp_out.addProperty("result", false);
+                resp_out.addProperty("message", "Ore e-learning superiori a quelle consentite.<br>Ore residue e-learning da pianificare: " + dapianEL);
+            } else {
+                resp_out.addProperty("result", false);
+            }
+        } else {
+            resp_out.addProperty("result", false);
+            resp_out.addProperty("message", "Errore durante l'individuazione del calendario formativo.");
+        }
+
+        request.setCharacterEncoding("utf8");
+        response.setCharacterEncoding("utf8");
+        response.setContentType("application/json");
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+
+    }
+
     protected void SALVAPIANIFICAZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Utils.printRequest(request);
 
         EntityOp ep1 = new EntityOp();
         List<Lingua> language = ep1.getLingue();
@@ -612,6 +678,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "SALVAPIANIFICAZIONE":
                     SALVAPIANIFICAZIONE(request, response);
+                    break;
+                case "CHECKMODULO":
+                    CHECKMODULO(request, response);
                     break;
                 case "ADDCORSO":
                     ADDCORSO(request, response);
