@@ -81,6 +81,11 @@
                         </div>
                         <div class="card-body py-3">
 
+                            <div class="row col-md-12 col-form-label">
+                                <div class="alert alert-danger"  id="messageerror" style="display: none;">
+                                    ERRORE: 
+                                </div>
+                            </div>
                             <div class="row">
                                 <label class="col-form-label fw-bold fs-6">
                                     <span class="text-danger"><b>Dati Modulo Formativo</b></span>

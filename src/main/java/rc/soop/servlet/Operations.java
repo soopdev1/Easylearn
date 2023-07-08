@@ -1,6 +1,7 @@
 package rc.soop.servlet;
 
 import com.google.common.util.concurrent.AtomicDouble;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +28,7 @@ import static rc.soop.sic.Constant.PATTERNDATE3;
 import static rc.soop.sic.Constant.PATTERNDATE4;
 import static rc.soop.sic.Constant.PATTERNDATE5;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE6;
+import rc.soop.sic.JsonResult;
 import rc.soop.sic.Pdf;
 import static rc.soop.sic.Pdf.GENERADECRETOAPPROVATIVO;
 import static rc.soop.sic.Pdf.checkFirmaQRpdfA;
@@ -446,7 +448,7 @@ public class Operations extends HttpServlet {
     }
 
     protected void CHECKMODULO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        Utils.printRequest(request);
+        Utils.printRequest(request);
 
         JsonObject resp_out = new JsonObject();
 
@@ -460,6 +462,9 @@ public class Operations extends HttpServlet {
             double ORETOTALI = fd(formatDoubleforMysql(Utils.getRequestValue(request, "ORETOTALI")));
             double OREELE = fd(formatDoubleforMysql(Utils.getRequestValue(request, "OREELE")));
 
+            double OREAULATEO = fd(formatDoubleforMysql(Utils.getRequestValue(request, "OREAULATEO")));
+            double OREAULATEC = fd(formatDoubleforMysql(Utils.getRequestValue(request, "OREAULATEC")));
+
             List<Calendario_Formativo> calendar = ep1.calendario_formativo_corso(co1);
             AtomicDouble orepian = new AtomicDouble(0.0);
             AtomicDouble orelearning = new AtomicDouble(0.0);
@@ -468,21 +473,18 @@ public class Operations extends HttpServlet {
                 orelearning.addAndGet(Double.parseDouble(String.valueOf(c1.getOre_teorica_el())));
             });
 
-            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(1) " + co1.getDurataore());
-            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(2) " + oremaxlearn);
-            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(3) " + orepian.get());
-            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(4) " + orelearning.get());
-            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(5) " + ORETOTALI);
-            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(6) " + OREELE);
-
+//            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(1) " + co1.getDurataore());
+//            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(2) " + oremaxlearn);
+//            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(3) " + orepian.get());
+//            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(4) " + orelearning.get());
+//            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(5) " + ORETOTALI);
+//            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(6) " + OREELE);
             double dapian = fd(String.valueOf(co1.getDurataore())) - orepian.get();
             double dapianEL = oremaxlearn - orelearning.get();
 
             boolean check_oretotali = orepian.get() + ORETOTALI <= fd(String.valueOf(co1.getDurataore()));
             boolean check_elearning = orelearning.get() + OREELE <= oremaxlearn;
-
-            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(7) " + check_oretotali);
-            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(8) " + check_elearning);
+            boolean check_sum = (ORETOTALI - OREAULATEO - OREAULATEC - OREELE) == 0;
 
             if (!check_oretotali) {
                 resp_out.addProperty("result", false);
@@ -490,17 +492,20 @@ public class Operations extends HttpServlet {
             } else if (!check_elearning) {
                 resp_out.addProperty("result", false);
                 resp_out.addProperty("message", "Ore e-learning superiori a quelle consentite.<br>Ore residue e-learning da pianificare: " + dapianEL);
-            } else {
+            } else if (!check_sum) {
                 resp_out.addProperty("result", false);
+                resp_out.addProperty("message", "La somma delle ore inserite ORE AULA TEORICA + ORE AULA TECNICO/OPERATIVA + ORE E-LEARNING ("
+                        + (OREAULATEO +"*"+ OREAULATEC +"*"+ OREELE) +") non corrisponde alle ORE TOTALI ("+ORETOTALI+") inserite . Controllare.");
+            } else {
+                resp_out.addProperty("result", true);
+                resp_out.addProperty("message", "");
+
             }
         } else {
             resp_out.addProperty("result", false);
             resp_out.addProperty("message", "Errore durante l'individuazione del calendario formativo.");
         }
 
-        request.setCharacterEncoding("utf8");
-        response.setCharacterEncoding("utf8");
-        response.setContentType("application/json");
         try (PrintWriter out = response.getWriter()) {
             out.print(resp_out.toString());
         }

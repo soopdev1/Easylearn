@@ -331,6 +331,7 @@ public class Utils {
         if (value.equals("-") || value.equals("")) {
             return "0.00";
         }
+        value = StringUtils.replace(value, "_", "");
         String add = "";
         if (value.contains("-")) {
             add = "-";

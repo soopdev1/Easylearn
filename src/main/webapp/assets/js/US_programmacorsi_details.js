@@ -1,40 +1,53 @@
 function verificasalvataggiodati() {
-
+    $('#messageerror').css('display', 'none');
     var idcorsodasalvare = $('#idcorsodasalvare').val();
     var ORETOTALI = $('#ORETOTALI').val();
     var OREAULATEO = $('#OREAULATEO').val();
     var OREAULATEC = $('#OREAULATEC').val();
     var OREELE = $('#OREELE').val();
+    var ok = false;
     $.ajax({
         url: 'Operations',
         type: 'POST',
         data: {
-            'type':'CHECKMODULO',
+            'type': 'CHECKMODULO',
             'IDOCORSO': idcorsodasalvare,
             'ORETOTALI': ORETOTALI,
             'OREAULATEO': OREAULATEO,
             'OREAULATEC': OREAULATEC,
-            'OREELE': OREELE            
+            'OREELE': OREELE
         },
         dataType: 'json',
+        async: false,
         success: function (data) {
-            alert('Data: ' + data);
+            //check
+            if (data.result) {
+                ok = true;
+            } else {
+                $('#messageerror').css('display', '');
+                $('#messageerror').html("ERRORE: " + data.message);
+            }
         },
-        error: function (request, error)
-        {
-            alert("Request: " + JSON.stringify(request));
+        error: function (request, error) {
+            $('#messageerror').css('display', '');
+            $('#messageerror').html("ERRORE: " + error);
         }
     });
 
+    if (ok) {
+        if ($('.checkboxesr input:checked').length === 0) {
+            ok = false;
+            $('#messageerror').css('display', '');
+            $('#messageerror').html("ERRORE: &#200; necessario selezionare almeno una competenza (Abilit&#224; e/o Conoscenza)");
+        }
+    }
 
-    return false;
+    return ok;
 }
 
 
 function check_abilita_competenze() {
     $('.compicon').css('display', 'none');
-
-
     $('.checkboxesr input[type=checkbox]').each(function () {
         var completeid = $(this).attr('id');
 //        var idch = completeid.split('_')[1];
@@ -49,23 +62,19 @@ function check_abilita_competenze() {
                 $('#comp_' + idcompetenza).css('display', '');
             }
         }
-//        if ($(this).is(":checked")) {
-//            selected.push($(this).attr('name'));
-//        }
     });
 }
 
 function checkmaskdecimal(input) {
-    alert($(input).val());
+    //alert($(input).val());
 }
 
 
 $(document).ready(function () {
     Inputmask({
         mask: "999,9",
-        greedy: false,
         digits: 1,
-        placeholder: "000,0"
+        numericInput: true
     }).mask(".decimalvalue");
     return check_abilita_competenze();
 });
