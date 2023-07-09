@@ -25,10 +25,8 @@ import javax.persistence.Table;
  *
  * @author Administrator
  */
-
 @NamedQueries(value = {
-    @NamedQuery(name = "calendarioformativo.corso", query = "SELECT u FROM Calendario_Formativo u WHERE u.corsodiriferimento=:corsodiriferimento ORDER BY u.idcalendarioformativo"),
-})
+    @NamedQuery(name = "calendarioformativo.corso", query = "SELECT u FROM Calendario_Formativo u WHERE u.corsodiriferimento=:corsodiriferimento ORDER BY u.idcalendarioformativo"),})
 @Entity
 @Table(name = "calendarioformativo")
 public class Calendario_Formativo implements Serializable {
@@ -41,65 +39,101 @@ public class Calendario_Formativo implements Serializable {
 
     @Column(name = "codicemodulo")
     private String codicemodulo;
-    
+
     @Column(name = "tipomodulo")
     private String tipomodulo;
-    
+
     @Column(name = "nomemodulo", columnDefinition = "LONGTEXT")
     private String nomemodulo;
 
     @ManyToOne
     @JoinColumn(name = "idcorso")
     private Corso corsodiriferimento;
-    
+
     @Column(name = "oreteoricaaula")
-    private int ore_teorica_aula;
-    
+    private double ore_teorica_aula;
+
     @Column(name = "oreteoricael")
-    private int ore_teorica_el;
-    
+    private double ore_teorica_el;
+
     @Column(name = "oretecnicaoperat")
-    private int ore_tecnica_operativa;
-    
+    private double ore_tecnica_operativa;
+
     @Column(name = "oreaula")
-    private int ore_aula;
-    
+    private double ore_aula;
+
     @Column(name = "ore")
-    private int ore;
-    
+    private double ore;
+
     @ManyToOne
     @JoinColumn(name = "idcompetenze")
     private Competenze_Trasversali competenzetrasversali;
-    
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "moduli_competenze",
             joinColumns = @JoinColumn(name = "idcalendarioformativo"),
             inverseJoinColumns = @JoinColumn(name = "idcompetenze"))
     List<Competenze> elencocompetenze;
-    
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "moduli_abilita",
             joinColumns = @JoinColumn(name = "idcalendarioformativo"),
             inverseJoinColumns = @JoinColumn(name = "idabilita"))
     List<Abilita> elencoabilita;
-    
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "moduli_conoscenze",
             joinColumns = @JoinColumn(name = "idcalendarioformativo"),
             inverseJoinColumns = @JoinColumn(name = "idconoscenze"))
     List<Conoscenze> elencoconoscenze;
-    
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "moduli_docenti",
             joinColumns = @JoinColumn(name = "idcalendarioformativo"),
             inverseJoinColumns = @JoinColumn(name = "iddocente"))
     List<Docente> elencodocenti;
-    
+
     @Column(name = "ctcodicelingua")
     private String ctcodicelingua;
-    
+
     @Column(name = "ctdescrizione", columnDefinition = "LONGTEXT")
     private String ctdescrizione;
+
+    public String exportCompetenze() {
+        if (this.elencocompetenze == null) {
+            return "";
+        } else {
+            StringBuilder sb1 = new StringBuilder();
+            this.elencocompetenze.forEach(f1 -> {
+                sb1.append(String.valueOf(f1.getIdcompetenze())).append("; ");
+            });
+            return sb1.toString().trim();
+        }
+    }
+
+    public String exportAbilita() {
+        if (this.elencoabilita == null) {
+            return "";
+        } else {
+            StringBuilder sb1 = new StringBuilder();
+            this.elencoabilita.forEach(f1 -> {
+                sb1.append(String.valueOf(f1.getIdabilita())).append("; ");
+            });
+            return sb1.toString().trim();
+        }
+    }
+
+    public String exportConoscenze() {
+        if (this.elencoconoscenze == null) {
+            return "";
+        } else {
+            StringBuilder sb1 = new StringBuilder();
+            this.elencoconoscenze.forEach(f1 -> {
+                sb1.append(String.valueOf(f1.getIdconoscenze())).append("; ");
+            });
+            return sb1.toString().trim();
+        }
+    }
 
     public String getCtcodicelingua() {
         return ctcodicelingua;
@@ -116,10 +150,10 @@ public class Calendario_Formativo implements Serializable {
     public void setCtdescrizione(String ctdescrizione) {
         this.ctdescrizione = ctdescrizione;
     }
-    
+
     public Calendario_Formativo() {
     }
-    
+
     public Long getIdcalendarioformativo() {
         return idcalendarioformativo;
     }
@@ -143,7 +177,7 @@ public class Calendario_Formativo implements Serializable {
     public void setTipomodulo(String tipomodulo) {
         this.tipomodulo = tipomodulo;
     }
-    
+
     public Corso getCorsodiriferimento() {
         return corsodiriferimento;
     }
@@ -152,43 +186,43 @@ public class Calendario_Formativo implements Serializable {
         this.corsodiriferimento = corsodiriferimento;
     }
 
-    public int getOre_teorica_aula() {
+    public double getOre_teorica_aula() {
         return ore_teorica_aula;
     }
 
-    public void setOre_teorica_aula(int ore_teorica_aula) {
+    public void setOre_teorica_aula(double ore_teorica_aula) {
         this.ore_teorica_aula = ore_teorica_aula;
     }
 
-    public int getOre_teorica_el() {
+    public double getOre_teorica_el() {
         return ore_teorica_el;
     }
 
-    public void setOre_teorica_el(int ore_teorica_el) {
+    public void setOre_teorica_el(double ore_teorica_el) {
         this.ore_teorica_el = ore_teorica_el;
     }
 
-    public int getOre_tecnica_operativa() {
+    public double getOre_tecnica_operativa() {
         return ore_tecnica_operativa;
     }
 
-    public void setOre_tecnica_operativa(int ore_tecnica_operativa) {
+    public void setOre_tecnica_operativa(double ore_tecnica_operativa) {
         this.ore_tecnica_operativa = ore_tecnica_operativa;
     }
 
-    public int getOre_aula() {
+    public double getOre_aula() {
         return ore_aula;
     }
 
-    public void setOre_aula(int ore_aula) {
+    public void setOre_aula(double ore_aula) {
         this.ore_aula = ore_aula;
     }
 
-    public int getOre() {
+    public double getOre() {
         return ore;
     }
 
-    public void setOre(int ore) {
+    public void setOre(double ore) {
         this.ore = ore;
     }
 
@@ -240,7 +274,6 @@ public class Calendario_Formativo implements Serializable {
         this.elencodocenti = elencodocenti;
     }
 
-    
     @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
@@ -272,5 +305,5 @@ public class Calendario_Formativo implements Serializable {
                 .append("}")
                 .toString();
     }
-    
+
 }

@@ -215,7 +215,7 @@
                                 <%}%>
                             </div>
                             <%if (!calendar.isEmpty()) {
-                                session.setAttribute("ses_idcorso", Utils.enc_string(String.valueOf(co1.getIdcorso())));
+                                    session.setAttribute("ses_idcorso", Utils.enc_string(String.valueOf(co1.getIdcorso())));
                             %>
                             <hr>
                             <div class="row">
@@ -272,11 +272,21 @@
                                                 <td class="p-2 w-50px"></td>
                                                 <td class="p-2 w-50px">Azioni</td>
                                             </tr>
-                                            <%}
-                                            %>
-
-                                            <%    }
-                                            %>
+                                            <%} else if (c1.getTipomodulo().equals("MODULOFORMATIVO")) {%>
+                                            <input type="hidden" class="value_ore" id="ore_modules_<%=indexmodules%>" value="<%=c1.getOre()%>" />
+                                            <input type="hidden" class="value_oreaula" id="oreaula_modules_<%=indexmodules%>" value="<%=c1.getOre_aula()%>" />
+                                            <tr>
+                                                <td class="p-2 w-50px"><%=c1.getCodicemodulo()%></td>
+                                                <td class="p-2 w-50px">MODULO FORMATIVO</td>
+                                                <td class="p-2 w-150px"></td>
+                                                <td class="p-2 w-50px"><%=c1.getOre()%></td>
+                                                <td class="p-2 w-50px"><%=c1.exportCompetenze()%></td>
+                                                <td class="p-2 w-50px"><%=c1.exportAbilita()%></td>
+                                                <td class="p-2 w-50px"><%=c1.exportConoscenze()%></td>
+                                                <td class="p-2 w-50px">Azioni</td>
+                                            </tr>
+                                            <%}%>
+                                            <%}%>
                                             <input type="hidden" id="lengthmodules" value="<%=indexmodules%>" /> 
                                             </tbody>
                                         </table>

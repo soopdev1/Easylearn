@@ -107,7 +107,7 @@
                                     <div class="col-md-2 fv-row">
                                         <input type="text" name="ORETOTALI" id="ORETOTALI"
                                                class="form-control decimalvalue" 
-                                               required onchange="return checkmaskdecimal(this);"/>
+                                               required />
                                     </div>
                                 </div>
                                 <div class="row row-border col-md-12 p-5">
@@ -158,18 +158,23 @@
                                     <%for (Abilita ab : cmp.getAbilita()) {%>
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" role="switch" 
-                                               id="AB_<%=ab.getIdabilita()%>_<%=cmp.getIdcompetenze()%>" onchange="return check_abilita_competenze();">
-                                        <label class="form-check-label" for="AB_<%=ab.getIdabilita()%>"><%=ab.getIdabilita()%> - <%=ab.getDescrizione()%></label>
+                                               id="AB_<%=ab.getIdabilita()%>_<%=cmp.getIdcompetenze()%>"
+                                               name="AB_<%=ab.getIdabilita()%>_<%=cmp.getIdcompetenze()%>"
+                                               onchange="return check_abilita_competenze();" />
+                                        <label class="form-check-label" 
+                                               for="AB_<%=ab.getIdabilita()%>"><%=ab.getIdabilita()%> - <%=ab.getDescrizione()%></label>
                                     </div>
                                     <%}%> 
                                     <label class="col-form-label">
                                         <span class="text-dark"><b>SELEZIONA CONOSCENZA</b></span>
                                     </label>
-                                    <%for (Conoscenze ab : cmp.getConoscenze()) {%>
+                                    <%for (Conoscenze co : cmp.getConoscenze()) {%>
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" role="switch" 
-                                               id="CO_<%=ab.getIdconoscenze()%>_<%=cmp.getIdcompetenze()%>" onchange="return check_abilita_competenze();">
-                                        <label class="form-check-label" for="CO_<%=ab.getIdconoscenze()%>"><%=ab.getIdconoscenze()%> - <%=ab.getDescrizione()%></label>
+                                               id="CO_<%=co.getIdconoscenze()%>_<%=cmp.getIdcompetenze()%>" 
+                                               name="CO_<%=co.getIdconoscenze()%>_<%=cmp.getIdcompetenze()%>" 
+                                               onchange="return check_abilita_competenze();" />
+                                        <label class="form-check-label" for="CO_<%=co.getIdconoscenze()%>"><%=co.getIdconoscenze()%> - <%=co.getDescrizione()%></label>
                                     </div>
                                     <%}%>    
 

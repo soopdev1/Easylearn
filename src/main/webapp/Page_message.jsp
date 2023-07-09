@@ -73,7 +73,9 @@
                                     String ty = "";
                                     String html = "";
                                     switch (esito) {
-                                        case "OK_CL": {
+                                        case "OK_CL": 
+                                        case "OK_SM": 
+                                            {
                                             ty = "alert-success";
                                             html = "<i class='fa fa-check-circle'></i> Operazione completata con successo. Chiudere questa finestra.";
                                             break;

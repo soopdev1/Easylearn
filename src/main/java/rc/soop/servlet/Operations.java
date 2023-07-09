@@ -1,7 +1,6 @@
 package rc.soop.servlet;
 
 import com.google.common.util.concurrent.AtomicDouble;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import java.io.File;
 import java.io.IOException;
@@ -9,6 +8,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import static java.lang.String.format;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,7 +28,6 @@ import static rc.soop.sic.Constant.PATTERNDATE3;
 import static rc.soop.sic.Constant.PATTERNDATE4;
 import static rc.soop.sic.Constant.PATTERNDATE5;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE6;
-import rc.soop.sic.JsonResult;
 import rc.soop.sic.Pdf;
 import static rc.soop.sic.Pdf.GENERADECRETOAPPROVATIVO;
 import static rc.soop.sic.Pdf.checkFirmaQRpdfA;
@@ -42,8 +41,11 @@ import static rc.soop.sic.Utils.getRequestValue;
 import static rc.soop.sic.Utils.parseIntR;
 import static rc.soop.sic.Utils.parseLongR;
 import static rc.soop.sic.Utils.redirect;
+import rc.soop.sic.jpa.Abilita;
 import rc.soop.sic.jpa.Calendario_Formativo;
+import rc.soop.sic.jpa.Competenze;
 import rc.soop.sic.jpa.Competenze_Trasversali;
+import rc.soop.sic.jpa.Conoscenze;
 import rc.soop.sic.jpa.Corso;
 import rc.soop.sic.jpa.CorsoStato;
 import rc.soop.sic.jpa.Corsoavviato;
@@ -447,8 +449,96 @@ public class Operations extends HttpServlet {
         }
     }
 
+    protected void MODIFICAPIANIFICAZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        try {
+
+            EntityOp ep1 = new EntityOp();
+            Corso co1 = ep1.getEm().find(Corso.class, Long.valueOf(getRequestValue(request, "idcorsodasalvare")));
+
+            if (co1 != null) {
+
+                String NOMEMODULO = getRequestValue(request, "NOMEMODULO");
+                double ORETOTALI = fd(formatDoubleforMysql(Utils.getRequestValue(request, "ORETOTALI")));
+                double OREELE = fd(formatDoubleforMysql(Utils.getRequestValue(request, "OREELE")));
+                double OREAULATEO = fd(formatDoubleforMysql(Utils.getRequestValue(request, "OREAULATEO")));
+                double OREAULATEC = fd(formatDoubleforMysql(Utils.getRequestValue(request, "OREAULATEC")));
+
+                List<Competenze> comp = ep1.competenze_correlate(co1.getRepertorio());
+
+                List<Competenze> list_comp = new ArrayList<>();
+                List<Abilita> list_abil = new ArrayList<>();
+                List<Conoscenze> list_cono = new ArrayList<>();
+
+                comp.forEach(c1 -> {
+                    for (Abilita ab : c1.getAbilita()) {
+                        String abnamecheck = "AB_" + ab.getIdabilita() + "_" + c1.getIdcompetenze();
+                        String req1 = Utils.getRequestValue(request, abnamecheck);
+                        if (req1 != null
+                                && req1.equalsIgnoreCase("on")) {
+                            if (!list_comp.contains(c1)) {
+                                list_comp.add(c1);
+                            }
+                            if (!list_abil.contains(ab)) {
+                                list_abil.add(ab);
+                            }
+                        }
+                    }
+
+                    for (Conoscenze co : c1.getConoscenze()) {
+                        String conamecheck = "CO_" + co.getIdconoscenze() + "_" + c1.getIdcompetenze();
+                        String req1 = Utils.getRequestValue(request, conamecheck);
+                        if (req1 != null
+                                && req1.equalsIgnoreCase("on")) {
+                            if (!list_comp.contains(c1)) {
+                                list_comp.add(c1);
+                            }
+                            if (!list_cono.contains(co)) {
+                                list_cono.add(co);
+                            }
+                        }
+                    }
+
+                });
+
+                List<Calendario_Formativo> calendar = ep1.calendario_formativo_corso(co1);
+
+                Calendario_Formativo ct = new Calendario_Formativo();
+                ct.setElencocompetenze(list_comp);
+                ct.setElencoconoscenze(list_cono);
+                ct.setElencoabilita(list_abil);
+                ct.setCodicemodulo("MOD" + (calendar.size() + 1));
+                ct.setCorsodiriferimento(co1);
+                ct.setNomemodulo(NOMEMODULO);
+                ct.setOre(ORETOTALI);
+                ct.setOre_aula(OREAULATEC + OREAULATEO);
+                ct.setOre_teorica_aula(OREAULATEC);
+                ct.setOre_tecnica_operativa(OREAULATEO);
+                ct.setOre_teorica_el(OREELE);
+                ct.setTipomodulo("MODULOFORMATIVO");
+                ep1.begin();
+                ep1.persist(ct);
+
+            } else {
+                request.getSession().setAttribute("ses_idcorso", Utils.enc_string(getRequestValue(request, "idcorsodasalvare")));
+                redirect(request, response, "US_compilacorsi.jsp?esito=KO1");
+            }
+
+            ep1.commit();
+            ep1.close();
+
+            redirect(request, response, "Page_message.jsp?esito=OK_SM");
+
+        } catch (Exception ex1) {
+            ex1.printStackTrace();
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            request.getSession().setAttribute("ses_idcorso", Utils.enc_string(getRequestValue(request, "idcorsodasalvare")));
+            redirect(request, response, "US_compilacorsi.jsp?esito=KO2");
+        }
+
+    }
+
     protected void CHECKMODULO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Utils.printRequest(request);
 
         JsonObject resp_out = new JsonObject();
 
@@ -495,7 +585,7 @@ public class Operations extends HttpServlet {
             } else if (!check_sum) {
                 resp_out.addProperty("result", false);
                 resp_out.addProperty("message", "La somma delle ore inserite ORE AULA TEORICA + ORE AULA TECNICO/OPERATIVA + ORE E-LEARNING ("
-                        + (OREAULATEO +"*"+ OREAULATEC +"*"+ OREELE) +") non corrisponde alle ORE TOTALI ("+ORETOTALI+") inserite . Controllare.");
+                        + (OREAULATEO + "*" + OREAULATEC + "*" + OREELE) + ") non corrisponde alle ORE TOTALI (" + ORETOTALI + ") inserite . Controllare.");
             } else {
                 resp_out.addProperty("result", true);
                 resp_out.addProperty("message", "");
@@ -686,6 +776,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "CHECKMODULO":
                     CHECKMODULO(request, response);
+                    break;
+                case "MODIFICAPIANIFICAZIONE":
+                    MODIFICAPIANIFICAZIONE(request, response);
                     break;
                 case "ADDCORSO":
                     ADDCORSO(request, response);

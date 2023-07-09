@@ -33,7 +33,6 @@ function verificasalvataggiodati() {
             $('#messageerror').html("ERRORE: " + error);
         }
     });
-
     if (ok) {
         if ($('.checkboxesr input:checked').length === 0) {
             ok = false;
@@ -41,7 +40,6 @@ function verificasalvataggiodati() {
             $('#messageerror').html("ERRORE: &#200; necessario selezionare almeno una competenza (Abilit&#224; e/o Conoscenza)");
         }
     }
-
     return ok;
 }
 
@@ -64,11 +62,6 @@ function check_abilita_competenze() {
         }
     });
 }
-
-function checkmaskdecimal(input) {
-    //alert($(input).val());
-}
-
 
 $(document).ready(function () {
     Inputmask({
