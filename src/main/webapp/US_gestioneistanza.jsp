@@ -4,6 +4,7 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.Tipologia_Percorso"%>
 <%@page import="rc.soop.sic.Engine"%>
 <%@page import="rc.soop.sic.jpa.User"%>
 <%@page import="rc.soop.sic.jpa.SoggettoProponente"%>
@@ -24,7 +25,7 @@
                 EntityOp eo = new EntityOp();
                 SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
                 List<Istanza> ist_l = eo.getIstanzeSoggetto(so);
-                int maxcorsi = Utils.parseIntR(Engine.getPath("conf.max.numcorsi", eo));
+
 
     %>
     <!--begin::Head-->
@@ -95,7 +96,7 @@
                                                         <thead>
                                                             <tr>
                                                                 <th class="p-2 w-50px">Stato</th>
-                                                                <th class="p-2 w-50px">Codice</th>
+                                                                <th class="p-2 w-50px">ID</th>
                                                                 <th class="p-2 min-w-120px">Corsi</th>
                                                                 <th class="p-2 w-80px">Data</th>
                                                                 <th class="p-2 min-w-120px">Azioni</th>
@@ -106,6 +107,8 @@
                                                         <tbody>
 
                                                             <%for (Istanza is1 : ist_l) {
+                                                                    Tipologia_Percorso tp1 = eo.getTipoPercorsoIstanza(is1);
+                                                                    int maxcorsi = tp1.getMaxcorsi();
                                                                     List<Corso> c1 = new EntityOp().getCorsiIstanza(is1);
                                                                     boolean addcorso = (maxcorsi > c1.size());
                                                                     boolean salvaistanza = true;
@@ -116,17 +119,24 @@
                                                                     <%=is1.getStatocorso().getHtmlicon()%>
                                                                 </td>
                                                                 <td class="p-2 w-50px">
-                                                                    <%=is1.getCodiceistanza()%>
+                                                                    <%=is1.getIdistanza()%>
                                                                 </td>                                    
                                                                 <td class="p-2 min-w-120px">
+                                                                    <b>Tipologia Percorsi: <%=tp1.getNometipologia()%></b> (Max <%=maxcorsi%>)<br/><hr>
                                                                     <%for (Corso cor : c1) {%>
-                                                                    <b><%=cor.getRepertorio().getDenominazione()%> - <%=cor.getSchedaattivita().getTipologiapercorso()%></b> 
+                                                                    <u><%=cor.getRepertorio().getDenominazione()%></u> 
                                                                     - Edizioni: <%=cor.getQuantitarichiesta()%><br/>
-                                                                    
+
                                                                     <form action="US_programmacorsi.jsp" method="POST" target="_blank">
                                                                         <input type="hidden" name="idcorso" value="<%=Utils.enc_string(String.valueOf(cor.getIdcorso()))%>"/>
-                                                                        <%=cor.getStatocorso().getHtmlicon()%>
-                                                                        <button type="submit"class="btn btn-sm btn-warning"><i class="fa fa-edit"></i> Modifica Corso</button>
+                                                                    <%=cor.getStatocorso().getHtmlicon()%> |
+                                                                    
+                                                                        <button type="submit"class="btn btn-sm btn-primary"
+                                                                                data-bs-toggle="tooltip" title="MODIFICA DETTAGLI CORSO" 
+                                                                                data-preload='false'><i class="fa fa-edit"></i></button> |
+                                                                        <button type="button"class="btn btn-sm btn-danger"
+                                                                                data-bs-toggle="tooltip" title="RIMUOVI CORSO DA ISTANZA" 
+                                                                       data-preload='false'><i class="fa fa-trash-arrow-up"></i></button>
                                                                     </form>
                                                                     <hr>
                                                                     <%}%>
@@ -137,7 +147,8 @@
                                                                     <%=is1.getDatacreazione()%>
                                                                 </td> 
                                                                 <td class="p-2 min-w-120px" style="white-space: nowrap; overflow: hidden; text-overflow:ellipsis;">
-                                                                    <a href="ADM_visdco.jsp?idist=<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>" data-fancybox data-type='iframe' 
+                                                                    <a href="ADM_visdco.jsp?idist=<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>" 
+                                                                       data-fancybox data-type='iframe' 
                                                                        data-bs-toggle="tooltip" title="VISUALIZZA/MODIFICA DETTAGLI ISTANZA" 
                                                                        data-preload='false' data-width='75%' data-height='75%' 
                                                                        class="btn btn-sm btn-bg-light btn-dark fan1">
