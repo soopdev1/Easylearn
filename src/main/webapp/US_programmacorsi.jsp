@@ -116,7 +116,7 @@
                                 </label>
                                 <label class="col-lg-3 col-form-label fw-bold fs-6">
                                     <span><b>eLearning</b></span><br/>
-                                    <span>MAX <%=co1.getElearningperc()%> % - MAX <%=Utils.getPercentuale(co1.getDurataore(), co1.getElearningperc())%> ORE</span>
+                                    <span><%=co1.getElearningperc()%> % - <%=Utils.getPercentuale(co1.getDurataore(), co1.getElearningperc())%> ORE</span>
                                 </label>
                                 <label class="col-lg-3 col-form-label fw-bold fs-6">
                                     <span><b>TOTALE ORE (AULA + STAGE)</b></span><br/>
@@ -241,7 +241,6 @@
                                        data-preload='false' data-width='75%' data-height='75%' id="addcalendariobutton">
                                         <i class="fa fa-plus-circle" ></i> Aggiungi</a>
                                 </label>
-
                                 <hr>
                                 <div class="card-body py-3">
                                     <!--begin::Table container-->
@@ -315,9 +314,7 @@
                             </div>
                             <%}
                                 boolean showstep4 = false;
-
                                 if (calendariocompleto) {
-
                                     if (modulidaassegnare == 0) {
                                         showstep4 = true;
                                     }

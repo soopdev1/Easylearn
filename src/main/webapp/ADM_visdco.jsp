@@ -18,6 +18,8 @@
         switch (verifysession) {
             case 1: {
                 String idc = Utils.getRequestValue(request, "idcorso");
+                        
+                
                 EntityOp eo = new EntityOp();
                 Corsoavviato ca = eo.getEm().find(Corsoavviato.class, Long.parseLong(idc));
 

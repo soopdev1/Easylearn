@@ -578,7 +578,7 @@ public class Operations extends HttpServlet {
             } else if (!check_sum) {
                 resp_out.addProperty("result", false);
                 resp_out.addProperty("message", "La somma delle ore inserite ORE AULA TEORICA + ORE AULA TECNICO/OPERATIVA + ORE E-LEARNING ("
-                        + (OREAULATEO + "*" + OREAULATEC + "*" + OREELE) + ") non corrisponde alle ORE TOTALI (" + ORETOTALI + ") inserite . Controllare.");
+                        + (OREAULATEO + OREAULATEC + OREELE) + ") non corrisponde alle ORE TOTALI (" + ORETOTALI + ") inserite . Controllare.");
             } else {
                 resp_out.addProperty("result", true);
                 resp_out.addProperty("message", "");
@@ -619,6 +619,7 @@ public class Operations extends HttpServlet {
 
                 ep1.commit();
                 ep1.close();
+                request.getSession().setAttribute("ses_idcorso", Utils.enc_string(getRequestValue(request, "idcorsodasalvare")));
                 redirect(request, response, "Page_message.jsp?esito=OK_SMD");
             } else {
                 request.getSession().setAttribute("ses_idcorso", Utils.enc_string(getRequestValue(request, "idcorsodasalvare")));
@@ -722,6 +723,7 @@ public class Operations extends HttpServlet {
 
             SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
 //            Istanza is = (Istanza) request.getSession().getAttribute("is_memory");
+
             String codiceis = generaId(30);
             EntityOp e = new EntityOp();
             e.begin();
@@ -732,15 +734,17 @@ public class Operations extends HttpServlet {
 //                is.setProtocollosoggettodata(new DateTime().toString(PATTERNDATE4));
 //                e.merge(is);
 //            } else {
-            Istanza is = new Istanza();
-            is.setProtocollosoggetto(getRequestValue(request, "protnum"));
-            is.setProtocollosoggettodata(new DateTime().toString(PATTERNDATE4));
-            is.setCodiceistanza(codiceis);
-            is.setSoggetto(so);
-            is.setStatocorso(e.getEm().find(CorsoStato.class, "01"));
-            is.setQuantitarichiesta(parseIntR(getRequestValue(request, "quantitarichiesta")));
-            e.persist(is);
-//            }
+            Istanza is = e.getEm().find(Istanza.class, Long.valueOf(getRequestValue(request, "istanzabase")));
+            if (is == null) {
+                is = new Istanza();
+                is.setProtocollosoggetto(getRequestValue(request, "protnum"));
+                is.setProtocollosoggettodata(new DateTime().toString(PATTERNDATE4));
+                is.setCodiceistanza(codiceis);
+                is.setSoggetto(so);
+                is.setStatocorso(e.getEm().find(CorsoStato.class, "01"));
+                is.setQuantitarichiesta(parseIntR(getRequestValue(request, "quantitarichiesta")));
+                e.persist(is);
+            }
 
             Corso c = new Corso();
             c.setDuratagiorni(parseIntR(getRequestValue(request, "duratagiorni")));
@@ -761,8 +765,6 @@ public class Operations extends HttpServlet {
             e.flush();
             e.commit();
             e.close();
-//            HttpSession se = request.getSession();
-//            se.setAttribute("is_memory", is);
             if (closewindow.equals("YES")) {
                 redirect(request, response, "Page_message.jsp?esito=OK_CL");
             } else {

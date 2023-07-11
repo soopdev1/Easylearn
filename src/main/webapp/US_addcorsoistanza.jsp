@@ -50,19 +50,13 @@
 
         EntityOp eo = new EntityOp();
         List<Scheda_Attivita> sche1 = (List<Scheda_Attivita>) eo.findAll(Scheda_Attivita.class);
-        List<Tipologia_Percorso> listper = (List<Tipologia_Percorso>) eo.findAll(Tipologia_Percorso.class);
-
         int maxrichiesta = Utils.parseIntR(Engine.getPath("conf.max.edizioni"));
         int maxallievi = Utils.parseIntR(Engine.getPath("conf.max.allievi"));
         User u1 = (User) session.getAttribute("us_memory");
-
         Long idist = Long.valueOf(Utils.dec_string(Utils.getRequestValue(request, "idist")));
-
         Istanza is1 = eo.getEm().find(Istanza.class, idist);
-
         Tipologia_Percorso tp1 = eo.getTipoPercorsoIstanza(is1);
         List<Corso> c1 = new EntityOp().getCorsiIstanza(is1);
-
     %>
     <body id="kt_body">
         <!--begin::Main-->
@@ -95,6 +89,7 @@
                                         <form id="signUpForm" action="Operations" method="POST">
                                             <input type="hidden" name="type" value="ADDCORSO" />
                                             <input type="hidden" name="closewindow" value="YES" />
+                                            <input type="hidden" name="istanzabase" value="<%=is1.getIdistanza()%>" />
 
                                             <!-- start step indicators -->
                                             <div class="form-header d-flex mb-4">
@@ -383,7 +378,7 @@
                                                 </div>
                                                 <div class="row mb-6">
                                                     <!--begin::Label-->
-                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Durata Complessiva Corso (GIORNI)</label>
+                                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">Durata Corso (GIORNI)</label>
                                                     <!--end::Label-->
                                                     <!--begin::Col-->
                                                     <div class="col-lg-8">
