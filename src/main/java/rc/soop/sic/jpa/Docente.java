@@ -6,6 +6,7 @@ package rc.soop.sic.jpa;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -17,6 +18,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import static rc.soop.sic.Utils.roundDoubleandFormat;
 import static rc.soop.sic.jpa.Stati.ABILITATO;
 
 /**
@@ -58,6 +60,22 @@ public class Docente implements Serializable {
 
     @Column(name = "anniesperienzadid", nullable = false, columnDefinition = "integer default 0")
     private int anniesperienzadid;
+
+    @Transient
+    private List<Moduli_Docenti> elencomoduli;
+
+    public String formatElencomoduli() {
+
+        if (this.elencomoduli != null) {
+            String view = "";
+            for (Moduli_Docenti md : this.elencomoduli) {
+                view = view + md.getModuloformativo().getCodicemodulo() + " (" + roundDoubleandFormat(md.getOrepreviste(), 1) + ")<br>";
+            }
+            return view;
+        }
+
+        return "";
+    }
 
     @Enumerated(EnumType.STRING)
     @Column(name = "statodocente")
@@ -174,6 +192,14 @@ public class Docente implements Serializable {
 
     public void setTipologia(String tipologia) {
         this.tipologia = tipologia;
+    }
+
+    public List<Moduli_Docenti> getElencomoduli() {
+        return elencomoduli;
+    }
+
+    public void setElencomoduli(List<Moduli_Docenti> elencomoduli) {
+        this.elencomoduli = elencomoduli;
     }
 
 }

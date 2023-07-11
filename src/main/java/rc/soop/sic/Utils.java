@@ -305,9 +305,15 @@ public class Utils {
         return 0.0;
     }
 
-    private static String roundDoubleandFormat(double d, int scale) {
-        return new DecimalFormat("###,###.00", DecimalFormatSymbols.getInstance(Locale.ITALIAN))
+    public static String roundDoubleandFormat(double d, int scale) {
+
+        String out = new DecimalFormat("###,###.#", DecimalFormatSymbols.getInstance(Locale.ITALIAN))
                 .format(BigDecimal.valueOf(d).setScale(scale, ROUND_HALF_DOWN).doubleValue());
+        if (out.startsWith(",0")) {
+            return "0";
+        } else {
+            return out;
+        }
     }
 
     public static double fd(String si_t_old) {

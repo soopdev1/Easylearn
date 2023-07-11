@@ -112,6 +112,11 @@
                             </div>
                             <!--end::Form-->
                     </div>
+                    <%if (Constant.ISDEMO) {%>
+                    <div class="mb-12">
+                        <img alt="Logo" src="assets/media/logos/demo.png" class="h-40px" /> 
+                    </div>
+                    <%}%>
                     <!--end::Wrapper-->
                 </div>
                 <!--end::Content-->

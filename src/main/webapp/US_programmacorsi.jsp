@@ -4,6 +4,7 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.Docente"%>
 <%@page import="rc.soop.sic.jpa.Calendario_Formativo"%>
 <%@page import="rc.soop.sic.jpa.Lingua"%>
 <%@page import="rc.soop.sic.jpa.Competenze_Trasversali"%>
@@ -39,6 +40,12 @@
                 List<Competenze_Trasversali> comp_tr = (List<Competenze_Trasversali>) eo.findAll(Competenze_Trasversali.class);
                 List<Lingua> language = eo.getLingue();
                 List<Calendario_Formativo> calendar = eo.calendario_formativo_corso(co1);
+                boolean calendariocompleto = Engine.calendario_completo(eo, co1);
+                List<Docente> eldoc = eo.findAll(Docente.class);
+                List<Docente> assegnati = eo.list_docenti_moduli(eldoc, calendar);
+                int moduliassegnati = Engine.verificamoduliassegnati(assegnati);
+                int modulidaassegnare = calendar.size() - moduliassegnati;
+                Engine.verificacorsodainviare(co1, calendariocompleto, modulidaassegnare);
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -109,7 +116,7 @@
                                 </label>
                                 <label class="col-lg-3 col-form-label fw-bold fs-6">
                                     <span><b>eLearning</b></span><br/>
-                                    <span><%=co1.getElearningperc()%> % - <%=Utils.getPercentuale(co1.getDurataore(), co1.getElearningperc())%> ORE</span>
+                                    <span>MAX <%=co1.getElearningperc()%> % - MAX <%=Utils.getPercentuale(co1.getDurataore(), co1.getElearningperc())%> ORE</span>
                                 </label>
                                 <label class="col-lg-3 col-form-label fw-bold fs-6">
                                     <span><b>TOTALE ORE (AULA + STAGE)</b></span><br/>
@@ -197,7 +204,7 @@
                                                placeholder="..." required value="<%=cf0.getCtdescrizione()%>" />
                                     </div>
                                     <label class="col-md-1 col-form-label">
-                                        <span id="htmlctdurata_<%=ct.getIdcompetenze()%>"><%=ct.getDurataore()%></span>
+                                        <span class="ctdurata" id="htmlctdurata_<%=ct.getIdcompetenze()%>"><%=ct.getDurataore()%></span>
                                     </label>
                                     <%} else {%>
                                     <div class="col-md-5 fv-row">
@@ -222,21 +229,23 @@
                                 <label class="col-form-label fw-bold fs-6">
                                     <span class="text-primary"><b>STEP 2) Calendario Formativo</b></span>
                                     |
-                                    <span class="text-primary">ORE PIANIFICATE: <span id="orepianificate">0</span></span>
+                                    <span class="text-primary">ORE TOTALI PIANIFICATE: <span id="orepianificate">0</span></span>
+                                    |
+                                    <span class="text-primary">ORE ELEARNING PIANIFICATE: <span id="orepianificateel">0</span></span>
                                     |
                                     <span class="text-primary">ORE DA PIANIFICARE: <span id="oredapianificare">0</span></span>
                                     |
                                     <a class="btn btn-primary btn-sm fan1" href="US_programmacorsi_details.jsp"
                                        data-fancybox data-type='iframe' 
-                                       data-bs-toggle="tooltip" title="VISUALIZZA/MODIFICA DETTAGLI ISTANZA" 
-                                       data-preload='false' data-width='75%' data-height='75%'>
-                                        <i class="fa fa-plus-circle"></i> Aggiungi</a>
+                                       data-bs-toggle="tooltip" title="AGGIUNGI MODULO FORMATIVO" 
+                                       data-preload='false' data-width='75%' data-height='75%' id="addcalendariobutton">
+                                        <i class="fa fa-plus-circle" ></i> Aggiungi</a>
                                 </label>
 
                                 <hr>
                                 <div class="card-body py-3">
                                     <!--begin::Table container-->
-                                    <div class="table-responsive ">
+                                    <div class="table-responsive">
                                         <!--begin::Table-->
                                         <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt1" style="border-bottom: 2px;">
                                             <!--begin::Table head-->
@@ -245,7 +254,8 @@
                                                     <th class="p-2 w-50px">#</th>
                                                     <th class="p-2 w-50px">Tipologia</th>
                                                     <th class="p-2 w-150px">Descrizione</th>
-                                                    <th class="p-2 w-50px">Ore</th>
+                                                    <th class="p-2 w-50px">Ore Totali</th>
+                                                    <th class="p-2 w-50px">Ore eLearning</th>
                                                     <th class="p-2 w-50px">ID Competenze</th>
                                                     <th class="p-2 w-50px">ID Abilita'</th>
                                                     <th class="p-2 w-50px">ID Conoscenze</th>
@@ -262,11 +272,13 @@
                                                         if (c1.getTipomodulo().equals("BASE")) {%>
                                             <input type="hidden" class="value_ore" id="ore_modules_<%=indexmodules%>" value="<%=c1.getOre()%>" />
                                             <input type="hidden" class="value_oreaula" id="oreaula_modules_<%=indexmodules%>" value="<%=c1.getOre_aula()%>" />
+                                            <input type="hidden" class="value_oreel" id="oreel_modules_<%=indexmodules%>" value="<%=c1.getOre_teorica_el()%>" />
                                             <tr>
                                                 <td class="p-2 w-50px"><%=c1.getCodicemodulo()%></td>
                                                 <td class="p-2 w-50px"><%=c1.getTipomodulo()%></td>
                                                 <td class="p-2 w-150px"><%=c1.getCompetenzetrasversali().getDescrizione()%></td>
-                                                <td class="p-2 w-50px"><%=c1.getOre()%></td>
+                                                <td class="p-2 w-50px"><%=Utils.roundDoubleandFormat(c1.getOre(), 1)%></td>
+                                                <td class="p-2 w-50px"><%=Utils.roundDoubleandFormat(c1.getOre_teorica_el(), 1)%></td>
                                                 <td class="p-2 w-50px"></td>
                                                 <td class="p-2 w-50px"></td>
                                                 <td class="p-2 w-50px"></td>
@@ -275,11 +287,13 @@
                                             <%} else if (c1.getTipomodulo().equals("MODULOFORMATIVO")) {%>
                                             <input type="hidden" class="value_ore" id="ore_modules_<%=indexmodules%>" value="<%=c1.getOre()%>" />
                                             <input type="hidden" class="value_oreaula" id="oreaula_modules_<%=indexmodules%>" value="<%=c1.getOre_aula()%>" />
+                                            <input type="hidden" class="value_oreel" id="oreel_modules_<%=indexmodules%>" value="<%=c1.getOre_teorica_el()%>" />
                                             <tr>
                                                 <td class="p-2 w-50px"><%=c1.getCodicemodulo()%></td>
                                                 <td class="p-2 w-50px">MODULO FORMATIVO</td>
-                                                <td class="p-2 w-150px"></td>
-                                                <td class="p-2 w-50px"><%=c1.getOre()%></td>
+                                                <td class="p-2 w-150px"><%=c1.getNomemodulo()%></td>
+                                                <td class="p-2 w-50px"><%=Utils.roundDoubleandFormat(c1.getOre(), 1)%></td>
+                                                <td class="p-2 w-50px"><%=Utils.roundDoubleandFormat(c1.getOre_teorica_el(), 1)%></td>
                                                 <td class="p-2 w-50px"><%=c1.exportCompetenze()%></td>
                                                 <td class="p-2 w-50px"><%=c1.exportAbilita()%></td>
                                                 <td class="p-2 w-50px"><%=c1.exportConoscenze()%></td>
@@ -299,18 +313,83 @@
                                 <label class="col-form-label fw-bold fs-6">
                                     <span class="text-primary">STEP 2) Calendario Formativo - COMPLETARE STEP 1</span>
                             </div>
-                            <%}%>
+                            <%}
+                                boolean showstep4 = false;
+
+                                if (calendariocompleto) {
+
+                                    if (modulidaassegnare == 0) {
+                                        showstep4 = true;
+                                    }
+                            %>
+                            <hr>
+                            <div class="row">
+                                <label class="col-form-label fw-bold fs-6">
+                                    <span class="text-warning">STEP 3) Elenco Docenti 
+                                        | <span class="text-warning">MODULI ASSEGNATI: <span id="moduliass"><%=moduliassegnati%></span></span>
+                                        | <span class="text-warning">MODULI DA ASSEGNARE: <span id="modulidaass"><%=modulidaassegnare%></span></span>
+                                        | <a class="btn btn-warning btn-sm fan1" href="US_programmacorsi_docenti.jsp"
+                                             data-fancybox data-type='iframe' 
+                                             data-bs-toggle="tooltip" title="ASSEGNA DOCENTE A MODULO FORMATIVO" 
+                                             data-preload='false' data-width='75%' data-height='75%' id="adddocentibutton">
+                                            <i class="fa fa-plus-circle" ></i> Aggiungi</a></span>
+                            </div>
+
+                            <div class="card-body py-3">
+                                <!--begin::Table container-->
+                                <div class="table-responsive">
+                                    <!--begin::Table-->
+                                    <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt2" style="border-bottom: 2px;">
+                                        <!--begin::Table head-->
+                                        <thead>
+                                            <tr>
+                                                <th class="p-2 w-150px">Docente</th>
+                                                <th class="p-2 w-50px">CF</th>
+                                                <th class="p-2 w-150px">Moduli assegnati (Ore previste)</th>
+                                                <th class="p-2 w-50px">Azioni</th>
+                                            </tr>
+                                        </thead>
+                                        <!--end::Table head-->
+                                        <!--begin::Table body-->
+                                        <tbody>
+                                            <%for (Docente d2 : assegnati) {%>
+                                            <tr>
+                                                <td class="p-2 w-150px"><%=d2.getCognome()%> <%=d2.getNome()%></td>
+                                                <td class="p-2 w-50px"><%=d2.getCodicefiscale()%></td>
+                                                <td class="p-2 w-150px"><%=d2.formatElencomoduli()%></td>
+                                                <td class="p-2 w-150px">Azioni</td>      
+                                            </tr>
+                                            <%}
+                                            %>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <%} else {%>
                             <hr>
                             <div class="row">
                                 <label class="col-form-label fw-bold fs-6">
                                     <span class="text-warning">STEP 3) Elenco Docenti - COMPLETARE STEP 2</span>
                             </div>
+                            <%}%>
                             <hr>
+                            <%if (showstep4) {%>
+                            <div class="row">
+                                <label class="col-form-label fw-bold fs-6">
+                                    <span class="text-dark">STEP 4) Elenco Attrezzature | 
+                                        <a class="btn btn-dark btn-sm fan1" href="US_programmacorsi_attr.jsp"
+                                       data-fancybox data-type='iframe' 
+                                       data-bs-toggle="tooltip" title="AGGIUNGI ATTREZZATURE" 
+                                       data-preload='false' data-width='75%' data-height='75%'>
+                                        <i class="fa fa-plus-circle" ></i> Aggiungi</a></span>
+                            </div>
+                            <%} else {%>
                             <div class="row">
                                 <label class="col-form-label fw-bold fs-6">
                                     <span class="text-dark">STEP 4) Elenco Attrezzature - COMPLETARE STEP 3</span>
                             </div>
-
+                            <%}%>
                         </div>
                     </div>
                     <!--end::Tables Widget 3-->

@@ -84,7 +84,7 @@
                                 </button>
                                 <!--end::Submit button-->
                             </div>
-                            
+
                             <div class="fv-row mb-10">
                                 <hr><!-- comment -->
                             </div>
@@ -100,6 +100,11 @@
                         </form>
                         <!--end::Form-->
                     </div>
+                    <%if (Constant.ISDEMO) {%>
+                    <div class="mb-12">
+                        <img alt="Logo" src="assets/media/logos/demo.png" class="h-40px" /> 
+                    </div>
+                    <%}%>
                     <!--end::Wrapper-->
                 </div>
                 <!--end::Content-->

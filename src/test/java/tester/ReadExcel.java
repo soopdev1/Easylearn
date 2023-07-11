@@ -161,7 +161,7 @@ public class ReadExcel {
 
         righe.forEach(f1 -> {
 
-            List<ExcelValues> contentfoglio1 = l_v.stream().filter(c -> c.getFoglio() == 1 && c.getRiga() == f1).distinct().collect(Collectors.toList());
+            List<ExcelValues> contentfoglio1 = l_v.stream().filter(c -> c.getFoglio() == 2 && c.getRiga() == f1).distinct().collect(Collectors.toList());
 
             Competenze c1 = new Competenze();
 
@@ -565,182 +565,182 @@ public class ReadExcel {
             //FOGLIO 2 - ELENCO ABILITA
 //            inserisci_abilita(l_v);
             //FOGLIO 3 - ELENCO CONOSCENZE
-//            inserisci_abilita(l_v);
+            inserisci_conoscenze(l_v);
             //FOGLIO 4 - ASSOCIA REPERTORIO CON PROFESSIONI
 //            repertorio_e_professioni(l_v);
-            EntityOp e = new EntityOp();
-            e.begin();
-            List<Integer> righe = l_v.stream().filter(c -> c.getFoglio() == 0).map(c1 -> c1.getRiga()).distinct().collect(Collectors.toList());
-
-            righe.forEach(f1 -> {
-
-                List<ExcelValues> contentfoglio1 = l_v.stream().filter(c -> c.getFoglio() == 0 && c.getRiga() == f1).distinct().collect(Collectors.toList());
-
-                if (f1 > 0) {
-                    Repertorio r1 = new Repertorio();
-                    Scheda_Attivita sa1 = new Scheda_Attivita();
-
-                    contentfoglio1.forEach(f2 -> {
-
-                        switch (f2.getColonna()) {
-                            case 0: {
-                                r1.setIdrepertorio(Long.valueOf(f2.getValue().trim()));
-                                break;
-                            }
-                            case 10: {
-                                if (!f2.getValue().trim().equals("")) {
-                                    if (Long.parseLong(f2.getValue().trim()) > 0) {
-                                        sa1.setIdschedaattivita(Long.valueOf(f2.getValue().trim()));
-                                    }
-                                }
-                                break;
-                            }
-                            case 11: {
-                                if (!f2.getValue().trim().equals("")) {
-                                    sa1.setTipologiapercorso(f2.getValue().trim());
-                                }
-                                break;
-                            }
-                            case 12: {
-                                if (!f2.getValue().trim().equals("")) {
-                                    sa1.setTitoloattestato(f2.getValue().trim());
-                                    sa1.setTitolopercorso(f2.getValue().trim());
-                                }
-                                break;
-                            }
-                            case 13: {
-                                if (!f2.getValue().trim().equals("")) {
-                                    sa1.setCertificazioneuscita(e.getCertif(f2.getValue().trim()));
-                                }
-                                break;
-                            }
-                            case 14: {
-                                if (!f2.getValue().trim().equals("")) {
-                                    sa1.setTipologiaprovafinale(f2.getValue().trim());
-                                }
-                                break;
-                            }
-                            case 15: {
-                                if (!f2.getValue().trim().equals("")) {
-                                    sa1.setDurataprovafinale(parseIntR(f2.getValue().trim()));
-                                } else {
-                                    sa1.setDurataprovafinale(0);
-                                }
-                                break;
-                            }
-                            case 16: {
-                                if (!f2.getValue().trim().equals("")) {
-                                    sa1.setOrecorsomassime_num(parseIntR(f2.getValue().trim()));
-                                    sa1.setOrecorsominime_num(parseIntR(f2.getValue().trim()));
-                                } else {
-                                    sa1.setOrecorsomassime_num(0);
-                                    sa1.setOrecorsominime_num(0);
-                                }
-                                break;
-                            }
-                            case 17: {
-                                if (!f2.getValue().trim().equals("") && sa1.getOrecorsominime_num() == 0) {
-                                    sa1.setOrecorsominime_num(parseIntR(f2.getValue().trim()));
-                                }
-                                break;
-                            }
-                            case 18: {
-                                if (!f2.getValue().trim().equals("") && sa1.getOrecorsomassime_num() == 0) {
-                                    sa1.setOrecorsomassime_num(parseIntR(f2.getValue().trim()));
-                                }
-                                break;
-                            }
-                            case 19: {
-                                if (!f2.getValue().trim().equals("")) {
-                                    sa1.setOrestageminime_num(parseIntR(f2.getValue().trim()));
-                                } else {
-                                    sa1.setOrestageminime_num(0);
-                                }
-                                break;
-                            }
-                            case 20: {
-                                if (!f2.getValue().trim().equals("")) {
-                                    sa1.setOrestagemassime_num(parseIntR(f2.getValue().trim()));
-                                } else {
-                                    sa1.setOrestagemassime_num(0);
-                                }
-                                break;
-                            }
-                            case 22: {
-                                if (!f2.getValue().trim().equals("")) {
-                                    sa1.setOreelearningeminime_perc(parseIntR(f2.getValue().trim()));
-                                } else {
-                                    sa1.setOreelearningeminime_perc(0);
-                                }
-                                break;
-                            }
-                            case 23: {
-                                if (!f2.getValue().trim().equals("")) {
-                                    sa1.setOreelearningemassime_perc(parseIntR(f2.getValue().trim()));
-                                } else {
-                                    sa1.setOreelearningemassime_perc(0);
-                                }
-                                break;
-                            }
-                            case 24: {
-                                if (!f2.getValue().trim().equals("")) {
-                                    sa1.setOreassenzamassime_perc(parseIntR(f2.getValue().trim()));
-                                } else {
-                                    sa1.setOreassenzamassime_perc(0);
-                                }
-                                break;
-                            }
-                            case 25: {
-                                sa1.setNormativa(f2.getValue().trim());
-                                break;
-                            }
-                            case 26: {
-                                sa1.setPrerequisiti(f2.getValue().trim());
-                                break;
-                            }
-                            case 27: {
-                                sa1.setUlterioriindicazioni(f2.getValue().trim());
-                                break;
-                            }
-                            case 28: {
-                                if (!f2.getValue().trim().equals("")) {
-                                    sa1.setEtaminima(parseIntR(f2.getValue().trim()));
-                                } else {
-                                    sa1.setEtaminima(0);
-                                }
-                                break;
-                            }
-                            case 29: {
-                                sa1.setLivellominimoscolarita(f2.getValue().trim());
-                                break;
-                            }
-                            case 30: {
-                                sa1.setLivellomassimoscolarita(f2.getValue().trim());
-                                break;
-                            }
-                            default: {
-                                break;
-                            }
-
-                        }
-
-                    });
-
-                    Repertorio r2 = e.getEm().find(Repertorio.class, r1.getIdrepertorio());
-                    if (r2 == null) {
-//                        System.out.println(r1.getIdrepertorio() + " REPERTORIO NON TROVATO");
-                    } else if (sa1.getIdschedaattivita() != null) {
-                        sa1.setRepertorio(r2);
-                        sa1.setTitolopercorso(r2.getDenominazione());
-                        e.persist(sa1);
-//                        System.out.println(r1.getIdrepertorio() + " SCHEDA -> " + sa1.getIdschedaattivita());
-                    }
-
-                }
-            });
-
-            e.commit();
-            e.close();
+//            EntityOp e = new EntityOp();
+//            e.begin();
+//            List<Integer> righe = l_v.stream().filter(c -> c.getFoglio() == 0).map(c1 -> c1.getRiga()).distinct().collect(Collectors.toList());
+//
+//            righe.forEach(f1 -> {
+//
+//                List<ExcelValues> contentfoglio1 = l_v.stream().filter(c -> c.getFoglio() == 0 && c.getRiga() == f1).distinct().collect(Collectors.toList());
+//
+//                if (f1 > 0) {
+//                    Repertorio r1 = new Repertorio();
+//                    Scheda_Attivita sa1 = new Scheda_Attivita();
+//
+//                    contentfoglio1.forEach(f2 -> {
+//
+//                        switch (f2.getColonna()) {
+//                            case 0: {
+//                                r1.setIdrepertorio(Long.valueOf(f2.getValue().trim()));
+//                                break;
+//                            }
+//                            case 10: {
+//                                if (!f2.getValue().trim().equals("")) {
+//                                    if (Long.parseLong(f2.getValue().trim()) > 0) {
+//                                        sa1.setIdschedaattivita(Long.valueOf(f2.getValue().trim()));
+//                                    }
+//                                }
+//                                break;
+//                            }
+//                            case 11: {
+//                                if (!f2.getValue().trim().equals("")) {
+//                                    sa1.setTipologiapercorso(f2.getValue().trim());
+//                                }
+//                                break;
+//                            }
+//                            case 12: {
+//                                if (!f2.getValue().trim().equals("")) {
+//                                    sa1.setTitoloattestato(f2.getValue().trim());
+//                                    sa1.setTitolopercorso(f2.getValue().trim());
+//                                }
+//                                break;
+//                            }
+//                            case 13: {
+//                                if (!f2.getValue().trim().equals("")) {
+//                                    sa1.setCertificazioneuscita(e.getCertif(f2.getValue().trim()));
+//                                }
+//                                break;
+//                            }
+//                            case 14: {
+//                                if (!f2.getValue().trim().equals("")) {
+//                                    sa1.setTipologiaprovafinale(f2.getValue().trim());
+//                                }
+//                                break;
+//                            }
+//                            case 15: {
+//                                if (!f2.getValue().trim().equals("")) {
+//                                    sa1.setDurataprovafinale(parseIntR(f2.getValue().trim()));
+//                                } else {
+//                                    sa1.setDurataprovafinale(0);
+//                                }
+//                                break;
+//                            }
+//                            case 16: {
+//                                if (!f2.getValue().trim().equals("")) {
+//                                    sa1.setOrecorsomassime_num(parseIntR(f2.getValue().trim()));
+//                                    sa1.setOrecorsominime_num(parseIntR(f2.getValue().trim()));
+//                                } else {
+//                                    sa1.setOrecorsomassime_num(0);
+//                                    sa1.setOrecorsominime_num(0);
+//                                }
+//                                break;
+//                            }
+//                            case 17: {
+//                                if (!f2.getValue().trim().equals("") && sa1.getOrecorsominime_num() == 0) {
+//                                    sa1.setOrecorsominime_num(parseIntR(f2.getValue().trim()));
+//                                }
+//                                break;
+//                            }
+//                            case 18: {
+//                                if (!f2.getValue().trim().equals("") && sa1.getOrecorsomassime_num() == 0) {
+//                                    sa1.setOrecorsomassime_num(parseIntR(f2.getValue().trim()));
+//                                }
+//                                break;
+//                            }
+//                            case 19: {
+//                                if (!f2.getValue().trim().equals("")) {
+//                                    sa1.setOrestageminime_num(parseIntR(f2.getValue().trim()));
+//                                } else {
+//                                    sa1.setOrestageminime_num(0);
+//                                }
+//                                break;
+//                            }
+//                            case 20: {
+//                                if (!f2.getValue().trim().equals("")) {
+//                                    sa1.setOrestagemassime_num(parseIntR(f2.getValue().trim()));
+//                                } else {
+//                                    sa1.setOrestagemassime_num(0);
+//                                }
+//                                break;
+//                            }
+//                            case 22: {
+//                                if (!f2.getValue().trim().equals("")) {
+//                                    sa1.setOreelearningeminime_perc(parseIntR(f2.getValue().trim()));
+//                                } else {
+//                                    sa1.setOreelearningeminime_perc(0);
+//                                }
+//                                break;
+//                            }
+//                            case 23: {
+//                                if (!f2.getValue().trim().equals("")) {
+//                                    sa1.setOreelearningemassime_perc(parseIntR(f2.getValue().trim()));
+//                                } else {
+//                                    sa1.setOreelearningemassime_perc(0);
+//                                }
+//                                break;
+//                            }
+//                            case 24: {
+//                                if (!f2.getValue().trim().equals("")) {
+//                                    sa1.setOreassenzamassime_perc(parseIntR(f2.getValue().trim()));
+//                                } else {
+//                                    sa1.setOreassenzamassime_perc(0);
+//                                }
+//                                break;
+//                            }
+//                            case 25: {
+//                                sa1.setNormativa(f2.getValue().trim());
+//                                break;
+//                            }
+//                            case 26: {
+//                                sa1.setPrerequisiti(f2.getValue().trim());
+//                                break;
+//                            }
+//                            case 27: {
+//                                sa1.setUlterioriindicazioni(f2.getValue().trim());
+//                                break;
+//                            }
+//                            case 28: {
+//                                if (!f2.getValue().trim().equals("")) {
+//                                    sa1.setEtaminima(parseIntR(f2.getValue().trim()));
+//                                } else {
+//                                    sa1.setEtaminima(0);
+//                                }
+//                                break;
+//                            }
+//                            case 29: {
+//                                sa1.setLivellominimoscolarita(f2.getValue().trim());
+//                                break;
+//                            }
+//                            case 30: {
+//                                sa1.setLivellomassimoscolarita(f2.getValue().trim());
+//                                break;
+//                            }
+//                            default: {
+//                                break;
+//                            }
+//
+//                        }
+//
+//                    });
+//
+//                    Repertorio r2 = e.getEm().find(Repertorio.class, r1.getIdrepertorio());
+//                    if (r2 == null) {
+////                        System.out.println(r1.getIdrepertorio() + " REPERTORIO NON TROVATO");
+//                    } else if (sa1.getIdschedaattivita() != null) {
+//                        sa1.setRepertorio(r2);
+//                        sa1.setTitolopercorso(r2.getDenominazione());
+//                        e.persist(sa1);
+////                        System.out.println(r1.getIdrepertorio() + " SCHEDA -> " + sa1.getIdschedaattivita());
+//                    }
+//
+//                }
+//            });
+//
+//            e.commit();
+//            e.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }

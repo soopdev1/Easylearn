@@ -49,9 +49,12 @@ import rc.soop.sic.jpa.Conoscenze;
 import rc.soop.sic.jpa.Corso;
 import rc.soop.sic.jpa.CorsoStato;
 import rc.soop.sic.jpa.Corsoavviato;
+import rc.soop.sic.jpa.Docente;
 import rc.soop.sic.jpa.EntityOp;
 import rc.soop.sic.jpa.Istanza;
 import rc.soop.sic.jpa.Lingua;
+import rc.soop.sic.jpa.Moduli_Docenti;
+import rc.soop.sic.jpa.Moduli_DocentiId;
 import rc.soop.sic.jpa.Path;
 import rc.soop.sic.jpa.Repertorio;
 import rc.soop.sic.jpa.Scheda_Attivita;
@@ -518,17 +521,13 @@ public class Operations extends HttpServlet {
                 ct.setTipomodulo("MODULOFORMATIVO");
                 ep1.begin();
                 ep1.persist(ct);
-
+                ep1.commit();
+                ep1.close();
+                redirect(request, response, "Page_message.jsp?esito=OK_SM");
             } else {
                 request.getSession().setAttribute("ses_idcorso", Utils.enc_string(getRequestValue(request, "idcorsodasalvare")));
                 redirect(request, response, "US_compilacorsi.jsp?esito=KO1");
             }
-
-            ep1.commit();
-            ep1.close();
-
-            redirect(request, response, "Page_message.jsp?esito=OK_SM");
-
         } catch (Exception ex1) {
             ex1.printStackTrace();
             EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
@@ -555,7 +554,7 @@ public class Operations extends HttpServlet {
             double OREAULATEO = fd(formatDoubleforMysql(Utils.getRequestValue(request, "OREAULATEO")));
             double OREAULATEC = fd(formatDoubleforMysql(Utils.getRequestValue(request, "OREAULATEC")));
 
-            List<Calendario_Formativo> calendar = ep1.calendario_formativo_corso(co1);
+            List<Calendario_Formativo> calendar = ep1.calendario_formativo_corso_solomoduli(co1);
             AtomicDouble orepian = new AtomicDouble(0.0);
             AtomicDouble orelearning = new AtomicDouble(0.0);
             calendar.forEach(c1 -> {
@@ -563,12 +562,6 @@ public class Operations extends HttpServlet {
                 orelearning.addAndGet(Double.parseDouble(String.valueOf(c1.getOre_teorica_el())));
             });
 
-//            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(1) " + co1.getDurataore());
-//            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(2) " + oremaxlearn);
-//            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(3) " + orepian.get());
-//            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(4) " + orelearning.get());
-//            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(5) " + ORETOTALI);
-//            System.out.println("rc.soop.servlet.Operations.CHECKMODULO(6) " + OREELE);
             double dapian = fd(String.valueOf(co1.getDurataore())) - orepian.get();
             double dapianEL = oremaxlearn - orelearning.get();
 
@@ -598,6 +591,42 @@ public class Operations extends HttpServlet {
 
         try (PrintWriter out = response.getWriter()) {
             out.print(resp_out.toString());
+        }
+
+    }
+
+    protected void MODIFICAPIANIFICAZIONEDOCENTI(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        EntityOp ep1 = new EntityOp();
+
+        Corso co1 = ep1.getEm().find(Corso.class, Long.valueOf(getRequestValue(request, "idcorsodasalvare")));
+        if (co1 != null) {
+            Docente d1 = ep1.getEm().find(Docente.class, Long.valueOf(getRequestValue(request, "docente")));
+            if (d1 != null) {
+                ep1.begin();
+                List<Calendario_Formativo> calendar = ep1.calendario_formativo_corso(co1);
+                for (Calendario_Formativo c1 : calendar) {
+                    String checkbox = getRequestValue(request, "CH_" + c1.getIdcalendarioformativo());
+                    if (checkbox != null && checkbox.equalsIgnoreCase("on")) {
+                        double orepreviste = fd(formatDoubleforMysql(Utils.getRequestValue(request, "ORE_" + c1.getIdcalendarioformativo())));
+                        Moduli_Docenti md = new Moduli_Docenti();
+                        md.setIdmodulidocenti(new Moduli_DocentiId(d1.getIddocente(), c1.getIdcalendarioformativo()));
+                        md.setDocente(d1);
+                        md.setModuloformativo(c1);
+                        md.setOrepreviste(orepreviste);
+                        ep1.persist(md);
+                    }
+                }
+
+                ep1.commit();
+                ep1.close();
+                redirect(request, response, "Page_message.jsp?esito=OK_SMD");
+            } else {
+                request.getSession().setAttribute("ses_idcorso", Utils.enc_string(getRequestValue(request, "idcorsodasalvare")));
+                redirect(request, response, "US_programmacorsi_docenti.jsp?esito=KO1");
+            }
+        } else {
+            request.getSession().setAttribute("ses_idcorso", Utils.enc_string(getRequestValue(request, "idcorsodasalvare")));
+            redirect(request, response, "US_programmacorsi_docenti.jsp?esito=KO2");
         }
 
     }
@@ -779,6 +808,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "MODIFICAPIANIFICAZIONE":
                     MODIFICAPIANIFICAZIONE(request, response);
+                    break;
+                case "MODIFICAPIANIFICAZIONEDOCENTI":
+                    MODIFICAPIANIFICAZIONEDOCENTI(request, response);
                     break;
                 case "ADDCORSO":
                     ADDCORSO(request, response);

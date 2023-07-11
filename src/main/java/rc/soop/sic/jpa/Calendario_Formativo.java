@@ -5,8 +5,10 @@
 package rc.soop.sic.jpa;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -19,6 +21,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -26,7 +29,9 @@ import javax.persistence.Table;
  * @author Administrator
  */
 @NamedQueries(value = {
-    @NamedQuery(name = "calendarioformativo.corso", query = "SELECT u FROM Calendario_Formativo u WHERE u.corsodiriferimento=:corsodiriferimento ORDER BY u.idcalendarioformativo"),})
+    @NamedQuery(name = "calendarioformativo.corso", query = "SELECT u FROM Calendario_Formativo u WHERE u.corsodiriferimento=:corsodiriferimento ORDER BY u.idcalendarioformativo"),
+    @NamedQuery(name = "calendarioformativo.corsosolomoduli", query = "SELECT u FROM Calendario_Formativo u WHERE u.corsodiriferimento=:corsodiriferimento AND u.tipomodulo='MODULOFORMATIVO' ORDER BY u.idcalendarioformativo")
+})
 @Entity
 @Table(name = "calendarioformativo")
 public class Calendario_Formativo implements Serializable {
@@ -86,12 +91,6 @@ public class Calendario_Formativo implements Serializable {
             joinColumns = @JoinColumn(name = "idcalendarioformativo"),
             inverseJoinColumns = @JoinColumn(name = "idconoscenze"))
     List<Conoscenze> elencoconoscenze;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "moduli_docenti",
-            joinColumns = @JoinColumn(name = "idcalendarioformativo"),
-            inverseJoinColumns = @JoinColumn(name = "iddocente"))
-    List<Docente> elencodocenti;
 
     @Column(name = "ctcodicelingua")
     private String ctcodicelingua;
@@ -265,15 +264,7 @@ public class Calendario_Formativo implements Serializable {
     public void setElencoconoscenze(List<Conoscenze> elencoconoscenze) {
         this.elencoconoscenze = elencoconoscenze;
     }
-
-    public List<Docente> getElencodocenti() {
-        return elencodocenti;
-    }
-
-    public void setElencodocenti(List<Docente> elencodocenti) {
-        this.elencodocenti = elencodocenti;
-    }
-
+    
     @Override
     public boolean equals(final Object obj) {
         if (this == obj) {

@@ -209,31 +209,67 @@ public class EntityOp {
         TypedQuery q = this.em.createNamedQuery("lingua.order", Lingua.class);
         return (List<Lingua>) q.getResultList();
     }
-    
+
     public List<Scheda_Attivita> repertorio_completo_scheda() {
         TypedQuery q = this.em.createNamedQuery("schedaattivita.all", Scheda_Attivita.class);
         return (List<Scheda_Attivita>) q.getResultList();
     }
-    
+
     public List<Calendario_Formativo> calendario_formativo_corso(Corso c) {
         TypedQuery q = this.em.createNamedQuery("calendarioformativo.corso", Calendario_Formativo.class);
         q.setParameter("corsodiriferimento", c);
         return (List<Calendario_Formativo>) q.getResultList();
     }
-    
+
+    public List<Calendario_Formativo> calendario_formativo_corso_solomoduli(Corso c) {
+        TypedQuery q = this.em.createNamedQuery("calendarioformativo.corsosolomoduli", Calendario_Formativo.class);
+        q.setParameter("corsodiriferimento", c);
+        return (List<Calendario_Formativo>) q.getResultList();
+    }
+
     public List<Competenze> competenze_correlate(Repertorio r) {
         TypedQuery q = this.em.createNamedQuery("competenze.repertorio", Competenze.class);
         q.setParameter("repertorio", r);
         return (List<Competenze>) q.getResultList();
     }
-    
+
     public Certificazione getCertif(String nome) {
         TypedQuery q = this.em.createNamedQuery("cert.name", Certificazione.class);
         q.setParameter("nome", nome);
-        q.setMaxResults(1);        
+        q.setMaxResults(1);
         return q.getResultList().isEmpty() ? null : (Certificazione) q.getSingleResult();
     }
 
-    
-    
+    public List<Docente> list_docenti_moduli(List<Docente> eldoc, List<Calendario_Formativo> calendar) {
+
+        List<Docente> out = new ArrayList<>();
+        try {
+            TypedQuery q = this.em.createNamedQuery("md.elenco", Moduli_Docenti.class);
+            for (Docente d1 : eldoc) {
+                for (Calendario_Formativo c1 : calendar) {
+                    q.setParameter("docente", d1);
+                    q.setParameter("moduloformativo", c1);
+                    List<Moduli_Docenti> res = (List<Moduli_Docenti>) q.getResultList();
+                    if (!res.isEmpty()) {
+
+                        List<Moduli_Docenti> def = d1.getElencomoduli() == null ? new ArrayList<>() : d1.getElencomoduli();
+                        def.addAll(res);
+                        d1.setElencomoduli(def);
+                        if (!out.contains(d1)) {
+                            out.add(d1);
+                        }
+//                        } else {
+//
+//                        }
+
+                    }
+                }
+            }
+        } catch (Exception ex1) {
+            ex1.printStackTrace();
+        }
+
+        return out;
+    }
+
 }

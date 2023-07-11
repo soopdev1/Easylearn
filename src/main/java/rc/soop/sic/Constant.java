@@ -24,5 +24,5 @@ public class Constant {
 
     public static final ResourceBundle RB = ResourceBundle.getBundle("parameter.conf");
     public static final Logger LOGGER = createLog(NAMEAPP, RB.getString("path.log"), PATTERNDATE1);
-
+    public static boolean ISDEMO = RB.getString("demo").equalsIgnoreCase("SI");
 }

@@ -12,5 +12,8 @@
     <div class="text-dark order-2 order-md-1">
         <span class="text-muted fw-bold me-1"><%=Constant.NAMEAPP%> &#169;2022</span>
         <span class="text-gray-800 text-hover-primary"><%=Constant.VERSIONAPP%></span>
+        <%if (Constant.ISDEMO) {%>
+        <img alt="Logo" src="assets/media/logos/demo.png" class="h-40px" /> 
+        <%}%>
     </div>
 </div>
