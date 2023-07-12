@@ -49,20 +49,9 @@
     <%
 
         EntityOp eo = new EntityOp();
-        List<Scheda_Attivita> sche1 = (List<Scheda_Attivita>) eo.findAll(Scheda_Attivita.class);
-        List<Tipologia_Percorso> listper = (List<Tipologia_Percorso>) eo.findAll(Tipologia_Percorso.class);
-
-        int maxrichiesta = Utils.parseIntR(Engine.getPath("conf.max.edizioni"));
-        int maxallievi = Utils.parseIntR(Engine.getPath("conf.max.allievi"));
-        User u1 = (User) session.getAttribute("us_memory");
-
         Long idist = Long.valueOf(Utils.dec_string(Utils.getRequestValue(request, "idist")));
-
         Istanza is1 = eo.getEm().find(Istanza.class, idist);
-
         Tipologia_Percorso tp1 = eo.getTipoPercorsoIstanza(is1);
-        List<Corso> c1 = new EntityOp().getCorsiIstanza(is1);
-
     %>
     <body id="kt_body">
         <!--begin::Main-->
@@ -91,18 +80,27 @@
                                     <!--begin::Col-->
                                     <div class="col-xl-12">
                                         <!--begin::Tables Widget 3-->
-                                        <h1 class="text-center fs-4">Codice Istanza: <%=is1.getCodiceistanza()%></h1>
+                                        <h1 class="text-center fs-4">ID Istanza: <%=is1.getIdistanza()%> - Codice Istanza: <%=is1.getCodiceistanza()%></h1>
                                         <div class="card h-xl-100">
                                             <!--begin::Header-->
                                             <div class="card-header border-0 pt-5">
                                                 <h3 class="card-title align-items-start flex-column">
                                                     <span class="card-label fw-bolder fs-3 mb-1">ISTANZA PER L'AUTORIZZAZIONE DEI CORSI AUTOFINANZIATI</span>
-                                                    <span class="text-muted mt-1 fw-bold fs-7">Istanza di autorizzazione allo svolgimento di corsi di formazione professionale autofinanziati</span>
+                                                    <span class="text-muted mt-1 fw-bold fs-7">Istanza di autorizzazione allo svolgimento di corsi di formazione professionale</span>
                                                 </h3>
                                             </div>
                                             <!--end::Header-->
                                             <!--begin::Body-->
                                             <div class="card-body py-3">
+                                                <div class="row row-border col-md-12 p-5">
+                                                    <!--begin::Label-->
+                                                    <label class="col-lg-3 col-form-label fw-bold fs-6" >
+                                                        <span class="text-primary"><b>TIPOLOGIA PERCORSO</b></span>
+                                                    </label>
+                                                    <label class="col-lg-9 col-form-label fw-bold fs-6" >
+                                                        <span class="text-dark"><b><%=tp1.getNometipologia()%></b></span>
+                                                    </label>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

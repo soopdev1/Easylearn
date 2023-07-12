@@ -103,6 +103,24 @@
                                     <span><%=co1.getSchedaattivita().getTipologiapercorso()%></span>
                                 </label>
                             </div>
+                            <div class="row">
+                                <label class="col-lg-3 col-form-label fw-bold fs-6">
+                                    <span><b>Protocollo (S.P.)</b></span><br/>
+                                    <span><%=co1.getIstanza().getProtocollosoggetto()%></span>
+                                </label>
+                                <label class="col-lg-3 col-form-label fw-bold fs-6">
+                                    <span><b>Numero Edizioni</b></span><br/>
+                                    <span><%=co1.getQuantitarichiesta()%></span>
+                                </label>
+                                <label class="col-lg-3 col-form-label fw-bold fs-6">
+                                    <span><b>Durata Corso (GIORNI)</b></span><br/>
+                                    <span><%=co1.getDuratagiorni()%></span>
+                                </label>
+                                <label class="col-lg-3 col-form-label fw-bold fs-6">
+                                    <span><b>Sede Formativa</b></span><br/>
+                                    <span><%=co1.getSedescelta().getIndirizzo()%> - <%=co1.getSedescelta().getComune()%></span>
+                                </label>
+                            </div>
                             <input type="hidden" id="startduration" value="<%=co1.getDurataore()%>" />
                             <input type="hidden" id="stageduration" value="<%=co1.getStageore()%>" />
                             <div class="row">

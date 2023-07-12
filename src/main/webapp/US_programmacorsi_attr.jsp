@@ -37,6 +37,7 @@
                 EntityOp eo = new EntityOp();
                 Long idc1 = Long.valueOf(Utils.dec_string(idcorso));
                 Corso co1 = eo.getEm().find(Corso.class, idc1);
+                List<String> mod_a = Engine.exportEnum("MA");
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -83,20 +84,41 @@
                                     ERRORE: 
                                 </div>
                             </div>
-                            <div class="row">
-                                <label class="col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>SELEZIONA DOCENTE</b></span>
+                            <div class="row col-md-12">
+                                <label class="col-md-2 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>DESCRIZIONE</b></span>
                                 </label>
-                                <div class="col-form-label fs-6">
+                                <div class="col-md-4 col-form-label fs-6">
+                                    <input type="text" 
+                                           name="descrizione"
+                                           id="descizione"
+                                           class="form-control" />
+                                </div>
+                                <label class="col-md-2 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>MODALIT&#192; DI ACQUISIZIONE</b></span>
+                                </label>
+                                <div class="col-md-4 col-form-label fs-6">
                                     <select 
                                         id="docente"
                                         name="docente" aria-label="Scegli..." 
                                         data-control="select2" data-placeholder="Scegli..." 
                                         class="form-select">
                                         <option value=""></option>
+                                        <%for (String e1 : mod_a) {%>
+                                        <option value="<%=e1%>"><%=e1%></option>                                        
+                                        <%}%>
                                     </select>
                                 </div>
-                                <hr>
+                                <label class="col-md-2 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>QUANTIT&#192;</b></span>
+                                </label>
+                                <div class="col-md-2 col-form-label fs-6">
+                                    <input type="text" 
+                                           name="quant"
+                                           id="quant"
+                                           class="form-control intvalue" />
+                                </div>    
+
                             </div>
                         </div>
                     </div>
@@ -133,7 +155,7 @@
         <script src="assets/js/scripts.bundle.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
         <script src="assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
-        <script src="assets/js/US_programmacorsi_docenti.js"></script>
+        <script src="assets/js/US_programmacorsi_attr.js"></script>
 
         <!--end::Page Custom Javascript-->
         <!--end::Javascript-->

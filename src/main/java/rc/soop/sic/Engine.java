@@ -6,6 +6,7 @@ package rc.soop.sic;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpSession;
@@ -21,6 +22,7 @@ import rc.soop.sic.jpa.EntityOp;
 import static rc.soop.sic.jpa.EntityOp.trackingAction;
 import rc.soop.sic.jpa.Lingua;
 import rc.soop.sic.jpa.Livello_Certificazione;
+import rc.soop.sic.jpa.Modacquisizione;
 import rc.soop.sic.jpa.Moduli_Docenti;
 import rc.soop.sic.jpa.Path;
 import rc.soop.sic.jpa.Repertorio;
@@ -156,9 +158,9 @@ public class Engine {
     public static void verificacorsodainviare(Corso co1, boolean calendariocompleto, int modulidaassegnare) {
         try {
             EntityOp eo = new EntityOp();
-            if(calendariocompleto && modulidaassegnare == 0){
+            if (calendariocompleto && modulidaassegnare == 0) {
                 co1.setStatocorso(eo.getEm().find(CorsoStato.class, "21"));
-            }else{
+            } else {
                 co1.setStatocorso(eo.getEm().find(CorsoStato.class, "20"));
             }
             eo.begin();
@@ -167,6 +169,15 @@ public class Engine {
             eo.close();
         } catch (Exception ex) {
             trackingAction("service", estraiEccezione(ex));
+        }
+    }
+
+    public static List<String> exportEnum(String name) {
+        switch (name) {
+            case "MA":
+                return EnumSet.allOf(Modacquisizione.class).stream().map(e -> e.name()).collect(Collectors.toList());
+            default:
+                return new ArrayList<>();
         }
     }
 

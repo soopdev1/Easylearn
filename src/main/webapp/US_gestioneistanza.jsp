@@ -42,6 +42,7 @@
         <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
         <link href="assets/plugins/DataTables/datatables.min.css" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="assets/plugins/jquery-confirm.3.3.2.min.css">
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/plus.css" rel="stylesheet" type="text/css" />
 
@@ -129,31 +130,25 @@
 
                                                                     <form action="US_programmacorsi.jsp" method="POST" target="_blank">
                                                                         <input type="hidden" name="idcorso" value="<%=Utils.enc_string(String.valueOf(cor.getIdcorso()))%>"/>
-                                                                    <%=cor.getStatocorso().getHtmlicon()%> |
-                                                                    
+                                                                        <%=cor.getStatocorso().getHtmlicon()%> |
+
                                                                         <button type="submit"class="btn btn-sm btn-primary"
                                                                                 data-bs-toggle="tooltip" title="MODIFICA DETTAGLI CORSO" 
                                                                                 data-preload='false'><i class="fa fa-edit"></i></button> |
                                                                         <button type="button"class="btn btn-sm btn-danger"
                                                                                 data-bs-toggle="tooltip" title="RIMUOVI CORSO DA ISTANZA" 
-                                                                       data-preload='false'><i class="fa fa-trash-arrow-up"></i></button>
+                                                                                data-preload='false'
+                                                                                onclick="return deletecorsofromistance('<%=cor.getIdcorso()%>')"
+                                                                                ><i class="fa fa-trash-arrow-up"></i>
+                                                                        </button>
                                                                     </form>
                                                                     <hr>
                                                                     <%}%>
-
-
                                                                 </td>
                                                                 <td class="p-2 w-80px">
                                                                     <%=is1.getDatacreazione()%>
                                                                 </td> 
                                                                 <td class="p-2 min-w-120px" style="white-space: nowrap; overflow: hidden; text-overflow:ellipsis;">
-                                                                    <a href="ADM_visdco.jsp?idist=<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>" 
-                                                                       data-fancybox data-type='iframe' 
-                                                                       data-bs-toggle="tooltip" title="VISUALIZZA/MODIFICA DETTAGLI ISTANZA" 
-                                                                       data-preload='false' data-width='75%' data-height='75%' 
-                                                                       class="btn btn-sm btn-bg-light btn-dark fan1">
-                                                                        <i class="fa fa-list-dots"></i>
-                                                                    </a>
                                                                     <%if (addcorso) {%>
                                                                     <a href="US_addcorsoistanza.jsp?idist=<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>"
                                                                        data-fancybox data-type='iframe' 
@@ -164,7 +159,7 @@
                                                                     </a>
                                                                     <%}%>
                                                                     <%if (salvaistanza) {%>
-                                                                    <a href="US_verificaistanza.jsp?idist=<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>"
+                                                                    <a href=""
                                                                        data-fancybox data-type='iframe' 
                                                                        data-bs-toggle="tooltip" title="VERIFICA E SALVA ISTANZA" 
                                                                        data-preload='false' data-width='75%' data-height='75%' 
@@ -173,12 +168,12 @@
                                                                     </a>
                                                                     <%}%>
                                                                     <%if (eliminaistanza) {%>
-                                                                    <a href="ADM_commissione.jsp?idcorso=" data-fancybox data-type='iframe' 
-                                                                       data-bs-toggle="tooltip" title="ELIMINA ISTANZA" 
-                                                                       data-preload='false' data-width='75%' data-height='75%' 
-                                                                       class="btn btn-sm btn-bg-light btn-danger fan1">
-                                                                        <i class="fa fa-remove"></i>
-                                                                    </a>
+                                                                    <button type="button"class="btn btn-sm btn-bg-light btn-danger"
+                                                                            data-bs-toggle="tooltip" title="ELIMINA ISTANZA" 
+                                                                            data-preload='false'
+                                                                            onclick="return deleteistanza('<%=is1.getIdistanza()%>')"
+                                                                            ><i class="fa fa-remove"></i>
+                                                                    </button>
                                                                     <%}%>
                                                                 </td>
                                                             </tr>
@@ -261,6 +256,7 @@
         <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
         <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
         <script type="text/javascript" src="assets/js/common.js"></script>
+        <script src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
         <script type="text/javascript" src="assets/js/US_gestioneistanza.js"></script>
         <!--end::Page Custom Javascript-->
 

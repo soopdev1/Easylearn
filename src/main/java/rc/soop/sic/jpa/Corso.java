@@ -5,6 +5,7 @@
 package rc.soop.sic.jpa;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,6 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -70,6 +72,10 @@ public class Corso implements Serializable {
     @Column(name = "costostimatoallievo")
     private double costostimatoallievo;
     
+    @OneToMany
+    @JoinColumn(name = "idattrezzature")
+    private List<Attrezzature> attrezzature;
+    
     
     public Corso() {
     }
@@ -78,6 +84,15 @@ public class Corso implements Serializable {
         return idcorso;
     }
 
+    public List<Attrezzature> getAttrezzature() {
+        return attrezzature;
+    }
+
+    public void setAttrezzature(List<Attrezzature> attrezzature) {
+        this.attrezzature = attrezzature;
+    }
+
+    
     public void setIdcorso(Long idcorso) {
         this.idcorso = idcorso;
     }

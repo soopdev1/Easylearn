@@ -452,6 +452,76 @@ public class Operations extends HttpServlet {
         }
     }
 
+    protected void DELETEISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JsonObject resp_out = new JsonObject();
+
+        try {
+
+            EntityOp ep1 = new EntityOp();
+            Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(getRequestValue(request, "IDISTANZA")));
+
+            if (is1 != null) {
+                ep1.begin();
+                ep1.remove(is1);
+                ep1.commit();
+                ep1.close();
+                resp_out.addProperty("result",
+                        true);
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "Errore: ISTANZA NON TROVATA.");
+            }
+
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+    }
+
+    protected void DELETECORSOISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        JsonObject resp_out = new JsonObject();
+        try {
+
+            EntityOp ep1 = new EntityOp();
+            Corso co1 = ep1.getEm().find(Corso.class, Long.valueOf(getRequestValue(request, "IDOCORSO")));
+
+            if (co1 != null) {
+                ep1.begin();
+                ep1.remove(co1);
+                ep1.commit();
+                ep1.close();
+                resp_out.addProperty("result",
+                        true);
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "Errore: CORSO NON TROVATO.");
+            }
+
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+    }
+
     protected void MODIFICAPIANIFICAZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         try {
@@ -734,7 +804,13 @@ public class Operations extends HttpServlet {
 //                is.setProtocollosoggettodata(new DateTime().toString(PATTERNDATE4));
 //                e.merge(is);
 //            } else {
-            Istanza is = e.getEm().find(Istanza.class, Long.valueOf(getRequestValue(request, "istanzabase")));
+            Istanza is;
+            try {
+                is = e.getEm().find(Istanza.class, Long.valueOf(getRequestValue(request, "istanzabase")));
+            } catch (Exception ex2) {
+                is = null;
+            }
+
             if (is == null) {
                 is = new Istanza();
                 is.setProtocollosoggetto(getRequestValue(request, "protnum"));
@@ -813,6 +889,12 @@ public class Operations extends HttpServlet {
                     break;
                 case "MODIFICAPIANIFICAZIONEDOCENTI":
                     MODIFICAPIANIFICAZIONEDOCENTI(request, response);
+                    break;
+                case "DELETECORSOISTANZA":
+                    DELETECORSOISTANZA(request, response);
+                    break;
+                case "DELETEISTANZA":
+                    DELETEISTANZA(request, response);
                     break;
                 case "ADDCORSO":
                     ADDCORSO(request, response);
