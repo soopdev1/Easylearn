@@ -99,7 +99,7 @@
                                                                 <th class="p-2 w-50px">Stato</th>
                                                                 <th class="p-2 w-50px">ID</th>
                                                                 <th class="p-2 min-w-120px">Corsi</th>
-                                                                <th class="p-2 w-80px">Data</th>
+                                                                <th class="p-2 w-80px">Data protocollo</th>
                                                                 <th class="p-2 min-w-120px">Azioni</th>
                                                             </tr>
                                                         </thead>
@@ -114,6 +114,21 @@
                                                                     boolean addcorso = (maxcorsi > c1.size());
                                                                     boolean salvaistanza = true;
                                                                     boolean eliminaistanza = true;
+                                                                    boolean modificacorso = true;
+                                                                    boolean inviaistanza = false;
+                                                                    boolean consultaistanza = false;
+                                                                    if (!is1.getStatocorso().getCodicestatocorso().equals("01")) {
+                                                                        addcorso = false;
+                                                                        salvaistanza = false;
+                                                                        modificacorso = false;
+                                                                    }
+                                                                    if (is1.getStatocorso().getCodicestatocorso().equals("02")) {
+                                                                        inviaistanza = true;
+                                                                    }
+                                                                    if (is1.getStatocorso().getCodicestatocorso().equals("07")) {
+                                                                        eliminaistanza = false;
+                                                                        consultaistanza = true;
+                                                                    }
                                                             %>
                                                             <tr>
                                                                 <td class="p-2 w-50px">
@@ -128,10 +143,10 @@
                                                                     <u><%=cor.getRepertorio().getDenominazione()%></u> 
                                                                     - Edizioni: <%=cor.getQuantitarichiesta()%><br/>
 
+                                                                    <%if (modificacorso) {%>
                                                                     <form action="US_programmacorsi.jsp" method="POST" target="_blank">
                                                                         <input type="hidden" name="idcorso" value="<%=Utils.enc_string(String.valueOf(cor.getIdcorso()))%>"/>
                                                                         <%=cor.getStatocorso().getHtmlicon()%> |
-
                                                                         <button type="submit"class="btn btn-sm btn-primary"
                                                                                 data-bs-toggle="tooltip" title="MODIFICA DETTAGLI CORSO" 
                                                                                 data-preload='false'><i class="fa fa-edit"></i></button> |
@@ -142,6 +157,7 @@
                                                                                 ><i class="fa fa-trash-arrow-up"></i>
                                                                         </button>
                                                                     </form>
+                                                                    <%}%>
                                                                     <hr>
                                                                     <%}%>
                                                                 </td>
@@ -149,6 +165,14 @@
                                                                     <%=is1.getDatacreazione()%>
                                                                 </td> 
                                                                 <td class="p-2 min-w-120px" style="white-space: nowrap; overflow: hidden; text-overflow:ellipsis;">
+                                                                    <%if (consultaistanza) {%>
+                                                                    <form action="US_showistanza.jsp" method="POST" target="_blank">
+                                                                        <input type="hidden" name="idist" value="<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>"/>
+                                                                        <button type="submit"class="btn btn-sm btn-primary"
+                                                                                data-bs-toggle="tooltip" title="VISUALIZZA ISTANZA PRESENTATA" 
+                                                                                data-preload='false'><i class="fa fa-file-text"></i></button>
+                                                                    </form>
+                                                                    <%}%>
                                                                     <%if (addcorso) {%>
                                                                     <a href="US_addcorsoistanza.jsp?idist=<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>"
                                                                        data-fancybox data-type='iframe' 
@@ -159,22 +183,26 @@
                                                                     </a>
                                                                     <%}%>
                                                                     <%if (salvaistanza) {%>
-                                                                    <a href=""
-                                                                       data-fancybox data-type='iframe' 
-                                                                       data-bs-toggle="tooltip" title="VERIFICA E SALVA ISTANZA" 
-                                                                       data-preload='false' data-width='75%' data-height='75%' 
-                                                                       class="btn btn-sm btn-bg-light btn-success fan1">
-                                                                        <i class="fa fa-save"></i>
-                                                                    </a>
+                                                                    <button type="button" data-bs-toggle="tooltip" title="VERIFICA E SALVA ISTANZA" 
+                                                                            data-preload='false'  
+                                                                            class="btn btn-sm btn-bg-light btn-success"
+                                                                            onclick="return saveistanza('<%=is1.getIdistanza()%>')"><i class="fa fa-save"></i>
+                                                                    </button>
+                                                                    <%} else if (inviaistanza) {%>
+                                                                    <button type="button" data-bs-toggle="tooltip" title="INVIA ISTANZA" 
+                                                                            data-preload='false'  
+                                                                            class="btn btn-sm btn-bg-light btn-success"
+                                                                            onclick="return sendistanza('<%=is1.getIdistanza()%>')"><i class="fa fa-envelope"></i>
+                                                                    </button>
                                                                     <%}%>
                                                                     <%if (eliminaistanza) {%>
                                                                     <button type="button"class="btn btn-sm btn-bg-light btn-danger"
                                                                             data-bs-toggle="tooltip" title="ELIMINA ISTANZA" 
                                                                             data-preload='false'
-                                                                            onclick="return deleteistanza('<%=is1.getIdistanza()%>')"
-                                                                            ><i class="fa fa-remove"></i>
+                                                                            onclick="return deleteistanza('<%=is1.getIdistanza()%>')"><i class="fa fa-remove"></i>
                                                                     </button>
                                                                     <%}%>
+
                                                                 </td>
                                                             </tr>
                                                             <%}%>        

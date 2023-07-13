@@ -5,6 +5,7 @@
 package rc.soop.sic.jpa;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -16,6 +17,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -42,6 +45,11 @@ public class Attrezzature implements Serializable {
     @Column(name = "quantita")
     private int quantita;
 
+    @Column(name = "datainizio")
+    @Temporal(TemporalType.DATE)
+    private Date datainizio;
+    
+    
     @Column(name = "registroinventario")
     private String registroinventario;
 
@@ -53,6 +61,14 @@ public class Attrezzature implements Serializable {
     private Corso corso;
     
     public Attrezzature() {
+    }
+
+    public Date getDatainizio() {
+        return datainizio;
+    }
+
+    public void setDatainizio(Date datainizio) {
+        this.datainizio = datainizio;
     }
 
     public Corso getCorso() {

@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
-    <persistence-unit name="easyle" transaction-type="RESOURCE_LOCAL">
-        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-        <exclude-unlisted-classes>false</exclude-unlisted-classes>
-        <shared-cache-mode>ALL</shared-cache-mode>
-        <properties>
-            <property name="eclipselink.logging.level" value="SEVERE"/>
-            <property name="eclipselink.query-results-cache" value="false"/>
-            <property name="eclipselink.cache.shared.default" value="false"/>
-            <property name="eclipselink.cache.size.default" value="5000"/>
-            <property name="eclipselink.cache.type.default" value="Full"/>
-            <property name="javax.persistence.schema-generation.database.action" value="create-or-extend-tables"/>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect"/>
-            <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
-            <property name="javax.persistence.jdbc.user" value="easylearn"/>
-            <property name="javax.persistence.jdbc.password" value="easylearn"/>
-            <!-- SVILUPPO/DEMO  LOCAL 
+  <persistence-unit name="easyle" transaction-type="RESOURCE_LOCAL">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>rc.soop.sic.jpa.EmailTemplate</class>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+    <properties>
+      <property name="eclipselink.logging.level" value="SEVERE"/>
+      <property name="eclipselink.query-results-cache" value="false"/>
+      <property name="eclipselink.cache.shared.default" value="false"/>
+      <property name="eclipselink.cache.size.default" value="5000"/>
+      <property name="eclipselink.cache.type.default" value="Full"/>
+      <property name="javax.persistence.schema-generation.database.action" value="create-or-extend-tables"/>
+      <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect"/>
+      <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+      <property name="javax.persistence.jdbc.user" value="easylearn"/>
+      <property name="javax.persistence.jdbc.password" value="easylearn"/>
+      <!-- SVILUPPO/DEMO  LOCAL 
             <property name="javax.persistence.jdbc.url" value="jdbc:mysql://127.0.0.1:3306/easylearn_dev?serverTimezone=UTC" />-->
-            <!-- SVILUPPO/DEMO AWS FORMEZ-->
-            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://172.25.1.18:3306/easylearn_dev" /> 
-        </properties>
-    </persistence-unit>
+      <!-- SVILUPPO/DEMO AWS FORMEZ-->
+      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://172.25.1.18:3306/easylearn_dev"/>
+    </properties>
+  </persistence-unit>
 </persistence>

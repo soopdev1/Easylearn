@@ -99,6 +99,14 @@ public class Repertorio implements Serializable {
     public Repertorio() {
     }
 
+    public List<Competenze> getCompetenzeassociate() {
+        return competenzeassociate;
+    }
+
+    public void setCompetenzeassociate(List<Competenze> competenzeassociate) {
+        this.competenzeassociate = competenzeassociate;
+    }
+
     public Long getIdrepertorio() {
         return idrepertorio;
     }

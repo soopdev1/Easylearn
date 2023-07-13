@@ -68,7 +68,7 @@
         <div class="row">
             <!--begin::Col-->
             <form method="POST" action="Operations" onsubmit="return verificasalvataggiodocentemodulo();">
-                <input type="hidden" name="type" value="MODIFICAPIANIFICAZIONEDOCENTI"/>
+                <input type="hidden" name="type" value="INSERISCIATTREZZATURA"/>
                 <input type="hidden" id="idcorsodasalvare" name="idcorsodasalvare" value="<%=co1.getIdcorso()%>"/>
                 <div class="col-xl-12">
                     <div class="card h-xl-100">
@@ -92,17 +92,17 @@
                                     <input type="text" 
                                            name="descrizione"
                                            id="descizione"
-                                           class="form-control" />
+                                           class="form-control" required />
                                 </div>
                                 <label class="col-md-2 col-form-label fw-bold fs-6">
                                     <span class="text-danger"><b>MODALIT&#192; DI ACQUISIZIONE</b></span>
                                 </label>
                                 <div class="col-md-4 col-form-label fs-6">
                                     <select 
-                                        id="docente"
-                                        name="docente" aria-label="Scegli..." 
+                                        id="modacq"
+                                        name="modacq" aria-label="Scegli..." 
                                         data-control="select2" data-placeholder="Scegli..." 
-                                        class="form-select">
+                                        class="form-select" required>
                                         <option value=""></option>
                                         <%for (String e1 : mod_a) {%>
                                         <option value="<%=e1%>"><%=e1%></option>                                        
@@ -118,6 +118,23 @@
                                            id="quant"
                                            class="form-control intvalue" />
                                 </div>    
+                                <label class="col-md-2 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>DATA INIZIO</b></span>
+                                </label>
+                                <div class="col-md-2 col-form-label fs-6">
+                                    <input type="date" name="datainizio" id="datainizio"
+                                           class="form-control" 
+                                           required/>
+                                </div>    
+                                <label class="col-md-2 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>REGISTRO E NUMERO INVENTARIO</b></span>
+                                </label>
+                                <div class="col-md-2 col-form-label fs-6">
+                                    <input type="text" 
+                                           name="invent"
+                                           id="invent"
+                                           class="form-control" />
+                                </div> 
 
                             </div>
                         </div>

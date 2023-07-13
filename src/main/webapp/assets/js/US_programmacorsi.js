@@ -104,4 +104,20 @@ $(document).ready(function () {
             url: 'assets/plugins/DataTables/it-IT.json'
         }
     });
+    $('#tab_dt3').DataTable({
+        dom: '<<t>p>',
+        lengthMenu: [[100, -1], [100, "Tutto"]],
+        columnDefs: [
+            {orderable: true, targets: 0},
+            {orderable: false, targets: 1},
+            {orderable: false, targets: 2},
+            {orderable: false, targets: 3},
+            {orderable: false, targets: 4},
+            {orderable: false, targets: 5}
+        ],
+        order: [[0, 'asc']],
+        language: {
+            url: 'assets/plugins/DataTables/it-IT.json'
+        }
+    });
 });

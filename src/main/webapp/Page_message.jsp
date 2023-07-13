@@ -75,6 +75,7 @@
                                     switch (esito) {
                                         case "OK_CL":
                                         case "OK_SM":
+                                        case "OK_SMAT":
                                         case "OK_SMD": {
                                             ty = "alert-success";
                                             html = "<i class='fa fa-check-circle'></i> Operazione completata con successo. Chiudere questa finestra.";

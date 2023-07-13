@@ -20,6 +20,7 @@ public class Constant {
     public static final String PATTERNDATE5 = "dd/MM/yyyy HH:mm:ss";
     public static final String PATTERNDATE6 = "yyyy-MM-dd";
     public static SimpleDateFormat sdf_PATTERNDATE4 = new SimpleDateFormat(PATTERNDATE4);
+    public static SimpleDateFormat sdf_PATTERNDATE5 = new SimpleDateFormat(PATTERNDATE5);
     public static SimpleDateFormat sdf_PATTERNDATE6 = new SimpleDateFormat(PATTERNDATE6);
 
     public static final ResourceBundle RB = ResourceBundle.getBundle("parameter.conf");

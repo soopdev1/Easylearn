@@ -14,6 +14,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.Normalizer;
 import java.util.Base64;
 import java.util.Enumeration;
 import java.util.List;
@@ -34,11 +35,9 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import static org.apache.commons.fileupload.servlet.ServletFileUpload.isMultipartContent;
-import org.apache.commons.lang3.RandomStringUtils;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import org.apache.commons.lang3.StringUtils;
-import static org.apache.commons.lang3.StringUtils.replace;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import org.joda.time.DateTime;
 import static rc.soop.sic.Constant.PATTERNDATE2;
@@ -192,6 +191,7 @@ public class Utils {
 
     public static int parseIntR(String value) {
         try {
+            value = StringUtils.replace(value, "_", "");
             if (value.contains(".")) {
                 StringTokenizer st = new StringTokenizer(value, ".");
                 value = st.nextToken();
@@ -356,6 +356,10 @@ public class Utils {
         }
         return add + value;
 
+    }
+
+    public static String normalize(String input) {
+        return input == null ? "" : Normalizer.normalize(input, Normalizer.Form.NFKD);
     }
 
 //

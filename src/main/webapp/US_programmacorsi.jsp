@@ -4,6 +4,7 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.Attrezzature"%>
 <%@page import="rc.soop.sic.jpa.Docente"%>
 <%@page import="rc.soop.sic.jpa.Calendario_Formativo"%>
 <%@page import="rc.soop.sic.jpa.Lingua"%>
@@ -31,7 +32,7 @@
         switch (verifysession) {
             case 1: {
                 String idcorso = Utils.getRequestValue(request, "idcorso");
-                if (idcorso == null) {
+                if (idcorso.equals("")) {
                     idcorso = (String) session.getAttribute("ses_idcorso");
                 }
                 EntityOp eo = new EntityOp();
@@ -299,7 +300,7 @@
                                                 <td class="p-2 w-50px"></td>
                                                 <td class="p-2 w-50px"></td>
                                                 <td class="p-2 w-50px"></td>
-                                                <td class="p-2 w-50px">Azioni</td>
+                                                <td class="p-2 w-50px"><i class='fa fa-hourglass'></i></td>
                                             </tr>
                                             <%} else if (c1.getTipomodulo().equals("MODULOFORMATIVO")) {%>
                                             <input type="hidden" class="value_ore" id="ore_modules_<%=indexmodules%>" value="<%=c1.getOre()%>" />
@@ -314,7 +315,7 @@
                                                 <td class="p-2 w-50px"><%=c1.exportCompetenze()%></td>
                                                 <td class="p-2 w-50px"><%=c1.exportAbilita()%></td>
                                                 <td class="p-2 w-50px"><%=c1.exportConoscenze()%></td>
-                                                <td class="p-2 w-50px">Azioni</td>
+                                                <td class="p-2 w-50px"><i class='fa fa-hourglass'></i></td>
                                             </tr>
                                             <%}%>
                                             <%}%>
@@ -372,7 +373,7 @@
                                                 <td class="p-2 w-150px"><%=d2.getCognome()%> <%=d2.getNome()%></td>
                                                 <td class="p-2 w-50px"><%=d2.getCodicefiscale()%></td>
                                                 <td class="p-2 w-150px"><%=d2.formatElencomoduli()%></td>
-                                                <td class="p-2 w-150px">Azioni</td>      
+                                                <td class="p-2 w-150px"><i class='fa fa-hourglass'></i></td>      
                                             </tr>
                                             <%}
                                             %>
@@ -399,6 +400,43 @@
                                        data-preload='false' data-width='75%' data-height='75%'>
                                         <i class="fa fa-plus-circle" ></i> Aggiungi</a></span>
                             </div>
+                            
+                            <div class="card-body py-3">
+                                <!--begin::Table container-->
+                                <div class="table-responsive">
+                                    <!--begin::Table-->
+                                    <table class="table align-middle gy-3 table-bordered table-hover" 
+                                           id="tab_dt3" style="border-bottom: 2px;">
+                                        <!--begin::Table head-->
+                                        <thead>
+                                            <tr>
+                                                <th class="p-2 w-150px">Descrizione</th>
+                                                <th class="p-2 w-50px">Modalit&#224; di acquisizione</th>
+                                                <th class="p-2 w-50px">Quantit&#224;</th>
+                                                <th class="p-2 w-50px">Data inizio</th>
+                                                <th class="p-2 w-150px">Registro e numero inventario</th>
+                                                <th class="p-2 w-50px">Azioni</th>
+                                            </tr>
+                                        </thead>
+                                        <!--end::Table head-->
+                                        <!--begin::Table body-->
+                                        <tbody>
+                                            <%
+                                            for(Attrezzature at1 : co1.getAttrezzature()){%>
+                                            <tr>
+                                                <td class="p-2 w-150px"><%=at1.getDescrizione()%></td>
+                                                <td class="p-2 w-50px"><%=at1.getModalita().name()%></td>
+                                                <td class="p-2 w-50px"><%=at1.getQuantita()%></td>
+                                                <td class="p-2 w-50px"><%=Constant.sdf_PATTERNDATE4.format(at1.getDatainizio())%></td>
+                                                <td class="p-2 w-150px"><%=at1.getRegistroinventario()%></td>
+                                                <td class="p-2 w-50px"><i class='fa fa-hourglass'></i></td>
+                                            </tr>
+                                                <%}
+                                            %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                </div>
                             <%} else {%>
                             <div class="row">
                                 <label class="col-form-label fw-bold fs-6">

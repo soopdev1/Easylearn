@@ -181,4 +181,13 @@ public class Engine {
         }
     }
 
+    public static String letterecorsi(int numerocorso) {
+        String LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        if (numerocorso >= 0 && numerocorso <= 25) {
+            return String.valueOf(LETTERS.substring(numerocorso, numerocorso + 1).charAt(0));
+        } else {
+            return "?";
+        }
+    }
+
 }

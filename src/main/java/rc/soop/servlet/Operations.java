@@ -38,10 +38,12 @@ import static rc.soop.sic.Utils.fd;
 import static rc.soop.sic.Utils.formatDoubleforMysql;
 import static rc.soop.sic.Utils.generaId;
 import static rc.soop.sic.Utils.getRequestValue;
+import static rc.soop.sic.Utils.normalize;
 import static rc.soop.sic.Utils.parseIntR;
 import static rc.soop.sic.Utils.parseLongR;
 import static rc.soop.sic.Utils.redirect;
 import rc.soop.sic.jpa.Abilita;
+import rc.soop.sic.jpa.Attrezzature;
 import rc.soop.sic.jpa.Calendario_Formativo;
 import rc.soop.sic.jpa.Competenze;
 import rc.soop.sic.jpa.Competenze_Trasversali;
@@ -53,6 +55,7 @@ import rc.soop.sic.jpa.Docente;
 import rc.soop.sic.jpa.EntityOp;
 import rc.soop.sic.jpa.Istanza;
 import rc.soop.sic.jpa.Lingua;
+import rc.soop.sic.jpa.Modacquisizione;
 import rc.soop.sic.jpa.Moduli_Docenti;
 import rc.soop.sic.jpa.Moduli_DocentiId;
 import rc.soop.sic.jpa.Path;
@@ -144,7 +147,7 @@ public class Operations extends HttpServlet {
         }
     }
 
-    protected void SENDISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void SENDISTANZA_OLD(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
             String codiceis = getRequestValue(request, "codice_istanza");
@@ -452,6 +455,81 @@ public class Operations extends HttpServlet {
         }
     }
 
+    protected void SENDISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JsonObject resp_out = new JsonObject();
+
+        try {
+
+            EntityOp ep1 = new EntityOp();
+            Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(getRequestValue(request, "IDISTANZA")));
+
+            if (is1 != null) {
+                ep1.begin();
+                is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "07"));
+                is1.setDatainvio(new DateTime().toString(PATTERNDATE5));
+                ep1.merge(is1);
+
+                //INVIO PEC
+                ep1.commit();
+                ep1.close();
+                resp_out.addProperty("result",
+                        true);
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "Errore: ISTANZA NON TROVATA.");
+            }
+
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+    }
+
+    protected void SAVEISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JsonObject resp_out = new JsonObject();
+
+        try {
+
+            EntityOp ep1 = new EntityOp();
+            Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(getRequestValue(request, "IDISTANZA")));
+
+            if (is1 != null) {
+                ep1.begin();
+                is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "02"));
+                ep1.merge(is1);
+                ep1.commit();
+                ep1.close();
+                resp_out.addProperty("result",
+                        true);
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "Errore: ISTANZA NON TROVATA.");
+            }
+
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+    }
+
     protected void DELETEISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JsonObject resp_out = new JsonObject();
 
@@ -532,10 +610,10 @@ public class Operations extends HttpServlet {
             if (co1 != null) {
 
                 String NOMEMODULO = getRequestValue(request, "NOMEMODULO");
-                double ORETOTALI = fd(formatDoubleforMysql(Utils.getRequestValue(request, "ORETOTALI")));
-                double OREELE = fd(formatDoubleforMysql(Utils.getRequestValue(request, "OREELE")));
-                double OREAULATEO = fd(formatDoubleforMysql(Utils.getRequestValue(request, "OREAULATEO")));
-                double OREAULATEC = fd(formatDoubleforMysql(Utils.getRequestValue(request, "OREAULATEC")));
+                double ORETOTALI = fd(formatDoubleforMysql(getRequestValue(request, "ORETOTALI")));
+                double OREELE = fd(formatDoubleforMysql(getRequestValue(request, "OREELE")));
+                double OREAULATEO = fd(formatDoubleforMysql(getRequestValue(request, "OREAULATEO")));
+                double OREAULATEC = fd(formatDoubleforMysql(getRequestValue(request, "OREAULATEC")));
 
                 List<Competenze> comp = ep1.competenze_correlate(co1.getRepertorio());
 
@@ -665,6 +743,48 @@ public class Operations extends HttpServlet {
 
     }
 
+    protected void INSERISCIATTREZZATURA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        EntityOp ep1 = new EntityOp();
+
+        Corso co1 = ep1.getEm().find(Corso.class, Long.valueOf(getRequestValue(request, "idcorsodasalvare")));
+
+        if (co1 != null) {
+
+            Attrezzature at = new Attrezzature();
+            at.setCorso(co1);
+            at.setDescrizione(normalize(getRequestValue(request, "descrizione")));
+            try {
+                at.setDatainizio(sdf_PATTERNDATE6.parse(getRequestValue(request, "datainizio")));
+            } catch (Exception ex1) {
+                at.setDatainizio(null);
+            }
+            try {
+                at.setModalita(Modacquisizione.valueOf(getRequestValue(request, "modacq")));
+            } catch (Exception ex1) {
+                at.setModalita(Modacquisizione.POSSESSO);
+            }
+            at.setRegistroinventario(normalize(getRequestValue(request, "invent")));
+            at.setQuantita(parseIntR(getRequestValue(request, "quant")));
+            at.setNumeroinventario("");
+
+            try {
+                ep1.begin();
+                ep1.persist(at);
+                ep1.commit();
+                ep1.close();
+                request.getSession().setAttribute("ses_idcorso", Utils.enc_string(getRequestValue(request, "idcorsodasalvare")));
+                redirect(request, response, "Page_message.jsp?esito=OK_SMAT");
+            } catch (Exception ex1) {
+                request.getSession().setAttribute("ses_idcorso", Utils.enc_string(getRequestValue(request, "idcorsodasalvare")));
+                redirect(request, response, "US_programmacorsi_attr.jsp?esito=KO1");
+            }
+
+        } else {
+            request.getSession().setAttribute("ses_idcorso", Utils.enc_string(getRequestValue(request, "idcorsodasalvare")));
+            redirect(request, response, "US_programmacorsi_attr.jsp?esito=KO2");
+        }
+    }
+
     protected void MODIFICAPIANIFICAZIONEDOCENTI(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         EntityOp ep1 = new EntityOp();
 
@@ -703,7 +823,6 @@ public class Operations extends HttpServlet {
     }
 
     protected void SALVAPIANIFICAZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
         EntityOp ep1 = new EntityOp();
         List<Lingua> language = ep1.getLingue();
         List<Competenze_Trasversali> comp_tr = (List<Competenze_Trasversali>) ep1.findAll(Competenze_Trasversali.class);
@@ -714,7 +833,6 @@ public class Operations extends HttpServlet {
             AtomicInteger indexmod = new AtomicInteger(1);
             if (calendar.isEmpty()) {//PRIMO INSERIMENTO
                 comp_tr.forEach(competenzatras -> {
-//                    String id = getRequestValue(request, "idct_" + competenzatras.getIdcompetenze());
                     String reqing = getRequestValue(request, "ctreqing_" + competenzatras.getIdcompetenze());
                     String descr = getRequestValue(request, "ctdescr_" + competenzatras.getIdcompetenze());
                     String lingua = getRequestValue(request, "ctlingua_" + competenzatras.getIdcompetenze());
@@ -755,16 +873,12 @@ public class Operations extends HttpServlet {
                     }
                 });
             } else {
-
             }//UPDATE
-
         }
         ep1.commit();
         ep1.close();
-
         request.getSession().setAttribute("ses_idcorso", Utils.enc_string(getRequestValue(request, "idcorsodasalvare")));
         redirect(request, response, "US_programmacorsi.jsp");
-
     }
 
     protected void SCELTAREPERTORIO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -890,11 +1004,20 @@ public class Operations extends HttpServlet {
                 case "MODIFICAPIANIFICAZIONEDOCENTI":
                     MODIFICAPIANIFICAZIONEDOCENTI(request, response);
                     break;
+                case "INSERISCIATTREZZATURA":
+                    INSERISCIATTREZZATURA(request, response);
+                    break;
                 case "DELETECORSOISTANZA":
                     DELETECORSOISTANZA(request, response);
                     break;
                 case "DELETEISTANZA":
                     DELETEISTANZA(request, response);
+                    break;
+                case "SAVEISTANZA":
+                    SAVEISTANZA(request, response);
+                    break;
+                case "SENDISTANZA":
+                    SENDISTANZA(request, response);
                     break;
                 case "ADDCORSO":
                     ADDCORSO(request, response);
@@ -914,9 +1037,9 @@ public class Operations extends HttpServlet {
                 case "ELIMINAISTANZAFIRMATA":
                     ELIMINAISTANZAFIRMATA(request, response);
                     break;
-                case "SENDISTANZA":
-                    SENDISTANZA(request, response);
-                    break;
+//                case "SENDISTANZAOLD":
+//                    SENDISTANZA_OLD(request, response);
+//                    break;
                 case "APPROVAISTANZA":
                     APPROVAISTANZA(request, response);
                     break;
