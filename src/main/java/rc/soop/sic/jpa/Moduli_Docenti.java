@@ -20,6 +20,7 @@ import javax.persistence.Table;
  */
 @NamedQueries(value = {
     @NamedQuery(name = "md.elencobydocente", query = "SELECT u FROM Moduli_Docenti u WHERE u.docente=:docente"),
+    @NamedQuery(name = "md.elencobycalendarioformativo", query = "SELECT u FROM Moduli_Docenti u WHERE u.moduloformativo=:moduloformativo"),
     @NamedQuery(name = "md.elenco", query = "SELECT u FROM Moduli_Docenti u WHERE u.docente=:docente AND u.moduloformativo=:moduloformativo")
 })
 @Entity

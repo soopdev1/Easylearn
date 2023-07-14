@@ -168,8 +168,9 @@
 
                                         String ri_selsi = "";
                                         String ri_selno = "";
-                                        if (calendar.stream().anyMatch(c3 -> c3.getCompetenzetrasversali().equals(ct))) {
-                                            cf0 = calendar.stream().filter(c3 -> c3.getCompetenzetrasversali().equals(ct)).findAny().get();
+                                        
+                                        if (Engine.checkexist_CT(calendar, ct)) {
+                                            cf0 = Engine.getexist_CT(calendar, ct);
                                             if (cf0.getTipomodulo().equals("BASE")) {
                                                 ri_selno = "selected";
                                             } else {

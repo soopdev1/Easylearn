@@ -190,4 +190,12 @@ public class Engine {
         }
     }
 
+    public static boolean checkexist_CT(List<Calendario_Formativo> calendar, Competenze_Trasversali ct) {
+        return calendar.stream().anyMatch(c3 -> c3.getCompetenzetrasversali().equals(ct));
+    }
+
+    public static Calendario_Formativo getexist_CT(List<Calendario_Formativo> calendar, Competenze_Trasversali ct) {
+        return calendar.stream().filter(c3 -> c3.getCompetenzetrasversali().equals(ct)).findAny().get();
+    }
+
 }

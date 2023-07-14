@@ -240,6 +240,12 @@ public class EntityOp {
         return q.getResultList().isEmpty() ? null : (Certificazione) q.getSingleResult();
     }
 
+    public List<Moduli_Docenti> list_moduli(Calendario_Formativo c1) {
+        TypedQuery q = this.em.createNamedQuery("md.elencobycalendarioformativo", Moduli_Docenti.class);
+        q.setParameter("moduloformativo", c1);
+        return (List<Moduli_Docenti>) q.getResultList();
+    }
+
     public List<Docente> list_docenti_moduli(List<Docente> eldoc, List<Calendario_Formativo> calendar) {
 
         List<Docente> out = new ArrayList<>();

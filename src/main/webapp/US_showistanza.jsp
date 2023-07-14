@@ -4,6 +4,7 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.Moduli_Docenti"%>
 <%@page import="rc.soop.sic.jpa.Professioni"%>
 <%@page import="rc.soop.sic.jpa.SoggettoProponente"%>
 <%@page import="rc.soop.sic.jpa.TipoCorso"%>
@@ -585,68 +586,407 @@
                                         <h2 class="title">ARTICOLAZIONE DIDATTICA IN ORE</h2>
                                     </span>
                                 </div>
+                                <div class="row col-md-12">
+                                    <table class="table table-responsive table-hover" id="tab_dtcorso<%=letteracorso%>">
+                                        <thead>
+                                            <tr>
+                                                <th>Modulo</th>
+                                                <th>Ore Aula - Teorica</th>
+                                                <th>Ore Aula - Elearning</th>
+                                                <th>Ore Area Tecnica-Operativa</th>
+                                                <th>Ore Aula</th>
+                                                <th>Ore Totali</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <%
+                                                double t_comp_base = 0.0;
+                                                double t_aula_teorica = 0.0;
+                                                double t_aula_el = 0.0;
+                                                double t_aula_tecnope = 0.0;
+                                                double t_aula = 0.0;
+                                                double t_tot = 0.0;
+                                                double t_compl = Utils.fd(String.valueOf(c1.getStageore()) + ".0");
+                                                List<Calendario_Formativo> calendar = eo.calendario_formativo_corso(c1);
+                                                for (Calendario_Formativo c2 : calendar) {
+                                                    if (c2.getTipomodulo().equals("BASE")) {
+                                                        t_comp_base = t_comp_base + c2.getOre();
+                                                    }
+                                                    t_aula_teorica = t_aula_teorica + c2.getOre_teorica_aula();
+                                                    t_aula_el = t_aula_el + c2.getOre_teorica_el();
+                                                    t_aula_tecnope = t_aula_tecnope + c2.getOre_tecnica_operativa();
+                                                    t_aula = t_aula + c2.getOre_aula();
+                                                    t_tot = t_tot + c2.getOre();
+                                            %>
+                                            <tr>
+                                                <td><%=c2.getNomemodulo()%> (<%=Utils.roundDoubleandFormat(c2.getOre(), 2)%> ORE)</td>
+                                                <td><%=Utils.roundDoubleandFormat(c2.getOre_teorica_aula(), 2)%></td>
+                                                <td><%=Utils.roundDoubleandFormat(c2.getOre_teorica_el(), 2)%></td>
+                                                <td><%=Utils.roundDoubleandFormat(c2.getOre_tecnica_operativa(), 2)%></td>
+                                                <td><%=Utils.roundDoubleandFormat(c2.getOre_aula(), 2)%></td>
+                                                <td><%=Utils.roundDoubleandFormat(c2.getOre(), 2)%></td>
+                                            </tr>
+                                            <%}
+                                            %>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th>TOTALI</th>
+                                                <th><%=Utils.roundDoubleandFormat(t_aula_teorica, 2)%></th>
+                                                <th><%=Utils.roundDoubleandFormat(t_aula_el, 2)%></th>
+                                                <th><%=Utils.roundDoubleandFormat(t_aula_tecnope, 2)%></th>
+                                                <th><%=Utils.roundDoubleandFormat(t_aula, 2)%></th>
+                                                <th><%=Utils.roundDoubleandFormat(t_tot, 2)%></th>
+                                            </tr>
+                                            <tr>
+                                                <th colspan="5">STAGE</th>
+                                                <th><%=c1.getStageore()%></th>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Elearning Percentuale</th>
+                                                <th><%=c1.getElearningperc()%> %</th>
+                                                <th colspan="3">TOTALE COMPLESSIVO</th>
+                                                <th><%=Utils.roundDoubleandFormat(t_compl + t_tot, 2)%></th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                                <hr>
+                                <div class="row col-md-12">
+                                    <h3 class="title text-center">RIEPILOGO ARTICOLAZIONE DIDATTICA</h3>
+                                </div>
+                                <div class="row col-md-12">
+                                    <div class="col-md-6">
+                                        <p align="right">
+                                            <strong>AREA TEORICA</strong>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p>
+                                            <strong><%=Utils.roundDoubleandFormat(t_aula_teorica, 2)%></strong>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="row col-md-12">
+                                    <div class="col-md-6">
+                                        <p align="right">
+                                            <strong>AREA TECNICA OPERATIVA</strong>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p>
+                                            <strong><%=Utils.roundDoubleandFormat(t_aula_tecnope, 2)%></strong>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="row col-md-12">
+                                    <div class="col-md-6">
+                                        <p align="right">
+                                            <strong>ELEARNING</strong>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p>
+                                            <strong><%=Utils.roundDoubleandFormat(t_aula_el, 2)%></strong>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="row col-md-12">
+                                    <div class="col-md-6">
+                                        <p align="right">
+                                            <strong>COMPETENZE DI BASE OBBLIGATORIE</strong>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p>
+                                            <strong><%=Utils.roundDoubleandFormat(t_comp_base, 2)%></strong>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="row col-md-12">
+                                    <div class="col-md-6">
+                                        <p align="right">
+                                            <strong>AULA</strong>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p>
+                                            <strong><%=Utils.roundDoubleandFormat(t_aula, 2)%></strong>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="row col-md-12">
+                                    <div class="col-md-6">
+                                        <p align="right">
+                                            <strong>STAGE</strong>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p>
+                                            <strong><%=c1.getStageore()%></strong>
+                                        </p>
+                                    </div>
+                                </div>
+                                <hr>
+                                <h3 class="title text-center">DESTINATARI E REQUISITI</h3>
+                                <div class="row col-md-12">
+                                    <p class="text-justify" align="justify">
+                                        Sono destinatari delle attività formative autofinanziate, le persone in età lavorativa, le persone in cerca di prima occupazione, i disoccupati, inclusi i disoccupati di lunga durata, e gli occupati che, al momento della candidatura per la partecipazione al percorso formativo, dovranno produrre la documentazione attestante il possesso dei seguenti requisiti:
+                                    <ul align="justify">
+                                        <li>essere residenti o domiciliati in Sicilia;</li>
+                                        <li>possedere il titolo di studio minimo di accesso indicato nel Repertorio delle qualificazioni in corrispondenza del profilo di riferimento;</li>
+                                        <li>in caso di percorsi di aggiornamento o specializzazione, essere in possesso della qualifica di provenienza prevista.</li>
+                                        <li>attestazione di servizio del datore di lavoro o impresa propria, per coloro che si rivolgono ai percorsi formativi per occupati;</li>
+                                        <li>in caso di cittadini non comunitari, possedere regolare permesso di soggiorno in corso di validità e traduzione o equipollenza del titolo di studio;</li>
+                                    </ul>
+                                    I suddetti requisiti devono essere posseduti alla data di presentazione della candidatura e, ad eccezione di quelli previsti ai punti 4 e 5, possono essere comprovati con dichiarazioni, contestuali all’istanza, sottoscritte dall’interessato e prodotte in sostituzione delle normali certificazioni, secondo le modalità previste dal D.P.R. 28 dicembre 2000 n. 445.
+                                    </p>
+                                </div>
+                                <hr>
+                                <h3 class="title text-center">CALENDARIO DELLE ATTIVITÀ DIDATTICHE</h3>
+                                <div class="row col-md-12">
+                                    <p class="text-justify" align="justify">
+                                        La sequenza delle competenze dovrà essere formulata come proposta dal Repertorio delle qualificazioni della Regione Siciliana.
+                                        Il piano didattico allegato all’istanza dovrà essere redatto e calendarizzato secondo l’organizzazione sopra citata.
+                                    </p>
+                                </div>
+                                <hr>
+                                <h3 class="title text-center">VERIFICHE INTERMEDIE</h3>
+                                <div class="row col-md-12">
+                                    <p class="text-justify" align="justify">
+                                        Al termine dell’erogazione di tutti i moduli riconducibili  a ciascuna delle competenze, dovrà essere effettuata la relativa prova di apprendimento, che avrà ad oggetto l’accertamento del raggiungimento degli obiettivi prefissati e rappresenterà elemento utile per il riconoscimento della certificazione delle competenze.
+                                        La prova di apprendimento consisterà in un questionario di composto da 25 domande a cui saranno assegnati 4 punti per ogni risposta esatta; nel caso di competenza pratica dovrà effettuarsi una prova dedicata.
+                                        Il questionario di apprendimento costituisce monte ore della prova di valutazione finale e dovrà essere costruito con domande a scelta multipla con tre opzioni di risposta, di cui una sola corretta; il superamento della prova è subordinato al conseguimento del risultato di 60 punti su 100.
+                                        Il superamento della prova pratica è subordinato all’effettiva dimostrazione delle competenze professionali acquisite (saper combinare e applicare conoscenze, capacità e abilità per svolgere mansioni in ambito lavorativo).
+                                    </p>
+                                </div>
+                                <hr>
+                                <h3 class="title text-center">STAGE</h3>
+                                <div class="row col-md-12">
+                                    <p class="text-justify" align="justify">
+                                        Lo stage è formalizzato tramite la stipula di convenzione tra la struttura formativa e la struttura ospitante e la sottoscrizione del progetto formativo di stage, sottoscritto dall’Allievo, dal Tutor aziendale e dal Responsabile didattico organizzativo (Tutor del corso).
+                                        Lo stage, ha una valenza orientativa in quanto serve a verificare, in situazione reale di lavoro, l’attitudine a svolgere la professione.
+                                        In questa fase l’allievo ha l’opportunità di conoscere direttamente il mondo del lavoro, e consente alla struttura formativa di valutare la capacità di tradurre le competenze acquisite durante il corso in una reale capacità lavorativa.
+                                        L’andamento delle attività di stage sarà oggetto di costante valutazione e concorrerà alla determinazione del giudizio utile per l’ammissione agli esami finali.
+                                        Per ogni allievo sarà individuato il Tutor aziendale e, da parte della struttura formativa, il Responsabile didattico/organizzativo, i quali, congiuntamente, redigeranno il “Progetto formativo di stage”, necessario alla definizione degli obiettivi formativi.
+                                        il Tutor aziendale sostiene l’allievo nelle attività di stage e il Responsabile didattico/organizzativo ne  verifica la rispondenza con quelle previste dal progetto formativo sottoscritto.
+                                        Le attività di stage sono valutate, congiuntamente alle strutture ospitanti, in termini di:
+                                    </p>
+                                    <ul>
+                                        <li>Conoscenza diretta del mondo del lavoro;</li>
+                                        <li>Conseguimento degli obiettivi prefissati;</li>
+                                        <li>Acquisizione dei comportamenti propri della figura professionale;</li>
+                                        <li>Capacità di trasformare le conoscenze acquisite durante il corso in reali abilità lavorative;</li>
+                                        <li>Capacità analitiche e di sintesi;</li>
+                                        <li>Autonomia e senso di responsabilità;</li>
+                                        <li>Manifestazione di spirito di iniziativa e di integrazione;</li>
+                                        <li>Comprensione dei processi produttivi;</li>
+                                        <li>Capacità relazionali in genere;</li>
+                                        <li>Acquisizione di capacità di relazionarsi con altre figure professionali;</li>
+                                        <li>Comprensione dei ruoli delle figure a monte e a valle della propria;</li>
+                                        <li>Capacità di integrarsi nel contesto dell’ambito nel quale deve rendere la prestazione.</li>
+                                    </ul>
+                                </div>
+                                <hr>
+                                <h3 class="title text-center">AUTOVALUTAZIONE</h3>
+                                <div class="row col-md-12">
+                                    <p class="text-justify" align="justify">
+                                        La struttura formativa si impegna ad adottare un sistema di autovalutazione, articolato per indicatori specifici e misurabili.
+                                        Sarà attuato tramite la somministrazione, in forma anonima, di almeno due schede di rilevazione per anno formativo, una intermedia ed una finale.
+                                        Le schede di valutazione consentiranno di ottenere una valutazione in forma anonima dell’efficacia della struttura formativa nel suo complesso, con particolare riferimento al raggiungimento degli obiettivi, all’organizzazione delle attività e all’efficacia dell’intervento dei docenti e delle altre figure professionali che intervengono a vario titolo nella erogazione del servizio. 
+                                        Pertanto, saranno incentrate sulla valutazione dell’utente rispetto alle prestazioni della Struttura formativa, del Tutor, del Responsabile del corso e dei Formatori.
+                                        Per i formatori sarà richiesta la valutazione per ognuno dei moduli insegnati.
+                                        Le schede di valutazione finale saranno consegnate in plico chiuso al Presidente della commissione degli esami finali, che la produrrà agli atti contestualmente ai relativi verbali.
+                                    </p>
+                                </div>
+                                <hr>
+                                <h3 class="title text-center">MONITORAGGIO DELLE PRESENZE DEGLI ALLIEVI</h3>
+                                <div class="row col-md-12">
+                                    <p class="text-justify" align="justify">
+                                        Al fine di evitare involontarie dimissioni per superamento dei limiti di assenza consentiti, le presenze degli allievi saranno costantemente monitorate e, con cadenza mensile, gli stessi riceveranno il relativo report personale.
+                                        Il report mensile individuale conterrà in calce la dichiarazione dell’allievo relativa alla veridicità dei dati esposti e sarà resa ai sensi del DPR n. 445/2000.
+                                        La struttura formativa è onerata a produrre mensilmente il riepilogo delle presenze ed i relativi report sottoscritti dagli allievi nonché la scansione del registro di classe e di stage.
+                                        La struttura formativa, inoltre, è onerata a trasmette mensilmente il riepilogo delle presenze corredato dalla dichiarazione sulla veridicità dei dati sottoscritta dal Legale rappresentante nelle forme previste dal DPR n. 445/2000.
+                                        La scansione diverrà giornaliera con l'istituzione del registro digitale e della piattaforma informatica dedicata ai corsi autofinanziati.
+                                        In assenza di tali adempimenti, l’Amministrazione avvierà il procedimento di revoca o sospensione.
+                                        Tali provvedimenti costituiranno elemento di valutazione per le successive richieste di autorizzazione.
+                                    </p>
+                                </div>
+                                <hr>
+                                <h3 class="title text-center">CERTIFICAZIONE FINALE</h3>
+                                <div class="row col-md-12">
+                                    <p class="text-justify" align="justify">
+                                        A seguito del superamento dell’esame finale, a cui saranno ammessi solo gli allievi che hanno frequentato almeno il 
+                                        <b><%=(100 - c1.getSchedaattivita().getOreassenzamassime_perc())%>%</b> delle ore complessivamente previste, 
+                                        sarà rilasciata il seguente attestato di qualifica, specializzazione o frequenza e profitto:<br/>
+                                        <b><u><%=c1.getSchedaattivita().getTitoloattestato()%></u></b><br/>
+                                        in coerenza con il Repertorio delle qualificazioni della Regione Siciliana adottato con decreto assessoriale n. 2570 del 26 maggio 2016.
+                                    </p>
+                                </div>
+                                <hr>
+                                <h3 class="title text-center">ESPERIENZA DIDATTICA E PROFESSIONALE DEI FORMATORI COINVOLTI</h3>
+                                <div class="row col-md-12">
+                                    <table class="table table-responsive table-hover" id="tab_dtdocenti">
+                                        <thead>
+                                            <tr>
+                                                <th>Cognome e Nome</th>
+                                                <th>Codice Fiscale</th>
+                                                <th>Data di Nascita</th>
+                                                <th>Ore Impegno Previste</th>
+                                                <th>Titolo di Studio</th>
+                                                <th>Moduli</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <%
+                                                for (Calendario_Formativo cf1 : calendar) {
+                                                    List<Moduli_Docenti> md1 = eo.list_moduli(cf1);
+                                                    for (Moduli_Docenti md2 : md1) {
+                                                        Docente d0 = md2.getDocente();
+                                                        md2.getOrepreviste();
+                                            %>
+                                            <tr>
+                                                <td><%=d0.getCognome()%> <%=d0.getNome()%></td>
+                                                <td><%=d0.getCodicefiscale()%></td>
+                                                <td><%=Constant.sdf_PATTERNDATE4.format(d0.getDatanascita())%></td>
+                                                <td><%=md2.getOrepreviste()%></td>
+                                                <td><%=d0.getTitolostudio()%></td>
+                                                <td><%=cf1.getNomemodulo()%></td>
+                                            </tr>   
+                                            <%}
+                                                }
+                                            %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <hr>
+
+                                <h3 class="title text-center">CONVENZIONI CON LE IMPRESE PER ACCOGLIENZA DEGLI ALLIEVI IN STAGE</h3>
+                                <div class="row col-md-12">
+                                    <p class="text-justify" align="justify">
+                                        Si allega la dichiarazione obbligatoria di impegno del Soggetto proponente a stipulare convenzioni di stage con aziende del settore, specificando tipologia di settore e numero di allievi ospitati per ogni struttura ospitante.
+                                        Le convenzioni saranno trasmesse al Servizio Gestione UOB II, con posta certificata, e al Centro per l’Impiego territorialmente competente almeno 30 giorni prima dell’avvio dello stage.
+                                    </p>
+                                </div>
+                                <hr>
+                                <h3 class="title text-center">DICHIARAZIONE SOSTITUTIVA DI AUTOCERTIFICAZIONE
+                                    (ai sensi dell’art. 46 del D.P.R. 28 dicembre 2000, n. 445)</h3>
+                                <div class="row col-md-12">
+                                    <p class="text-justify" align="justify">
+                                        Il/La sottoscritto/a: <strong class="text-uppercase"><%=s0.getRap_cognome()%> <%=s0.getRap_nome()%></strong>
+                                        nato/a: <strong class="text-uppercase"><%=s0.getRap_luogonascita()%></strong>
+                                        il: <strong class="text-uppercase"><%=s0.getRap_datanascita()%></strong>
+                                        Codice Fiscale: <strong class="text-uppercase"><%=s0.getRap_cf()%></strong>
+                                        legale rappresentante del soggetto proponente: <strong class="text-uppercase"><%=s0.getRAGIONESOCIALE()%></strong>
+                                        con sede legale in: <strong class="text-uppercase"><%=s0.getSedelegale().getComune()%> (<%=s0.getSedelegale().getProvincia()%>)</strong> 
+                                        indirizzo: <strong class="text-uppercase"><%=s0.getSedelegale().getIndirizzo()%> - <%=s0.getSedelegale().getCap()%></strong> 
+                                        <br/>
+                                        <b>avvalendosi delle disposizioni in materia di autocertificazione e consapevole delle pene stabilite per false attestazioni e mendaci dichiarazioni previste dagli artt. 483, 495 e 496 del Codice Penale, sotto la propria personale responsabilità,</b>
+                                    </p>
+                                    <h4 class="title text-center">DICHIARA</h4>
+                                    <h4 class="title">
+                                        che per il corso <%=letteracorso%> di cui all'istanza prot. <%=is1.getProtocollosoggetto()%> del <%=is1.getProtocollosoggettodata()%></h4>
+                                    <ul align="justify">
+                                        <li>l’intervento formativo proposto	non è sottoposto a specifiche tutele da parte dell’ordinamento giuridico</li>
+                                        <li>e a particolari normative di settore (in caso affermativo, allegare la specifica normativa di settore).
+                                        </li>
+                                        <li>tipo, quantità, titolo di disponibilità, registro e numero inventario delle attrezzature destinate alla realizzazione dell'intervento formativo in oggetto, con esclusione di quelle previste e già dichiarate in sede di accreditamento, sono:
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="row col-md-12">
+                                    <table class="table table-responsive table-hover" id="tab_dtattr">
+                                        <thead>
+                                            <tr>
+                                                <th>Descrizione</th>
+                                                <th>Modalità di acquisizione</th>
+                                                <th>Quantità</th>
+                                                <th>Dal</th>
+                                                <th>Registro e Numero Inventario</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <%
+                                            for(Attrezzature at1 : c1.getAttrezzature()){%>
+                                            <tr>
+                                                <td><%=at1.getDescrizione()%></td>
+                                                <td><%=at1.getModalita().name()%></td>
+                                                <td><%=at1.getQuantita()%></td>
+                                                <td><%=Constant.sdf_PATTERNDATE4.format(at1.getDatainizio())%></td>
+                                                <td><%=at1.getRegistroinventario()%></td>
+                                            </tr>
+                                            <%}%>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <hr>
                             </div>
-                            <%}
-                            %>
                         </div>
+                        <%}
+                        %>
+
+
+
                     </div>
                 </div>
             </div>
-
-            <!--end::Col-->
-            <!--begin::Col-->
-            <!--end::Col-->
         </div>
-        <!--end::Row-->
-        <div id="kt_scrolltop" class="scrolltop" data-kt-scrolltop="true">
-            <!--begin::Svg Icon | path: icons/duotune/arrows/arr066.svg-->
-            <span class="svg-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <rect opacity="0.5" x="13" y="6" width="13" height="2" rx="1" transform="rotate(90 13 6)" fill="black" />
-                <path d="M12.5657 8.56569L16.75 12.75C17.1642 13.1642 17.8358 13.1642 18.25 12.75C18.6642 12.3358 18.6642 11.6642 18.25 11.25L12.7071 5.70711C12.3166 5.31658 11.6834 5.31658 11.2929 5.70711L5.75 11.25C5.33579 11.6642 5.33579 12.3358 5.75 12.75C6.16421 13.1642 6.83579 13.1642 7.25 12.75L11.4343 8.56569C11.7467 8.25327 12.2533 8.25327 12.5657 8.56569Z" fill="black" />
-                </svg>
-            </span>
-            <!--end::Svg Icon-->
-        </div>
-        <!--end::Scrolltop-->
-        <!--begin::Javascript-->
-        <script>var hostUrl = "assets/";</script>
 
-        <!--begin::Global Javascript Bundle(used by all pages)-->
+        <!--end::Col-->
+        <!--begin::Col-->
+        <!--end::Col-->
+    </div>
+    <!--end::Row-->
+    <div id="kt_scrolltop" class="scrolltop" data-kt-scrolltop="true">
+        <!--begin::Svg Icon | path: icons/duotune/arrows/arr066.svg-->
+        <span class="svg-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <rect opacity="0.5" x="13" y="6" width="13" height="2" rx="1" transform="rotate(90 13 6)" fill="black" />
+            <path d="M12.5657 8.56569L16.75 12.75C17.1642 13.1642 17.8358 13.1642 18.25 12.75C18.6642 12.3358 18.6642 11.6642 18.25 11.25L12.7071 5.70711C12.3166 5.31658 11.6834 5.31658 11.2929 5.70711L5.75 11.25C5.33579 11.6642 5.33579 12.3358 5.75 12.75C6.16421 13.1642 6.83579 13.1642 7.25 12.75L11.4343 8.56569C11.7467 8.25327 12.2533 8.25327 12.5657 8.56569Z" fill="black" />
+            </svg>
+        </span>
+        <!--end::Svg Icon-->
+    </div>
+    <!--end::Scrolltop-->
+    <!--begin::Javascript-->
+    <script>var hostUrl = "assets/";</script>
 
-        <!--end::Global Javascript Bundle-->
-        <!--begin::Page Vendors Javascript(used by this page)-->
-        <!--end::Page Vendors Javascript-->
-        <!--begin::Page Custom Javascript(used by this page)-->
-        <script src="assets/plugins/global/plugins.bundle.js"></script>
-        <script src="assets/js/scripts.bundle.js"></script>
-        <script src="assets/plugins/DataTables/jquery-3.5.1.js"></script>
-        <script src="assets/plugins/DataTables/jquery.dataTables.min.js"></script>
-        <script src="assets/plugins/DataTables/datatables.min.js"></script>
-        <script src="assets/plugins/DataTables/date-eu.js"></script>
-        <script src="assets/fontawesome-6.0.0/js/all.js"></script>
-        <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
-        <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
-        <script type="text/javascript" src="assets/js/common.js"></script>
-        <script src="assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
+    <!--begin::Global Javascript Bundle(used by all pages)-->
 
-        <script src="assets/js/US_showistanza.js"></script>
+    <!--end::Global Javascript Bundle-->
+    <!--begin::Page Vendors Javascript(used by this page)-->
+    <!--end::Page Vendors Javascript-->
+    <!--begin::Page Custom Javascript(used by this page)-->
+    <script src="assets/plugins/global/plugins.bundle.js"></script>
+    <script src="assets/js/scripts.bundle.js"></script>
+    <script src="assets/plugins/DataTables/jquery-3.5.1.js"></script>
+    <script src="assets/plugins/DataTables/jquery.dataTables.min.js"></script>
+    <script src="assets/plugins/DataTables/datatables.min.js"></script>
+    <script src="assets/plugins/DataTables/date-eu.js"></script>
+    <script src="assets/fontawesome-6.0.0/js/all.js"></script>
+    <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
+    <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
+    <script type="text/javascript" src="assets/js/common.js"></script>
+    <script src="assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
 
-        <!--end::Page Custom Javascript-->
-        <!--end::Javascript-->
-    </body>
-    <!--end::Body-->
-    <%break;
-            }
+    <script src="assets/js/US_showistanza.js"></script>
 
-            case -1:
-                Utils.redirect(request, response, "login.jsp");
-                break;
-            case 0:
-                Utils.redirect(request, response, "login.jsp");
-                break;
-            default:
-                throw new Exception();
+    <!--end::Page Custom Javascript-->
+    <!--end::Javascript-->
+</body>
+<!--end::Body-->
+<%break;
         }
-    %>
+
+        case -1:
+            Utils.redirect(request, response, "login.jsp");
+            break;
+        case 0:
+            Utils.redirect(request, response, "login.jsp");
+            break;
+        default:
+            throw new Exception();
+    }
+%>
 </html>
