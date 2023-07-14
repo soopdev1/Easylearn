@@ -95,20 +95,40 @@
                                         type="button" role="tab" aria-controls="pills-ist1" aria-selected="true">ISTANZA</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Profile</button>
+                                <button class="nav-link" id="pills-autoc1-tab" data-bs-toggle="pill" data-bs-target="#pills-autoc1" 
+                                        type="button" role="tab" aria-controls="pills-autoc1" aria-selected="false">AUTOCERTIFICAZIONE</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#pills-contact" type="button" role="tab" aria-controls="pills-contact" aria-selected="false">Contact</button>
+                                <button class="nav-link" id="pills-patt1-tab" data-bs-toggle="pill" data-bs-target="#pills-patt1" 
+                                        type="button" role="tab" aria-controls="pills-patt1" aria-selected="false">PATTO DI INTEGRIT&#192;</button>
                             </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="pills-stag1-tab" data-bs-toggle="pill" data-bs-target="#pills-stag1" 
+                                        type="button" role="tab" aria-controls="pills-stag1" aria-selected="false">DICH. IMPEGNO STAGE</button>
+                            </li>
+
+                            <%
+                                for (int i = 0; i < list.size(); i++) {
+                                    String letteracorso = Engine.letterecorsi(i);
+                            %>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="pills-defcorso<%=letteracorso%>-tab" data-bs-toggle="pill" data-bs-target="#pills-defcorso<%=letteracorso%>" 
+                                        type="button" role="tab" aria-controls="pills-defcorso<%=letteracorso%>" aria-selected="false">CORSO <%=letteracorso%></button>
+                            </li>
+                            <%}
+                            %>
+
                         </ul>
                         <div class="tab-content" id="pills-tabContent">
                             <div class="tab-pane fade show active" id="pills-ist1" role="tabpanel" aria-labelledby="pills-ist1-tab">
-                                <%if (autofinanz) {%>
-                                <h2 class="title">OGGETTO: Istanza di autorizzazione allo svolgimento di corsi di formazione professionale AUTOFINANZIATI</h2>
-                                <%} else {%>
-                                <h2 class="title">OGGETTO: Istanza di autorizzazione allo svolgimento di corsi di formazione professionale FINANZIATI</h2>
-                                <%}%>
-                                <span class="text-justify">
+                                <span class="text-center">
+                                    <%if (autofinanz) {%>
+                                    <h2 class="title">OGGETTO: Istanza di autorizzazione allo svolgimento di corsi di formazione professionale AUTOFINANZIATI</h2>
+                                    <%} else {%>
+                                    <h2 class="title">OGGETTO: Istanza di autorizzazione allo svolgimento di corsi di formazione professionale FINANZIATI</h2>
+                                    <%}%>
+                                </span>
+                                <p class="text-justify" style="text-align: justify-all;" align="justify">
                                     Il/La sottoscritto/a: <strong class="text-uppercase"><%=s0.getRap_cognome()%> <%=s0.getRap_nome()%></strong>
                                     nato/a: <strong class="text-uppercase"><%=s0.getRap_luogonascita()%></strong>
                                     il: <strong class="text-uppercase"><%=s0.getRap_datanascita()%></strong>
@@ -126,18 +146,18 @@
                                     numero di telefono: <strong class="text-uppercase"><%=s0.getTELEFONO()%></strong>
                                     Posta Elettronica Certificata: <strong class="text-uppercase"><%=s0.getPEC()%></strong>
                                     CIR: <strong class="text-uppercase"><%=s0.getCIR()%></strong>
-                                </span>
+                                </p>
                                 <br/>
                                 <br/>
-                                <span class="text-justify">
+                                <p class="text-justify" style="text-align: justify-all;" align="justify">
                                     consapevole del fatto che, in caso di dichiarazioni mendaci, saranno applicate nei suoi riguardi, ai sensi degli artt. 47 e 76 del DPR n. 445/2000 e s.m.i., le sanzioni previste dal codice penale e dalle leggi speciali in materia di falsità negli atti,
-                                </span>
+                                </p>
                                 <hr>
                                 <h3 class="text-center">
                                     DICHIARA
                                 </h3>
                                 <br/>
-                                <ul>
+                                <ul align="justify">
                                     <li>di disporre in Sicilia di una sede direzionale e organizzativa permanente;</li>
                                     <li>di essere cittadino italiano;</li>
                                     <li>che il legale rappresentante (e i componenti degli eventuali organi collegiali) non hanno riportato sentenze penali di condanna passate in giudicato per i reati di cui all'art.11 del D.lgs. 24/07/1992 n°358;</li>
@@ -193,7 +213,7 @@
                                     SI IMPEGNA
                                 </h3>
                                 <br/>
-                                <ul>
+                                <ul align="justify">
                                     <li>ad applicare al personale dipendente utilizzato nelle attività formative il C.C.N.L. della formazione professionale;</li>
                                     <li>a selezionare gli allievi in base al titolo di studio secondo quanto previsto dai profili formativi inseriti nel Repertorio delle qualificazioni della Regione Siciliana;</li>
                                     <li>a selezionare, per ciascun corso, non più di n. 20 allievi, ovvero un numero inferiore proporzionato alle capacità logistiche e funzionali della sede, conformemente agli standard della Regione Siciliana, approvate con D.P.R.  25/2015 art. 4 comma 5, così come accertato da apposita perizia giurata a firma di Tecnico abilitato già validata dal S.AC. che attesti:</li>
@@ -252,7 +272,7 @@
                                 </h3>
                                 <br/>
                                 <strong>
-                                che a fronte di 1 autorizzazioni concesse, sono stati autorizzati 7 corsi, dei quali 0 sono stati avviati e conclusi e 5 in fase di attuazione. I corsi non avviati, pertanto, sono pari a 2.    
+                                    che a fronte di 1 autorizzazioni concesse, sono stati autorizzati X corsi, dei quali X sono stati avviati e conclusi e X in fase di attuazione. I corsi non avviati, pertanto, sono pari a X.    
                                 </strong>
                                 <br>
                                 Allega:
@@ -263,13 +283,314 @@
                                     <li>Dichiara di essere a conoscenza delle modalità di vigilanza e controllo della Regione Siciliana - Dipartimento Regionale dell'istruzione e Formazione Professionale che, ai sensi della normativa vigente, si avvale dei servizi Centro per l’Impiego per la vigilanza didattico – amministrativa e degli Ispettorati territoriali del lavoro per la vigilanza tecnico-amministrativa.</li>
                                 </ul>
                             </div>
+                            <div class="tab-pane fade" id="pills-autoc1" role="tabpanel" aria-labelledby="pills-autoc1-tab">
+                                <span class="text-center">
+                                    <h2 class="title">AUTOCERTIFICAZIONE</h2>
+                                </span>
+                                <p class="text-justify" style="text-align: justify-all;" align="justify">
+                                    Il/La sottoscritto/a: <strong class="text-uppercase"><%=s0.getRap_cognome()%> <%=s0.getRap_nome()%></strong>
+                                    nato/a: <strong class="text-uppercase"><%=s0.getRap_luogonascita()%></strong>
+                                    il: <strong class="text-uppercase"><%=s0.getRap_datanascita()%></strong>
+                                    Codice Fiscale: <strong class="text-uppercase"><%=s0.getRap_cf()%></strong>
+                                    residente in: <strong class="text-uppercase"><%=s0.getRap_sede().getComune()%> (<%=s0.getRap_sede().getProvincia()%>)</strong> 
+                                    indirizzo: <strong class="text-uppercase"><%=s0.getRap_sede().getIndirizzo()%> - <%=s0.getRap_sede().getCap()%></strong> 
+                                    nella qualità di: <strong class="text-uppercase"><%=s0.getRap_carica()%></strong>
+                                    e legale rappresentante dell'organismo denominato: <strong class="text-uppercase"><%=s0.getRAGIONESOCIALE()%></strong>
+                                    costituito il: <strong class="text-uppercase"><%=s0.getDATADICOSTITUZIONE()%></strong>
+                                    Codice Fiscale: <strong class="text-uppercase"><%=s0.getCODICEFISCALE()%></strong>
+                                    Partita IVA: <strong class="text-uppercase"><%=s0.getPARTITAIVA()%></strong>
+                                    avente natura giuridica di: <strong class="text-uppercase"><%=s0.getTIPOLOGIA()%></strong>
+                                    con sede legale in: <strong class="text-uppercase"><%=s0.getSedelegale().getComune()%> (<%=s0.getSedelegale().getProvincia()%>)</strong> 
+                                    indirizzo: <strong class="text-uppercase"><%=s0.getSedelegale().getIndirizzo()%> - <%=s0.getSedelegale().getCap()%></strong> 
+                                    numero di telefono: <strong class="text-uppercase"><%=s0.getTELEFONO()%></strong>
+                                    Posta Elettronica Certificata: <strong class="text-uppercase"><%=s0.getPEC()%></strong>
+                                    CIR: <strong class="text-uppercase"><%=s0.getCIR()%></strong>
+                                </p>
+                                <br/>
+                                <br/>
+                                <p class="text-justify" style="text-align: justify-all;" align="justify">
+                                    consapevole del fatto che, in caso di dichiarazioni mendaci, saranno applicate nei suoi riguardi, ai sensi degli artt. 47 e 76 del DPR n. 445/2000 e s.m.i., le sanzioni previste dal codice penale e dalle leggi speciali in materia di falsità negli atti,
+                                </p>
+                                <hr>
+                                <h3 class="text-center">
+                                    DICHIARA
+                                </h3>
+                                <br/>
+                                <ul align="justify">
+                                    <li>di possedere affidabilità economica e finanziaria provata con avvenuta adozione del bilancio d'esercizio nei termini di legge; di non essere in stato di fallimento, liquidazione coatta, concordato preventivo o altra situazione liquidatoria, anche volontaria (salve le eccezioni di legge);
+                                    </li>
+                                    <li>che il Soggetto attuatore è in regola con le disposizioni della legge 68/1999 e s.m.i. sulle "Norme per il diritto al lavoro dei disabili" laddove previsto, di essere iscritto al repertorio delle notizie economiche e amministrative (REA) di cui al decreto del Presidente della Repubblica del 7 dicembre 1995, n.581 e successive modifiche e integrazioni;
+                                    </li>
+                                    <li>che i soggetti che amministrano il Soggetto attuatore hanno qualità morali e professionali;</li>
+                                    <li>che gli amministratori del Soggetto attuatore muniti di potere di rappresentanza non hanno subito condanne penali - anche non definitive - per delitti considerati all'art. 80 del d.lgs. n. 50/2016 e che non sono sottoposti alle misure di prevenzione od ostative previste rispettivamente all'art. 6 ed all'art. 67 del d.lgs. n. 159/2011;
+                                    </li>
+                                    <li>di rispettare le norme dell’ordinamento giuridico in materia di prevenzione degli infortuni sul luogo di lavoro e delle malattie professionali, della sicurezza sui luoghi di lavoro, dei contratti collettivi di lavoro e della normativa relativa alla tutela dell’ambiente.
+                                    </li>
+                                    <li>di aver preso visione e delle ulteriori disposizioni adottate da parte dell’Amministrazione e di accettarne tutti i contenuti e le condizioni;
+                                    </li>
+                                    <li>di possedere capacità tecnico-professionali e organizzative tali da garantire il regolare svolgimento delle attività previste nell’ambito della proposta progettuale presentata;
+                                    </li>
+                                    <li>di fornire, su richiesta dell’Amministrazione, la documentazione necessaria ad attestare la correttezza dei dati forniti ai fini della valutazione della proposta ai sensi del D.P.R.S. n. 25 del 01/10/2015 e di essere consapevole che, a fronte di dati non veritieri o di mancata trasmissione della documentazione richiesta, sarà revocata l’autorizzazione rilasciata e trasmessa segnalazione all’Autorità Giudiziaria competente;
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="tab-pane fade" id="pills-patt1" role="tabpanel" aria-labelledby="pills-patt1-tab">
+                                <span class="text-center">
+                                    <h2 class="title">Patto di Integrit&#224;</h2><br/>
+                                    <h4 class="title">tra</h4><br/>
+                                    <h3 class="title">Regione Siciliana - Assessorato Regionale dell'Istruzione e della Formazione Professionale</h3><br/>
+                                    <h4 class="title">e</h4><br/>
+                                </span>
+                                <p class="text-justify text-uppercase" style="text-align: justify-all;" align="justify">
+                                    SOGGETTO ATTUATORE: <strong><u><%=s0.getRAGIONESOCIALE()%></u></strong> 
+                                    Sede legale: <strong><%=s0.getSedelegale().getComune()%> (<%=s0.getSedelegale().getProvincia()%>)</strong> 
+                                    Indirizzo:  <strong><%=s0.getSedelegale().getIndirizzo()%> <%=s0.getSedelegale().getCap()%></strong>
+                                    Codice fiscale: <strong><%=s0.getCODICEFISCALE()%></strong> 
+                                    Partita IVA: <strong><%=s0.getPARTITAIVA()%></strong>
+                                    in persona di: 
+                                    <strong><%=s0.getRap_cognome()%> <%=s0.getRap_nome()%> </strong> 
+                                    Codice fiscale: <strong><%=s0.getRap_cf()%></strong> 
+                                    nato/a a: <strong><%=s0.getRap_luogonascita()%></strong> il: <strong><%=s0.getRap_datanascita()%></strong> 
+                                    residente in: <strong><%=s0.getRap_sede().getComune()%> (<%=s0.getRap_sede().getProvincia()%>)</strong> 
+                                    indirizzo: <strong><%=s0.getRap_sede().getIndirizzo()%></strong> in qualit&#224; di: <strong><%=s0.getRap_carica()%></strong> 
+                                    munito dei relativi poteri,
+                                </p>
+                                <hr>
+                                <span class="text-center">
+                                    <h4 class="title">premesso che</h4><br/>
+                                </span>
+                                <p class="text-justify" style="text-align: justify-all;" align="justify">
+                                    la Regione Siciliana Assessorato dell'Istruzione e della Formazione professionale, nell'ambito delle materie di competenza, gestisce procedimenti finalizzati a erogare servizi al cittadino, che rivestono il carattere della pubblica utilità, anche avvalendosi di soggetti privati. 
+                                </p>
+                                <span class="text-center">
+                                    <h4 class="title">considerato che</h4><br/>
+                                </span>
+                                <p class="text-justify" style="text-align: justify-all;" align="justify">
+                                    al fine di garantire il rispetto della legalità ed il corretto agire della pubblica amministrazione nel settore, si ritiene necessario incentivare e valorizzare l'utilizzo da parte dell'Amministrazione di appositi strumenti per prevenire e/o reprimere il manifestarsi di fenomeni di illecito che possano determinare anche lo sviamento dell'azione amministrativa dai suoi fini propri; analogamente si ritiene opportuno obbligare i soggetti attuatori del settore della formazione professionale che intendono instaurare rapporti contrattuali con la Regione Siciliana quali erogatori di servizi, attraverso la sottoscrizione di appositi patti di integrità, ad adottare analoghe iniziative anche per responsabilizzarli sulle conseguenze interdittive di determinati comportamenti riguardanti un ventaglio di situazioni a rischio che, sebbene non individuate specificamente dalla normativa di settore, delineano fattispecie che possono dar luogo a comportamenti illeciti o favorire le infiltrazioni della criminalità organizzata; un consolidato orientamento giurisprudenziale consente alle Amministrazioni pubbliche, per operare più incisivamente e per tutelare interessi pubblici aventi specifica rilevanza, di individuare nuovi strumenti da affiancare a quelli normativamente previsti da introdurre nei propri atti amministrativi come specifiche clausole di gradimento - clausole di tutela - tese a responsabilizzare i soggetti che entrano in rapporto con essa sulle conseguenze interdittive di comportamenti illeciti;
+                                </p>
+                                <span class="text-center">
+                                    <h4 class="title">ritenuto</h4><br/>
+                                </span>
+                                <p class="text-justify" style="text-align: justify-all;" align="justify">
+                                    di assumere consapevolmente formali obbligazioni per assicurare, in generale, la prevenzione da possibili fenomeni di devianza e di vulnerazione dei principi di trasparenza, libertà di impresa e leale concorrenza e concorrere a prevenire il rischio delle infiltrazioni criminali nel mercato nonché specifici impegni per salvaguardare i livelli occupazionali.
+                                    <br/>
+                                    Tutto ciò premesso, le Parti concordano e stipulano quanto segue.
+                                </p>
+                                <span class="text-center">
+                                    <h4 class="title">ART. 1</h4><br/>
+                                </span>
+                                <span class="text-justify">
+                                    Le premesse di cui sopra costituiscono parte integrante e sostanziale del presente Patto.
+                                </span><hr>
+                                <span class="text-center">
+                                    <h4 class="title">ART. 2</h4><br/>
+                                </span>
+                                <p class="text-justify" style="text-align: justify-all;" align="justify">
+                                    Il Patto di integrità stabilisce la reciproca, formale obbligazione della <b>Regione Siciliana - Assessorato Regionale dell'Istruzione e della Formazione professionale</b>
+                                    e del Soggetto attuatore <strong class="text-uppercase"><u><%=s0.getRAGIONESOCIALE()%></u></strong> per l'erogazione di servizi nel settore della formazione professionale in Sicilia a conformare i propri comportamenti ai principi di lealtà, trasparenza, correttezza, ed espresso impegno anticorruzione e antimafia.
+                                </p><hr>
+                                <span class="text-center">
+                                    <h4 class="title">ART. 3</h4><br/>
+                                </span>
+                                <p class="text-justify" style="text-align: justify-all;" align="justify">
+                                    La Regione Siciliana - Assessorato Regionale dell'Istruzione e della Formazione professionale si impegna a rendere pubblici i dati riguardanti il procedimento di selezione delle proposte formative nel settore della formazione professionale, permettendo ad ogni operatore economico di conoscere e verificare gli aspetti tecnici dell'intervento e quelli amministrativi del suddetto procedimento, a effettuare i controlli e a condividere anche esso Io spirito etico e moralizzatore che è insito nell'adozione dello strumento, assumendosi le responsabilità connesse e conseguenti. L'Assessorato si impegna, inoltre, a semplificare le procedure amministrative, a renderle trasparenti e a rispettare i termini previsti dalle vigenti norme per tutti gli adempimenti a proprio carico.
+                                </p><hr>
+                                <span class="text-center">
+                                    <h4 class="title">ART. 4</h4><br/>
+                                </span>
+                                <span class="text-justify">
+                                    Il Soggetto attuatore si impegna a:<br/>
+                                    <ul align="justify">
+                                        <li>ispirare la propria attività ai principi di onestà, trasparenza, lealtà, integrità e correttezza, nel rispetto delle leggi e dei regolamenti vigenti;</li>
+                                        <li>adottare uno specifico Codice Etico, affinché la condotta di tutti coloro che, ai vari livelli di responsabilità, concorrono con i propri atti allo svolgimento della complessiva attività del Soggetto attuatore sia improntata sui seguenti valori:</li>
+                                        <ul><li>integrità morale, onestà personale e correttezza nei rapporti interni ed esterni;</li>
+                                            <li>trasparenza nei confronti dei dipendenti, dei portatori di interessi correlati e del mercato; </li>
+                                            <li>rispetto dei dipendenti e impegno a valorizzarne le capacità professionali;</li>
+                                            <li>impegno sociale;</li>
+                                            <li>tutela della salute, della sicurezza e dell'ambiente;</li>
+                                        </ul>
+                                        <li>favorire la massima diffusione del Codice Etico, provvedendo al suo approfondimento ed aggiornamento e a garantire il rispetto; selezionare, assumere, retribuire, formare e valutare i dipendenti in base a criteri di merito, di competenza e professionalità, senza alcuna discriminazione politica, sindacale, religiosa, razziale, di lingua e di sesso;</li>
+                                        <li>combattere, in particolare, qualsiasi forma di intimidazione, ostilità, isolamento, indebita interferenza o condizionamento, molestia sessuale;</li>
+                                        <li>rappresentare i fatti gestionali in modo completo, trasparente, veritiero, accurato e tempestivo;</li>
+                                        <li>conservare adeguata documentazione di ogni operazione relativa ai percorsi formativi avviati, in modo da rendere agevole la verifica;</li>
+                                        <li>consentire l'effettuazione dei controlli che attestino le caratteristiche e le motivazioni dell'operazione;</li>
+                                        <li>fornire all'Amministrazione regionale le informazioni necessarie in modo veritiero e completo;</li>
+                                        <li>non offrire, accettare o richiedere somme di denaro o qualsiasi altra ricompensa, vantaggio o beneficio, sia direttamente che indirettamente tramite intermediari, al fine dell'ottenimento dell’autorizzazione o al fine di distorcere l'espletamento corretto della successiva attività o valutazione da parte dell'Amministrazione regionale;</li>
+                                        <li>denunciare immediatamente alle Forze di Polizia ogni illecita richiesta di denaro o altra utilità ovvero  offerta di protezione o estorsione di qualsiasi natura che venga avanzata nei loro confronti o nei confronti di propri rappresentanti o dipendenti, di loro familiari o di eventuali soggetti legati al Soggetto attuatore da rapporti professionali;</li>
+                                        <li>comunicare ogni variazione delle informazioni concernenti la compagine sociale;</li>
+                                        <li>comunicare le generalità del/i proprietario/i e dei soggetti che hanno a qualsiasi titolo la disponibilità degli immobili su cui verranno realizzati gli interventi formativi concessi da parte dell'Amministrazione Regionale e che si è consapevoli che, nel caso in cui la Regione Siciliana Assessorato dell'Istruzione e della Formazione professionale dovesse comunque acquisire nei confronti degli stessi elementi di fatto o indicazioni comunque negative da farli ritenere collegati direttamente o indirettamente ad associazioni di tipo mafioso, si impegnano a recedere dal contratto;</li>
+                                        <li>non attribuire al personale dipendente del Soggetto attuatore incarichi di responsabilità di qualsiasi genere qualora ricorra una delle condizioni di cui agli articoli 7 e 8 del D. Lgs. n. 235/2012 e/o sia accertata la sussistenza di forme di condizionamento, attraverso collegamenti diretti o indiretti con la criminalità di tipo mafioso, tali da compromettere il buon andamento e l'imparzialità dell'amministrazione del Soggetto attuatore, nonché il regolare funzionamento dei servizi ad esso affidati;</li>
+                                        <li>non instaurare rapporti di consulenza, collaborazione, studio, ricerca, o rapporti di lavoro disciplinati dal D. Lgs. 10 settembre 2003, n. 276 né a conferire incarico di componente di organi di controllo o altri incarichi a soggetti esterni nei cui confronti ricorrano le condizioni di cui al punto precedente;</li>
+                                        <li>dichiarare di non trovarsi in situazioni di controllo o di collegamento formale o sostanziale con altri concorrenti e che non si è accordato e non si accorderà con altri partecipanti alla procedura in oggetto;</li>
+                                        <li>informare tutto il personale di cui si avvale del presente patto di integrità e degli obblighi in esso convenuti;</li>
+                                        <li>vigilare affinché gli impegni sopra indicati siano osservati da tutti i collaboratori e dipendenti nell'esercizio dei compiti loro assegnati;</li>
+                                        <li>denunziare alla Pubblica Autorità competente ogni irregolarità o distorsione di cui sia venuto a conoscenza per quanto attiene all'oggetto della presente procedura;</li>
+                                        <li>ai fini dell'applicazione dell'art. 53, comma 16 ter, D.Lgs. n. 165/2001, non intrattenere, né avere intrattenuto, contratti di lavoro subordinato o autonomo e/o attribuito incarichi ad ex dipendenti dell'Amministrazione regionale che hanno esercitato poteri autoritativi o negoziali per conto della stessa Amministrazione nei loro confronti, per il triennio successivo alla cessazione del rapporto;</li>
+                                        <li>ai fini dell'applicazione dell'art. 1 , comma 9, lettera e), Legge n. 190/2012, non trovarsi in rapporti  di coniugio, parentela o affinità, né lui né i propri dipendenti, con i dipendenti dell'Amministrazione  regionale coinvolti a qualunque titolo nella trattazione e/o istruttoria del procedimento di selezione delle proposte formative nel settore della formazione professionale (direttiva del Responsabile per la prevenzione della corruzione e per la trasparenza prot. n. 133740 del 24.1.2014).</li>
+                                    </ul>
+                                </span>
+                                <hr>
+                                <span class="text-center">
+                                    <h4 class="title">ART. 5</h4><br/>
+                                </span>
+                                <p class="text-justify" style="text-align: justify-all;" align="justify">
+                                    Fatte salve specifiche disposizioni normative nazionali e/o regionali poste a salvaguardia dell'imparzialità e del buon andamento della pubblica amministrazione, le parti si impegnano reciprocamente nel caso concreto e ciascuno nell'esercizio delle proprie competenze a evitare la sussistenza di situazioni di conflitto di interesse derivanti da rapporti di lavoro o di consulenza, collaborazione, studio, ricerca, anche occasionali instaurati con parenti entro il quarto grado o affini entro il terzo di soggetti che prestano attività lavorativa a qualunque titolo presso uffici dell'Amministrazione regionale esercitanti competenze aventi refluenze nel settore della Formazione professionale. A tal fine, le parti si impegnano ad adottare ogni misura idonea a rimuovere la situazione di conflitto.
+                                </p><hr>
+                                <span class="text-center">
+                                    <h4 class="title">ART. 6</h4><br/>
+                                </span>
+                                <p class="text-justify" style="text-align: justify-all;" align="justify">
+                                    Il Soggetto attuatore prende atto e accetta che, nel caso di mancato rispetto degli impegni assunti con questo Patto di integrità, la Regione Siciliana Assessorato Regionale dell'Istruzione e della Formazione professionale recederà dal rapporto e revocherà le autorizzazioni concesse.
+                                </p><hr>
+                                <span class="text-center">
+                                    <h4 class="title">ART. 7</h4><br/>
+                                </span>
+                                <p class="text-justify" style="text-align: justify-all;" align="justify">
+                                    Il Soggetto attuatore è consapevole che la Regione Siciliana - Assessorato Regionale dell'Istruzione e della Formazione professionale, al fine di prevenire o reprimere possibili irregolarità e/o abusi nella gestione delle attività economiche autorizzate, nonché per verificare il rispetto degli obblighi assunti con il presente Patto, oltre ad utilizzare uffici interni, si avvarrà anche della collaborazione dell’Autorità Giudiziaria.
+                                </p><hr>
+                                <span class="text-center">
+                                    <h4 class="title">ART. 8</h4><br/>
+                                </span>
+                                <p class="text-justify" style="text-align: justify-all;" align="justify">
+                                    Il presente Patto di Integrità e le relative sanzioni applicabili resteranno in vigore per tutta la durata del rapporto instaurato fra le parti a seguito dell’autorizzazione concessa di cui il presente Patto forma parte integrante e sostanziale.
+                                </p>
+                            </div>
+                            <div class="tab-pane fade" id="pills-stag1" role="tabpanel" aria-labelledby="pills-stag1-tab">
+                                <span class="text-center">
+                                    <h2 class="title">DICHIARAZIONE D'IMPEGNO ALLA STIPULA DELLE CONVENZIONI DI STAGE</h2>
+                                </span>
+                                <p class="text-justify" style="text-align: justify-all;" align="justify">
+                                    Il/La sottoscritto/a: <strong class="text-uppercase"><%=s0.getRap_cognome()%> <%=s0.getRap_nome()%></strong>
+                                    nato/a: <strong class="text-uppercase"><%=s0.getRap_luogonascita()%></strong>
+                                    il: <strong class="text-uppercase"><%=s0.getRap_datanascita()%></strong>
+                                    Codice Fiscale: <strong class="text-uppercase"><%=s0.getRap_cf()%></strong>
+                                    residente in: <strong class="text-uppercase"><%=s0.getRap_sede().getComune()%> (<%=s0.getRap_sede().getProvincia()%>)</strong> 
+                                    indirizzo: <strong class="text-uppercase"><%=s0.getRap_sede().getIndirizzo()%> - <%=s0.getRap_sede().getCap()%></strong> 
+                                    nella qualità di: <strong class="text-uppercase"><%=s0.getRap_carica()%></strong>
+                                    e legale rappresentante dell'organismo denominato: <strong class="text-uppercase"><%=s0.getRAGIONESOCIALE()%></strong>
+                                    costituito il: <strong class="text-uppercase"><%=s0.getDATADICOSTITUZIONE()%></strong>
+                                    Codice Fiscale: <strong class="text-uppercase"><%=s0.getCODICEFISCALE()%></strong>
+                                    Partita IVA: <strong class="text-uppercase"><%=s0.getPARTITAIVA()%></strong>
+                                    avente natura giuridica di: <strong class="text-uppercase"><%=s0.getTIPOLOGIA()%></strong>
+                                    con sede legale in: <strong class="text-uppercase"><%=s0.getSedelegale().getComune()%> (<%=s0.getSedelegale().getProvincia()%>)</strong> 
+                                    indirizzo: <strong class="text-uppercase"><%=s0.getSedelegale().getIndirizzo()%> - <%=s0.getSedelegale().getCap()%></strong> 
+                                    numero di telefono: <strong class="text-uppercase"><%=s0.getTELEFONO()%></strong>
+                                    Posta Elettronica Certificata: <strong class="text-uppercase"><%=s0.getPEC()%></strong>
+                                    CIR: <strong class="text-uppercase"><%=s0.getCIR()%></strong> 
+                                    D.D.G. n° <strong class="text-uppercase"><%=s0.getDDGNUMERO()%></strong>  del <strong class="text-uppercase"><%=s0.getDDGDATA()%></strong> 
+                                <hr>
+                                <h3 class="text-center">
+                                    SI IMPEGNA A
+                                </h3>
+                                <br/>
+                                <ul align="justify">
+                                    <li>stipulare convenzioni di stage con aziende operanti nei settori di riferimento per tutti gli allievi frequentanti i corsi per i quali é stata chiesta autorizzazione;</li>
+                                    <li>trasmettere, almeno 30 giorni prima dell’avvio degli stage, tutte le convenzioni con posta certificata al Servizio Gestione UOB II e al Centro per l’Impiego territorialmente competente.</li>
+                                </ul>
+                                <hr>
+                                <h3 class="text-center">
+                                    DICHIARA
+                                </h3>
+                                <br/>
+                                <ul align="justify">
+                                    <li>di essere a conoscenza delle modalità di vigilanza e controllo della Regione Siciliana - Dipartimento Regionale dell'istruzione e Formazione Professionale che, ai sensi della normativa vigente, si avvale dei servizi Centro per l’Impiego per la vigilanza didattico – amministrativa e degli Ispettorati territoriali del lavoro per la vigilanza tecnico-amministrativa.</li>
+                                </ul>
+                                <i>Autorizza il trattamento dei dati forniti ai sensi D.Lgs. n. 196/2003 e s.m.i.</i>
+                                </p>
+                            </div>
 
-                            <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">...</div>
-                            <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">...</div>
+                            <%
+                                for (int i = 0; i < list.size(); i++) {
+                                    Corso c1 = list.get(i);
+                                    String letteracorso = Engine.letterecorsi(i);
+                            %>
+                            <div class="tab-pane fade" id="pills-defcorso<%=letteracorso%>" role="tabpanel" aria-labelledby="pills-defcorso<%=letteracorso%>-tab">
+                                <span class="text-center">
+                                    <h3 class="title">PIANO DIDATTICO DEL CORSO DI <%=c1.getSchedaattivita().getCertificazioneuscita().getNome()%> PER</h3>
+                                    <br/>
+                                    <h2 class="title"><u><%=c1.getSchedaattivita().getTitoloattestato()%></u></h2>
+                                    <br/>
+                                </span>
+                                <div class="row col-md-12">
+                                    <div class="col-md-4">
+                                        <span class="text-center">
+                                            <h3 class="title">SOGGETTO PROPONENTE</h3>
+                                        </span>
+                                        <p class="text-justify text-uppercase" style="text-align: justify-all;" align="justify">
+                                            SOGGETTO ATTUATORE: <strong><u><%=s0.getRAGIONESOCIALE()%></u></strong> 
+                                            Sede legale: <strong><%=s0.getSedelegale().getComune()%> (<%=s0.getSedelegale().getProvincia()%>)</strong> 
+                                            Indirizzo:  <strong><%=s0.getSedelegale().getIndirizzo()%> <%=s0.getSedelegale().getCap()%></strong>
+                                            Codice fiscale: <strong><%=s0.getCODICEFISCALE()%></strong> 
+                                            Partita IVA: <strong><%=s0.getPARTITAIVA()%></strong>
+                                            avente natura giuridica di: <strong class="text-uppercase"><%=s0.getTIPOLOGIA()%></strong>
+                                            con sede legale in: <strong class="text-uppercase"><%=s0.getSedelegale().getComune()%> (<%=s0.getSedelegale().getProvincia()%>)</strong> 
+                                            indirizzo: <strong class="text-uppercase"><%=s0.getSedelegale().getIndirizzo()%> - <%=s0.getSedelegale().getCap()%></strong> 
+                                            numero di telefono: <strong class="text-uppercase"><%=s0.getTELEFONO()%></strong>
+                                            Posta Elettronica Certificata: <strong class="text-uppercase"><%=s0.getPEC()%></strong>
+                                            CIR: <strong class="text-uppercase"><%=s0.getCIR()%></strong> 
+                                        </p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <span class="text-center">
+                                            <h3 class="title">DIRETTORE RESPONSABILE</h3>
+                                        </span>
+                                        <p class="text-justify text-uppercase" style="text-align: justify-all;" align="justify">
+                                            Cognome e Nome: <strong class="text-uppercase"><%=s0.getRap_cognome()%> <%=s0.getRap_nome()%></strong>
+                                            nato/a: <strong class="text-uppercase"><%=s0.getRap_luogonascita()%></strong>
+                                            il: <strong class="text-uppercase"><%=s0.getRap_datanascita()%></strong>
+                                            Codice Fiscale: <strong class="text-uppercase"><%=s0.getRap_cf()%></strong>
+                                            residente in: <strong class="text-uppercase"><%=s0.getRap_sede().getComune()%> (<%=s0.getRap_sede().getProvincia()%>)</strong> 
+                                            indirizzo: <strong class="text-uppercase"><%=s0.getRap_sede().getIndirizzo()%> - <%=s0.getRap_sede().getCap()%></strong> 
+                                        </p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <span class="text-center">
+                                            <h3 class="title">SEDE OPERATIVA</h3>
+                                        </span>
+                                        <p class="text-justify text-uppercase" style="text-align: justify-all;" align="justify">
+                                            Comune: <strong class="text-uppercase"><%=c1.getSedescelta().getComune()%> (<%=c1.getSedescelta().getProvincia()%>)</strong><br/>
+                                            Indirizzo: <strong class="text-uppercase"><%=c1.getSedescelta().getIndirizzo()%> - <%=c1.getSedescelta().getCap()%></strong><br/>
+                                            Telefono: <strong class="text-uppercase"><%=s0.getTELEFONO()%></strong>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="row col-md-12">
+                                    <span class="text-center">
+                                        <h2 class="title">DATI SPECIFICI</h2>
+                                    </span>
+                                    <p class="text-justify text-uppercase" style="text-align: justify-all;" align="justify">
+                                        <%if (!c1.getRepertorio().getProfessioni().isEmpty()) {%>
+                                        CODICE ISTAT: 
+                                        <%for (Professioni pr1 : c1.getRepertorio().getProfessioni()) {%>
+                                        <strong><%=pr1.getCodiceProfessioni()%> - <%=pr1.getNome()%> </strong>, 
+                                        <%}%>
+                                        <%}%> 
+                                        TIPO: <strong><%=c1.getSchedaattivita().getCertificazioneuscita().getNome()%></strong>
+                                        CERTIFICAZIONE: <strong><%=c1.getSchedaattivita().getCertificazioneuscita().getNome()%></strong> - <strong><%=c1.getRepertorio().getLivelloeqf().getNome()%></strong>
+                                        TITOLO CONSEGUITO:  <strong><%=c1.getSchedaattivita().getTitoloattestato()%></strong>
+                                        NUMERO EDIZIONI: <strong><%=c1.getQuantitarichiesta()%></strong> 
+                                        requisiti d'ingresso: <%=c1.getSchedaattivita().getPrerequisiti()%>
+                                        <%if (!c1.getSchedaattivita().getLivellomassimoscolarita().equals("")) {%>
+                                        - <%=c1.getSchedaattivita().getLivellomassimoscolarita()%>
+                                        <%}%>
+                                        ORE: <strong><%=(c1.getDurataore() + c1.getStageore())%></strong> - GIORNI: <strong><%=c1.getDuratagiorni()%></strong> 
+                                        - ORE STAGE IN IMPRESA: <strong><%=c1.getStageore()%></strong>
+                                        DESTINATARI AMMISSIBILI: <strong><%=c1.getNumeroallievi()%></strong>
+                                        <br/>
+                                        costo previsto per allievo: <strong><%=Utils.roundDoubleandFormat(c1.getCostostimatoallievo(), 2)%> &#8364;</strong>
+                                    </p>
+                                </div>
+                                <div class="row col-md-12">
+                                    <span class="text-center">
+                                        <h2 class="title">ARTICOLAZIONE DIDATTICA IN ORE</h2>
+                                    </span>
+                                </div>
+                            </div>
+                            <%}
+                            %>
                         </div>
                     </div>
                 </div>
-                <!--end::Tables Widget 3-->
             </div>
 
             <!--end::Col-->
