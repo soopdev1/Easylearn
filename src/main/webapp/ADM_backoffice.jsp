@@ -96,6 +96,8 @@
                                                                                 <th class="p-2">Descrizione</th>
                                                                                 <th class="p-2">Data Inizio</th>
                                                                                 <th class="p-2">Data Fine</th>
+                                                                                <th class="p-2">Numero Max Corsi</th>
+                                                                                <th class="p-2">Numero Max Edizioni</th>
                                                                                 <th class="p-2">Stato</th>
                                                                                 <th class="p-2">Azioni</th>
                                                                             </tr>

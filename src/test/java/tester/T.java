@@ -9,6 +9,9 @@ import static java.math.BigDecimal.ROUND_HALF_DOWN;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
+import rc.soop.sic.SendMail;
+import rc.soop.sic.jpa.EntityOp;
+import rc.soop.sic.jpa.Istanza;
 
 /**
  *
@@ -17,9 +20,14 @@ import java.util.Locale;
 public class T {
 
     public static void main(String[] args) {
-        double d = 23.599;
-        int scale = 2;
-               
+//        EntityOp eo = new EntityOp();
+//        
+//        SendMail.inviaNotificaADMIN_presentazioneIstanza(eo, eo.getEm().find(Istanza.class, 7L));
+//        
+        
+//        double d = 23.599;
+//        int scale = 2;
+//               
         
 //        EntityOp e = new EntityOp();
 //        GENERADECRETOAPPROVATIVO(e.getEm().find(Istanza.class, 8L));

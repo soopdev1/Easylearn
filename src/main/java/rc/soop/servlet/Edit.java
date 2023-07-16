@@ -54,6 +54,8 @@ public class Edit extends HttpServlet {
                 data_value.addProperty("datastart", new DateTime(res.getDatastart()).toString(PATTERNDATE4));
                 data_value.addProperty("dataend", new DateTime(res.getDataend()).toString(PATTERNDATE4));
                 data_value.addProperty("stato", res.getEtichettastato());
+                data_value.addProperty("maxcorsi", res.getMaxcorsi());
+                data_value.addProperty("maxedizioni", res.getMaxedizioni());
                 data_value.addProperty("azioni", "<i class='fa fa-hourglass'></i>");
                 data.add(data_value);
 

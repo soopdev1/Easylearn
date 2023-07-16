@@ -4,6 +4,24 @@
  */
 package rc.soop.sic;
 
+import com.mailjet.client.ClientOptions;
+import static com.mailjet.client.ClientOptions.builder;
+import com.mailjet.client.MailjetClient;
+import com.mailjet.client.MailjetRequest;
+import com.mailjet.client.MailjetResponse;
+import static com.mailjet.client.resource.Emailv31.MESSAGES;
+import static com.mailjet.client.resource.Emailv31.Message.ATTACHMENTS;
+import static com.mailjet.client.resource.Emailv31.Message.BCC;
+import static com.mailjet.client.resource.Emailv31.Message.CC;
+import static com.mailjet.client.resource.Emailv31.Message.FROM;
+import static com.mailjet.client.resource.Emailv31.Message.HTMLPART;
+import static com.mailjet.client.resource.Emailv31.Message.SUBJECT;
+import static com.mailjet.client.resource.Emailv31.Message.TO;
+import static com.mailjet.client.resource.Emailv31.resource;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import static java.nio.file.Files.probeContentType;
 import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -22,10 +40,18 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import static org.apache.commons.codec.binary.Base64.encodeBase64;
+import static org.apache.commons.io.IOUtils.toByteArray;
+import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import static rc.soop.sic.Constant.LOGGER;
+import static rc.soop.sic.Constant.RB;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE5;
 import static rc.soop.sic.Utils.estraiEccezione;
+import rc.soop.sic.jpa.EmailTemplate;
 import rc.soop.sic.jpa.EntityOp;
+import rc.soop.sic.jpa.Istanza;
 import rc.soop.sic.jpa.Path;
 
 /**
@@ -34,16 +60,124 @@ import rc.soop.sic.jpa.Path;
  */
 public class SendMail {
 
-    public static boolean inviaNotificaADMIN_presentazioneIstanza(EntityOp eo){
-        
-        
-        
+    public static boolean inviaNotificaADMIN_presentazioneIstanza(EntityOp eo, Istanza is1) {
+
+        try {
+            EmailTemplate et = eo.getEm().find(EmailTemplate.class, 1L);
+
+            String name = "EasyLearn Notification Mail";
+
+            String to[] = {eo.getEm().find(Path.class, "dest.nuovaistanza").getDescrizione()};
+
+            String contenthtml = StringUtils.replace(et.getHtmlmail(), "@nomesoggetto", is1.getSoggetto().getRAGIONESOCIALE());
+            contenthtml = StringUtils.replace(contenthtml, "@idistanza", String.valueOf(is1.getIdistanza()));
+            contenthtml = StringUtils.replace(contenthtml, "@codiceistanza", is1.getCodiceistanza());
+            contenthtml = StringUtils.replace(contenthtml, "@version", Constant.VERSIONAPP);
+            
+            
+            return sendMail(name, to, null, null, contenthtml, et.getOggettomail(), null);
+
+        } catch (Exception ex) {
+            LOGGER.severe(estraiEccezione(ex));
+        }
+
         return false;
 //        return sendPec(eo, eo.getEm().find(Path.class, "pec.sender").getDescrizione(),
 //                "EasyLearn", content, fileattach);
     }
-    
-    
+
+    private static boolean sendMail(String name, String[] to, String[] cc, String[] ccn, String txt, String subject, File file) {
+        try {
+            MailjetClient client;
+            MailjetRequest request;
+            MailjetResponse response;
+
+            String filename = "";
+            String content_type = "";
+            String b64 = "";
+
+            String mailjet_api = RB.getString("mail.mj.api");
+            String mailjet_secret = RB.getString("mail.mj.secret");
+            String mailjet_name = RB.getString("mail.mj.name");
+
+            ClientOptions options = builder()
+                    .apiKey(mailjet_api)
+                    .apiSecretKey(mailjet_secret)
+                    .build();
+
+            client = new MailjetClient(options);
+
+            JSONArray dest = new JSONArray();
+            JSONArray ccnj = new JSONArray();
+            JSONArray ccj = new JSONArray();
+
+            if (to != null) {
+                for (String s : to) {
+                    dest.put(new JSONObject().put("Email", s)
+                            .put("Name", ""));
+                }
+            }
+
+            if (cc != null) {
+                for (String s : cc) {
+                    ccj.put(new JSONObject().put("Email", s)
+                            .put("Name", ""));
+                }
+            }
+
+            if (ccn != null) {
+                for (String s : ccn) {
+                    ccnj.put(new JSONObject().put("Email", s)
+                            .put("Name", ""));
+                }
+            }
+
+            JSONObject mail = new JSONObject().put(FROM, new JSONObject()
+                    .put("Email", mailjet_name)
+                    .put("Name", name))
+                    .put(TO, dest)
+                    .put(CC, ccj)
+                    .put(BCC, ccnj)
+                    .put(SUBJECT, subject)
+                    .put(HTMLPART, txt);
+
+            if (file != null) {
+                try {
+                    filename = file.getName();
+                    content_type = probeContentType(file.toPath());
+                    try (InputStream i = new FileInputStream(file)) {
+                        b64 = new String(encodeBase64(toByteArray(i)));
+                    }
+                    mail.put(ATTACHMENTS, new JSONArray()
+                            .put(new JSONObject()
+                                    .put("ContentType", content_type)
+                                    .put("Filename", filename)
+                                    .put("Base64Content", b64)));
+                } catch (Exception ex1) {
+                    LOGGER.severe(estraiEccezione(ex1));
+                }
+            }
+
+            request = new MailjetRequest(resource)
+                    .property(MESSAGES, new JSONArray()
+                            .put(mail));
+
+            response = client.post(request);
+
+            boolean ok = response.getStatus() == 200;
+
+            if (!ok) {
+                LOGGER.log(Level.SEVERE, "sendMail - {0} -- {1} --- {2}", new Object[]{response.getStatus(), response.getRawResponseContent(), response.getData().toList()});
+            }
+
+            return ok;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            LOGGER.severe(estraiEccezione(ex));
+        }
+        return false;
+    }
+
     private static boolean sendPec(EntityOp eo, String dest, String subject, String content, String fileattach) {
 
         String host = eo.getEm().find(Path.class, "pec.smtp").getDescrizione();
@@ -90,7 +224,7 @@ public class SendMail {
                 mp.addBodyPart(mbp2);
             }
             message.setContent(mp, "text/html; charset=utf-8");
-            
+
             // Aggiunta del listener per la ricevuta di invio
             Transport transport = session.getTransport();
             transport.addTransportListener(new TransportListener() {

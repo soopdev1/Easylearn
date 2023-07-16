@@ -87,7 +87,6 @@
                             <h3 class="card-title align-items-start flex-column">
                                 <span class="card-label fw-bolder fs-3 mb-1">Corso di formazione - Progettazione di Dettaglio ed Unità Formative - <%=co1.getStatocorso().getHtmlicon()%></span>
                             </h3>
-                            <button class="btn btn-lg btn-success"><i class="fa fa-save"></i> SALVA DATI</button>
                         </div>
                         <div class="card-body py-3">
                             <div class="row">
@@ -145,7 +144,8 @@
                             <hr>
                             <div class="row">
                                 <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                    <span class="text-danger"><b>STEP 1) Competenze Trasversali</b></span>
+                                    <span class="text-success"><b>STEP 1) Competenze Trasversali</b></span>
+                                    <button class="btn btn-sm btn-success"><i class="fa fa-save"></i> SALVA DATI</button>
                                 </label>
                                 <hr>
                                 <div class="row col-md-12">

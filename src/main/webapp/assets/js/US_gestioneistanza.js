@@ -43,6 +43,9 @@ function sendistanza(idistanza) {
                             if (data.result) {
                                 ok = true;
                             } else {
+                                
+                                    
+                            
                                 messageko = ("ERRORE: " + data.message);
                             }
                         },

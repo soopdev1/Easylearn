@@ -18,6 +18,8 @@ $(document).ready(function () {
             {data: 'descrizione'},
             {data: 'datastart', type: 'date-eu'},
             {data: 'dataend', type: 'date-eu'},
+            {data: 'maxcorsi'},
+            {data: 'maxedizioni'},
             {data: 'stato'},
             {data: 'azioni', orderable: false}
         ]

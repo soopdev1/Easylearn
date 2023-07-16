@@ -28,9 +28,11 @@ import static rc.soop.sic.Constant.PATTERNDATE3;
 import static rc.soop.sic.Constant.PATTERNDATE4;
 import static rc.soop.sic.Constant.PATTERNDATE5;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE6;
+import rc.soop.sic.Engine;
 import rc.soop.sic.Pdf;
 import static rc.soop.sic.Pdf.GENERADECRETOAPPROVATIVO;
 import static rc.soop.sic.Pdf.checkFirmaQRpdfA;
+import rc.soop.sic.SendMail;
 import rc.soop.sic.Utils;
 import static rc.soop.sic.Utils.calcolaPercentuale;
 import static rc.soop.sic.Utils.estraiEccezione;
@@ -149,18 +151,24 @@ public class Operations extends HttpServlet {
 
     protected void SENDISTANZA_OLD(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
+
             SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
             String codiceis = getRequestValue(request, "codice_istanza");
             EntityOp e = new EntityOp();
             Istanza is = e.getIstanza(so, codiceis);
+
+            List<Corso> c1 = e.getCorsiIstanza(is);
+
             e.begin();
             is.setStatocorso(e.getEm().find(CorsoStato.class, "07"));
             is.setDatainvio(new DateTime().toString(PATTERNDATE5));
             e.merge(is);
             e.commit();
             e.close();
+
             request.getSession().setAttribute("is_memory", is);
             redirect(request, response, "US_gestioneistanza.jsp");
+
         } catch (Exception ex) {
             EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
             redirect(request, response, "US_gestioneistanza.jsp?esito=KO");
@@ -457,23 +465,46 @@ public class Operations extends HttpServlet {
 
     protected void SENDISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JsonObject resp_out = new JsonObject();
-
+        StringBuilder message = new StringBuilder();
         try {
 
             EntityOp ep1 = new EntityOp();
             Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(getRequestValue(request, "IDISTANZA")));
 
             if (is1 != null) {
-                ep1.begin();
-                is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "07"));
-                is1.setDatainvio(new DateTime().toString(PATTERNDATE5));
-                ep1.merge(is1);
+                List<Docente> eldoc = ep1.findAll(Docente.class);
+                List<Corso> c1 = new EntityOp().getCorsiIstanza(is1);
+                for (Corso c2 : c1) {
+                    boolean calendariocompleto = Engine.calendario_completo(ep1, c2);
+                    List<Calendario_Formativo> calendar = ep1.calendario_formativo_corso(c2);
+                    List<Docente> assegnati = ep1.list_docenti_moduli(eldoc, calendar);
+                    int moduliassegnati = Engine.verificamoduliassegnati(assegnati);
+                    int modulidaassegnare = calendar.size() - moduliassegnati;
+                    if (calendariocompleto && modulidaassegnare == 0) {
+                    } else {
+                        resp_out.addProperty("result",
+                                false);
+                        resp_out.addProperty("message",
+                                "Errore: UNO O PI&#217; CORSI NON SONO COMPLETI. IMPOSSIBILE PRESENTARE ISTANZA.");
+                    }
+                }
+                if (resp_out.isEmpty()) {
+                    ep1.begin();
+                    is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "07"));
+                    is1.setDatainvio(new DateTime().toString(PATTERNDATE5));
+                    ep1.merge(is1);
+                    //INVIO PEC
+                    try {
+                        SendMail.inviaNotificaADMIN_presentazioneIstanza(ep1, is1);
+                    } catch (Exception ex2) {
+                        EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex2));
+                    }
+                    ep1.commit();
+                    ep1.close();
+                    resp_out.addProperty("result",
+                            true);
 
-                //INVIO PEC
-                ep1.commit();
-                ep1.close();
-                resp_out.addProperty("result",
-                        true);
+                }
             } else {
                 resp_out.addProperty("result",
                         false);
@@ -503,13 +534,35 @@ public class Operations extends HttpServlet {
             Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(getRequestValue(request, "IDISTANZA")));
 
             if (is1 != null) {
-                ep1.begin();
-                is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "02"));
-                ep1.merge(is1);
-                ep1.commit();
-                ep1.close();
-                resp_out.addProperty("result",
-                        true);
+
+                List<Docente> eldoc = ep1.findAll(Docente.class);
+                List<Corso> c1 = new EntityOp().getCorsiIstanza(is1);
+                for (Corso c2 : c1) {
+                    boolean calendariocompleto = Engine.calendario_completo(ep1, c2);
+                    List<Calendario_Formativo> calendar = ep1.calendario_formativo_corso(c2);
+                    List<Docente> assegnati = ep1.list_docenti_moduli(eldoc, calendar);
+                    int moduliassegnati = Engine.verificamoduliassegnati(assegnati);
+                    int modulidaassegnare = calendar.size() - moduliassegnati;
+                    if (calendariocompleto && modulidaassegnare == 0) {
+                    } else {
+                        resp_out.addProperty("result",
+                                false);
+                        resp_out.addProperty("message",
+                                "Errore: UNO O PI&#217; CORSI NON SONO COMPLETI. IMPOSSIBILE SALVARE ISTANZA SENZA AVERLI COMPLETATI.");
+                    }
+                }
+
+                if (resp_out.isEmpty()) {
+                    ep1.begin();
+                    is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "02"));
+                    ep1.merge(is1);
+                    ep1.commit();
+                    ep1.close();
+                    resp_out.addProperty("result",
+                            true);
+
+                }
+
             } else {
                 resp_out.addProperty("result",
                         false);

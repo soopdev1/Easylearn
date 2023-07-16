@@ -20,6 +20,7 @@ import rc.soop.sic.jpa.CorsoStato;
 import rc.soop.sic.jpa.Docente;
 import rc.soop.sic.jpa.EntityOp;
 import static rc.soop.sic.jpa.EntityOp.trackingAction;
+import rc.soop.sic.jpa.Istanza;
 import rc.soop.sic.jpa.Lingua;
 import rc.soop.sic.jpa.Livello_Certificazione;
 import rc.soop.sic.jpa.Modacquisizione;
@@ -87,6 +88,22 @@ public class Engine {
 
         try {
 
+            EntityOp eo = new EntityOp();
+
+            List<Istanza> dagestire = eo.getIstanzedaGestire();
+            List<Istanza> gestite = eo.getIstanzeGestite();
+
+            contatori[0] = String.valueOf(dagestire.size());
+            try {
+                contatori[1] = String.valueOf(
+                        gestite.stream().filter(i1 -> i1.getStatocorso().getCodicestatocorso().equals("08"))
+                                .collect(Collectors.toList()).size());
+            } catch (Exception ex1) {
+                trackingAction(se.getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            }
+            
+            //corsi avviati
+            
         } catch (Exception ex) {
             trackingAction(se.getAttribute("us_cod").toString(), estraiEccezione(ex));
         }

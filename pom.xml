@@ -135,6 +135,13 @@
             <artifactId>log4j-core</artifactId>
             <version>2.20.0</version>
         </dependency>
+        
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+        
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
@@ -146,6 +153,12 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>32.1.1-jre</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.mailjet</groupId>
+            <artifactId>mailjet-client</artifactId>
+            <version>5.2.0</version>
             <type>jar</type>
         </dependency>
         <dependency>

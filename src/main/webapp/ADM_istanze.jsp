@@ -30,12 +30,13 @@
         <!--end::Fonts-->
         <!--begin::Page Vendor Stylesheets(used by this page)-->
         <link href="assets/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet" type="text/css" />
-        <link href="assets/plugins/DataTables/datatables.min.css" rel="stylesheet" type="text/css" />
         <!--end::Page Vendor Stylesheets-->
         <!--begin::Global Stylesheets Bundle(used by all pages)-->
         <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="assets/plugins/jquery-confirm.3.3.2.min.css">
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+        <script src="https://cdn.tiny.cloud/1/<%=Constant.TINYMCEKEY%>/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
         <!--end::Global Stylesheets Bundle-->
     </head>
     <!--end::Head-->
@@ -83,41 +84,37 @@
                                                     <tr>
                                                         <th scope="col"><b>ID</b></th>
                                                         <th scope="col"><b>Soggetto Proponente</b></th>
-                                                        <th scope="col"><b>Protocollo Istanza</b></th>
+                                                        <th scope="col"><b>Protocollo Istanza (S.P.)</b></th>
                                                         <th scope="col"><b>Data presentazione</b></th>
                                                         <th scope="col"><b>Azioni</b></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-
-                                                    <%                                                        for (Istanza is1 : dagestire) {%>
+                                                    <%for (Istanza is1 : dagestire) {%>
                                                     <tr>
                                                         <th scope="row"><%=is1.getIdistanza()%></th>
                                                         <td><%=is1.getSoggetto().getRAGIONESOCIALE()%></td>
                                                         <td><%=is1.getProtocollosoggetto()%> <%=is1.getProtocollosoggettodata()%> </td>                                                       
                                                         <td><%=is1.getDatainvio()%></td>
                                                         <td>
-                                                            <a href="#" class="btn btn-sm btn-bg-light btn-primary" data-bs-toggle="tooltip" title="PROTOCOLLA ISTANZA" 
-                                                               onclick="return document.forms['sca_<%=is1.getCodiceistanza()%>'].submit();" >
-                                                                <i class="fa fa-file-archive"></i></a>
-                                                            <a href="#" class="btn btn-sm btn-bg-light btn-dark" data-bs-toggle="tooltip" title="VISUALIZZA ISTANZA" 
-                                                               onclick="return document.forms['sca_<%=is1.getCodiceistanza()%>'].submit();" >
-                                                                <i class="fa fa-file-pdf"></i></a>
-                                                            <a href="#" class="btn btn-sm btn-bg-light btn-warning" data-bs-toggle='tooltip' title='SOCCORSO ISTRUTTORIO' 
-                                                               onclick="return document.forms['soc_<%=is1.getCodiceistanza()%>'].submit();">
-                                                                <i class="fa fa-warning"></i></a>
-                                                            <a href="#" class="btn btn-sm btn-bg-light btn-success" data-bs-toggle='tooltip' title='APPROVA ISTANZA' 
-                                                               onclick="return document.forms['apprist_<%=is1.getCodiceistanza()%>'].submit();">
-                                                                <i class="fa fa-check-circle"></i></a>
-                                                            <a href="#" class="btn btn-sm btn-bg-light btn-danger fan1" data-bs-toggle='tooltip' title="RIGETTA ISTANZA">
-                                                                <i class="fa fa-cancel"></i></a>
-                                                            <form action="Operations" method="POST" target="_blank" name="sca_<%=is1.getCodiceistanza()%>">
-                                                                <input type="hidden" name="type" value="SCARICAISTANZAFIRMATA" />
-                                                                <input type="hidden" name="codice_istanza" value="<%=is1.getCodiceistanza()%>" />
-                                                            </form>
-                                                            <form action="Operations" method="POST" name="apprist_<%=is1.getCodiceistanza()%>">
-                                                                <input type="hidden" name="type" value="APPROVAISTANZA" />
-                                                                <input type="hidden" name="codice_istanza" value="<%=is1.getCodiceistanza()%>" />
+                                                            <form action="US_showistanza.jsp" method="POST" target="_blank">
+                                                                <input type="hidden" name="idist" value="<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>"/>
+                                                                <button type="submit"class="btn btn-sm btn-primary"
+                                                                        data-bs-toggle="tooltip" title="VISUALIZZA ISTANZA PRESENTATA" 
+                                                                        data-preload='false'><i class="fa fa-file-text"></i></button>
+                                                                |
+                                                                <button type="button"class="btn btn-sm btn-bg-light btn-success"
+                                                                        data-bs-toggle="tooltip" title="APPROVA ISTANZA" 
+                                                                        data-preload='false'
+                                                                        onclick="return approvaistanza('<%=is1.getIdistanza()%>')">
+                                                                    <i class="fa fa-check"></i>
+                                                                </button>
+                                                                |
+                                                                <button type="button"class="btn btn-sm btn-bg-light btn-danger"
+                                                                        data-bs-toggle="tooltip" title="RIGETTA ISTANZA" 
+                                                                        data-preload='false'
+                                                                        onclick="return rigettaistanza('<%=is1.getIdistanza()%>')"><i class="fa fa-remove"></i>
+                                                                </button>
                                                             </form>
                                                         </td>
                                                     </tr>  
@@ -244,20 +241,11 @@
         <!--begin::Page Custom Javascript(used by this page)-->
         <script src="assets/js/widgets.bundle.js"></script>
         <script src="assets/js/custom/widgets.js"></script>
-        <script src="assets/js/custom/apps/chat/chat.js"></script>
-        <script src="assets/js/custom/utilities/modals/create-app.js"></script>
-        <script src="assets/js/custom/utilities/modals/create-campaign.js"></script>
-        <script src="assets/js/custom/utilities/modals/users-search.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
 
-        <script type="text/javascript">
-            $(document).ready(function () {
-                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                    return new bootstrap.Tooltip(tooltipTriggerEl);
-                });
-            });
-        </script>
+        <script src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
+        <script type="text/javascript" src="assets/js/ADM_istanze.js"></script>
+
         <!--end::Page Custom Javascript-->
         <!--end::Javascript-->
     </body>
