@@ -226,6 +226,12 @@ public class EntityOp {
         q.setParameter("corsodiriferimento", c);
         return (List<Calendario_Formativo>) q.getResultList();
     }
+    
+    public List<Calendario_Formativo> calendario_formativo_corso_lezioni(Corso c) {
+        TypedQuery q = this.em.createNamedQuery("calendarioformativo.pianificare", Calendario_Formativo.class);
+        q.setParameter("corsodiriferimento", c);
+        return (List<Calendario_Formativo>) q.getResultList();
+    }
 
     public List<Competenze> competenze_correlate(Repertorio r) {
         TypedQuery q = this.em.createNamedQuery("competenze.repertorio", Competenze.class);

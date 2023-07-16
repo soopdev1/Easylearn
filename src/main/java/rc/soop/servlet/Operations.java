@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -476,7 +477,7 @@ public class Operations extends HttpServlet {
                 List<Corso> c1 = new EntityOp().getCorsiIstanza(is1);
                 for (Corso c2 : c1) {
                     boolean calendariocompleto = Engine.calendario_completo(ep1, c2);
-                    List<Calendario_Formativo> calendar = ep1.calendario_formativo_corso(c2);
+                    List<Calendario_Formativo> calendar = ep1.calendario_formativo_corso_lezioni(c2);
                     List<Docente> assegnati = ep1.list_docenti_moduli(eldoc, calendar);
                     int moduliassegnati = Engine.verificamoduliassegnati(assegnati);
                     int modulidaassegnare = calendar.size() - moduliassegnati;
@@ -539,7 +540,7 @@ public class Operations extends HttpServlet {
                 List<Corso> c1 = new EntityOp().getCorsiIstanza(is1);
                 for (Corso c2 : c1) {
                     boolean calendariocompleto = Engine.calendario_completo(ep1, c2);
-                    List<Calendario_Formativo> calendar = ep1.calendario_formativo_corso(c2);
+                    List<Calendario_Formativo> calendar = ep1.calendario_formativo_corso_lezioni(c2);
                     List<Docente> assegnati = ep1.list_docenti_moduli(eldoc, calendar);
                     int moduliassegnati = Engine.verificamoduliassegnati(assegnati);
                     int modulidaassegnare = calendar.size() - moduliassegnati;
@@ -551,7 +552,6 @@ public class Operations extends HttpServlet {
                                 "Errore: UNO O PI&#217; CORSI NON SONO COMPLETI. IMPOSSIBILE SALVARE ISTANZA SENZA AVERLI COMPLETATI.");
                     }
                 }
-
                 if (resp_out.isEmpty()) {
                     ep1.begin();
                     is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "02"));
@@ -560,9 +560,7 @@ public class Operations extends HttpServlet {
                     ep1.close();
                     resp_out.addProperty("result",
                             true);
-
                 }
-
             } else {
                 resp_out.addProperty("result",
                         false);
@@ -711,7 +709,7 @@ public class Operations extends HttpServlet {
                 ct.setElencocompetenze(list_comp);
                 ct.setElencoconoscenze(list_cono);
                 ct.setElencoabilita(list_abil);
-                ct.setCodicemodulo("MOD" + (calendar.size() + 1));
+                ct.setCodicemodulo("MOD" + (calendar.stream().filter(c1 -> c1.getCodicemodulo().startsWith("MOD")).collect(Collectors.toList()).size() + 1));
                 ct.setCorsodiriferimento(co1);
                 ct.setNomemodulo(NOMEMODULO);
                 ct.setOre(ORETOTALI);

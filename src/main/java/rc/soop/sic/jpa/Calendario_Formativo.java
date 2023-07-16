@@ -27,7 +27,8 @@ import javax.persistence.Table;
  */
 @NamedQueries(value = {
     @NamedQuery(name = "calendarioformativo.corso", query = "SELECT u FROM Calendario_Formativo u WHERE u.corsodiriferimento=:corsodiriferimento ORDER BY u.idcalendarioformativo"),
-    @NamedQuery(name = "calendarioformativo.corsosolomoduli", query = "SELECT u FROM Calendario_Formativo u WHERE u.corsodiriferimento=:corsodiriferimento AND u.tipomodulo='MODULOFORMATIVO' ORDER BY u.idcalendarioformativo")
+    @NamedQuery(name = "calendarioformativo.corsosolomoduli", query = "SELECT u FROM Calendario_Formativo u WHERE u.corsodiriferimento=:corsodiriferimento AND u.tipomodulo='MODULOFORMATIVO' ORDER BY u.idcalendarioformativo"),
+    @NamedQuery(name = "calendarioformativo.pianificare", query = "SELECT u FROM Calendario_Formativo u WHERE u.corsodiriferimento=:corsodiriferimento AND (u.tipomodulo='MODULOFORMATIVO' OR u.tipomodulo='BASE') ORDER BY u.idcalendarioformativo")
 })
 @Entity
 @Table(name = "calendarioformativo")

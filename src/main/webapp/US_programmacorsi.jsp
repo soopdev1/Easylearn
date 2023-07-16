@@ -41,11 +41,12 @@
                 List<Competenze_Trasversali> comp_tr = (List<Competenze_Trasversali>) eo.findAll(Competenze_Trasversali.class);
                 List<Lingua> language = eo.getLingue();
                 List<Calendario_Formativo> calendar = eo.calendario_formativo_corso(co1);
+                List<Calendario_Formativo> calendarlez = eo.calendario_formativo_corso_lezioni(co1);
                 boolean calendariocompleto = Engine.calendario_completo(eo, co1);
                 List<Docente> eldoc = eo.findAll(Docente.class);
                 List<Docente> assegnati = eo.list_docenti_moduli(eldoc, calendar);
                 int moduliassegnati = Engine.verificamoduliassegnati(assegnati);
-                int modulidaassegnare = calendar.size() - moduliassegnati;
+                int modulidaassegnare = calendarlez.size() - moduliassegnati;
                 Engine.verificacorsodainviare(co1, calendariocompleto, modulidaassegnare);
     %>
     <!--begin::Head-->
@@ -168,13 +169,14 @@
 
                                         String ri_selsi = "";
                                         String ri_selno = "";
-                                        
+                                        int duratashow = ct.getDurataore();
                                         if (Engine.checkexist_CT(calendar, ct)) {
                                             cf0 = Engine.getexist_CT(calendar, ct);
                                             if (cf0.getTipomodulo().equals("BASE")) {
                                                 ri_selno = "selected";
                                             } else {
                                                 ri_selsi = "selected";
+                                                duratashow = 0;
                                             }
                                         } else {
                                             cf0.setCtdescrizione("");
@@ -224,7 +226,7 @@
                                                placeholder="..." required value="<%=cf0.getCtdescrizione()%>" />
                                     </div>
                                     <label class="col-md-1 col-form-label">
-                                        <span class="ctdurata" id="htmlctdurata_<%=ct.getIdcompetenze()%>"><%=ct.getDurataore()%></span>
+                                        <span class="ctdurata" id="htmlctdurata_<%=ct.getIdcompetenze()%>"><%=duratashow%></span>
                                     </label>
                                     <%} else {%>
                                     <div class="col-md-5 fv-row">
@@ -234,7 +236,7 @@
                                     </div>
 
                                     <label class="col-md-1 col-form-label">
-                                        <span class="ctdurata" id="htmlctdurata_<%=ct.getIdcompetenze()%>"><%=ct.getDurataore()%></span>
+                                        <span class="ctdurata" id="htmlctdurata_<%=ct.getIdcompetenze()%>"><%=duratashow%></span>
                                     </label>
                                     <%}%>
                                     <input type="hidden" id="ctdurata_<%=ct.getIdcompetenze()%>" value="<%=ct.getDurataore()%>" />
@@ -396,12 +398,12 @@
                                 <label class="col-form-label fw-bold fs-6">
                                     <span class="text-dark">STEP 4) Elenco Attrezzature | 
                                         <a class="btn btn-dark btn-sm fan1" href="US_programmacorsi_attr.jsp"
-                                       data-fancybox data-type='iframe' 
-                                       data-bs-toggle="tooltip" title="AGGIUNGI ATTREZZATURE" 
-                                       data-preload='false' data-width='75%' data-height='75%'>
-                                        <i class="fa fa-plus-circle" ></i> Aggiungi</a></span>
+                                           data-fancybox data-type='iframe' 
+                                           data-bs-toggle="tooltip" title="AGGIUNGI ATTREZZATURE" 
+                                           data-preload='false' data-width='75%' data-height='75%'>
+                                            <i class="fa fa-plus-circle" ></i> Aggiungi</a></span>
                             </div>
-                            
+
                             <div class="card-body py-3">
                                 <!--begin::Table container-->
                                 <div class="table-responsive">
@@ -423,7 +425,7 @@
                                         <!--begin::Table body-->
                                         <tbody>
                                             <%
-                                            for(Attrezzature at1 : co1.getAttrezzature()){%>
+                                                for (Attrezzature at1 : co1.getAttrezzature()) {%>
                                             <tr>
                                                 <td class="p-2 w-150px"><%=at1.getDescrizione()%></td>
                                                 <td class="p-2 w-50px"><%=at1.getModalita().name()%></td>
@@ -432,12 +434,12 @@
                                                 <td class="p-2 w-150px"><%=at1.getRegistroinventario()%></td>
                                                 <td class="p-2 w-50px"><i class='fa fa-hourglass'></i></td>
                                             </tr>
-                                                <%}
+                                            <%}
                                             %>
                                         </tbody>
                                     </table>
                                 </div>
-                                </div>
+                            </div>
                             <%} else {%>
                             <div class="row">
                                 <label class="col-form-label fw-bold fs-6">
