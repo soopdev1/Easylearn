@@ -306,7 +306,6 @@ public class Utils {
     }
 
     public static String roundDoubleandFormat(double d, int scale) {
-
         String out = new DecimalFormat("###,###.#", DecimalFormatSymbols.getInstance(Locale.ITALIAN))
                 .format(BigDecimal.valueOf(d).setScale(scale, ROUND_HALF_DOWN).doubleValue());
         if (out.startsWith(",0")) {

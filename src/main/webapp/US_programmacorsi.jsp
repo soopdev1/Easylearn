@@ -48,6 +48,7 @@
                 int moduliassegnati = Engine.verificamoduliassegnati(assegnati);
                 int modulidaassegnare = calendarlez.size() - moduliassegnati;
                 Engine.verificacorsodainviare(co1, calendariocompleto, modulidaassegnare);
+                String costostimato = (co1.getCostostimatoallievo() == 0.0) ? "" : String.format("%.2f", co1.getCostostimatoallievo());
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -77,7 +78,7 @@
         <!--begin::Row-->
         <div class="row">
             <!--begin::Col-->
-            <form method="POST" action="Operations" onsubmit="return verificasalvataggiodati();">
+            <form method="POST" action="Operations">
                 <input type="hidden" name="type" value="SALVAPIANIFICAZIONE"/>
                 <input type="hidden" name="idcorsodasalvare" value="<%=co1.getIdcorso()%>"/>
                 <div class="col-xl-12">
@@ -144,9 +145,9 @@
                             </div>
                             <hr>
                             <div class="row">
-                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                    <span class="text-success"><b>STEP 1) Competenze Trasversali</b></span>
-                                    <button class="btn btn-sm btn-success"><i class="fa fa-save"></i> SALVA DATI</button>
+                                <label class="col-lg-12 col-form-label fw-bold fs-6" >
+                                    <span class="text-success"><b>STEP 1) Competenze Trasversali e Costo stimato Allievo</b></span>
+                                    <button type="submit" class="btn btn-sm btn-success"><i class="fa fa-save"></i> SALVA DATI</button>
                                 </label>
                                 <hr>
                                 <div class="row col-md-12">
@@ -242,6 +243,17 @@
                                     <input type="hidden" id="ctdurata_<%=ct.getIdcompetenze()%>" value="<%=ct.getDurataore()%>" />
                                 </div>
                                 <%}%>
+                                <hr>
+                                <div class="row col-md-12">
+                                    <label class="col-md-4 col-form-label fw-bold">
+                                        <span class="text-dark">Costo stimato allievo</span>
+                                    </label>
+                                    <div class="col-md-4 fv-row">
+                                        <input type="text" name="COSTOSTIMATO" id="COSTOSTIMATO"
+                                               class="form-control decimalvalue" 
+                                               required value="<%=costostimato%>" />
+                                    </div>
+                                </div>
                             </div>
                             <%if (!calendar.isEmpty()) {
                                     session.setAttribute("ses_idcorso", Utils.enc_string(String.valueOf(co1.getIdcorso())));

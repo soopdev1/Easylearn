@@ -74,10 +74,14 @@
                                                     </h3>
                                                     <div class="card-toolbar">
                                                         <!--begin::Menu-->
-                                                        <button type="button" 
-                                                                class="btn btn-sm btn-bg-light btn-primary">
-                                                            <i class="fa fa-plus-circle"></i> AGGIUNGI NUOVO
-                                                        </button>
+                                                        <a href="ADM_addtipopercorso.jsp"
+                                                           data-fancybox data-type='iframe' 
+                                                           data-bs-toggle="tooltip" 
+                                                           title="AGGIUNGI NUOVA TIPOLOGIA PERCORSO" 
+                                                           data-preload='false' data-width='100%' data-height='100%' 
+                                                           class="btn btn-sm btn-bg-light btn-primary fan1">
+                                                            <i class="fa fa-plus-circle"></i>
+                                                        </a>
                                                     </div>
                                                 </div>
                                                 <!--end::Header-->
@@ -86,31 +90,31 @@
                                                     <!--begin::Items-->
                                                     <div class="card-px pt-5 pb-10 flex-grow-1">
                                                         <!--begin::Item-->
-                                                                <div class="table-responsive">
-                                                                    <!--begin::Table-->
-                                                                    <table class="table align-middle table-bordered table-hover" id="tab_dt1">
-                                                                        <!--begin::Table head-->
-                                                                        <thead>
-                                                                            <tr>
-                                                                                <th class="p-2">Tipologia</th>
-                                                                                <th class="p-2">Descrizione</th>
-                                                                                <th class="p-2">Data Inizio</th>
-                                                                                <th class="p-2">Data Fine</th>
-                                                                                <th class="p-2">Numero Max Corsi</th>
-                                                                                <th class="p-2">Numero Max Edizioni</th>
-                                                                                <th class="p-2">Stato</th>
-                                                                                <th class="p-2">Azioni</th>
-                                                                            </tr>
-                                                                        </thead>
-                                                                        <!--end::Table head-->
-                                                                        <!--begin::Table body-->
-                                                                        <tbody></tbody>
-                                                                        <!--end::Table body-->
-                                                                    </table>
-                                                                    <!--end::Table-->
-                                                                </div>
-                                                            </div>
-                                                            <!--end::Section-->
+                                                        <div class="table-responsive">
+                                                            <!--begin::Table-->
+                                                            <table class="table align-middle table-bordered table-hover" id="tab_dt1">
+                                                                <!--begin::Table head-->
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="p-2">Tipologia</th>
+                                                                        <th class="p-2">Descrizione</th>
+                                                                        <th class="p-2">Data Inizio</th>
+                                                                        <th class="p-2">Data Fine</th>
+                                                                        <th class="p-2">Numero Max Corsi</th>
+                                                                        <th class="p-2">Numero Max Edizioni</th>
+                                                                        <th class="p-2">Stato</th>
+                                                                        <th class="p-2">Azioni</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <!--end::Table head-->
+                                                                <!--begin::Table body-->
+                                                                <tbody></tbody>
+                                                                <!--end::Table body-->
+                                                            </table>
+                                                            <!--end::Table-->
+                                                        </div>
+                                                    </div>
+                                                    <!--end::Section-->
                                                 </div>
                                                 <!--end::Body-->
                                             </div>

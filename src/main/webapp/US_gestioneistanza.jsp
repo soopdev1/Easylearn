@@ -149,13 +149,15 @@
                                                                         <%=cor.getStatocorso().getHtmlicon()%> |
                                                                         <button type="submit"class="btn btn-sm btn-primary"
                                                                                 data-bs-toggle="tooltip" title="MODIFICA DETTAGLI CORSO" 
-                                                                                data-preload='false'><i class="fa fa-edit"></i></button> |
-                                                                        <button type="button"class="btn btn-sm btn-danger"
+                                                                                data-preload='false'><i class="fa fa-edit"></i></button>
+                                                                        <%if (c1.size() > 1) {%>
+                                                                         | <button type="button"class="btn btn-sm btn-danger"
                                                                                 data-bs-toggle="tooltip" title="RIMUOVI CORSO DA ISTANZA" 
                                                                                 data-preload='false'
                                                                                 onclick="return deletecorsofromistance('<%=cor.getIdcorso()%>')"
                                                                                 ><i class="fa fa-trash-arrow-up"></i>
                                                                         </button>
+                                                                        <%}%>
                                                                     </form>
                                                                     <%}%>
                                                                     <hr>

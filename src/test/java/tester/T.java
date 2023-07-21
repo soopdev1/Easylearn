@@ -10,6 +10,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import rc.soop.sic.SendMail;
+import rc.soop.sic.Utils;
 import rc.soop.sic.jpa.EntityOp;
 import rc.soop.sic.jpa.Istanza;
 
@@ -20,6 +21,11 @@ import rc.soop.sic.jpa.Istanza;
 public class T {
 
     public static void main(String[] args) {
+        double d = 1500.0;
+        
+        System.out.println("tester.T.main() "+Utils.roundDoubleandFormat(d, 2));
+        System.out.println("tester.T.main() "+String.format("%.2f", d));
+        
 //        EntityOp eo = new EntityOp();
 //        
 //        SendMail.inviaNotificaADMIN_presentazioneIstanza(eo, eo.getEm().find(Istanza.class, 7L));

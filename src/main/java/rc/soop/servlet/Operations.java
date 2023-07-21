@@ -178,7 +178,7 @@ public class Operations extends HttpServlet {
 
     protected void APPROVAISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            Utils.printRequest(request);
+//            Utils.printRequest(request);
             String codiceis = getRequestValue(request, "codice_istanza");
             EntityOp e = new EntityOp();
             Istanza is = e.getIstanza(codiceis);
@@ -466,12 +466,9 @@ public class Operations extends HttpServlet {
 
     protected void SENDISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JsonObject resp_out = new JsonObject();
-        StringBuilder message = new StringBuilder();
         try {
-
             EntityOp ep1 = new EntityOp();
             Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(getRequestValue(request, "IDISTANZA")));
-
             if (is1 != null) {
                 List<Docente> eldoc = ep1.findAll(Docente.class);
                 List<Corso> c1 = new EntityOp().getCorsiIstanza(is1);
@@ -874,12 +871,18 @@ public class Operations extends HttpServlet {
     }
 
     protected void SALVAPIANIFICAZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        Utils.printRequest(request);
+
         EntityOp ep1 = new EntityOp();
         List<Lingua> language = ep1.getLingue();
         List<Competenze_Trasversali> comp_tr = (List<Competenze_Trasversali>) ep1.findAll(Competenze_Trasversali.class);
         Corso co1 = ep1.getEm().find(Corso.class, Long.valueOf(getRequestValue(request, "idcorsodasalvare")));
         if (co1 != null) {
             ep1.begin();
+
+            co1.setCostostimatoallievo(fd(formatDoubleforMysql(getRequestValue(request, "COSTOSTIMATO"))));
+
             List<Calendario_Formativo> calendar = ep1.calendario_formativo_corso(co1);
             AtomicInteger indexmod = new AtomicInteger(1);
             if (calendar.isEmpty()) {//PRIMO INSERIMENTO
@@ -924,6 +927,73 @@ public class Operations extends HttpServlet {
                     }
                 });
             } else {
+
+                comp_tr.forEach(competenzatras -> {
+                    String reqing = getRequestValue(request, "ctreqing_" + competenzatras.getIdcompetenze());
+                    String descr = getRequestValue(request, "ctdescr_" + competenzatras.getIdcompetenze());
+                    String lingua = getRequestValue(request, "ctlingua_" + competenzatras.getIdcompetenze());
+                    String nomemod = competenzatras.getDescrizione();
+                    if (!lingua.equals("")) {
+                        try {
+                            String lan1 = language.stream().filter(l1 -> l1.getCodicelingua().equals(lingua)).findAny().get().getNome();
+                            nomemod = nomemod + " - " + lan1;
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                    nomemod = nomemod + " - " + descr;
+
+                    if (calendar.stream().anyMatch(c3 -> c3.getCompetenzetrasversali().equals(competenzatras))) {
+                        Calendario_Formativo ct2 = calendar.stream().filter(c3 -> c3.getCompetenzetrasversali().equals(competenzatras)).findAny().get();
+
+                        if (reqing.equals("0")) {
+                            ct2.setCodicemodulo("MOD" + indexmod.get());
+                            indexmod.addAndGet(1);
+                            ct2.setNomemodulo(nomemod);
+                            ct2.setOre(competenzatras.getDurataore());
+                            ct2.setOre_aula(competenzatras.getDurataore());
+                            ct2.setOre_teorica_aula(competenzatras.getDurataore());
+                            ct2.setTipomodulo("BASE");
+                            ct2.setCtcodicelingua(lingua);
+                            ct2.setCtdescrizione(descr);
+                        } else {
+                            ct2.setCodicemodulo("BASE1"); //
+                            ct2.setNomemodulo(nomemod);
+                            ct2.setTipomodulo("REQ");
+                            ct2.setCtcodicelingua(lingua);
+                            ct2.setCtdescrizione(descr);
+                        }
+                        ep1.merge(ct2);
+                    } else {
+                        if (reqing.equals("0")) {
+                            Calendario_Formativo ct = new Calendario_Formativo();
+                            ct.setCompetenzetrasversali(competenzatras);
+                            ct.setCodicemodulo("MOD" + indexmod.get());
+                            indexmod.addAndGet(1);
+                            ct.setCorsodiriferimento(co1);
+                            ct.setNomemodulo(nomemod);
+                            ct.setOre(competenzatras.getDurataore());
+                            ct.setOre_aula(competenzatras.getDurataore());
+                            ct.setOre_teorica_aula(competenzatras.getDurataore());
+                            ct.setTipomodulo("BASE");
+                            ct.setCtcodicelingua(lingua);
+                            ct.setCtdescrizione(descr);
+                            ep1.persist(ct);
+                        } else {
+                            Calendario_Formativo ct = new Calendario_Formativo();
+                            ct.setCompetenzetrasversali(competenzatras);
+                            ct.setCodicemodulo("BASE1"); //
+                            ct.setCorsodiriferimento(co1);
+                            ct.setNomemodulo(nomemod);
+                            ct.setTipomodulo("REQ");
+                            ct.setCtcodicelingua(lingua);
+                            ct.setCtdescrizione(descr);
+                            ep1.persist(ct);
+                        }
+                    }
+
+                });
+
             }//UPDATE
         }
         ep1.commit();

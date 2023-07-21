@@ -30,14 +30,14 @@ function competenzetrasv() {
         pianificateel += parseFloat($(this).val());
     });
 
-    $("#orepianificate").html( Number(pianificate).toLocaleString("it-IT", {minimumFractionDigits: 1}).replace(/[.,]0$/, ""));
-    $("#orepianificateel").html( Number(pianificateel).toLocaleString("it-IT", {minimumFractionDigits: 1}).replace(/[.,]0$/, ""));
+    $("#orepianificate").html(Number(pianificate).toLocaleString("it-IT", {minimumFractionDigits: 1}).replace(/[.,]0$/, ""));
+    $("#orepianificateel").html(Number(pianificateel).toLocaleString("it-IT", {minimumFractionDigits: 1}).replace(/[.,]0$/, ""));
 
     var orepian = parseFloat($("#orepianificate").html());
-    $("#totaleorecompl").html( Number(inizio_ore + stage_dur).toLocaleString("it-IT", {minimumFractionDigits: 1}).replace(/[.,]0$/, ""));
+    $("#totaleorecompl").html(Number(inizio_ore + stage_dur).toLocaleString("it-IT", {minimumFractionDigits: 1}).replace(/[.,]0$/, ""));
 
     var oredapianificare = inizio_ore - orepian;
-    $("#oredapianificare").html( Number(oredapianificare).toLocaleString("it-IT", {minimumFractionDigits: 1}).replace(/[.,]0$/, ""));
+    $("#oredapianificare").html(Number(oredapianificare).toLocaleString("it-IT", {minimumFractionDigits: 1}).replace(/[.,]0$/, ""));
 
     if (oredapianificare === 0) {
         $('#addcalendariobutton').click(function () {
@@ -55,20 +55,10 @@ function competenzetrasv() {
     }
 
     //var oredapian = parseInt($("#oredapianificare").html());
-    
-    
-    
+
+
+
 }
-
-
-
-function verificasalvataggiodati() {
-    return true;
-}
-
-
-
-
 
 $(document).ready(function () {
     $('#tab_dt1').DataTable({
@@ -120,4 +110,9 @@ $(document).ready(function () {
             url: 'assets/plugins/DataTables/it-IT.json'
         }
     });
+    Inputmask({
+        mask: "999.999,99",
+        digits: 1,
+        numericInput: true
+    }).mask(".decimalvalue");
 });
