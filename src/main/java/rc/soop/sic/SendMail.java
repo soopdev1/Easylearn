@@ -72,10 +72,9 @@ public class SendMail {
             String contenthtml = StringUtils.replace(et.getHtmlmail(), "@nomesoggetto", is1.getSoggetto().getRAGIONESOCIALE());
             contenthtml = StringUtils.replace(contenthtml, "@idistanza", String.valueOf(is1.getIdistanza()));
             contenthtml = StringUtils.replace(contenthtml, "@codiceistanza", is1.getCodiceistanza());
-            contenthtml = StringUtils.replace(contenthtml, "@version", Constant.VERSIONAPP);
+            contenthtml = StringUtils.replace(contenthtml, "@version", Constant.VERSIONAPP);            
             
-            
-            return sendMail(name, to, null, null, contenthtml, et.getOggettomail(), null);
+            return sendMail(name, to, null, null, contenthtml, et.getOggettomail() + is1.getSoggetto().getRAGIONESOCIALE(), null);
 
         } catch (Exception ex) {
             LOGGER.severe(estraiEccezione(ex));

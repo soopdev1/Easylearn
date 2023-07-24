@@ -117,6 +117,7 @@
                                                                     boolean modificacorso = true;
                                                                     boolean inviaistanza = false;
                                                                     boolean consultaistanza = false;
+
                                                                     if (!is1.getStatocorso().getCodicestatocorso().equals("01")) {
                                                                         addcorso = false;
                                                                         salvaistanza = false;
@@ -124,6 +125,7 @@
                                                                     }
                                                                     if (is1.getStatocorso().getCodicestatocorso().equals("02")) {
                                                                         inviaistanza = true;
+                                                                        consultaistanza = true;
                                                                     }
                                                                     if (is1.getStatocorso().getCodicestatocorso().equals("07")) {
                                                                         eliminaistanza = false;
@@ -150,12 +152,12 @@
                                                                         <button type="submit"class="btn btn-sm btn-primary"
                                                                                 data-bs-toggle="tooltip" title="MODIFICA DETTAGLI CORSO" 
                                                                                 data-preload='false'><i class="fa fa-edit"></i></button>
-                                                                        <%if (c1.size() > 1) {%>
-                                                                         | <button type="button"class="btn btn-sm btn-danger"
-                                                                                data-bs-toggle="tooltip" title="RIMUOVI CORSO DA ISTANZA" 
-                                                                                data-preload='false'
-                                                                                onclick="return deletecorsofromistance('<%=cor.getIdcorso()%>')"
-                                                                                ><i class="fa fa-trash-arrow-up"></i>
+                                                                            <%if (c1.size() > 1) {%>
+                                                                        | <button type="button"class="btn btn-sm btn-danger"
+                                                                                  data-bs-toggle="tooltip" title="RIMUOVI CORSO DA ISTANZA" 
+                                                                                  data-preload='false'
+                                                                                  onclick="return deletecorsofromistance('<%=cor.getIdcorso()%>')"
+                                                                                  ><i class="fa fa-trash-arrow-up"></i>
                                                                         </button>
                                                                         <%}%>
                                                                     </form>
@@ -167,43 +169,53 @@
                                                                     <%=is1.getDatacreazione()%>
                                                                 </td> 
                                                                 <td class="p-2 min-w-120px" style="white-space: nowrap; overflow: hidden; text-overflow:ellipsis;">
-                                                                    <%if (consultaistanza) {%>
                                                                     <form action="US_showistanza.jsp" method="POST" target="_blank">
                                                                         <input type="hidden" name="idist" value="<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>"/>
+
+                                                                        <%if (consultaistanza) {%>
                                                                         <button type="submit"class="btn btn-sm btn-primary"
                                                                                 data-bs-toggle="tooltip" title="VISUALIZZA ISTANZA PRESENTATA" 
-                                                                                data-preload='false'><i class="fa fa-file-text"></i></button>
+                                                                                data-preload='false'><i class="fa fa-file-text"></i></button> | 
+                                                                            <%}%>
+                                                                            <%if (addcorso) {%>
+                                                                        <a href="US_addcorsoistanza.jsp?idist=<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>"
+                                                                           data-fancybox data-type='iframe' 
+                                                                           data-bs-toggle="tooltip" title="AGGIUNGI CORSO AD ISTANZA" 
+                                                                           data-preload='false' data-width='100%' data-height='100%' 
+                                                                           class="btn btn-sm btn-bg-light btn-primary fan1">
+                                                                            <i class="fa fa-plus-circle"></i>
+                                                                        </a> | 
+                                                                        <%}%>
+                                                                        <%if (salvaistanza) {%>
+                                                                        <button type="button" data-bs-toggle="tooltip" title="VERIFICA E SALVA ISTANZA" 
+                                                                                data-preload='false'  
+                                                                                class="btn btn-sm btn-bg-light btn-success"
+                                                                                onclick="return saveistanza('<%=is1.getIdistanza()%>')"><i class="fa fa-save"></i>
+                                                                        </button> | 
+                                                                        <%} else if (inviaistanza) {%>
+                                                                        <button type="button" data-bs-toggle="tooltip" title="INVIA ISTANZA" 
+                                                                                data-preload='false'  
+                                                                                class="btn btn-sm btn-bg-light btn-success"
+                                                                                onclick="return sendistanza('<%=is1.getIdistanza()%>')"><i class="fa fa-envelope"></i>
+                                                                        </button> | 
+                                                                        <%}%>
+                                                                        <%if (eliminaistanza) {%>
+                                                                        <button type="button"class="btn btn-sm btn-bg-light btn-danger"
+                                                                                data-bs-toggle="tooltip" title="ELIMINA ISTANZA" 
+                                                                                data-preload='false'
+                                                                                onclick="return deleteistanza('<%=is1.getIdistanza()%>')"><i class="fa fa-remove"></i>
+                                                                        </button> | 
+                                                                        <%}%>
+
+                                                                        <a href="US_gestioneallegati.jsp?idist=<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>"
+                                                                           data-fancybox data-type='iframe' 
+                                                                           data-bs-toggle="tooltip" title="GESTIONE ALLEGATI" 
+                                                                           data-preload='false' data-width='100%' data-height='100%' 
+                                                                           class="btn btn-sm btn-bg-light btn-secondary"
+                                                                           >
+                                                                            <i class="fa fa-file-clipboard"></i>
+                                                                        </a>
                                                                     </form>
-                                                                    <%}%>
-                                                                    <%if (addcorso) {%>
-                                                                    <a href="US_addcorsoistanza.jsp?idist=<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>"
-                                                                       data-fancybox data-type='iframe' 
-                                                                       data-bs-toggle="tooltip" title="AGGIUNGI CORSO AD ISTANZA" 
-                                                                       data-preload='false' data-width='100%' data-height='100%' 
-                                                                       class="btn btn-sm btn-bg-light btn-primary fan1">
-                                                                        <i class="fa fa-plus-circle"></i>
-                                                                    </a>
-                                                                    <%}%>
-                                                                    <%if (salvaistanza) {%>
-                                                                    <button type="button" data-bs-toggle="tooltip" title="VERIFICA E SALVA ISTANZA" 
-                                                                            data-preload='false'  
-                                                                            class="btn btn-sm btn-bg-light btn-success"
-                                                                            onclick="return saveistanza('<%=is1.getIdistanza()%>')"><i class="fa fa-save"></i>
-                                                                    </button>
-                                                                    <%} else if (inviaistanza) {%>
-                                                                    <button type="button" data-bs-toggle="tooltip" title="INVIA ISTANZA" 
-                                                                            data-preload='false'  
-                                                                            class="btn btn-sm btn-bg-light btn-success"
-                                                                            onclick="return sendistanza('<%=is1.getIdistanza()%>')"><i class="fa fa-envelope"></i>
-                                                                    </button>
-                                                                    <%}%>
-                                                                    <%if (eliminaistanza) {%>
-                                                                    <button type="button"class="btn btn-sm btn-bg-light btn-danger"
-                                                                            data-bs-toggle="tooltip" title="ELIMINA ISTANZA" 
-                                                                            data-preload='false'
-                                                                            onclick="return deleteistanza('<%=is1.getIdistanza()%>')"><i class="fa fa-remove"></i>
-                                                                    </button>
-                                                                    <%}%>
 
                                                                 </td>
                                                             </tr>

@@ -742,6 +742,9 @@ public class Operations extends HttpServlet {
 
         if (co1 != null) {
 
+            double mx_oreteo = Utils.calcolaPercentuale(String.valueOf(co1.getDurataore()), String.valueOf(60));
+            double mx_oretec = Utils.calcolaPercentuale(String.valueOf(co1.getDurataore()), String.valueOf(40));
+
             double oremaxlearn = calcolaPercentuale(String.valueOf(co1.getDurataore()), String.valueOf(co1.getElearningperc()));
 
             double ORETOTALI = fd(formatDoubleforMysql(Utils.getRequestValue(request, "ORETOTALI")));
@@ -753,9 +756,15 @@ public class Operations extends HttpServlet {
             List<Calendario_Formativo> calendar = ep1.calendario_formativo_corso_solomoduli(co1);
             AtomicDouble orepian = new AtomicDouble(0.0);
             AtomicDouble orelearning = new AtomicDouble(0.0);
+
+            AtomicDouble ore_pteo = new AtomicDouble(0.0);
+            AtomicDouble ore_ptec = new AtomicDouble(0.0);
+
             calendar.forEach(c1 -> {
                 orepian.addAndGet(Double.parseDouble(String.valueOf(c1.getOre())));
                 orelearning.addAndGet(Double.parseDouble(String.valueOf(c1.getOre_teorica_el())));
+                ore_pteo.addAndGet(Double.parseDouble(String.valueOf(c1.getOre_teorica_aula())));
+                ore_ptec.addAndGet(Double.parseDouble(String.valueOf(c1.getOre_tecnica_operativa())));
             });
 
             double dapian = fd(String.valueOf(co1.getDurataore())) - orepian.get();
@@ -765,9 +774,20 @@ public class Operations extends HttpServlet {
             boolean check_elearning = orelearning.get() + OREELE <= oremaxlearn;
             boolean check_sum = (ORETOTALI - OREAULATEO - OREAULATEC - OREELE) == 0;
 
+            boolean check_teoria = ore_pteo.get() + OREAULATEO <= mx_oreteo;
+            boolean check_tecnic = ore_ptec.get() + OREAULATEC <= mx_oretec;
+
             if (!check_oretotali) {
                 resp_out.addProperty("result", false);
                 resp_out.addProperty("message", "Ore superiori a quelle consentite.<br>Ore residue da pianificare: " + dapian);
+            } else if (!check_teoria) {
+                resp_out.addProperty("result", false);
+                resp_out.addProperty("message",
+                        "Ore di aula teorica superiori al massimo consentito (60% del totale corso). Massime ore di questa tipologia pianificabili: " + (mx_oreteo - ore_pteo.get()));
+            } else if (!check_tecnic) {
+                resp_out.addProperty("result", false);
+                resp_out.addProperty("message",
+                        "Ore di aula tecnico/operativa superiori al massimo consentito (40% del totale corso). Massime ore di questa tipologia pianificabili: " + (mx_oretec - ore_ptec.get()));
             } else if (!check_elearning) {
                 resp_out.addProperty("result", false);
                 resp_out.addProperty("message", "Ore e-learning superiori a quelle consentite.<br>Ore residue e-learning da pianificare: " + dapianEL);

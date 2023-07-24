@@ -49,6 +49,11 @@
                 int modulidaassegnare = calendarlez.size() - moduliassegnati;
                 Engine.verificacorsodainviare(co1, calendariocompleto, modulidaassegnare);
                 String costostimato = (co1.getCostostimatoallievo() == 0.0) ? "" : String.format("%.2f", co1.getCostostimatoallievo());
+            
+
+                double oreteo = Utils.calcolaPercentuale(String.valueOf(co1.getDurataore()), String.valueOf(60));
+                double oretec = Utils.calcolaPercentuale(String.valueOf(co1.getDurataore()), String.valueOf(40));
+
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -92,17 +97,21 @@
                         </div>
                         <div class="card-body py-3">
                             <div class="row">
-                                <label class="col-lg-4 col-form-label fw-bold fs-6">
+                                <label class="col-lg-3 col-form-label fw-bold fs-6">
                                     <span><b>Tipologia Percorso</b></span><br/>
                                     <span><%=co1.getTipologiapercorso().getNometipologia()%></span>
                                 </label>
-                                <label class="col-lg-4 col-form-label fw-bold fs-6">
+                                <label class="col-lg-3 col-form-label fw-bold fs-6">
                                     <span><b>Nome Percorso</b></span><br/>
                                     <span><%=co1.getRepertorio().getDenominazione()%></span>
                                 </label>
-                                <label class="col-lg-4 col-form-label fw-bold fs-6">
+                                <label class="col-lg-3 col-form-label fw-bold fs-6">
                                     <span><b>Dati Percorso</b></span><br/>
                                     <span><%=co1.getSchedaattivita().getTipologiapercorso()%></span>
+                                </label>
+                                <label class="col-lg-3 col-form-label fw-bold fs-6">
+                                    <span><b>Sede Formativa</b></span><br/>
+                                    <span><%=co1.getSedescelta().getIndirizzo()%> - <%=co1.getSedescelta().getComune()%></span>
                                 </label>
                             </div>
                             <div class="row">
@@ -119,21 +128,25 @@
                                     <span><%=co1.getDuratagiorni()%></span>
                                 </label>
                                 <label class="col-lg-3 col-form-label fw-bold fs-6">
-                                    <span><b>Sede Formativa</b></span><br/>
-                                    <span><%=co1.getSedescelta().getIndirizzo()%> - <%=co1.getSedescelta().getComune()%></span>
+                                    <span><b>Stage</b></span><br/>
+                                    <span><%=co1.getStageore()%> ORE</span>
                                 </label>
                             </div>
                             <input type="hidden" id="startduration" value="<%=co1.getDurataore()%>" />
                             <input type="hidden" id="stageduration" value="<%=co1.getStageore()%>" />
+                            <input type="hidden" id="teoduration" value="<%=oreteo%>" />
+                            <input type="hidden" id="tecduration" value="<%=oretec%>" />
+                            
                             <div class="row">
                                 <label class="col-lg-3 col-form-label fw-bold fs-6">
                                     <span><b>Durata in Ore AULA (Iniziale - Complessiva)</b></span><br/>
                                     <span><%=co1.getDurataore()%> ORE - <b id="completeduration" class="text-primary"><%=co1.getDurataore()%></b><b class="text-primary">&nbsp;ORE</b></span>
                                 </label>
                                 <label class="col-lg-3 col-form-label fw-bold fs-6">
-                                    <span><b>Stage</b></span><br/>
-                                    <span><%=co1.getStageore()%> ORE</span>
+                                    <span><b>Ore AULA Teoria (60%) - Tec./Ope. (40%)</b></span><br/>
+                                    <span><%=Utils.roundDoubleandFormat(oreteo, 2)%> - <%=Utils.roundDoubleandFormat(oretec, 2)%></span>
                                 </label>
+                                
                                 <label class="col-lg-3 col-form-label fw-bold fs-6">
                                     <span><b>eLearning</b></span><br/>
                                     <span><%=co1.getElearningperc()%> % - <%=Utils.getPercentuale(co1.getDurataore(), co1.getElearningperc())%> ORE</span>
