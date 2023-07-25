@@ -18,7 +18,7 @@
                 int corsi_attuali = 0;
                 boolean istanzaok = false;
                 if (i1 != null) {
-                    istanzaok = i1.getStatocorso().getCodice().equals("02");
+                    istanzaok = i1.getStatocorso().getCodicestatocorso().equals("02");
                     corsi_attuali = i1.getQuantitarichiesta();
                 } else {
                     i1 = new Istanza();

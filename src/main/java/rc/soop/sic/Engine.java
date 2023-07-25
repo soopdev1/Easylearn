@@ -28,8 +28,10 @@ import rc.soop.sic.jpa.Moduli_Docenti;
 import rc.soop.sic.jpa.Path;
 import rc.soop.sic.jpa.Repertorio;
 import rc.soop.sic.jpa.Scheda_Attivita;
+import rc.soop.sic.jpa.SoggettoProponente;
 import rc.soop.sic.jpa.Stati;
 import rc.soop.sic.jpa.Tipologia_Percorso;
+import rc.soop.sic.jpa.User;
 
 /**
  *
@@ -75,7 +77,21 @@ public class Engine {
         String[] contatori = {"0", "0", "0", "0"};
 
         try {
+            SoggettoProponente so = ((User) se.getAttribute("us_memory")).getSoggetto();
+            EntityOp eo = new EntityOp();
 
+            List<Istanza> all = eo.getIstanzeSoggetto(so);
+            
+            try {
+                contatori[0] = String.valueOf(all.stream().filter(is1-> is1.getStatocorso().getCodicestatocorso().equals("07")).collect(Collectors.toList()).size());
+            } catch (Exception ex0) {
+                trackingAction(se.getAttribute("us_cod").toString(), estraiEccezione(ex0));
+            }
+            try {
+                contatori[1] = String.valueOf(all.stream().filter(is1-> is1.getStatocorso().getCodicestatocorso().equals("08")).collect(Collectors.toList()).size());
+            } catch (Exception ex0) {
+                trackingAction(se.getAttribute("us_cod").toString(), estraiEccezione(ex0));
+            }
         } catch (Exception ex) {
             trackingAction(se.getAttribute("us_cod").toString(), estraiEccezione(ex));
         }
@@ -101,9 +117,8 @@ public class Engine {
             } catch (Exception ex1) {
                 trackingAction(se.getAttribute("us_cod").toString(), estraiEccezione(ex1));
             }
-            
+
             //corsi avviati
-            
         } catch (Exception ex) {
             trackingAction(se.getAttribute("us_cod").toString(), estraiEccezione(ex));
         }

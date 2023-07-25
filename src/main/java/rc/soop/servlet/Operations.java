@@ -40,8 +40,11 @@ import static rc.soop.sic.Utils.estraiEccezione;
 import static rc.soop.sic.Utils.fd;
 import static rc.soop.sic.Utils.formatDoubleforMysql;
 import static rc.soop.sic.Utils.generaId;
+import static rc.soop.sic.Utils.generateIdentifier;
+import static rc.soop.sic.Utils.getMimeType;
 import static rc.soop.sic.Utils.getRequestValue;
 import static rc.soop.sic.Utils.normalize;
+import static rc.soop.sic.Utils.normalizeUTF8;
 import static rc.soop.sic.Utils.parseIntR;
 import static rc.soop.sic.Utils.parseLongR;
 import static rc.soop.sic.Utils.redirect;
@@ -74,6 +77,70 @@ import rc.soop.sic.jpa.User;
  * @author Raffaele
  */
 public class Operations extends HttpServlet {
+
+    protected void UPLGENERIC(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Utils.printRequest(request);
+
+        try {
+
+            EntityOp ep1 = new EntityOp();
+//            SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
+            Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
+            FileItemFactory factory = new DiskFileItemFactory();
+            ServletFileUpload upload = new ServletFileUpload(factory);
+            File nomefile = null;
+            List<FileItem> items = upload.parseRequest(request);
+            Iterator<FileItem> iterator = items.iterator();
+            String IDIST = null;
+            String DESCRIZIONE = null;
+            String MIME = null;
+            String codiceDOC = generateIdentifier(6);
+            while (iterator.hasNext()) {
+                FileItem item = (FileItem) iterator.next();
+                if (item.isFormField()) {
+                    if (item.getFieldName().equals("idist")) {
+                        IDIST = item.getString();
+                    } else if (item.getFieldName().equals("DESCRIZIONE")) {
+                        DESCRIZIONE = normalizeUTF8(normalize(item.getString()));
+                    }
+                } else {
+                    String fileName = item.getName();
+                    String estensione = fileName.substring(fileName.lastIndexOf("."));
+                    String nome = codiceDOC + new DateTime().toString(PATTERNDATE3)
+                            + RandomStringUtils.randomAlphabetic(15) + estensione;
+                    try {
+                        nomefile = new File(pathtemp.getDescrizione() + nome);
+                        item.write(nomefile);
+                        MIME = getMimeType(nomefile);
+                    } catch (Exception ex) {
+                        EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
+                        nomefile = null;
+                    }
+                }
+            }
+
+            if (nomefile != null) {
+
+                if (IDIST != null) {
+                    Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(getRequestValue(request, "IDISTANZA")));
+                    if (is1 == null) {
+                        
+                        
+                        
+                    } else {
+
+                    }
+                } else {
+
+                }
+            } else {
+
+            }
+
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+    }
 
     protected void UPLISTA1(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getSession().setAttribute("is_qrerror", "");
@@ -147,32 +214,6 @@ public class Operations extends HttpServlet {
             }
         } else {
             redirect(request, response, "US_upload.jsp?codice_istanza=" + codiceISTANZA + "&esito=KO4");
-        }
-    }
-
-    protected void SENDISTANZA_OLD(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-
-            SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
-            String codiceis = getRequestValue(request, "codice_istanza");
-            EntityOp e = new EntityOp();
-            Istanza is = e.getIstanza(so, codiceis);
-
-            List<Corso> c1 = e.getCorsiIstanza(is);
-
-            e.begin();
-            is.setStatocorso(e.getEm().find(CorsoStato.class, "07"));
-            is.setDatainvio(new DateTime().toString(PATTERNDATE5));
-            e.merge(is);
-            e.commit();
-            e.close();
-
-            request.getSession().setAttribute("is_memory", is);
-            redirect(request, response, "US_gestioneistanza.jsp");
-
-        } catch (Exception ex) {
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
-            redirect(request, response, "US_gestioneistanza.jsp?esito=KO");
         }
     }
 
@@ -1198,6 +1239,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "NOMINACOMMISSIONE":
                     NOMINACOMMISSIONE(request, response);
+                    break;
+                case "UPLGENERIC":
+                    UPLGENERIC(request, response);
                     break;
                 default:
                     break;

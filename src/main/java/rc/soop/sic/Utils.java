@@ -39,6 +39,7 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import org.apache.commons.lang3.StringUtils;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+import org.apache.tika.Tika;
 import org.joda.time.DateTime;
 import static rc.soop.sic.Constant.PATTERNDATE2;
 import static rc.soop.sic.Constant.PATTERNDATE3;
@@ -361,6 +362,23 @@ public class Utils {
         return input == null ? "" : Normalizer.normalize(input, Normalizer.Form.NFKD);
     }
 
+    public static String normalizeUTF8(String var) {
+        try {
+            return new String(var.getBytes(ISO_8859_1), "UTF-8");
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+        }
+        return var;
+    }
+
+    public static String getMimeType(File ing) {
+        try {
+            return new Tika().detect(ing);
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+        }
+        return "";
+    }
 //
 //    
 //    public static String dec_string(String ing){

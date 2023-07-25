@@ -22,12 +22,16 @@ function sendistanza(idistanza) {
     var messageko = "ERRORE GENERICO";
     $.confirm({
         title: 'Conferma Operazione',
-        content: "Confermi di voler presentare l'istanza con ID " + idistanza + " ? L'operazione non potrà essere annullata.",
+        content: "Confermi di voler presentare l'istanza con ID <b>" + idistanza +
+                "</b> ? Confermi di accettare e sottoscrivere l'istanza in tutte le sue parti come da visualizzazione a sistema della stessa?"+
+                " L'operazione non potrà essere annullata.",
         theme: 'bootstrap',
+        columnClass: 'col-md-9',
+
         buttons: {
             confirm: {
-                btnClass: 'btn-success',
-                text: "<i class='fa fa-check'></i> CONFERMO", // With spaces and symbols
+                btnClass: 'btn-success btn-lg',
+                text: "<i class='fa fa-check'></i> SI. ACCETTO E CONFERMO", // With spaces and symbols
                 action: function () {
                     $.ajax({
                         url: 'Operations',
@@ -43,9 +47,9 @@ function sendistanza(idistanza) {
                             if (data.result) {
                                 ok = true;
                             } else {
-                                
-                                    
-                            
+
+
+
                                 messageko = ("ERRORE: " + data.message);
                             }
                         },
@@ -88,8 +92,8 @@ function sendistanza(idistanza) {
             }
             ,
             cancel: {
-                btnClass: 'btn-danger',
-                text: "<i class='fa fa-remove'></i> ANNULLO" // With spaces and symbols                
+                btnClass: 'btn-danger btn-lg',
+                text: "<i class='fa fa-remove'></i> NO. ANNULLA INVIO" // With spaces and symbols                
             }
         }
     });
@@ -102,6 +106,7 @@ function saveistanza(idistanza) {
         title: 'Conferma Operazione',
         content: "Confermi di voler salvare l'istanza con ID " + idistanza + " ? L'operazione non potrà essere annullata.",
         theme: 'bootstrap',
+        columnClass: 'col-md-9',
         buttons: {
             confirm: {
                 btnClass: 'btn-success',

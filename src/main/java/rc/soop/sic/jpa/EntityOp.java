@@ -14,6 +14,7 @@ import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import javax.servlet.http.HttpSession;
 import static rc.soop.sic.Utils.convmd5;
+import static rc.soop.sic.Utils.estraiEccezione;
 
 /**
  *
@@ -226,7 +227,7 @@ public class EntityOp {
         q.setParameter("corsodiriferimento", c);
         return (List<Calendario_Formativo>) q.getResultList();
     }
-    
+
     public List<Calendario_Formativo> calendario_formativo_corso_lezioni(Corso c) {
         TypedQuery q = this.em.createNamedQuery("calendarioformativo.pianificare", Calendario_Formativo.class);
         q.setParameter("corsodiriferimento", c);
@@ -250,6 +251,23 @@ public class EntityOp {
         TypedQuery q = this.em.createNamedQuery("md.elencobycalendarioformativo", Moduli_Docenti.class);
         q.setParameter("moduloformativo", c1);
         return (List<Moduli_Docenti>) q.getResultList();
+    }
+
+    public List<Allegati> list_allegati(Istanza is1, Corso c1, Corsoavviato c2, Docente d1, Allievi a1) {
+
+        List<Allegati> elenco = new ArrayList<>();
+        if (is1 != null) {
+
+            try {
+                TypedQuery q = this.em.createNamedQuery("allegati.istanza", Allegati.class);
+                q.setParameter("istanza", is1);
+                elenco.addAll((List<Allegati>) q.getResultList());
+            } catch (Exception ex0) {
+                trackingAction("SERVICE", estraiEccezione(ex0));
+            }
+
+        }
+        return elenco;
     }
 
     public List<Docente> list_docenti_moduli(List<Docente> eldoc, List<Calendario_Formativo> calendar) {
@@ -283,9 +301,5 @@ public class EntityOp {
 
         return out;
     }
-    
-    
-    
-    
 
 }

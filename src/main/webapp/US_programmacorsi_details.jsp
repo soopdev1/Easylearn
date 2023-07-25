@@ -174,7 +174,8 @@
                                                id="CO_<%=co.getIdconoscenze()%>_<%=cmp.getIdcompetenze()%>" 
                                                name="CO_<%=co.getIdconoscenze()%>_<%=cmp.getIdcompetenze()%>" 
                                                onchange="return check_abilita_competenze();" />
-                                        <label class="form-check-label" for="CO_<%=co.getIdconoscenze()%>"><%=co.getIdconoscenze()%> - <%=co.getDescrizione()%></label>
+                                        <label class="form-check-label" for="CO_<%=co.getIdconoscenze()%>">
+                                            <%=co.getIdconoscenze()%> - <%=co.getDescrizione()%></label>
                                     </div>
                                     <%}%>    
 

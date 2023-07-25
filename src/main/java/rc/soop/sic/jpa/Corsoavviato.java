@@ -34,8 +34,8 @@ public class Corsoavviato implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "idcorso")
-    private Long idcorso;
+    @Column(name = "idcorsoavviato")
+    private Long idcorsoavviato;
 
     @ManyToOne
     @JoinColumn(name = "idsoggetto")
@@ -69,12 +69,12 @@ public class Corsoavviato implements Serializable {
     @Column(name = "membricommissione")
     private String membricommissione;
 
-    public Long getIdcorso() {
-        return idcorso;
+    public Long getIdcorsoavviato() {
+        return idcorsoavviato;
     }
 
-    public void setIdcorso(Long idcorso) {
-        this.idcorso = idcorso;
+    public void setIdcorsoavviato(Long idcorsoavviato) {
+        this.idcorsoavviato = idcorsoavviato;
     }
 
     public SoggettoProponente getSoggetto() {

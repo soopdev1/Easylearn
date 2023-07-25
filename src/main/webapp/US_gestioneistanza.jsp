@@ -81,13 +81,20 @@
                                             <!--begin::Header-->
                                             <div class="card-header border-0 pt-5">
                                                 <h3 class="card-title align-items-start flex-column">
-                                                    <span class="card-label fw-bolder fs-3 mb-1">ISTANZA PER L'AUTORIZZAZIONE DEI CORSI AUTOFINANZIATI</span>
-                                                    <span class="text-muted mt-1 fw-bold fs-7">Istanza di autorizzazione allo svolgimento di corsi di formazione professionale autofinanziati</span>
+                                                    <span class="card-label fw-bolder fs-3 mb-1">ISTANZA PER L'AUTORIZZAZIONE DEI CORSI</span>
+                                                    <span class="text-muted mt-1 fw-bold fs-7">Istanza di autorizzazione allo svolgimento di corsi di formazione professionale</span>
                                                 </h3>
 
                                             </div>
                                             <!--end::Header-->
                                             <!--begin::Body-->
+                                            
+                                            
+                                            
+                                            <div class="card-body py-3">
+                                                SEZIONE FILTRI
+                                            </div>
+                                            <hr>
                                             <div class="card-body py-3">
                                                 <!--begin::Table container-->
                                                 <div class="table-responsive ">
@@ -174,7 +181,7 @@
 
                                                                         <%if (consultaistanza) {%>
                                                                         <button type="submit"class="btn btn-sm btn-primary"
-                                                                                data-bs-toggle="tooltip" title="VISUALIZZA ISTANZA PRESENTATA" 
+                                                                                data-bs-toggle="tooltip" title="VISUALIZZA ISTANZA" 
                                                                                 data-preload='false'><i class="fa fa-file-text"></i></button> | 
                                                                             <%}%>
                                                                             <%if (addcorso) {%>
