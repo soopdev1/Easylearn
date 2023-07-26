@@ -24,7 +24,8 @@ import javax.persistence.TemporalType;
  * @author Administrator
  */
 @NamedQueries(value = {
-    @NamedQuery(name = "allegati.istanza", query = "SELECT c FROM Allegati c WHERE c.istanza=:istanza")
+    @NamedQuery(name = "allegati.istanza", query = "SELECT c FROM Allegati c WHERE c.istanza=:istanza"),
+    @NamedQuery(name = "allegati.istanza.ok", query = "SELECT c FROM Allegati c WHERE c.istanza=:istanza AND c.stato.codicestatocorso<>'32'")
 })
 @Entity
 @Table(name = "allegati")
@@ -73,7 +74,7 @@ public class Allegati implements Serializable {
     private CorsoStato stato;
 
     @Column(name = "datacaricamento")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date datacaricamento;
 
     @Column(name = "utentecaricamento")
@@ -203,7 +204,6 @@ public class Allegati implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Allegati)) {
             return false;
         }

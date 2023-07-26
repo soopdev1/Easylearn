@@ -88,9 +88,9 @@
                                             </div>
                                             <!--end::Header-->
                                             <!--begin::Body-->
-                                            
-                                            
-                                            
+
+
+
                                             <div class="card-body py-3">
                                                 SEZIONE FILTRI
                                             </div>
@@ -214,16 +214,17 @@
                                                                         </button> | 
                                                                         <%}%>
 
-                                                                        <a href="US_gestioneallegati.jsp?idist=<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>"
-                                                                           data-fancybox data-type='iframe' 
-                                                                           data-bs-toggle="tooltip" title="GESTIONE ALLEGATI" 
-                                                                           data-preload='false' data-width='100%' data-height='100%' 
-                                                                           class="btn btn-sm btn-bg-light btn-secondary"
-                                                                           >
+                                                                        <button type="button"  
+                                                                                data-bs-toggle="tooltip" title="GESTIONE ALLEGATI" 
+                                                                                data-preload='false' 
+                                                                                class="btn btn-sm btn-bg-light btn-secondary"
+                                                                                onclick="return document.getElementById('gestall_<%=is1.getIdistanza()%>').submit();">
                                                                             <i class="fa fa-file-clipboard"></i>
-                                                                        </a>
+                                                                        </button>
                                                                     </form>
-
+                                                                    <form action="US_gestioneallegati.jsp" method="POST" target="_blank" id="gestall_<%=is1.getIdistanza()%>">
+                                                                        <input type="hidden" name="idist" value="<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>"/>
+                                                                    </form>       
                                                                 </td>
                                                             </tr>
                                                             <%}%>        

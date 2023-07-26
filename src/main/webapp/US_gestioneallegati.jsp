@@ -39,6 +39,7 @@
         <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
         <link href="assets/plugins/DataTables/datatables.min.css" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="assets/plugins/jquery-confirm.3.3.2.min.css">
 
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/plus.css" rel="stylesheet" type="text/css" />
@@ -49,9 +50,12 @@
     <!--begin::Body-->
     <%
 
+        String idistS = Utils.getRequestValue(request, "idist");
+        if (idistS.equals("")) {
+            idistS = (String) session.getAttribute("ses_idist");
+        }
         EntityOp eo = new EntityOp();
-        User u1 = (User) session.getAttribute("us_memory");
-        Long idist = Long.valueOf(Utils.dec_string(Utils.getRequestValue(request, "idist")));
+        Long idist = Long.valueOf(Utils.dec_string(idistS));
         Istanza is1 = eo.getEm().find(Istanza.class, idist);
         List<Allegati> la = eo.list_allegati(is1, null, null, null, null);
     %>
@@ -140,9 +144,11 @@
                                                 <!--begin::Table head-->
                                                 <thead>
                                                     <tr>
+                                                        <th class="p-2 w-50px">ID</th>
                                                         <th class="p-2 w-50px">CODICE</th>
                                                         <th class="p-2 w-150px">DESCRIZIONE</th>
-                                                        <th class="p-2 w-150px">DATA CARICAMENTO</th>
+                                                        <th class="p-2 w-50px">DATA CARICAMENTO</th>
+                                                        <th class="p-2 w-50px">TIPO FILE</th>
                                                         <th class="p-2 w-50px">AZIONI</th>
                                                     </tr>
                                                 </thead>
@@ -151,10 +157,27 @@
                                                 <tbody>
                                                     <%for (Allegati d2 : la) {%>
                                                     <tr>
+                                                        <td class="p-2 w-50px"><%=d2.getIdallegati()%></td>
                                                         <td class="p-2 w-50px"><%=d2.getCodiceallegati()%></td>
                                                         <td class="p-2 w-150px"><%=d2.getDescrizione()%></td>
-                                                        <td class="p-2 w-150px"><%=d2.getDatacaricamento()%></td>
-                                                        <td class="p-2 w-150px"><i class='fa fa-hourglass'></i></td>      
+                                                        <td class="p-2 w-50px"><%=Constant.sdf_PATTERNDATE5.format(d2.getDatacaricamento())%></td>
+                                                        <td class="p-2 w-50px"><%=d2.getMimetype()%></td>
+                                                        <td class="p-2 w-150px">
+                                                            <form method="POST" action="Operations" target="_blank">
+                                                                <input type="hidden" name="type" value="VISUALDOC"/>
+                                                                <input type="hidden" name="iddocument" value="<%=d2.getIdallegati()%>" />
+                                                                <button type="submit" class="btn btn-sm btn-bg-light btn-success"
+                                                                        data-bs-toggle="tooltip" title="VISUALIZZA DOCUMENTO" 
+                                                                        data-preload='false'
+                                                                        ><i class="fa fa-file-alt"></i>
+                                                                </button> | 
+                                                                <button type="button"class="btn btn-sm btn-bg-light btn-danger"
+                                                                        data-bs-toggle="tooltip" title="ELIMINA DOCUMENTO" 
+                                                                        data-preload='false'
+                                                                        onclick="return deletedoc('<%=d2.getIdallegati()%>')"><i class="fa fa-remove"></i>
+                                                                </button>
+                                                            </form>
+                                                        </td>      
                                                     </tr>
                                                     <%}
                                                     %>
@@ -219,12 +242,13 @@
         <script src="assets/plugins/DataTables/jquery-3.5.1.js"></script>
         <script src="assets/plugins/DataTables/jquery.dataTables.min.js"></script>
         <script src="assets/plugins/DataTables/datatables.min.js"></script>
-        <script src="assets/plugins/DataTables/date-eu.js"></script>
+        <script src="assets/plugins/DataTables/date-euro.js"></script>
         <!--end::Page Vendors Javascript-->
         <!--begin::Page Custom Javascript(used by this page)-->
         <script src="assets/js/widgets.bundle.js"></script>
         <script src="assets/js/custom/widgets.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
+        <script src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
         <script src="assets/js/US_gestioneallegati.js"></script>
 
         <!--end::Page Custom Javascript-->

@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import static java.lang.String.format;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,12 +19,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.tika.mime.MimeType;
+import org.apache.tika.mime.MimeTypes;
 import org.joda.time.DateTime;
 import static rc.soop.sic.Constant.PATTERNDATE3;
 import static rc.soop.sic.Constant.PATTERNDATE4;
@@ -49,6 +53,7 @@ import static rc.soop.sic.Utils.parseIntR;
 import static rc.soop.sic.Utils.parseLongR;
 import static rc.soop.sic.Utils.redirect;
 import rc.soop.sic.jpa.Abilita;
+import rc.soop.sic.jpa.Allegati;
 import rc.soop.sic.jpa.Attrezzature;
 import rc.soop.sic.jpa.Calendario_Formativo;
 import rc.soop.sic.jpa.Competenze;
@@ -79,12 +84,13 @@ import rc.soop.sic.jpa.User;
 public class Operations extends HttpServlet {
 
     protected void UPLGENERIC(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Utils.printRequest(request);
+//        Utils.printRequest(request);
 
         try {
 
             EntityOp ep1 = new EntityOp();
-//            SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
+            String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
+//            SoggettoProponente so = ((User) request.getSession().getAttribute("us_cod")).getSoggetto();
             Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
             FileItemFactory factory = new DiskFileItemFactory();
             ServletFileUpload upload = new ServletFileUpload(factory);
@@ -122,24 +128,41 @@ public class Operations extends HttpServlet {
             if (nomefile != null) {
 
                 if (IDIST != null) {
-                    Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(getRequestValue(request, "IDISTANZA")));
-                    if (is1 == null) {
-                        
-                        
-                        
-                    } else {
+                    request.getSession().setAttribute("ses_idist", Utils.enc_string(IDIST));
+                    Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(IDIST));
+                    if (is1 != null) {
 
+                        Allegati al1 = new Allegati();
+                        al1.setIstanza(is1);
+                        al1.setCodiceallegati(codiceDOC);
+                        al1.setContent(Base64.encodeBase64String(FileUtils.readFileToByteArray(nomefile)));
+                        al1.setDescrizione(DESCRIZIONE);
+                        al1.setStato(ep1.getEm().find(CorsoStato.class, "30"));
+                        al1.setMimetype(MIME);
+                        al1.setUtentecaricamento(utentecaricamento);
+                        al1.setDatacaricamento(new Date());
+
+                        ep1.begin();
+                        ep1.persist(al1);
+                        ep1.commit();
+                        ep1.close();
+                        redirect(request, response, "US_gestioneallegati.jsp");
+                    } else {
+                        redirect(request, response, "Page_message.jsp?esito=KOUP_IS1");
                     }
                 } else {
-
+                    redirect(request, response, "Page_message.jsp?esito=KOUP_IS2");
                 }
             } else {
-
+                redirect(request, response, "Page_message.jsp?esito=KOUP_IS3");
             }
 
         } catch (Exception ex1) {
+            ex1.printStackTrace();
             EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KOUP_IS4");
         }
+
     }
 
     protected void UPLISTA1(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -319,6 +342,34 @@ public class Operations extends HttpServlet {
         } catch (Exception ex) {
             EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
             redirect(request, response, "US_gestioneistanza.jsp?esito=KO");
+        }
+    }
+
+    protected void VISUALDOC(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        try {
+
+            Long iddoc = Long.valueOf(getRequestValue(request, "iddocument"));
+            EntityOp eo = new EntityOp();
+
+            Allegati a1 = eo.getEm().find(Allegati.class, iddoc);
+            if (a1 != null) {
+
+                response.setContentType(a1.getMimetype());
+                String headerKey = "Content-Disposition";
+                String headerValue = format("attach; filename=\"%s\"",
+                        Utils.generaId(50)
+                        + MimeTypes.getDefaultMimeTypes().forName(a1.getMimetype()).getExtension());
+                response.setHeader(headerKey, headerValue);
+                response.setContentLength(-1);
+                try (OutputStream outStream = response.getOutputStream()) {
+                    outStream.write(Base64.decodeBase64(a1.getContent()));
+                }
+
+            }
+
+        } catch (Exception ex1) {
+
         }
     }
 
@@ -617,6 +668,42 @@ public class Operations extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             out.print(resp_out.toString());
         }
+    }
+
+    protected void DELETEDOCUMENT(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JsonObject resp_out = new JsonObject();
+        try {
+
+            EntityOp ep1 = new EntityOp();
+            Allegati al1 = ep1.getEm().find(Allegati.class, Long.valueOf(getRequestValue(request, "IDDOCUMENT")));
+
+            if (al1 != null) {
+                ep1.begin();
+                al1.setStato(ep1.getEm().find(CorsoStato.class, "32"));
+                ep1.merge(al1);
+                ep1.commit();
+                ep1.close();
+                resp_out.addProperty("result",
+                        true);
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "Errore: ALLEGATO NON TROVATO.");
+            }
+
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+
     }
 
     protected void DELETEISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -1195,6 +1282,9 @@ public class Operations extends HttpServlet {
                 case "DELETEISTANZA":
                     DELETEISTANZA(request, response);
                     break;
+                case "DELETEDOCUMENT":
+                    DELETEDOCUMENT(request, response);
+                    break;
                 case "SAVEISTANZA":
                     SAVEISTANZA(request, response);
                     break;
@@ -1219,9 +1309,9 @@ public class Operations extends HttpServlet {
                 case "ELIMINAISTANZAFIRMATA":
                     ELIMINAISTANZAFIRMATA(request, response);
                     break;
-//                case "SENDISTANZAOLD":
-//                    SENDISTANZA_OLD(request, response);
-//                    break;
+                case "VISUALDOC":
+                    VISUALDOC(request, response);
+                    break;
                 case "APPROVAISTANZA":
                     APPROVAISTANZA(request, response);
                     break;

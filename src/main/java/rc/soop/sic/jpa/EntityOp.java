@@ -259,7 +259,7 @@ public class EntityOp {
         if (is1 != null) {
 
             try {
-                TypedQuery q = this.em.createNamedQuery("allegati.istanza", Allegati.class);
+                TypedQuery q = this.em.createNamedQuery("allegati.istanza.ok", Allegati.class);
                 q.setParameter("istanza", is1);
                 elenco.addAll((List<Allegati>) q.getResultList());
             } catch (Exception ex0) {

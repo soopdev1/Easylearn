@@ -41,13 +41,13 @@ jQuery.extend( jQuery.fn.dataTableExt.oSort, {
 
 		/*month*/
 		var month = eu_date[1];
-		if ( month.length == 1 ) {
+		if ( month.length === 1 ) {
 			month = 0+month;
 		}
 
 		/*day*/
 		var day = eu_date[0];
-		if ( day.length == 1 ) {
+		if ( day.length === 1 ) {
 			day = 0+day;
 		}
 

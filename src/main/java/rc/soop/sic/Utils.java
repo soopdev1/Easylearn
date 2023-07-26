@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import static java.math.BigDecimal.ROUND_HALF_DOWN;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -39,7 +40,6 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import org.apache.commons.lang3.StringUtils;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import org.apache.tika.Tika;
 import org.joda.time.DateTime;
 import static rc.soop.sic.Constant.PATTERNDATE2;
 import static rc.soop.sic.Constant.PATTERNDATE3;
@@ -373,15 +373,11 @@ public class Utils {
 
     public static String getMimeType(File ing) {
         try {
-            return new Tika().detect(ing);
+            return Files.probeContentType(ing.toPath());
         } catch (Exception ex) {
             Constant.LOGGER.severe(estraiEccezione(ex));
         }
         return "";
     }
-//
-//    
-//    public static String dec_string(String ing){
-//        
-//    }
+    
 }
