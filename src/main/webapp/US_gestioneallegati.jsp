@@ -96,6 +96,13 @@
                                 <!--end::Row-->
                                 <div class="card h-xl-100">
                                     <!--begin::Header-->
+
+                                    <%if (is1.getStatocorso().getCodicestatocorso().equals("06")
+                                                || is1.getStatocorso().getCodicestatocorso().equals("07")
+                                                || is1.getStatocorso().getCodicestatocorso().equals("08")) {
+
+                                        } else {%>
+
                                     <form action="Operations?type=UPLGENERIC" method="post"  enctype="multipart/form-data">
                                         <input type="hidden" name="idist" value="<%=is1.getIdistanza()%>"/>
 
@@ -129,6 +136,8 @@
                                         </div>
                                     </form>
                                     <hr>
+                                    <%}%>
+
                                     <div class="card-header border-0 pt-5">
                                         <h3 class="card-title align-items-start flex-column">
                                             <span class="card-label fw-bolder fs-3 mb-1">ELENCO ALLEGATI</span>
@@ -170,12 +179,20 @@
                                                                         data-bs-toggle="tooltip" title="VISUALIZZA DOCUMENTO" 
                                                                         data-preload='false'
                                                                         ><i class="fa fa-file-alt"></i>
-                                                                </button> | 
+                                                                </button>
+                                                                <%if (is1.getStatocorso().getCodicestatocorso().equals("06")
+                                                                            || is1.getStatocorso().getCodicestatocorso().equals("07")
+                                                                            || is1.getStatocorso().getCodicestatocorso().equals("08")) {
+
+                                                                    } else {%>
+                                                                | 
+
                                                                 <button type="button"class="btn btn-sm btn-bg-light btn-danger"
                                                                         data-bs-toggle="tooltip" title="ELIMINA DOCUMENTO" 
                                                                         data-preload='false'
                                                                         onclick="return deletedoc('<%=d2.getIdallegati()%>')"><i class="fa fa-remove"></i>
                                                                 </button>
+                                                                <%}%>
                                                             </form>
                                                         </td>      
                                                     </tr>

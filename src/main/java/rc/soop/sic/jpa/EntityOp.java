@@ -5,6 +5,7 @@
 package rc.soop.sic.jpa;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
@@ -300,6 +301,34 @@ public class EntityOp {
         }
 
         return out;
+    }
+
+    public List<Istanza> list_istanze_adm(String tipopercorso,String statoistanza) {
+        HashMap<String, Object> param = new HashMap<>();
+        String sql = "SELECT i FROM Istanza i ";
+
+        if (!tipopercorso.equals("")) {
+            sql += !sql.toUpperCase().contains("WHERE") ? "WHERE " : " AND ";
+            sql += "i.statocorso.codicestatocorso = :statoistanza";
+            param.put("statoistanza", statoistanza);
+        }
+        if (!statoistanza.equals("")) {
+            sql += !sql.toUpperCase().contains("WHERE") ? "WHERE " : " AND ";
+            sql += "i.statocorso.codicestatocorso = :statoistanza";
+            param.put("statoistanza", statoistanza);
+        }
+        
+        TypedQuery<Istanza> q = this.em.createQuery(sql, Istanza.class);
+
+        if (param.isEmpty()) {
+            q.setMaxResults(500);
+        }
+
+        param.entrySet().forEach(m -> {
+            q.setParameter(m.getKey(), m.getValue());
+        });
+
+        return q.getResultList().isEmpty() ? new ArrayList() : (List<Istanza>) q.getResultList();
     }
 
 }

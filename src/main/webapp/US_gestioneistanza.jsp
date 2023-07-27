@@ -87,14 +87,24 @@
 
                                             </div>
                                             <!--end::Header-->
-                                            <!--begin::Body-->
+                                            <!--begin::Body
 
 
 
                                             <div class="card-body py-3">
-                                                SEZIONE FILTRI
+
+                                                <div class="form-check form-switch active">
+                                                    <input class="form-check-input" type="checkbox" role="switch" 
+                                                           id="filterIS1"
+                                                           name="filterIS1"
+                                                           onchange="return check_abilita_competenze();" checked/>
+                                                    <label class="form-check-label" 
+                                                           for="filterIS1">
+                                                        VISUALIZZA ISTANZE GI&#192; PRESENTATE
+                                                    </label>
+                                                </div>
                                             </div>
-                                            <hr>
+                                            <hr>-->
                                             <div class="card-body py-3">
                                                 <!--begin::Table container-->
                                                 <div class="table-responsive ">
@@ -113,7 +123,6 @@
                                                         <!--end::Table head-->
                                                         <!--begin::Table body-->
                                                         <tbody>
-
                                                             <%for (Istanza is1 : ist_l) {
                                                                     Tipologia_Percorso tp1 = eo.getTipoPercorsoIstanza(is1);
                                                                     int maxcorsi = tp1.getMaxcorsi();
@@ -124,7 +133,6 @@
                                                                     boolean modificacorso = true;
                                                                     boolean inviaistanza = false;
                                                                     boolean consultaistanza = false;
-
                                                                     if (!is1.getStatocorso().getCodicestatocorso().equals("01")) {
                                                                         addcorso = false;
                                                                         salvaistanza = false;

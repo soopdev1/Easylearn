@@ -1202,6 +1202,7 @@ public class Operations extends HttpServlet {
                 is.setSoggetto(so);
                 is.setStatocorso(e.getEm().find(CorsoStato.class, "01"));
                 is.setQuantitarichiesta(parseIntR(getRequestValue(request, "quantitarichiesta")));
+                is.setTipologiapercorso(e.getEm().find(Tipologia_Percorso.class, Long.valueOf(getRequestValue(request, "scelta"))));            
                 e.persist(is);
             }
 

@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
     @NamedQuery(name = "istanza.listaaccettate", query = "SELECT i FROM Istanza i WHERE i.soggetto=:soggetto AND i.statocorso.codicestatocorso IN('08') ORDER BY i.idistanza DESC"),
     @NamedQuery(name = "istanza.dagestire", query = "SELECT i FROM Istanza i WHERE i.statocorso.codicestatocorso IN('07') ORDER BY i.idistanza DESC"),
     @NamedQuery(name = "istanza.gestite", query = "SELECT i FROM Istanza i WHERE i.statocorso.codicestatocorso IN('08','09') ORDER BY i.idistanza DESC")
+
 })
 @Entity
 @Table(name = "istanza")
@@ -47,6 +48,10 @@ public class Istanza implements Serializable {
     @ManyToOne
     @JoinColumn(name = "idsoggetto")
     private SoggettoProponente soggetto;
+
+    @ManyToOne
+    @JoinColumn(name = "tipologiapercorso")
+    private Tipologia_Percorso tipologiapercorso;
 
     @ManyToOne
     @JoinColumn(name = "stato")
@@ -111,6 +116,14 @@ public class Istanza implements Serializable {
 
     public void setQuantitarichiesta(int quantitarichiesta) {
         this.quantitarichiesta = quantitarichiesta;
+    }
+
+    public Tipologia_Percorso getTipologiapercorso() {
+        return tipologiapercorso;
+    }
+
+    public void setTipologiapercorso(Tipologia_Percorso tipologiapercorso) {
+        this.tipologiapercorso = tipologiapercorso;
     }
 
     public String getProtocollosoggetto() {

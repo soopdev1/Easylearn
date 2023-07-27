@@ -1,3 +1,43 @@
+var table;
+$(document).ready(function () {
+    var sti = $('#statoistanza').val();
+    var tip = $('#tipopercorso').val();
+    table = $('#tab_dt1').DataTable({
+        dom: '<if<t>lp>',
+        lengthMenu: [[10, 50, 100, -1], [10, 50, 100, "Tutto"]],
+        order: [[1, 'asc']],
+        language: {
+            url: 'assets/plugins/DataTables/it-IT.json'
+        },
+        responsive: true,
+        processing: true,
+        ajax: {
+            url: 'Search',
+            type: 'POST',
+            data: function (d) {
+                d.type = 'list_istanze_adm';
+                d.statoistanza = $('#statoistanza').val();
+                d.tipopercorso = $('#tipopercorso').val();
+            }
+        },
+        columns: [
+            {data: 'stato', orderable: false},
+            {data: 'cognome'},
+            {data: 'nome'},
+            {data: 'cf'},
+            {data: 'email'},
+            {data: 'telefono'},
+            {data: 'azioni', orderable: false}
+        ]
+    });
+});
+function refreshtable() {
+    table.ajax.reload(null, false);
+}
+
+
+
+
 function approvaistanza(idistanza) {
     var ok = false;
     var messageko = "ERRORE GENERICO";
@@ -35,7 +75,6 @@ function approvaistanza(idistanza) {
                             messageko = ("ERRORE: " + error);
                         }
                     });
-
                     if (ok) {
                         $.alert({
                             title: 'Operazione conclusa con successo!',
