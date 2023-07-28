@@ -32,7 +32,7 @@ public class Ateco implements Serializable {
     @Column(name = "descrizione", columnDefinition = "LONGTEXT")
     private String descrizione;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "repertorio_ateco",
             joinColumns = @JoinColumn(name = "codiceateco"),
             inverseJoinColumns = @JoinColumn(name = "idrepertorio"))

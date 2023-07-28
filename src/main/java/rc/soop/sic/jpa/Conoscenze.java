@@ -6,8 +6,10 @@ package rc.soop.sic.jpa;
 
 import java.io.Serializable;
 import java.util.Objects;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -32,8 +34,8 @@ public class Conoscenze implements Serializable {
     @Column(name = "descrizione", columnDefinition = "LONGTEXT")
     private String descrizione;
     
-    @ManyToOne
-    @JoinColumn(name = "idcompetenze")
+        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+@JoinColumn(name = "idcompetenze")
     private Competenze competenza;
 
     public Conoscenze() {

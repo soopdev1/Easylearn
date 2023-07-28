@@ -16,8 +16,10 @@ import static rc.soop.sic.Utils.estraiEccezione;
 import static rc.soop.sic.Utils.getRequestValue;
 import static rc.soop.sic.Utils.redirect;
 import rc.soop.sic.jpa.Allievi;
+import rc.soop.sic.jpa.Corso;
 import rc.soop.sic.jpa.Docente;
 import rc.soop.sic.jpa.EntityOp;
+import rc.soop.sic.jpa.Istanza;
 import rc.soop.sic.jpa.Sede;
 import rc.soop.sic.jpa.SoggettoProponente;
 import rc.soop.sic.jpa.User;
@@ -39,17 +41,14 @@ public class Search extends HttpServlet {
 
     protected void list_istanze_adm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-         try (PrintWriter out = response.getWriter()) {
+        try (PrintWriter out = response.getWriter()) {
             JsonObject jMembers = new JsonObject();
             JsonArray data = new JsonArray();
-            
+
             String statoistanza = getRequestValue(request, "statoistanza");
             String tipopercorso = getRequestValue(request, "tipopercorso");
-            
-            
-            
-            
-            List<Docente> result = new ArrayList<>();
+
+            List<Istanza> result = new EntityOp().list_istanze_adm(tipopercorso, statoistanza);
 
             jMembers.addProperty(ITOTALRECORDS, result.size());
             jMembers.addProperty(ITOTALDISPLAY, result.size());
@@ -57,25 +56,46 @@ public class Search extends HttpServlet {
             jMembers.addProperty(SCOLUMS, "");
             AtomicInteger at = new AtomicInteger(1);
             result.forEach(res -> {
-//                String pdf
-//                        = "<a href='javascript:void(0)' onclick='return $(\"#frm\").submit();' class='btn btn-sm btn-outline-primary m-btn m-btn--icon m-btn--icon-only m-btn--custom m-btn--pill m-btn--air' "
-//                        + "data-toggle='popover' data-placement='right' title='Visualizza File' data-content='Visualizza file documento.'><i class='far fa-file-pdf'></i></a>"
-//                        + "<form id='frm_' target='_blank' method='POST' action='Operations'>"
-//                        + "<input type='hidden' name='type' value='showPDF'/>"
-//                        + "<input type='hidden' name='ido' value='' />"
-//                        + "</form>";
-//
-//                String edit = "";
                 JsonObject data_value = new JsonObject();
                 data_value.addProperty(RECORDID, at.get());
-                data_value.addProperty("stato", res.getEtichettastato());
-                data_value.addProperty("cognome", res.getCognome());
-                data_value.addProperty("nome", res.getNome());
-                data_value.addProperty("cf", res.getCodicefiscale());
-                data_value.addProperty("titolo", res.getTitolostudio());
-                data_value.addProperty("tipologia", res.getTipologia());
-                data_value.addProperty("profiloprof", res.getProfiloprof());
-                data_value.addProperty("azioni", "<i class='fa fa-hourglass'></i>");
+                data_value.addProperty("id", res.getIdistanza());
+                data_value.addProperty("soggetto", res.getSoggetto().getRAGIONESOCIALE());
+                data_value.addProperty("corsi", res.getSoggetto().getRAGIONESOCIALE());
+                String corsi = "<b>Tipologia Percorsi: " + res.getTipologiapercorso().getNometipologia() + "</b><br/><hr>";
+                List<Corso> c1 = new EntityOp().getCorsiIstanza(res);
+                for (Corso cor : c1) {
+                    corsi += "<u>" + cor.getRepertorio().getDenominazione() + "</u>- Edizioni: " + cor.getQuantitarichiesta() + "<br/>";
+                }
+
+                data_value.addProperty("corsi", corsi);
+                data_value.addProperty("protocollo", res.getProtocollosoggetto() + " " + res.getProtocollosoggettodata());
+                data_value.addProperty("data", res.getDatainvio());
+                
+                
+                
+                data_value.addProperty("stato", res.getStatocorso().getHtmldescr());
+
+                String azioni = "<i class='fa fa-hourglass'></i>";
+                if (res.getStatocorso().getCodicestatocorso().equals("07")) {//DA GESTIRE
+                    azioni ="<div class=\"p-2 min-w-150px btn-group btn-group-justified\" role=\"group\" aria-label=\"Basic example\">"+ 
+                            "<form action=\"US_showistanza.jsp\" method=\"POST\" target=\"_blank\">"
+                            + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
+                            + "<button type=\"submit\"class=\"btn btn-sm btn-primary\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ISTANZA PRESENTATA\" data-preload='false'>"
+                            + "<i class=\"fa fa-file-text\"></i></button>"
+                            + "<button type=\"button\"class=\"btn btn-sm btn-bg-light btn-success\" data-bs-toggle=\"tooltip\" title=\"APPROVA ISTANZA\" data-preload='false'"
+                            + " onclick=\"return approvaistanza('" + res.getIdistanza() + "')\"><i class=\"fa fa-check\"></i></button>"
+                            + "<a data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+                            + " class=\"btn btn-sm btn-bg-light btn-danger fan1\" data-bs-toggle=\"tooltip\" title=\"RIGETTA ISTANZA\" data-preload='false' "
+                            + "onclick=\"return rigettaistanza('" + res.getIdistanza() + "')\"><i class=\"fa fa-remove\"></i></a>"
+                            + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ALLEGATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\" "
+                            + " onclick=\"return document.getElementById('gestall_" + res.getIdistanza() + "').submit();\"><i class=\"fa fa-file-clipboard\"></i></button>"
+                            + "</form>"
+                            + "<form action=\"ADM_allegati.jsp\" method=\"POST\" target=\"_blank\" id=\"gestall_" + res.getIdistanza() + "\">"
+                            + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/></form></div>";
+
+                }
+
+                data_value.addProperty("azioni", azioni);
                 data.add(data_value);
 
                 at.addAndGet(1);
@@ -85,10 +105,9 @@ public class Search extends HttpServlet {
             response.setHeader(CONTENTTYPE, APPJSON);
             out.print(jMembers.toString());
         }
-        
-        
+
     }
-    
+
     protected void list_docenti(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try (PrintWriter out = response.getWriter()) {

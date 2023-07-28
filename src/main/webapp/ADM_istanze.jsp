@@ -69,185 +69,78 @@
                                 <!--begin::Row-->
                                 <div class="row g-10">
                                     <!--begin::Col-->
-                                    <div class="row g-5 g-lg-10">
-                                        <%String esito = Utils.getRequestValue(request, "esito");
-                                            if (esito.equals("APPROVED")) {%>
-                                        <div class="alert alert-success">
-                                            <i class="fa fa-check-circle"></i> ISTANZA APPROVATA CORRETTAMENTE. DECRETO GENERATO ED INVIATO VIA PEC AL SOGGETTO PROPONENTE.
+                                    <%String esito = Utils.getRequestValue(request, "esito");
+                                        if (esito.equals("APPROVED")) {%>
+                                    <div class="alert alert-success">
+                                        <i class="fa fa-check-circle"></i> ISTANZA APPROVATA CORRETTAMENTE. DECRETO GENERATO ED INVIATO VIA PEC AL SOGGETTO PROPONENTE.
+                                    </div>
+                                    <hr>
+                                    <%}%>
+                                    <%
+                                        List<Tipologia_Percorso> per1 = Engine.tipo_percorso_attivi();
+                                    %>
+                                    <div class="card card-xl-stretch">
+                                        <div class="card-header border-0 pt-5">
+                                            <h3 class="card-title align-items-start flex-column">
+                                                <span class="card-label fw-bolder fs-3 mb-1">ELENCO ISTANZE</span>
+                                            </h3>
+
                                         </div>
-                                        <hr>
-                                        <%}%>
-                                        <div class="card h-xl-50">
-                                            <br/>
-                                            <h3 class="text-danger">ISTANZE DA GESTIRE (<%=dagestire.size()%>)</h3>
-                                            <hr>
-                                            <%if (!dagestire.isEmpty()) {%>
-                                            <table class="table table-bordered table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col"><b>ID</b></th>
-                                                        <th scope="col"><b>Soggetto Proponente</b></th>
-                                                        <th scope="col"><b>Protocollo Istanza (S.P.)</b></th>
-                                                        <th scope="col"><b>Data presentazione</b></th>
-                                                        <th scope="col"><b>Azioni</b></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <%for (Istanza is1 : dagestire) {%>
-                                                    <tr>
-                                                        <th scope="row"><%=is1.getIdistanza()%></th>
-                                                        <td><%=is1.getSoggetto().getRAGIONESOCIALE()%></td>
-                                                        <td><%=is1.getProtocollosoggetto()%> <%=is1.getProtocollosoggettodata()%> </td>                                                       
-                                                        <td><%=is1.getDatainvio()%></td>
-                                                        <td>
-                                                            <form action="US_showistanza.jsp" method="POST" target="_blank">
-                                                                <input type="hidden" name="idist" value="<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>"/>
-                                                                <button type="submit"class="btn btn-sm btn-primary"
-                                                                        data-bs-toggle="tooltip" title="VISUALIZZA ISTANZA PRESENTATA" 
-                                                                        data-preload='false'><i class="fa fa-file-text"></i></button>
-                                                                |
-                                                                <button type="button"class="btn btn-sm btn-bg-light btn-success"
-                                                                        data-bs-toggle="tooltip" title="APPROVA ISTANZA" 
-                                                                        data-preload='false'
-                                                                        onclick="return approvaistanza('<%=is1.getIdistanza()%>')">
-                                                                    <i class="fa fa-check"></i>
-                                                                </button>
-                                                                |
-                                                                <button type="button"class="btn btn-sm btn-bg-light btn-danger"
-                                                                        data-bs-toggle="tooltip" title="RIGETTA ISTANZA" 
-                                                                        data-preload='false'
-                                                                        onclick="return rigettaistanza('<%=is1.getIdistanza()%>')"><i class="fa fa-remove"></i>
-                                                                </button>
-                                                            </form>
-                                                        </td>
-                                                    </tr>  
-                                                    <% }%>
-                                                </tbody>
-                                            </table>
-                                            <%}%>
-                                        </div>
-                                        <div class="card h-xl-50">
-                                            <br/>
-                                            <h3 class="text-success">ISTANZE GESTITE (<%=gestite.size()%>)</h3>
-                                            <hr>
-                                            <%if (!gestite.isEmpty()) {%>
-                                            <table class="table table-bordered">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col"><b>ID</b></th>
-                                                        <th scope="col"><b>Soggetto Proponente</b></th>
-                                                        <th scope="col"><b>Protocollo Istanza</b></th>
-                                                        <th scope="col"><b>Data presentazione</b></th>
-                                                        <th scope="col"><b>Stato</b></th>
-                                                        <th scope="col"><b>Azioni</b></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <%for (Istanza is1 : gestite) {
-
-                                                            String stato = !is1.getStatocorso().getCodicestatocorso().equals("08")
-                                                                    ? "<span class='badge badge-danger'>RIGETTATA</span> "
-                                                                    : "<span class='badge badge-success'>APPROVATA</span> ";
-
-                                                            stato = stato + " IN DATA " + is1.getDatagestione();
-
-                                                    %>
-                                                    <tr>
-                                                        <th scope="row"><%=is1.getIdistanza()%></th>
-                                                        <td><%=is1.getSoggetto().getRAGIONESOCIALE()%></td>
-                                                        <td><%=is1.getProtocollosoggetto()%> <%=is1.getProtocollosoggettodata()%> </td>                                                       
-                                                        <td><%=is1.getDatainvio()%></td>
-                                                        <td><%=stato%></td>
-                                                        <td>
-                                                            <a href="#" class="btn btn-sm btn-bg-light btn-dark" data-bs-toggle="tooltip" title="VISUALIZZA ISTANZA" 
-                                                               onclick="return document.forms['sca_<%=is1.getCodiceistanza()%>'].submit();" >
-                                                                <i class="fa fa-file-pdf"></i></a>
-                                                            <a href="#" class="btn btn-sm btn-bg-light btn-success" data-bs-toggle='tooltip' title='VISUALIZZA DECRETO' 
-                                                               onclick="return document.forms['decr_<%=is1.getCodiceistanza()%>'].submit();">
-                                                                <i class="fa fa-check-circle"></i></a>
-                                                            <form action="Operations" method="POST" target="_blank" name="sca_<%=is1.getCodiceistanza()%>">
-                                                                <input type="hidden" name="type" value="SCARICAISTANZAFIRMATA" />
-                                                                <input type="hidden" name="codice_istanza" value="<%=is1.getCodiceistanza()%>" />
-                                                            </form>
-                                                            <form action="Operations" method="POST" target="_blank" name="decr_<%=is1.getCodiceistanza()%>">
-                                                                <input type="hidden" name="type" value="SCARICADECRETOISTANZA" />
-                                                                <input type="hidden" name="codice_istanza" value="<%=is1.getCodiceistanza()%>" />
-                                                            </form>
-                                                        </td>
-
-                                                    </tr>  
-
-                                                    <% }
-                                                    %>
-
-                                                </tbody>
-                                            </table>
-                                            <%}%>
-                                        </div>
-
-                                        <%
-                                            List<Tipologia_Percorso> per1 = Engine.tipo_percorso_attivi();
-
-                                        %>
-                                        <hr>
-                                        <div class="card">
-                                            <div class="card-body py-3">
-                                                <div class="col-md-12 row">
-                                                    <div class="col-md-6">
-                                                        <label>Tipo Percorso</label>
-                                                        <select aria-label="Scegli..." 
-                                                                data-placeholder="Scegli Tipologia percorso" 
-                                                                class="form-select form-select-solid form-select-lg fw-bold" 
-                                                                name="tipopercorso"
-                                                                id="tipopercorso" onchange="return refreshtable();"
-                                                                >
-                                                            <option value="">...</option>  
-                                                            <%for (Tipologia_Percorso t1 : per1) {%>
-                                                            <option value="<%=t1.getIdtipopercorso()%>"><%=t1.getNometipologia().toUpperCase()%></option>  
-                                                            <%}%>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <label>Stato Istanza</label>
-                                                        <select aria-label="Scegli..." 
-                                                                data-placeholder="Scegli Tipologia percorso" 
-                                                                class="form-select form-select-solid form-select-lg fw-bold" 
-                                                                name="statoistanza"
-                                                                id="statoistanza" onchange="return refreshtable();"
-                                                                >
-                                                            <option value="">...</option>  
-                                                            <option value="07">ISTANZA DA GESTIRE</option>  
-                                                            <option value="08">ISTANZA APPROVATA</option>  
-                                                            <option value="09">ISTANZA RIGETTATA</option>  
-                                                        </select>
-                                                    </div>
+                                        <div class="card-body py-3">
+                                            <div class="col-md-12 row">
+                                                <div class="col-md-6">
+                                                    <label>Tipo Percorso</label>
+                                                    <select aria-label="Scegli..." 
+                                                            data-placeholder="Scegli Tipologia percorso" 
+                                                            class="form-select form-select-solid form-select-lg fw-bold" 
+                                                            name="tipopercorso"
+                                                            id="tipopercorso" onchange="return refreshtable();"
+                                                            >
+                                                        <option value="">...</option>  
+                                                        <%for (Tipologia_Percorso t1 : per1) {%>
+                                                        <option value="<%=t1.getIdtipopercorso()%>"><%=t1.getNometipologia().toUpperCase()%></option>  
+                                                        <%}%>
+                                                    </select>
                                                 </div>
-                                                <hr>
-                                                <!--begin::Table container-->
-                                                <div class="table-responsive ">
-                                                    <!--begin::Table-->
-                                                    <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt1">
-                                                        <!--begin::Table head-->
-                                                        <thead>
-                                                            <tr>
-                                                                <th class="p-2">Stato</th>
-                                                                <th class="p-2">Cognome</th>
-                                                                <th class="p-2">Nome</th>
-                                                                <th class="p-2">Codice Fiscale</th>
-                                                                <th class="p-2">Email</th>
-                                                                <th class="p-2">Telefono</th>
-                                                                <th class="p-2">Azioni</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <!--end::Table head-->
-                                                        <!--begin::Table body-->
-                                                        <tbody></tbody>
-                                                        <!--end::Table body-->
-                                                    </table>
-                                                    <!--end::Table-->
+                                                <div class="col-md-6">
+                                                    <label>Stato Istanza</label>
+                                                    <select aria-label="Scegli..." 
+                                                            data-placeholder="Scegli Tipologia percorso" 
+                                                            class="form-select form-select-solid form-select-lg fw-bold" 
+                                                            name="statoistanza"
+                                                            id="statoistanza" onchange="return refreshtable();"
+                                                            >
+                                                        <option value="">...</option>  
+                                                        <option value="07">ISTANZA DA GESTIRE</option>  
+                                                        <option value="08">ISTANZA APPROVATA</option>  
+                                                        <option value="09">ISTANZA RIGETTATA</option>  
+                                                    </select>
                                                 </div>
-                                                <!--end::Table container-->
                                             </div>
+                                            <hr>
+                                            <!--begin::Table container-->
+                                            <div class="table-responsive ">
+                                                <!--begin::Table-->
+                                                <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt1">
+                                                    <!--begin::Table head-->
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col"><b>ID</b></th>
+                                                            <th scope="col"><b>Soggetto Proponente</b></th>
+                                                            <th scope="col"><b>Corsi</b></th>
+                                                            <th scope="col"><b>Data presentazione</b></th>
+                                                            <th scope="col"><b>Stato</b></th>
+                                                            <th scope="col"><b>Azioni</b></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <!--end::Table head-->
+                                                    <!--begin::Table body-->
+                                                    <tbody></tbody>
+                                                    <!--end::Table body-->
+                                                </table>
+                                                <!--end::Table-->
+                                            </div>
+                                            <!--end::Table container-->
                                         </div>
                                     </div>
                                     <!--end::Col-->
@@ -286,13 +179,17 @@
         <script src="assets/plugins/DataTables/jquery-3.5.1.js"></script>
         <script src="assets/plugins/DataTables/jquery.dataTables.min.js"></script>
         <script src="assets/plugins/DataTables/datatables.min.js"></script>
-        <script src="assets/plugins/DataTables/date-eu.js"></script>
+        <script src="assets/plugins/DataTables/date-euro.js"></script>
+
 
         <!--end::Page Vendors Javascript-->
         <!--begin::Page Custom Javascript(used by this page)-->
         <script src="assets/js/widgets.bundle.js"></script>
         <script src="assets/js/custom/widgets.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
+
+        <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
+        <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
 
         <script src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
         <script type="text/javascript" src="assets/js/ADM_istanze.js"></script>

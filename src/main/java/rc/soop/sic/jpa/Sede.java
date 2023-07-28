@@ -10,6 +10,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -33,9 +34,9 @@ public class Sede implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "idsede")
-    Long idsede;    
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "sedetipo", referencedColumnName = "idtiposede")
+    Long idsede;
+        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+@JoinColumn(name = "sedetipo", referencedColumnName = "idtiposede")
     TipoSede tipo;
     @Column(name = "indirizzo")
     private String indirizzo;
@@ -46,15 +47,15 @@ public class Sede implements Serializable {
     @Column(name = "provincia")
     private String provincia;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "idsoggetto")
     SoggettoProponente soggetto;
-            
+
     @Enumerated(EnumType.STRING)
     @Column(name = "statosede")
     private Stati statosede;
 
-        @Transient
+    @Transient
     private String etichettastato;
 
     public String getEtichettastato() {
@@ -78,9 +79,7 @@ public class Sede implements Serializable {
     public void setEtichettastato(String etichettastato) {
         this.etichettastato = etichettastato;
     }
-    
-    
-    
+
     public Sede() {
     }
 
@@ -100,7 +99,6 @@ public class Sede implements Serializable {
         this.soggetto = soggetto;
     }
 
-    
     public Long getIdsede() {
         return idsede;
     }
@@ -149,8 +147,4 @@ public class Sede implements Serializable {
         this.provincia = provincia;
     }
 
-    
-    
-    
-    
 }

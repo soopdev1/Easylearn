@@ -7,6 +7,7 @@ package rc.soop.sic.jpa;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -49,7 +50,7 @@ public class Calendario_Formativo implements Serializable {
     @Column(name = "nomemodulo", columnDefinition = "LONGTEXT")
     private String nomemodulo;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "idcorso")
     private Corso corsodiriferimento;
 
@@ -68,23 +69,23 @@ public class Calendario_Formativo implements Serializable {
     @Column(name = "ore")
     private double ore;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "idcompetenze")
     private Competenze_Trasversali competenzetrasversali;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "moduli_competenze",
             joinColumns = @JoinColumn(name = "idcalendarioformativo"),
             inverseJoinColumns = @JoinColumn(name = "idcompetenze"))
     List<Competenze> elencocompetenze;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "moduli_abilita",
             joinColumns = @JoinColumn(name = "idcalendarioformativo"),
             inverseJoinColumns = @JoinColumn(name = "idabilita"))
     List<Abilita> elencoabilita;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "moduli_conoscenze",
             joinColumns = @JoinColumn(name = "idcalendarioformativo"),
             inverseJoinColumns = @JoinColumn(name = "idconoscenze"))

@@ -31,7 +31,18 @@ public class CorsoStato implements Serializable {
     @Column(name = "htmlicon")
     private String htmlicon;
     
+    @Column(name = "htmldescr")
+    private String htmldescr;
+    
     public CorsoStato() {
+    }
+
+    public String getHtmldescr() {
+        return htmldescr;
+    }
+
+    public void setHtmldescr(String htmldescr) {
+        this.htmldescr = htmldescr;
     }
 
     public String getCodicestatocorso() {

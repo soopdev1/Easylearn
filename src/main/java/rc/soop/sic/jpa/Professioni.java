@@ -35,7 +35,7 @@ public class Professioni implements Serializable {
     @Column(name = "descrizione", columnDefinition = "LONGTEXT")
     private String descrizione;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "repertorio_professioni",
             joinColumns = @JoinColumn(name = "codiceprofessioni"),
             inverseJoinColumns = @JoinColumn(name = "idrepertorio"))

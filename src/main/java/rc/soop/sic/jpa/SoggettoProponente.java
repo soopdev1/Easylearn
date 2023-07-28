@@ -47,24 +47,24 @@ public class SoggettoProponente implements Serializable {
     private String PEC;
     @Column(name = "CIR")
     private String CIR;
-    
+
     @Column(name = "TIPOLOGIA")
     private String TIPOLOGIA;
-    
+
     @Column(name = "DDGNUMERO")
     private String DDGNUMERO;
     @Column(name = "DDGDATA")
     private String DDGDATA;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "sedelegale")
     Sede sedelegale;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "sedeoperativa")
     Sede sedeoperativa;
 
-    @OneToMany(mappedBy = "soggetto", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "soggetto", fetch = FetchType.EAGER)
     List<Sede> sediformazione;
 
     @Column(name = "rap_cognome")
@@ -77,7 +77,7 @@ public class SoggettoProponente implements Serializable {
     private String rap_luogonascita;
     @Column(name = "rap_datanascita")
     private String rap_datanascita;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "rap_sede")
     Sede rap_sede;
     @Column(name = "rap_carica")

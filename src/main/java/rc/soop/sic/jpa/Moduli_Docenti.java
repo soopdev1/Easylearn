@@ -5,9 +5,11 @@
 package rc.soop.sic.jpa;
 
 import java.io.Serializable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.NamedQueries;
@@ -33,12 +35,12 @@ public class Moduli_Docenti implements Serializable {
     @Column(name = "idmodulidocenti")
     private Moduli_DocentiId idmodulidocenti = new Moduli_DocentiId();
 
-    @ManyToOne
-    @MapsId("iddocente")
+        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+@MapsId("iddocente")
     private Docente docente;
 
-    @ManyToOne
-    @MapsId("idcalendarioformativo")
+        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+@MapsId("idcalendarioformativo")
     private Calendario_Formativo moduloformativo;
 
     @Column(name = "orepreviste")

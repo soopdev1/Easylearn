@@ -1,11 +1,9 @@
 var table;
 $(document).ready(function () {
-    var sti = $('#statoistanza').val();
-    var tip = $('#tipopercorso').val();
     table = $('#tab_dt1').DataTable({
         dom: '<if<t>lp>',
         lengthMenu: [[10, 50, 100, -1], [10, 50, 100, "Tutto"]],
-        order: [[1, 'asc']],
+        order: [[3, 'desc']],
         language: {
             url: 'assets/plugins/DataTables/it-IT.json'
         },
@@ -21,14 +19,22 @@ $(document).ready(function () {
             }
         },
         columns: [
+            {data: 'id'},
+            {data: 'soggetto'},
+            {data: 'corsi'},
+            {data: 'data', type: "date-euro"},
             {data: 'stato', orderable: false},
-            {data: 'cognome'},
-            {data: 'nome'},
-            {data: 'cf'},
-            {data: 'email'},
-            {data: 'telefono'},
             {data: 'azioni', orderable: false}
         ]
+    });
+
+    Fancybox.bind(".fan1", {
+        groupAll: false, // Group all items
+        on: {
+            closing: (fancybox) => {
+                refreshtable();
+            }
+        }
     });
 });
 function refreshtable() {

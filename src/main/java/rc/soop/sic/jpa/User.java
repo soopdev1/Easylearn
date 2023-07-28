@@ -55,7 +55,7 @@ public class User implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date creationdate;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "idsoggetto")
     private SoggettoProponente soggetto;
 

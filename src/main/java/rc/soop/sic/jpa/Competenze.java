@@ -7,6 +7,7 @@ package rc.soop.sic.jpa;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -43,14 +44,14 @@ public class Competenze implements Serializable {
     @Column(name = "descrizione", columnDefinition = "LONGTEXT")
     private String descrizione;
 
-    @ManyToOne
-    @JoinColumn(name = "idrepertorio")
+        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+@JoinColumn(name = "idrepertorio")
     private Repertorio repertorio;
     
-    @OneToMany(mappedBy = "competenza",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "competenza",fetch = FetchType.EAGER)
     private List<Abilita> abilita;
     
-    @OneToMany(mappedBy = "competenza",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "competenza",fetch = FetchType.EAGER)
     private List<Conoscenze> conoscenze;
     
     public Competenze() {

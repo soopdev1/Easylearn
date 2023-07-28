@@ -165,7 +165,8 @@
                                                                     </form>
                                                                 </td>
                                                                 <td class="text-end text-muted fw-bold" colspan="1">
-                                                                    <a href="US_upload.jsp?codice_istanza=<%=i1.getCodiceistanza()%>" data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%' 
+                                                                    <a href="US_upload.jsp?codice_istanza=<%=i1.getCodiceistanza()%>" 
+                                                                       data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%' 
                                                                        class="btn btn-sm btn-bg-light btn-danger fan1">
                                                                         <i class="fa fa-file-upload"></i> CARICA DOCUMENTO FIRMATO</a>
                                                                 </td>

@@ -124,7 +124,7 @@
                                                         <!--begin::Table body-->
                                                         <tbody>
                                                             <%for (Istanza is1 : ist_l) {
-                                                                    Tipologia_Percorso tp1 = eo.getTipoPercorsoIstanza(is1);
+                                                                    Tipologia_Percorso tp1 = is1.getTipologiapercorso();
                                                                     int maxcorsi = tp1.getMaxcorsi();
                                                                     List<Corso> c1 = new EntityOp().getCorsiIstanza(is1);
                                                                     boolean addcorso = (maxcorsi > c1.size());

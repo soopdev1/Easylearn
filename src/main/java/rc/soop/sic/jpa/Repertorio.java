@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -41,13 +42,13 @@ public class Repertorio implements Serializable {
     @Column(name = "denominazione")
     String denominazione;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "repertorio_professioni",
             joinColumns = @JoinColumn(name = "idrepertorio"),
             inverseJoinColumns = @JoinColumn(name = "codiceprofessioni"))
     private List<Professioni> professioni;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "repertorio_ateco",
             joinColumns = @JoinColumn(name = "idrepertorio"),
             inverseJoinColumns = @JoinColumn(name = "codiceateco"))
@@ -62,12 +63,12 @@ public class Repertorio implements Serializable {
     @Column(name = "descrizione", columnDefinition = "LONGTEXT")
     private String descrizione;
 
-    @ManyToOne
-    @JoinColumn(name = "codicelivellocertificazione")
+        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+@JoinColumn(name = "codicelivellocertificazione")
     private Livello_Certificazione livelloeqf;
 
-    @ManyToOne
-    @JoinColumn(name = "codicecertificazione")
+        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+@JoinColumn(name = "codicecertificazione")
     private Certificazione qualificarilasciata;
 
     @Column(name = "durataprovafinale")
@@ -88,12 +89,12 @@ public class Repertorio implements Serializable {
     @Column(name = "normativarif", columnDefinition = "LONGTEXT")
     private String normativarif;
 
-    @ManyToOne
-    @JoinColumn(name = "tipologia")
+        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+@JoinColumn(name = "tipologia")
     private Tipologia_Repertorio tipologia;
 
-    @ManyToOne
-    @JoinColumn(name = "tipologiacategoria")
+        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+@JoinColumn(name = "tipologiacategoria")
     private Categoria_Repertorio tipologiacategoria;
 
     public Repertorio() {

@@ -303,14 +303,14 @@ public class EntityOp {
         return out;
     }
 
-    public List<Istanza> list_istanze_adm(String tipopercorso,String statoistanza) {
+    public List<Istanza> list_istanze_adm(String tipologiapercorso,String statoistanza) {
         HashMap<String, Object> param = new HashMap<>();
-        String sql = "SELECT i FROM Istanza i ";
+        String sql = "SELECT i FROM Istanza i  WHERE i.statocorso.codicestatocorso IN ('07','08','09') ";
 
-        if (!tipopercorso.equals("")) {
+        if (!tipologiapercorso.equals("")) {
             sql += !sql.toUpperCase().contains("WHERE") ? "WHERE " : " AND ";
-            sql += "i.statocorso.codicestatocorso = :statoistanza";
-            param.put("statoistanza", statoistanza);
+            sql += "i.tipologiapercorso.idtipopercorso = :tipologiapercorso";
+            param.put("tipologiapercorso", Long.valueOf(tipologiapercorso));
         }
         if (!statoistanza.equals("")) {
             sql += !sql.toUpperCase().contains("WHERE") ? "WHERE " : " AND ";

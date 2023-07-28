@@ -6,8 +6,10 @@ package rc.soop.sic.jpa;
 
 import java.io.Serializable;
 import java.util.Date;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -37,12 +39,12 @@ public class Corsoavviato implements Serializable {
     @Column(name = "idcorsoavviato")
     private Long idcorsoavviato;
 
-    @ManyToOne
-    @JoinColumn(name = "idsoggetto")
+        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+@JoinColumn(name = "idsoggetto")
     private SoggettoProponente soggetto;
 
-    @ManyToOne
-    @JoinColumn(name = "idistanza")
+        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+@JoinColumn(name = "idistanza")
     private Istanza istanza;
 
     @Column(name = "datainizio")
@@ -59,8 +61,8 @@ public class Corsoavviato implements Serializable {
     @Column(name = "elencoallievi")
     private String elencoallievi;
 
-    @ManyToOne
-    @JoinColumn(name = "stato")
+        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+@JoinColumn(name = "stato")
     private CorsoStato statocorso;
 
     @Column(name = "presidentecommissione")

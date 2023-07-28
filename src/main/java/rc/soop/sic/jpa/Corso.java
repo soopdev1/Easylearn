@@ -6,6 +6,7 @@ package rc.soop.sic.jpa;
 
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -36,17 +37,17 @@ public class Corso implements Serializable {
     @GeneratedValue(strategy=GenerationType.SEQUENCE)
     @Column(name = "idcorso")
     private Long idcorso;
-    @ManyToOne
-    @JoinColumn(name = "idsoggetto")
+        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+@JoinColumn(name = "idsoggetto")
     private SoggettoProponente soggetto;
-    @ManyToOne
-    @JoinColumn(name = "stato")
+        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+@JoinColumn(name = "stato")
     private CorsoStato statocorso;    
-    @ManyToOne
-    @JoinColumn(name = "repertorio")
+        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+@JoinColumn(name = "repertorio")
     private Repertorio repertorio;
-    @ManyToOne
-    @JoinColumn(name = "schedaattivita")
+        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+@JoinColumn(name = "schedaattivita")
     private Scheda_Attivita schedaattivita;
     @Column(name = "durataore")
     private int durataore;
@@ -60,20 +61,20 @@ public class Corso implements Serializable {
     private int numeroallievi;
     @Column(name = "quantitarichiesta")
     private int quantitarichiesta;
-    @ManyToOne
-    @JoinColumn(name = "idsede")
+        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+@JoinColumn(name = "idsede")
     private Sede sedescelta;
-    @ManyToOne
-    @JoinColumn(name = "istanza")
+        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+@JoinColumn(name = "istanza")
     private Istanza istanza;
-    @ManyToOne
-    @JoinColumn(name = "tipologiapercorso")
+        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+@JoinColumn(name = "tipologiapercorso")
     private Tipologia_Percorso tipologiapercorso;
     
     @Column(name = "costostimatoallievo")
     private double costostimatoallievo;
     
-    @OneToMany(mappedBy = "corso",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "corso",fetch = FetchType.EAGER)
     private List<Attrezzature> attrezzature;
     
     

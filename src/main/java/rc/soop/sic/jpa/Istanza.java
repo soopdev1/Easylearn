@@ -5,8 +5,10 @@
 package rc.soop.sic.jpa;
 
 import java.io.Serializable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -45,15 +47,15 @@ public class Istanza implements Serializable {
     @Column(name = "codiceistanza")
     private String codiceistanza;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "idsoggetto")
     private SoggettoProponente soggetto;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "tipologiapercorso")
     private Tipologia_Percorso tipologiapercorso;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "stato")
     private CorsoStato statocorso;
 
