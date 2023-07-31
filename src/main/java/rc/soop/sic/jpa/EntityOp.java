@@ -305,7 +305,7 @@ public class EntityOp {
 
     public List<Istanza> list_istanze_adm(String tipologiapercorso,String statoistanza) {
         HashMap<String, Object> param = new HashMap<>();
-        String sql = "SELECT i FROM Istanza i  WHERE i.statocorso.codicestatocorso IN ('07','08','09') ";
+        String sql = "SELECT i FROM Istanza i  WHERE i.statocorso.codicestatocorso IN ('07','08','09','10') ";
 
         if (!tipologiapercorso.equals("")) {
             sql += !sql.toUpperCase().contains("WHERE") ? "WHERE " : " AND ";

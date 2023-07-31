@@ -36,10 +36,11 @@
         <!--begin::Global Stylesheets Bundle(used by all pages)-->
         <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
-        <link href="assets/plugins/DataTables/datatables.min.css" rel="stylesheet" type="text/css" />
         <link rel="stylesheet" href="assets/plugins/jquery-confirm.3.3.2.min.css">
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
         <script src="https://cdn.tiny.cloud/1/<%=Constant.TINYMCEKEY%>/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
+        <link href="assets/plugins/DataTables/datatables.min.css" rel="stylesheet" type="text/css" />
         <!--end::Global Stylesheets Bundle-->
     </head>
     <!--end::Head-->
@@ -84,7 +85,6 @@
                                             <h3 class="card-title align-items-start flex-column">
                                                 <span class="card-label fw-bolder fs-3 mb-1">ELENCO ISTANZE</span>
                                             </h3>
-
                                         </div>
                                         <div class="card-body py-3">
                                             <div class="col-md-12 row">
@@ -114,6 +114,7 @@
                                                         <option value="07">ISTANZA DA GESTIRE</option>  
                                                         <option value="08">ISTANZA APPROVATA</option>  
                                                         <option value="09">ISTANZA RIGETTATA</option>  
+                                                        <option value="10">ISTANZA RIGETTATA - SOCCORSO </option>  
                                                     </select>
                                                 </div>
                                             </div>

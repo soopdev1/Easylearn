@@ -4,6 +4,7 @@
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <class>rc.soop.sic.jpa.EmailTemplate</class>
     <class>rc.soop.sic.jpa.Allegati</class>
+    <class>rc.soop.sic.jpa.Information</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <shared-cache-mode>ALL</shared-cache-mode>
     <properties>

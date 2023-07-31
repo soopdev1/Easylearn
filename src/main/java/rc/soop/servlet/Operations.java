@@ -64,6 +64,7 @@ import rc.soop.sic.jpa.CorsoStato;
 import rc.soop.sic.jpa.Corsoavviato;
 import rc.soop.sic.jpa.Docente;
 import rc.soop.sic.jpa.EntityOp;
+import rc.soop.sic.jpa.Information;
 import rc.soop.sic.jpa.Istanza;
 import rc.soop.sic.jpa.Lingua;
 import rc.soop.sic.jpa.Modacquisizione;
@@ -82,6 +83,66 @@ import rc.soop.sic.jpa.User;
  * @author Raffaele
  */
 public class Operations extends HttpServlet {
+
+    protected void APPROVAISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+    }
+
+    protected void RIGETTAISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
+        String idist = Utils.dec_string(getRequestValue(request, "idist"));
+
+        EntityOp ep1 = new EntityOp();
+
+        try {
+            Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(idist));
+            if (is1 != null) {
+                boolean soccorsoistr = getRequestValue(request, "soccorsoistr").equalsIgnoreCase("on");
+                String motivazione = getRequestValue(request, "motivazione");
+                List<Allegati> la = ep1.list_allegati(is1, null, null, null, null);
+
+                List<Long> idko = new ArrayList<>();
+
+                for (Allegati a1 : la) {
+                    String checkallegato = getRequestValue(request, "soc_ko_" + a1.getIdallegati());
+                    if (checkallegato.equalsIgnoreCase("on")) {
+                        idko.add(a1.getIdallegati());
+                    }
+                }
+                ep1.begin();
+                if (soccorsoistr) {
+                    for (Long idko1 : idko) {
+                        Allegati a1 = ep1.getEm().find(Allegati.class, idko1);
+                        if (a1 != null) {
+                            a1.setStato(ep1.getEm().find(CorsoStato.class, "31"));
+                            ep1.merge(a1);
+                        }
+                    }
+                    is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "10"));
+                    //MAIL CON SOCCORSO
+                } else {
+                    is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "09"));
+                    //MAIL SOLO RIGETTO
+                }
+                ep1.merge(is1);
+
+                Information info1 = new Information();
+                info1.setDatacreazione(new Date());
+                info1.setIstanza(is1);
+                info1.setMotivazione(motivazione);
+                info1.setUtente(utentecaricamento);
+                ep1.persist(info1);
+                ep1.commit();
+                ep1.close();
+                redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
+            } else {
+                redirect(request, response, "Page_message.jsp?esito=KORI_IS1");
+            }
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KORI_IS2");
+        }
+    }
 
     protected void UPLGENERIC(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 //        Utils.printRequest(request);
@@ -237,32 +298,6 @@ public class Operations extends HttpServlet {
             }
         } else {
             redirect(request, response, "US_upload.jsp?codice_istanza=" + codiceISTANZA + "&esito=KO4");
-        }
-    }
-
-    protected void APPROVAISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-//            Utils.printRequest(request);
-            String codiceis = getRequestValue(request, "codice_istanza");
-            EntityOp e = new EntityOp();
-            Istanza is = e.getIstanza(codiceis);
-            File pdf = GENERADECRETOAPPROVATIVO(is);
-            if (pdf != null) {
-                e.begin();
-                is.setStatocorso(e.getEm().find(CorsoStato.class, "08"));
-                is.setDecreto(pdf.getPath());
-                is.setDatagestione(new DateTime().toString(PATTERNDATE5));
-                e.merge(is);
-                e.flush();
-                e.commit();
-                e.close();
-                redirect(request, response, "ADM_istanze.jsp?esito=APPROVED");
-            } else {
-                redirect(request, response, "ADM_istanze.jsp?esito=KO1");
-            }
-        } catch (Exception ex) {
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
-            redirect(request, response, "ADM_istanze.jsp?esito=KO");
         }
     }
 
@@ -617,9 +652,7 @@ public class Operations extends HttpServlet {
 
     protected void SAVEISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JsonObject resp_out = new JsonObject();
-
         try {
-
             EntityOp ep1 = new EntityOp();
             Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(getRequestValue(request, "IDISTANZA")));
 
@@ -1202,7 +1235,7 @@ public class Operations extends HttpServlet {
                 is.setSoggetto(so);
                 is.setStatocorso(e.getEm().find(CorsoStato.class, "01"));
                 is.setQuantitarichiesta(parseIntR(getRequestValue(request, "quantitarichiesta")));
-                is.setTipologiapercorso(e.getEm().find(Tipologia_Percorso.class, Long.valueOf(getRequestValue(request, "scelta"))));            
+                is.setTipologiapercorso(e.getEm().find(Tipologia_Percorso.class, Long.valueOf(getRequestValue(request, "scelta"))));
                 e.persist(is);
             }
 
@@ -1333,6 +1366,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "UPLGENERIC":
                     UPLGENERIC(request, response);
+                    break;
+                case "RIGETTAISTANZA":
+                    RIGETTAISTANZA(request, response);
                     break;
                 default:
                     break;
