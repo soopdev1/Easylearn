@@ -4,6 +4,7 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.Information"%>
 <%@page import="rc.soop.sic.jpa.Tipologia_Percorso"%>
 <%@page import="rc.soop.sic.Engine"%>
 <%@page import="rc.soop.sic.jpa.User"%>
@@ -124,15 +125,18 @@
                                                         <!--begin::Table body-->
                                                         <tbody>
                                                             <%for (Istanza is1 : ist_l) {
+                                                                        String labelallegati = "GESTIONE ALLEGATI";
                                                                     Tipologia_Percorso tp1 = is1.getTipologiapercorso();
                                                                     int maxcorsi = tp1.getMaxcorsi();
-                                                                    List<Corso> c1 = new EntityOp().getCorsiIstanza(is1);
+                                                                    List<Corso> c1 = eo.getCorsiIstanza(is1);
                                                                     boolean addcorso = (maxcorsi > c1.size());
                                                                     boolean salvaistanza = true;
                                                                     boolean eliminaistanza = true;
                                                                     boolean modificacorso = true;
                                                                     boolean inviaistanza = false;
                                                                     boolean consultaistanza = false;
+                                                                    
+                                                                    
                                                                     if (!is1.getStatocorso().getCodicestatocorso().equals("01")) {
                                                                         addcorso = false;
                                                                         salvaistanza = false;
@@ -146,6 +150,14 @@
                                                                         eliminaistanza = false;
                                                                         consultaistanza = true;
                                                                     }
+
+                                                                    if (is1.getStatocorso().getCodicestatocorso().equals("10")) { //SOCCORSO ISTRUTTORIO
+                                                                        eliminaistanza = false;
+                                                                        consultaistanza = true;
+                                                                        inviaistanza = true;
+                                                                        labelallegati = "GESTISCI SOCCORSO ISTRUTTORIO";
+                                                                    }
+
                                                             %>
                                                             <tr>
                                                                 <td class="p-2 w-50px">
@@ -223,7 +235,7 @@
                                                                         <%}%>
 
                                                                         <button type="button"  
-                                                                                data-bs-toggle="tooltip" title="GESTIONE ALLEGATI" 
+                                                                                data-bs-toggle="tooltip" title="<%=labelallegati%>" 
                                                                                 data-preload='false' 
                                                                                 class="btn btn-sm btn-bg-light btn-secondary"
                                                                                 onclick="return document.getElementById('gestall_<%=is1.getIdistanza()%>').submit();">

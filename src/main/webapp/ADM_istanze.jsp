@@ -114,7 +114,7 @@
                                                         <option value="07">ISTANZA DA GESTIRE</option>  
                                                         <option value="08">ISTANZA APPROVATA</option>  
                                                         <option value="09">ISTANZA RIGETTATA</option>  
-                                                        <option value="10">ISTANZA RIGETTATA - SOCCORSO </option>  
+                                                        <option value="10">ISTANZA RIGETTATA - SOC.ISTR.</option>  
                                                     </select>
                                                 </div>
                                             </div>

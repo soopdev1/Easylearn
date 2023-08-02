@@ -76,7 +76,9 @@
                                         case "OK_CL":
                                         case "OK_SM":
                                         case "OK_SMAT":
-                                        case "OK_SMD": {
+                                        case "OK_SMD":
+                                        case "OK_UPAL":
+                                        case "OKRI_IS1": {
                                             ty = "alert-success";
                                             html = "<i class='fa fa-check-circle'></i> Operazione completata con successo. Chiudere questa finestra.";
                                             break;
@@ -98,6 +100,14 @@
                                         case "KOUP_IS4": {
                                             ty = "alert-danger";
                                             html = "<i class='fa fa-exclamation-triangle'></i> ERRORE! Impossibile caricare il documento. File corrotto o assente, riprovare."
+                                                    + " <hr>"
+                                                    + "<button class='btn btn-danger' onclick='history.back()'><i class='fa fa-backward'></i> Torna Indietro</button>";
+                                            break;
+                                        }
+                                        case "KORI_IS1":
+                                        case "KORI_IS2": {
+                                            ty = "alert-danger";
+                                            html = "<i class='fa fa-exclamation-triangle'></i> ERRORE! Impossibile rigettare l'istanza. Istanza non trovata, riprovare."
                                                     + " <hr>"
                                                     + "<button class='btn btn-danger' onclick='history.back()'><i class='fa fa-backward'></i> Torna Indietro</button>";
                                             break;

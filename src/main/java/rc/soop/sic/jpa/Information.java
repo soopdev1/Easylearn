@@ -15,6 +15,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -23,6 +25,11 @@ import javax.persistence.TemporalType;
  *
  * @author Administrator
  */
+
+
+@NamedQueries(value = {
+    @NamedQuery(name = "info.istanza", query = "SELECT c FROM Information c WHERE c.istanza=:istanza"),
+})
 @Entity
 @Table(name = "information")
 public class Information implements Serializable {

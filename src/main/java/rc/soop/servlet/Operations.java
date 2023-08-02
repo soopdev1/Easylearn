@@ -26,16 +26,16 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.tika.mime.MimeType;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.mime.MimeTypes;
 import org.joda.time.DateTime;
 import static rc.soop.sic.Constant.PATTERNDATE3;
 import static rc.soop.sic.Constant.PATTERNDATE4;
 import static rc.soop.sic.Constant.PATTERNDATE5;
+import static rc.soop.sic.Constant.sdf_PATTERNDATE5;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE6;
 import rc.soop.sic.Engine;
 import rc.soop.sic.Pdf;
-import static rc.soop.sic.Pdf.GENERADECRETOAPPROVATIVO;
 import static rc.soop.sic.Pdf.checkFirmaQRpdfA;
 import rc.soop.sic.SendMail;
 import rc.soop.sic.Utils;
@@ -64,6 +64,7 @@ import rc.soop.sic.jpa.CorsoStato;
 import rc.soop.sic.jpa.Corsoavviato;
 import rc.soop.sic.jpa.Docente;
 import rc.soop.sic.jpa.EntityOp;
+import rc.soop.sic.jpa.IncrementalCorso;
 import rc.soop.sic.jpa.Information;
 import rc.soop.sic.jpa.Istanza;
 import rc.soop.sic.jpa.Lingua;
@@ -75,6 +76,7 @@ import rc.soop.sic.jpa.Repertorio;
 import rc.soop.sic.jpa.Scheda_Attivita;
 import rc.soop.sic.jpa.Sede;
 import rc.soop.sic.jpa.SoggettoProponente;
+import rc.soop.sic.jpa.TipoCorso;
 import rc.soop.sic.jpa.Tipologia_Percorso;
 import rc.soop.sic.jpa.User;
 
@@ -84,8 +86,91 @@ import rc.soop.sic.jpa.User;
  */
 public class Operations extends HttpServlet {
 
-    protected void APPROVAISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void GENERADECRETOBASE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+        String idist = Utils.dec_string(getRequestValue(request, "idist"));
+
+        EntityOp ep1 = new EntityOp();
+
+        
+        try {
+            Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(idist));
+            if (is1 != null) {
+           //     redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
+            } else {
+           //     redirect(request, response, "Page_message.jsp?esito=KORI_IS1");
+            }
+        } catch (Exception ex1) {
+            ex1.printStackTrace();
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            //redirect(request, response, "Page_message.jsp?esito=KORI_IS2");
+        }
+        
+    }
+
+    protected void APPROVAISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
+        String idist = Utils.dec_string(getRequestValue(request, "idist"));
+
+        EntityOp ep1 = new EntityOp();
+
+        try {
+            Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(idist));
+            if (is1 != null) {
+                List<Corso> c1 = ep1.getCorsiIstanza(is1);
+                ep1.begin();
+
+                for (Corso c2 : c1) {
+                    String corsoapproved = getRequestValue(request, "OK_" + c2.getIdcorso());
+                    if (corsoapproved.equalsIgnoreCase("on")) {
+                        c2.setStatocorso(ep1.getEm().find(CorsoStato.class, "24"));
+
+                        if (is1.getTipologiapercorso().getTipocorso().equals(TipoCorso.FINANZIATO)) {
+                            String CIP = getRequestValue(request, "CIP_" + c2.getIdcorso());
+                            String CUP = getRequestValue(request, "CUP_" + c2.getIdcorso());
+                            String ID = getRequestValue(request, "ID_" + c2.getIdcorso());
+                            String CS = getRequestValue(request, "CS_" + c2.getIdcorso());
+                            String ED = getRequestValue(request, "ED_" + c2.getIdcorso());
+                            c2.setCip_corso(CIP);
+                            c2.setCup_corso(CUP);
+                            c2.setId_corso(ID);
+                            c2.setCs_corso(CS);
+                            c2.setEd_corso(ED);
+                            c2.setIdentificativocorso(CIP + "/" + CUP + "/" + ID + "/" + CS + "/" + ED);
+                        } else {
+                            IncrementalCorso ics = new IncrementalCorso();
+                            ics.setCorso(c2);
+                            try {
+                                EntityOp ep2 = new EntityOp();
+                                ep2.begin();
+                                ep2.persist(ics);
+                                ep2.commit();
+                                ep2.close();
+                            } catch (Exception ex2) {
+                                ex2.printStackTrace();
+                            }
+                            IncrementalCorso ics2 = ep1.getIC(c2);
+                            c2.setIdentificativocorso(new DateTime().year().getAsText() + "/AUT/" + StringUtils.leftPad(String.valueOf(ics2.getIdincrementalcorso()), 4, "0"));
+                        }
+                    } else {
+                        c2.setStatocorso(ep1.getEm().find(CorsoStato.class, "25"));
+                    }
+                    ep1.merge(c2);
+                }
+                is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "08"));
+                is1.setDatagestione(sdf_PATTERNDATE5.format(new Date()));
+                ep1.merge(is1);
+                ep1.commit();
+                ep1.close();
+                redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
+            } else {
+                redirect(request, response, "Page_message.jsp?esito=KORI_IS1");
+            }
+        } catch (Exception ex1) {
+            ex1.printStackTrace();
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KORI_IS2");
+        }
     }
 
     protected void RIGETTAISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -142,6 +227,99 @@ public class Operations extends HttpServlet {
             EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
             redirect(request, response, "Page_message.jsp?esito=KORI_IS2");
         }
+    }
+
+    protected void UPLSOST(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+//        Utils.printRequest(request);
+
+        try {
+
+            EntityOp ep1 = new EntityOp();
+            String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
+//            SoggettoProponente so = ((User) request.getSession().getAttribute("us_cod")).getSoggetto();
+            Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
+            FileItemFactory factory = new DiskFileItemFactory();
+            ServletFileUpload upload = new ServletFileUpload(factory);
+            File nomefile = null;
+            List<FileItem> items = upload.parseRequest(request);
+            Iterator<FileItem> iterator = items.iterator();
+            String IDALLEGATO = null;
+            String DESCRIZIONE = null;
+            String MIME = null;
+            String codiceDOC = generateIdentifier(6);
+            while (iterator.hasNext()) {
+                FileItem item = (FileItem) iterator.next();
+                if (item.isFormField()) {
+                    if (item.getFieldName().equals("idallegato")) {
+                        IDALLEGATO = item.getString();
+                    } else if (item.getFieldName().equals("DESCRIZIONE")) {
+                        DESCRIZIONE = normalizeUTF8(normalize(item.getString()));
+                    }
+                } else {
+                    String fileName = item.getName();
+                    String estensione = fileName.substring(fileName.lastIndexOf("."));
+                    String nome = codiceDOC + new DateTime().toString(PATTERNDATE3)
+                            + RandomStringUtils.randomAlphabetic(15) + estensione;
+                    try {
+                        nomefile = new File(pathtemp.getDescrizione() + nome);
+                        item.write(nomefile);
+                        MIME = getMimeType(nomefile);
+                    } catch (Exception ex) {
+                        EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
+                        nomefile = null;
+                    }
+                }
+            }
+
+            if (nomefile != null) {
+
+                if (IDALLEGATO != null) {
+                    request.getSession().setAttribute("ses_idalleg", IDALLEGATO);
+
+                    Allegati original = ep1.getEm().find(Allegati.class, Long.valueOf(IDALLEGATO));
+                    if (original != null) {
+
+                        //CREO COPIA DI ALLEGATO PRECEDENTE "ELIMINATO"
+                        Allegati al1 = new Allegati();
+                        al1.setIstanza(original.getIstanza());
+                        al1.setCodiceallegati(original.getCodiceallegati());
+                        al1.setContent(original.getContent());
+                        al1.setDescrizione(original.getDescrizione());
+                        al1.setStato(ep1.getEm().find(CorsoStato.class, "32"));
+                        al1.setMimetype(original.getMimetype());
+                        al1.setUtentecaricamento(original.getUtentecaricamento());
+                        al1.setDatacaricamento(original.getDatacaricamento());
+
+                        ep1.begin();
+                        ep1.persist(al1);
+
+                        //AGGIORNO ALLEGATO ATTUALE
+                        original.setContent(Base64.encodeBase64String(FileUtils.readFileToByteArray(nomefile)));
+                        original.setDescrizione(DESCRIZIONE);
+                        original.setStato(ep1.getEm().find(CorsoStato.class, "30"));
+                        original.setMimetype(MIME);
+                        original.setUtentecaricamento(utentecaricamento);
+                        original.setDatacaricamento(new Date());
+                        ep1.merge(original);
+                        ep1.commit();
+                        ep1.close();
+                        redirect(request, response, "Page_message.jsp?esito=OK_UPAL");
+                    } else {
+                        redirect(request, response, "Page_message.jsp?esito=KOUP_IS1");
+                    }
+                } else {
+                    redirect(request, response, "Page_message.jsp?esito=KOUP_IS2");
+                }
+            } else {
+                redirect(request, response, "Page_message.jsp?esito=KOUP_IS3");
+            }
+
+        } catch (Exception ex1) {
+            ex1.printStackTrace();
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KOUP_IS4");
+        }
+
     }
 
     protected void UPLGENERIC(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -1367,8 +1545,14 @@ public class Operations extends HttpServlet {
                 case "UPLGENERIC":
                     UPLGENERIC(request, response);
                     break;
+                case "UPLSOST":
+                    UPLSOST(request, response);
+                    break;
                 case "RIGETTAISTANZA":
                     RIGETTAISTANZA(request, response);
+                    break;
+                case "GENERADECRETOBASE":
+                    GENERADECRETOBASE(request, response);
                     break;
                 default:
                     break;

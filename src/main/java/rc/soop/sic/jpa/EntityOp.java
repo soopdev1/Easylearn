@@ -181,7 +181,7 @@ public class EntityOp {
             EntityOp e1 = new EntityOp();
             e1.begin();
             e1.persist(t1);
-            e1.flush();
+            e1.commit();
             e1.close();
         } catch (Exception ex1) {
             ex1.printStackTrace();
@@ -247,11 +247,24 @@ public class EntityOp {
         q.setMaxResults(1);
         return q.getResultList().isEmpty() ? null : (Certificazione) q.getSingleResult();
     }
+    
+    public IncrementalCorso getIC(Corso c1) {
+        TypedQuery q = this.em.createNamedQuery("inc.corso", IncrementalCorso.class);
+        q.setParameter("corso", c1);
+        q.setMaxResults(1);
+        return q.getResultList().isEmpty() ? null : (IncrementalCorso) q.getSingleResult();
+    }
 
     public List<Moduli_Docenti> list_moduli(Calendario_Formativo c1) {
         TypedQuery q = this.em.createNamedQuery("md.elencobycalendarioformativo", Moduli_Docenti.class);
         q.setParameter("moduloformativo", c1);
         return (List<Moduli_Docenti>) q.getResultList();
+    }
+    
+    public List<Information> list_info(Istanza is1) {
+        TypedQuery q = this.em.createNamedQuery("info.istanza", Information.class);
+        q.setParameter("istanza", is1);
+        return (List<Information>) q.getResultList();
     }
 
     public List<Allegati> list_allegati(Istanza is1, Corso c1, Corsoavviato c2, Docente d1, Allievi a1) {

@@ -13,10 +13,13 @@ $(document).ready(function () {
             {orderable: true, targets: 2},
             {type: "date-euro", orderable: true, targets: 3},
             {orderable: true, targets: 4},
-            {orderable: false, targets: 5}
+            {orderable: false, targets: 5},
+            {orderable: false, targets: 6}
         ]
-    });
+    });    
 });
+
+
 
 function deletedoc(iddocument) {
     var ok = false;

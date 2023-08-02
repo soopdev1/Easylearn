@@ -4,6 +4,7 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.Information"%>
 <%@page import="rc.soop.sic.jpa.Allegati"%>
 <%@page import="rc.soop.sic.jpa.Tipologia_Percorso"%>
 <%@page import="rc.soop.sic.jpa.User"%>
@@ -50,14 +51,14 @@
     <!--begin::Body-->
     <%
 
-        String idistS = Utils.getRequestValue(request, "idist");
-        if (idistS.equals("")) {
-            idistS = (String) session.getAttribute("ses_idist");
+        String id_alleg = Utils.getRequestValue(request, "id_alleg");
+        if (id_alleg.equals("")) {
+            id_alleg = (String) session.getAttribute("ses_idalleg");
         }
         EntityOp eo = new EntityOp();
-        Long idist = Long.valueOf(Utils.dec_string(idistS));
-        Istanza is1 = eo.getEm().find(Istanza.class, idist);
-        List<Allegati> la = eo.list_allegati(is1, null, null, null, null);
+        Long idall = Long.valueOf(id_alleg);
+        Allegati is1 = eo.getEm().find(Allegati.class, idall);
+
     %>
     <body id="kt_body">
         <!--begin::Main-->
@@ -87,69 +88,48 @@
                                     <!--begin::Col-->
                                     <div class="col-xl-12">
                                         <!--begin::Tables Widget 3-->
-                                        <h1 class="text-center fs-4">Id Istanza <%=is1.getIdistanza()%> - Codice Istanza: <%=is1.getCodiceistanza()%></h1>                                    
+                                        <h1 class="text-center fs-4">Id Allegato <%=is1.getIdallegati()%> - Codice Istanza: <%=is1.getIstanza().getCodiceistanza()%></h1>                                    
                                     </div>
                                     <!--end::Col-->
                                     <!--begin::Col-->
                                     <!--end::Col-->
                                 </div>
                                 <!--end::Row-->
-                                <div class="card h-xl-100">
+                                <div class="card h-xl-50">
                                     <!--begin::Header-->
-                                    <div class="card-header border-0 pt-5">
-                                        <h3 class="card-title align-items-start flex-column">
-                                            <span class="card-label fw-bolder fs-3 mb-1">ELENCO ALLEGATI</span>
-                                        </h3>
-                                    </div>
 
-                                    <div class="card-body py-3">
-                                        <!--begin::Table container-->
-                                        <div class="table-responsive">
-                                            <!--begin::Table-->
-                                            <table class="table align-middle gy-3 table-bordered table-hover" 
-                                                   id="tab_dt1" style="border-bottom: 2px;">
-                                                <!--begin::Table head-->
-                                                <thead>
-                                                    <tr>
-                                                        <th class="p-2 w-50px">ID</th>
-                                                        <th class="p-2 w-50px">CODICE</th>
-                                                        <th class="p-2 w-150px">DESCRIZIONE</th>
-                                                        <th class="p-2 w-50px">DATA CARICAMENTO</th>
-                                                        <th class="p-2 w-50px">TIPO FILE</th>
-                                                        <th class="p-2 w-50px">STATO</th>
-                                                        <th class="p-2 w-50px">AZIONI</th>
-                                                    </tr>
-                                                </thead>
-                                                <!--end::Table head-->
-                                                <!--begin::Table body-->
-                                                <tbody>
-                                                    <%for (Allegati d2 : la) {%>
-                                                    <tr>
-                                                        <td class="p-2 w-50px"><%=d2.getIdallegati()%></td>
-                                                        <td class="p-2 w-50px"><%=d2.getCodiceallegati()%></td>
-                                                        <td class="p-2 w-150px"><%=d2.getDescrizione()%></td>
-                                                        <td class="p-2 w-50px"><%=Constant.sdf_PATTERNDATE5.format(d2.getDatacaricamento())%></td>
-                                                        <td class="p-2 w-50px"><%=d2.getMimetype()%></td>
-                                                        <td class="p-2 w-50px"><%=d2.getStato().getHtmldescr()%></td>
-                                                        <td class="p-2 w-50px">
-                                                            <form method="POST" action="Operations" target="_blank">
-                                                                <input type="hidden" name="type" value="VISUALDOC"/>
-                                                                <input type="hidden" name="iddocument" value="<%=d2.getIdallegati()%>" />
-                                                                <button type="submit" class="btn btn-sm btn-bg-light btn-success"
-                                                                        data-bs-toggle="tooltip" title="VISUALIZZA DOCUMENTO" 
-                                                                        data-preload='false'
-                                                                        ><i class="fa fa-file-alt"></i>
-                                                                </button>                                                                
-                                                            </form>
-                                                        </td>      
-                                                    </tr>
-                                                    <%}
-                                                    %>
 
-                                                </tbody>
-                                            </table>
+                                    <form action="Operations?type=UPLSOST" method="post"  enctype="multipart/form-data">
+                                        <input type="hidden" name="idallegato" value="<%=is1.getIdallegati()%>"/>
+
+                                        <div class="card-header border-0 pt-5">
+                                            <h3 class="card-title align-items-start flex-column">
+                                                <span class="card-label fw-bolder fs-3 mb-1">SOSTITUISCI ALLEGATO</span>
+                                            </h3>
+                                            <button class="btn btn-primary"><i class="fa fa-upload"></i> UPLOAD E CONFERMA</button>
                                         </div>
-                                    </div>
+                                        <div class="card-body py-3">
+                                            <div class="row row-border col-md-12 p-5">
+                                                <!--begin::Label-->
+                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                    <span class="text-info"><b>SELEZIONA ALLEGATO</b></span>
+                                                </label>
+                                                <div class="col-md-8 fv-row">
+                                                    <input class="form-control" type="file" id="formFile"name="formFile" required />
+                                                </div>
+                                            </div>
+                                            <div class="row row-border col-md-12 p-5">
+                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                    <span class="text-info"><b>DESCRIZIONE ALLEGATO (MAX 50 CARATTERI) - Sostituisce la precedente</b></span>
+                                                </label>
+                                                <div class="col-md-8 fv-row">
+                                                    <input type="text" name="DESCRIZIONE" id="DESCRIZIONE"
+                                                           class="form-control" maxlength="50"
+                                                           placeholder="..." required />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
 
                                 <%}%>
@@ -213,7 +193,6 @@
         <script src="assets/js/custom/widgets.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
         <script src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
-        <script src="assets/js/US_gestioneallegati.js"></script>
 
         <!--end::Page Custom Javascript-->
         <!--end::Javascript-->

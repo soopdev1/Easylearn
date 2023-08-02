@@ -24,30 +24,28 @@ import javax.persistence.Table;
  *
  * @author Raffaele
  */
-
 @NamedQueries(value = {
-    @NamedQuery(name = "corso.istanza", query = "SELECT c FROM Corso c WHERE c.istanza=:codiceistanza"),
-})
+    @NamedQuery(name = "corso.istanza", query = "SELECT c FROM Corso c WHERE c.istanza=:codiceistanza"),})
 @Entity
 @Table(name = "corso")
 public class Corso implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy=GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "idcorso")
     private Long idcorso;
-        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-@JoinColumn(name = "idsoggetto")
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @JoinColumn(name = "idsoggetto")
     private SoggettoProponente soggetto;
-        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-@JoinColumn(name = "stato")
-    private CorsoStato statocorso;    
-        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-@JoinColumn(name = "repertorio")
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @JoinColumn(name = "stato")
+    private CorsoStato statocorso;
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @JoinColumn(name = "repertorio")
     private Repertorio repertorio;
-        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-@JoinColumn(name = "schedaattivita")
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @JoinColumn(name = "schedaattivita")
     private Scheda_Attivita schedaattivita;
     @Column(name = "durataore")
     private int durataore;
@@ -61,25 +59,88 @@ public class Corso implements Serializable {
     private int numeroallievi;
     @Column(name = "quantitarichiesta")
     private int quantitarichiesta;
-        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-@JoinColumn(name = "idsede")
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @JoinColumn(name = "idsede")
     private Sede sedescelta;
-        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-@JoinColumn(name = "istanza")
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @JoinColumn(name = "istanza")
     private Istanza istanza;
-        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-@JoinColumn(name = "tipologiapercorso")
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @JoinColumn(name = "tipologiapercorso")
     private Tipologia_Percorso tipologiapercorso;
-    
+
     @Column(name = "costostimatoallievo")
     private double costostimatoallievo;
-    
-    @OneToMany(mappedBy = "corso",fetch = FetchType.EAGER)
+
+    @OneToMany(mappedBy = "corso", fetch = FetchType.EAGER)
     private List<Attrezzature> attrezzature;
     
+    @Column(name = "identificativocorso")
+    private String identificativocorso;
+    
+    @Column(name = "cip_corso")
+    private String cip_corso;
+    @Column(name = "cup_corso")
+    private String cup_corso;
+    @Column(name = "id_corso")
+    private String id_corso;
+    @Column(name = "cs_corso")
+    private String cs_corso;
+    @Column(name = "ed_corso")
+    private String ed_corso;
     
     public Corso() {
     }
+
+    public String getIdentificativocorso() {
+        return identificativocorso;
+    }
+
+    public void setIdentificativocorso(String identificativocorso) {
+        this.identificativocorso = identificativocorso;
+    }
+
+    public String getCip_corso() {
+        return cip_corso;
+    }
+
+    public void setCip_corso(String cip_corso) {
+        this.cip_corso = cip_corso;
+    }
+
+    public String getCup_corso() {
+        return cup_corso;
+    }
+
+    public void setCup_corso(String cup_corso) {
+        this.cup_corso = cup_corso;
+    }
+
+    public String getId_corso() {
+        return id_corso;
+    }
+
+    public void setId_corso(String id_corso) {
+        this.id_corso = id_corso;
+    }
+
+    public String getCs_corso() {
+        return cs_corso;
+    }
+
+    public void setCs_corso(String cs_corso) {
+        this.cs_corso = cs_corso;
+    }
+
+    public String getEd_corso() {
+        return ed_corso;
+    }
+
+    public void setEd_corso(String ed_corso) {
+        this.ed_corso = ed_corso;
+    }
+    
+    
 
     public Long getIdcorso() {
         return idcorso;
@@ -93,7 +154,6 @@ public class Corso implements Serializable {
         this.attrezzature = attrezzature;
     }
 
-    
     public void setIdcorso(Long idcorso) {
         this.idcorso = idcorso;
     }
@@ -209,5 +269,5 @@ public class Corso implements Serializable {
     public void setCostostimatoallievo(double costostimatoallievo) {
         this.costostimatoallievo = costostimatoallievo;
     }
-    
+
 }
