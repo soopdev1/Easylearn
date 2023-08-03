@@ -86,26 +86,142 @@ import rc.soop.sic.jpa.User;
  */
 public class Operations extends HttpServlet {
 
-    protected void GENERADECRETOBASE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void INVIANOTIFICADECRETO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        JsonObject resp_out = new JsonObject();
+
+        try {
+            String IDISTANZA = getRequestValue(request, "IDISTANZA");
+            EntityOp ep1 = new EntityOp();
+            Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(IDISTANZA));
+            if (is1 != null) {
+
+                boolean sendmail = SendMail.inviaNotificaSP_rigettoIstanzaSOCCORSO(ep1, is1);
+                if (sendmail) {
+                    resp_out.addProperty("result",
+                            true);
+                } else {
+                    resp_out.addProperty("result",
+                            false);
+                    resp_out.addProperty("message",
+                            "Errore durante l'invio della mail. Riprovare in seguito.");
+                }
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "Errore: ISTANZA NON TROVATA.");
+            }
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+    }
+
+    protected void SCARICADECRETOFIRMATO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         String idist = Utils.dec_string(getRequestValue(request, "idist"));
 
         EntityOp ep1 = new EntityOp();
 
-        
         try {
             Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(idist));
             if (is1 != null) {
-           //     redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
+
+                String mimeType = "application/pdf";
+
+                response.setContentType(mimeType);
+                String headerKey = "Content-Disposition";
+                String headerValue = format("attach; filename=\"%s\"",
+                        Utils.generaId(50)
+                        + MimeTypes.getDefaultMimeTypes().forName(mimeType).getExtension());
+                response.setHeader(headerKey, headerValue);
+                response.setContentLength(-1);
+                try (OutputStream outStream = response.getOutputStream()) {
+                    outStream.write(Base64.decodeBase64(is1.getPathfirmato()));
+                }
             } else {
-           //     redirect(request, response, "Page_message.jsp?esito=KORI_IS1");
+                redirect(request, response, "404.jsp");
             }
         } catch (Exception ex1) {
             ex1.printStackTrace();
             EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
-            //redirect(request, response, "Page_message.jsp?esito=KORI_IS2");
+            redirect(request, response, "404.jsp");
         }
-        
+
+    }
+
+    protected void GENERADECRETOBASE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String idist = Utils.dec_string(getRequestValue(request, "idist"));
+
+        EntityOp ep1 = new EntityOp();
+
+        try {
+            Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(idist));
+            if (is1 != null) {
+                File temp1 = Pdf.GENERADECRETOBASE(ep1, is1);
+
+                String mimeType = Files.probeContentType(temp1.toPath());
+                if (mimeType == null) {
+                    mimeType = "application/pdf";
+                }
+                response.setContentType(mimeType);
+                String headerKey = "Content-Disposition";
+                String headerValue = format("attach; filename=\"%s\"", temp1.getName());
+                response.setHeader(headerKey, headerValue);
+                response.setContentLength(-1);
+                try (OutputStream outStream = response.getOutputStream()) {
+                    outStream.write(FileUtils.readFileToByteArray(temp1));
+                }
+            } else {
+                redirect(request, response, "404.jsp");
+            }
+        } catch (Exception ex1) {
+            ex1.printStackTrace();
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "404.jsp");
+        }
+
+    }
+
+    protected void GENERADECRETODDSFTO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String idist = Utils.dec_string(getRequestValue(request, "idist"));
+
+        EntityOp ep1 = new EntityOp();
+
+        try {
+            Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(idist));
+            if (is1 != null) {
+                File temp1 = Pdf.GENERADECRETODDSFTO(ep1, is1);
+
+                String mimeType = Files.probeContentType(temp1.toPath());
+                if (mimeType == null) {
+                    mimeType = "application/pdf";
+                }
+                response.setContentType(mimeType);
+                String headerKey = "Content-Disposition";
+                String headerValue = format("attach; filename=\"%s\"", temp1.getName());
+                response.setHeader(headerKey, headerValue);
+                response.setContentLength(-1);
+                try (OutputStream outStream = response.getOutputStream()) {
+                    outStream.write(FileUtils.readFileToByteArray(temp1));
+                }
+            } else {
+                redirect(request, response, "404.jsp");
+            }
+        } catch (Exception ex1) {
+            ex1.printStackTrace();
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "404.jsp");
+        }
+
     }
 
     protected void APPROVAISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -205,9 +321,11 @@ public class Operations extends HttpServlet {
                     }
                     is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "10"));
                     //MAIL CON SOCCORSO
+                    SendMail.inviaNotificaSP_rigettoIstanzaSOCCORSO(ep1, is1, motivazione, idko);
                 } else {
                     is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "09"));
                     //MAIL SOLO RIGETTO
+                    SendMail.inviaNotificaSP_rigettoIstanza(ep1, is1, motivazione);
                 }
                 ep1.merge(is1);
 
@@ -320,6 +438,75 @@ public class Operations extends HttpServlet {
             redirect(request, response, "Page_message.jsp?esito=KOUP_IS4");
         }
 
+    }
+
+    protected void UPLDECAUT(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+
+            EntityOp ep1 = new EntityOp();
+            String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
+            Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
+            FileItemFactory factory = new DiskFileItemFactory();
+            ServletFileUpload upload = new ServletFileUpload(factory);
+            File nomefile = null;
+            List<FileItem> items = upload.parseRequest(request);
+            Iterator<FileItem> iterator = items.iterator();
+            String IDIST = null;
+            String DDSNUMERO = null;
+            String DDSDATA = null;
+            while (iterator.hasNext()) {
+                FileItem item = (FileItem) iterator.next();
+                if (item.isFormField()) {
+                    if (item.getFieldName().equals("idist")) {
+                        IDIST = item.getString();
+                    } else if (item.getFieldName().equals("DDSNUMERO")) {
+                        DDSNUMERO = normalizeUTF8(normalize(item.getString()));
+                    } else if (item.getFieldName().equals("DDSDATA")) {
+                        DDSDATA = normalizeUTF8(normalize(item.getString()));
+                    }
+                } else {
+                    String fileName = item.getName();
+                    String estensione = fileName.substring(fileName.lastIndexOf("."));
+                    String nome = "DDUPL" + new DateTime().toString(PATTERNDATE3)
+                            + RandomStringUtils.randomAlphabetic(15) + estensione;
+                    try {
+                        nomefile = new File(pathtemp.getDescrizione() + nome);
+                        item.write(nomefile);
+                    } catch (Exception ex) {
+                        EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
+                        nomefile = null;
+                    }
+                }
+            }
+
+            if (nomefile != null) {
+
+                if (IDIST != null) {
+                    request.getSession().setAttribute("ses_idist", Utils.enc_string(IDIST));
+                    Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(IDIST));
+                    if (is1 != null) {
+                        is1.setDecreto(DDSNUMERO + "§" + DDSDATA);
+                        is1.setPathfirmato(Base64.encodeBase64String(FileUtils.readFileToByteArray(nomefile)));
+                        ep1.begin();
+                        ep1.merge(is1);
+                        ep1.commit();
+                        ep1.close();
+                        redirect(request, response, "Page_message.jsp?esito=OK_UPAL");
+                    } else {
+                        redirect(request, response, "Page_message.jsp?esito=KOUP_IS1");
+                    }
+                } else {
+                    redirect(request, response, "Page_message.jsp?esito=KOUP_IS2");
+                }
+            } else {
+                redirect(request, response, "Page_message.jsp?esito=KOUP_IS3");
+            }
+
+        } catch (Exception ex1) {
+            ex1.printStackTrace();
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KOUP_IS4");
+        }
     }
 
     protected void UPLGENERIC(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -1548,11 +1735,23 @@ public class Operations extends HttpServlet {
                 case "UPLSOST":
                     UPLSOST(request, response);
                     break;
+                case "UPLDECAUT":
+                    UPLDECAUT(request, response);
+                    break;
                 case "RIGETTAISTANZA":
                     RIGETTAISTANZA(request, response);
                     break;
+                case "GENERADECRETODDSFTO":
+                    GENERADECRETODDSFTO(request, response);
+                    break;
                 case "GENERADECRETOBASE":
                     GENERADECRETOBASE(request, response);
+                    break;
+                case "SCARICADECRETOFIRMATO":
+                    SCARICADECRETOFIRMATO(request, response);
+                    break;
+                case "INVIANOTIFICADECRETO":
+                    INVIANOTIFICADECRETO(request, response);
                     break;
                 default:
                     break;

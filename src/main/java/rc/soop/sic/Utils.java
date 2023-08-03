@@ -380,4 +380,13 @@ public class Utils {
         return "";
     }
     
+    public static String datemysqltoita(String ing){
+        try {
+            return Constant.sdf_PATTERNDATE4.format(Constant.sdf_PATTERNDATE6.parse(ing));
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+        }
+        return ing;
+    }
+    
 }

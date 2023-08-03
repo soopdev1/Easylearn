@@ -26,7 +26,7 @@ public class T {
 
         Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf("26"));
 
-        Pdf.GENERADECRETOBASE(ep1, is1);
+        Pdf.GENERADECRETODDSFTO(ep1, is1);
         
         
 //        double d = 1500.0;

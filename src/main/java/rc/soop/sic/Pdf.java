@@ -50,7 +50,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.imageio.ImageIO;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Base64InputStream;
 import static org.apache.commons.io.FileUtils.readFileToByteArray;
 import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.apache.commons.lang3.StringUtils.replace;
@@ -86,7 +85,10 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.Store;
+import static rc.soop.sic.Utils.datemysqltoita;
 import static rc.soop.sic.Utils.estraiEccezione;
+import static rc.soop.sic.Utils.roundDoubleandFormat;
+import rc.soop.sic.jpa.Calendario_Formativo;
 import rc.soop.sic.jpa.TipoCorso;
 
 /**
@@ -677,6 +679,197 @@ public class Pdf {
     private static final String DIRCARICA = "IL DIRIGENTE DEL SERVIZIO";
     private static final String DIRNOME = "Maria Josè Verde";
 
+    public static File GENERADECRETODDSFTO(EntityOp ep, Istanza ista1) {
+        try {
+            String DDS = ista1.getDecreto().split("§")[0];
+            String DDSDATA = datemysqltoita(ista1.getDecreto().split("§")[1]);
+            Path pathtemp = ep.getEm().find(Path.class, "path.temp");
+            Path template_parte1 = ep.getEm().find(Path.class, "pdf.decreto.ok.p1");
+            Path template_parte2 = ep.getEm().find(Path.class, "pdf.decreto.ok.p2");
+            Path template_parte_corso = ep.getEm().find(Path.class, "pdf.decreto.ok.corso1");
+
+            DateTime datael = new DateTime();
+
+            createDir(pathtemp.getDescrizione());
+
+            File pdfOut_part1 = new File(pathtemp.getDescrizione() + "DECRETO_APP_" + "_" + ista1.getCodiceistanza() + "_" + datael.toString(PATTERNDATE3) + ".D1.pdf");
+            File pdfOut_part2 = new File(pathtemp.getDescrizione() + "DECRETO_APP_" + "_" + ista1.getCodiceistanza() + "_" + datael.toString(PATTERNDATE3) + ".D2.pdf");
+            File pdfOut_part_corso = new File(pathtemp.getDescrizione() + "DECRETO_APP_" + "_" + ista1.getCodiceistanza() + "_" + datael.toString(PATTERNDATE3) + ".C1.pdf");
+
+            try (InputStream is = new ByteArrayInputStream(Base64.decodeBase64(template_parte_corso.getDescrizione())); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut_part_corso); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
+                PdfAcroForm form = getAcroForm(pdfDoc, true);
+                form.setGenerateAppearance(true);
+                Map<String, PdfFormField> fields = form.getFormFields();
+
+                setFieldsValue(form, fields, "DDS", DDS);
+                setFieldsValue(form, fields, "DDSDATA", DDSDATA);
+                setFieldsValue(form, fields, "paginecorso", "PAGINA 5 DI 7");
+
+                List<Corso> c1 = ep.getCorsiIstanza(ista1);
+                AtomicInteger indice = new AtomicInteger(1);
+                for (Corso c2 : c1) {
+                    if (c2.getStatocorso().getCodicestatocorso().equals("24")) {
+                        double t_comp_base = 0.0;
+                        double t_aula_teorica = 0.0;
+                        double t_aula_el = 0.0;
+                        double t_aula_tecnope = 0.0;
+                        double t_aula = 0.0;
+                        double t_tot = 0.0;
+                        List<Calendario_Formativo> calendar = ep.calendario_formativo_corso(c2);
+                        for (Calendario_Formativo cal2 : calendar) {
+                            if (cal2.getTipomodulo().equals("BASE")) {
+                                t_comp_base = t_comp_base + cal2.getOre();
+                            }
+                            t_aula_teorica = t_aula_teorica + cal2.getOre_teorica_aula();
+                            t_aula_el = t_aula_el + cal2.getOre_teorica_el();
+                            t_aula_tecnope = t_aula_tecnope + cal2.getOre_tecnica_operativa();
+                            t_aula = t_aula + cal2.getOre_aula();
+                            t_tot = t_tot + cal2.getOre();
+                        }
+
+                        setFieldsValue(form, fields, indice.get() + "_codice", c2.getIdentificativocorso());
+                        setFieldsValue(form, fields, indice.get() + "_nome", c2.getRepertorio().getDenominazione());
+
+                        setFieldsValue(form, fields, indice.get() + "_sede", c2.getSedescelta().getComune() + ", " + c2.getSedescelta().getIndirizzo());
+                        setFieldsValue(form, fields, indice.get() + "_accesso", c2.getSchedaattivita().getPrerequisiti());
+                        setFieldsValue(form, fields, indice.get() + "_oreteoria", roundDoubleandFormat(t_aula_teorica, 2));
+                        setFieldsValue(form, fields, indice.get() + "_orepratica", roundDoubleandFormat(t_aula_tecnope, 2));
+                        setFieldsValue(form, fields, indice.get() + "_orestage", String.valueOf(c2.getStageore()));
+                        setFieldsValue(form, fields, indice.get() + "_orefad", roundDoubleandFormat(t_aula_el, 2));
+                        setFieldsValue(form, fields, indice.get() + "_altro", "");
+                        setFieldsValue(form, fields, indice.get() + "_giorni", String.valueOf(c2.getDuratagiorni()));
+                        setFieldsValue(form, fields, indice.get() + "_numallievi", String.valueOf(c2.getNumeroallievi()));
+
+                    }
+                }
+
+                fields.forEach((t, u) -> {
+                    form.partialFormFlattening(t);
+                });
+                form.flattenFields();
+
+            }
+
+            try (InputStream is = new ByteArrayInputStream(Base64.decodeBase64(template_parte1.getDescrizione())); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut_part1); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
+                PdfAcroForm form = getAcroForm(pdfDoc, true);
+                form.setGenerateAppearance(true);
+                Map<String, PdfFormField> fields = form.getFormFields();
+
+                String ogg = "Autorizzazione allo svolgimento dei percorsi formativi autofinanziati di cui all'istanza "
+                        + "acquisita al protocollo xxxxx del xx/xx/xxxx- ente gestore " + ista1.getSoggetto().getRAGIONESOCIALE() + " con "
+                        + "sede legale in " + ista1.getSoggetto().getSedelegale().getComune() + ", C.I.R. " + ista1.getSoggetto().getCIR() + ".";
+                if (ista1.getTipologiapercorso().getTipocorso().equals(TipoCorso.FINANZIATO)) {
+                    ogg = "Autorizzazione allo svolgimento dei percorsi formativi finanziati di cui all'istanza "
+                            + "acquisita al protocollo xxxxx del xx/xx/xxxx- ente gestore " + ista1.getSoggetto().getRAGIONESOCIALE() + " con "
+                            + "sede legale in " + ista1.getSoggetto().getSedelegale().getComune() + ", C.I.R. " + ista1.getSoggetto().getCIR() + ".";
+                }
+
+                String ART1 = "Su proposta del Dirigente responsabile del Servizio 3 \"Sistema di Accreditamento della Formazione "
+                        + "Professionale e Certificazione delle Competenze\" si autorizza l'ente di formazione " + ista1.getSoggetto().getRAGIONESOCIALE()
+                        + ", con sede legale in Santa " + ista1.getSoggetto().getSedelegale().getComune()
+                        + ", accreditato con D.D.G. n° " + ista1.getSoggetto().getDDGNUMERO() + " del " + ista1.getSoggetto().getDDGNUMERO() + ", Partita IVA "
+                        + ista1.getSoggetto().getPARTITAIVA() + ", C.I.R. " + ista1.getSoggetto().getCIR()
+                        + ", ad attuare i sottostanti percorsi formativi autofinanziati, di seguito elencati:";
+
+                if (ista1.getTipologiapercorso().getTipocorso().equals(TipoCorso.FINANZIATO)) {
+                    ART1 = "Su proposta del Dirigente responsabile del Servizio 3 \"Sistema di Accreditamento della Formazione "
+                            + "Professionale e Certificazione delle Competenze\" si autorizza l'ente di formazione " + ista1.getSoggetto().getRAGIONESOCIALE()
+                            + ", con sede legale in Santa " + ista1.getSoggetto().getSedelegale().getComune()
+                            + ", accreditato con D.D.G. n° " + ista1.getSoggetto().getDDGNUMERO() + " del " + ista1.getSoggetto().getDDGNUMERO() + ", Partita IVA "
+                            + ista1.getSoggetto().getPARTITAIVA() + ", C.I.R. " + ista1.getSoggetto().getCIR()
+                            + ", ad attuare i sottostanti percorsi formativi finanziati, di seguito elencati:";
+                }
+
+                setFieldsValue(form, fields, "NOMESERVIZIO", NOMESERVIZIO);
+                setFieldsValue(form, fields, "DESCRIZIONE", ogg);
+                setFieldsValue(form, fields, "DDS", DDS);
+                setFieldsValue(form, fields, "DDSDATA", DDSDATA);
+                setFieldsValue(form, fields, "pag1", "PAGINA 1 DI 7");
+                setFieldsValue(form, fields, "pag2", "PAGINA 2 DI 7");
+                setFieldsValue(form, fields, "pag3", "PAGINA 3 DI 7");
+                setFieldsValue(form, fields, "pag4", "PAGINA 4 DI 7");
+                setFieldsValue(form, fields, "VISTO1", VISTO1);
+                setFieldsValue(form, fields, "ART1", ART1);
+
+                fields.forEach((t, u) -> {
+                    form.partialFormFlattening(t);
+                });
+                form.flattenFields();
+
+//                BarcodeQRCode barcode = new BarcodeQRCode(ista1.getCodiceistanza() + " / DECRETOAPPROVATIVO / "
+//                        + ista1.getSoggetto().getRap_cf() + "_" + datael.toString(PATTERNDATE3));
+//                printbarcode(barcode, pdfDoc);
+            }
+
+            try (InputStream is = new ByteArrayInputStream(Base64.decodeBase64(template_parte2.getDescrizione())); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut_part2); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
+                PdfAcroForm form = getAcroForm(pdfDoc, true);
+                form.setGenerateAppearance(true);
+                Map<String, PdfFormField> fields = form.getFormFields();
+
+                setFieldsValue(form, fields, "NOMESERVIZIO", NOMESERVIZIO);
+                setFieldsValue(form, fields, "RAGIONESOCIALE", ista1.getSoggetto().getRAGIONESOCIALE());
+                setFieldsValue(form, fields, "PARTITAIVA", ista1.getSoggetto().getPARTITAIVA());
+                setFieldsValue(form, fields, "CIR", ista1.getSoggetto().getCIR());
+
+                setFieldsValue(form, fields, "DDS", DDS);
+                setFieldsValue(form, fields, "DDSDATA", DDSDATA);
+                setFieldsValue(form, fields, "pagA", "PAGINA 6 DI 7");
+                setFieldsValue(form, fields, "pagB", "PAGINA 7 DI 7");
+
+                setFieldsValue(form, fields, "DATA", ista1.getDatagestione().split(" ")[0]);
+                setFieldsValue(form, fields, "funz1carica", FUNZCARICA);
+                setFieldsValue(form, fields, "funz1nome", FUNZNOME);
+                setFieldsValue(form, fields, "funz1fto", "F.TO");
+                setFieldsValue(form, fields, "dir1carica", DIRCARICA);
+                setFieldsValue(form, fields, "dir1nome", DIRNOME);
+                setFieldsValue(form, fields, "dir1fto", "F.TO");
+
+                fields.forEach((t, u) -> {
+                    form.partialFormFlattening(t);
+                });
+                form.flattenFields();
+
+            }
+
+            File pdfOut_FINAL = new File(pathtemp.getDescrizione() + "DECRETO_APP_" + "_" + ista1.getCodiceistanza() + "_" + datael.toString(PATTERNDATE3) + ".F.pdf");
+
+            try (PdfDocument pdf = new PdfDocument(new PdfWriter(pdfOut_FINAL))) {
+                PdfMerger merger = new PdfMerger(pdf);
+                PdfDocument parte1 = new PdfDocument(new PdfReader(pdfOut_part1));
+                merger.merge(parte1, 1, parte1.getNumberOfPages());
+
+                PdfDocument partecorsi = new PdfDocument(new PdfReader(pdfOut_part_corso));
+                merger.merge(partecorsi, 1, partecorsi.getNumberOfPages());
+
+                PdfDocument parte2 = new PdfDocument(new PdfReader(pdfOut_part2));
+                merger.merge(parte2, 1, parte2.getNumberOfPages());
+
+                parte1.close();
+                parte2.close();
+                partecorsi.close();
+                merger.close();
+                pdfOut_part1.delete();
+                pdfOut_part2.delete();
+                pdfOut_part_corso.delete();
+            }
+
+            try {
+//                File fdef = convertPDFA(pdfOut_part1, "DECRETOAPPROVATIVO ISTANZA " + ista1.getCodiceistanza());
+//                if (fdef != null) {
+//                    pdfOut_part1.delete();
+                System.out.println("tester.T.GENERADECRETOAPPROVATIVO() " + pdfOut_FINAL.getPath());
+                return pdfOut_FINAL;
+//                }
+            } catch (Exception ex1) {
+                LOGGER.severe(estraiEccezione(ex1));
+            }
+
+        } catch (Exception ex0) {
+            LOGGER.severe(estraiEccezione(ex0));
+        }
+        return null;
+    }
+
     public static File GENERADECRETOBASE(EntityOp ep, Istanza ista1) {
         try {
 
@@ -692,6 +885,111 @@ public class Pdf {
             File pdfOut_part1 = new File(pathtemp.getDescrizione() + "DECRETO_APP_" + "_" + ista1.getCodiceistanza() + "_" + datael.toString(PATTERNDATE3) + ".D1.pdf");
             File pdfOut_part2 = new File(pathtemp.getDescrizione() + "DECRETO_APP_" + "_" + ista1.getCodiceistanza() + "_" + datael.toString(PATTERNDATE3) + ".D2.pdf");
             File pdfOut_part_corso = new File(pathtemp.getDescrizione() + "DECRETO_APP_" + "_" + ista1.getCodiceistanza() + "_" + datael.toString(PATTERNDATE3) + ".C1.pdf");
+
+            try (InputStream is = new ByteArrayInputStream(Base64.decodeBase64(template_parte_corso.getDescrizione())); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut_part_corso); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
+                PdfAcroForm form = getAcroForm(pdfDoc, true);
+                form.setGenerateAppearance(true);
+                Map<String, PdfFormField> fields = form.getFormFields();
+
+                setFieldsValue(form, fields, "DDS", "");
+                setFieldsValue(form, fields, "DDDSDATA", "");
+                setFieldsValue(form, fields, "paginecorso", "PAGINA 5 DI 7");
+
+                List<Corso> c1 = ep.getCorsiIstanza(ista1);
+                AtomicInteger indice = new AtomicInteger(1);
+                for (Corso c2 : c1) {
+                    if (c2.getStatocorso().getCodicestatocorso().equals("24")) {
+                        double t_comp_base = 0.0;
+                        double t_aula_teorica = 0.0;
+                        double t_aula_el = 0.0;
+                        double t_aula_tecnope = 0.0;
+                        double t_aula = 0.0;
+                        double t_tot = 0.0;
+                        List<Calendario_Formativo> calendar = ep.calendario_formativo_corso(c2);
+                        for (Calendario_Formativo cal2 : calendar) {
+                            if (cal2.getTipomodulo().equals("BASE")) {
+                                t_comp_base = t_comp_base + cal2.getOre();
+                            }
+                            t_aula_teorica = t_aula_teorica + cal2.getOre_teorica_aula();
+                            t_aula_el = t_aula_el + cal2.getOre_teorica_el();
+                            t_aula_tecnope = t_aula_tecnope + cal2.getOre_tecnica_operativa();
+                            t_aula = t_aula + cal2.getOre_aula();
+                            t_tot = t_tot + cal2.getOre();
+                        }
+
+                        setFieldsValue(form, fields, indice.get() + "_codice", c2.getIdentificativocorso());
+                        setFieldsValue(form, fields, indice.get() + "_nome", c2.getRepertorio().getDenominazione());
+
+                        setFieldsValue(form, fields, indice.get() + "_sede", c2.getSedescelta().getComune() + ", " + c2.getSedescelta().getIndirizzo());
+                        setFieldsValue(form, fields, indice.get() + "_accesso", c2.getSchedaattivita().getPrerequisiti());
+                        setFieldsValue(form, fields, indice.get() + "_oreteoria", roundDoubleandFormat(t_aula_teorica, 2));
+                        setFieldsValue(form, fields, indice.get() + "_orepratica", roundDoubleandFormat(t_aula_tecnope, 2));
+                        setFieldsValue(form, fields, indice.get() + "_orestage", String.valueOf(c2.getStageore()));
+                        setFieldsValue(form, fields, indice.get() + "_orefad", roundDoubleandFormat(t_aula_el, 2));
+                        setFieldsValue(form, fields, indice.get() + "_altro", "");
+                        setFieldsValue(form, fields, indice.get() + "_giorni", String.valueOf(c2.getDuratagiorni()));
+                        setFieldsValue(form, fields, indice.get() + "_numallievi", String.valueOf(c2.getNumeroallievi()));
+
+                    }
+                }
+
+                fields.forEach((t, u) -> {
+                    form.partialFormFlattening(t);
+                });
+                form.flattenFields();
+
+            }
+
+            try (InputStream is = new ByteArrayInputStream(Base64.decodeBase64(template_parte1.getDescrizione())); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut_part1); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
+                PdfAcroForm form = getAcroForm(pdfDoc, true);
+                form.setGenerateAppearance(true);
+                Map<String, PdfFormField> fields = form.getFormFields();
+
+                String ogg = "Autorizzazione allo svolgimento dei percorsi formativi autofinanziati di cui all'istanza "
+                        + "acquisita al protocollo xxxxx del xx/xx/xxxx- ente gestore " + ista1.getSoggetto().getRAGIONESOCIALE() + " con "
+                        + "sede legale in " + ista1.getSoggetto().getSedelegale().getComune() + ", C.I.R. " + ista1.getSoggetto().getCIR() + ".";
+                if (ista1.getTipologiapercorso().getTipocorso().equals(TipoCorso.FINANZIATO)) {
+                    ogg = "Autorizzazione allo svolgimento dei percorsi formativi finanziati di cui all'istanza "
+                            + "acquisita al protocollo xxxxx del xx/xx/xxxx- ente gestore " + ista1.getSoggetto().getRAGIONESOCIALE() + " con "
+                            + "sede legale in " + ista1.getSoggetto().getSedelegale().getComune() + ", C.I.R. " + ista1.getSoggetto().getCIR() + ".";
+                }
+
+                String ART1 = "Su proposta del Dirigente responsabile del Servizio 3 \"Sistema di Accreditamento della Formazione "
+                        + "Professionale e Certificazione delle Competenze\" si autorizza l'ente di formazione " + ista1.getSoggetto().getRAGIONESOCIALE()
+                        + ", con sede legale in Santa " + ista1.getSoggetto().getSedelegale().getComune()
+                        + ", accreditato con D.D.G. n° " + ista1.getSoggetto().getDDGNUMERO() + " del " + ista1.getSoggetto().getDDGNUMERO() + ", Partita IVA "
+                        + ista1.getSoggetto().getPARTITAIVA() + ", C.I.R. " + ista1.getSoggetto().getCIR()
+                        + ", ad attuare i sottostanti percorsi formativi autofinanziati, di seguito elencati:";
+
+                if (ista1.getTipologiapercorso().getTipocorso().equals(TipoCorso.FINANZIATO)) {
+                    ART1 = "Su proposta del Dirigente responsabile del Servizio 3 \"Sistema di Accreditamento della Formazione "
+                            + "Professionale e Certificazione delle Competenze\" si autorizza l'ente di formazione " + ista1.getSoggetto().getRAGIONESOCIALE()
+                            + ", con sede legale in Santa " + ista1.getSoggetto().getSedelegale().getComune()
+                            + ", accreditato con D.D.G. n° " + ista1.getSoggetto().getDDGNUMERO() + " del " + ista1.getSoggetto().getDDGNUMERO() + ", Partita IVA "
+                            + ista1.getSoggetto().getPARTITAIVA() + ", C.I.R. " + ista1.getSoggetto().getCIR()
+                            + ", ad attuare i sottostanti percorsi formativi finanziati, di seguito elencati:";
+                }
+
+                setFieldsValue(form, fields, "NOMESERVIZIO", NOMESERVIZIO);
+                setFieldsValue(form, fields, "DESCRIZIONE", ogg);
+                setFieldsValue(form, fields, "DDS", "");
+                setFieldsValue(form, fields, "DDDSDATA", "");
+                setFieldsValue(form, fields, "pag1", "PAGINA 1 DI 7");
+                setFieldsValue(form, fields, "pag2", "PAGINA 2 DI 7");
+                setFieldsValue(form, fields, "pag3", "PAGINA 3 DI 7");
+                setFieldsValue(form, fields, "pag4", "PAGINA 4 DI 7");
+                setFieldsValue(form, fields, "VISTO1", VISTO1);
+                setFieldsValue(form, fields, "ART1", ART1);
+
+                fields.forEach((t, u) -> {
+                    form.partialFormFlattening(t);
+                });
+                form.flattenFields();
+
+//                BarcodeQRCode barcode = new BarcodeQRCode(ista1.getCodiceistanza() + " / DECRETOAPPROVATIVO / "
+//                        + ista1.getSoggetto().getRap_cf() + "_" + datael.toString(PATTERNDATE3));
+//                printbarcode(barcode, pdfDoc);
+            }
 
             try (InputStream is = new ByteArrayInputStream(Base64.decodeBase64(template_parte2.getDescrizione())); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut_part2); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
@@ -723,69 +1021,26 @@ public class Pdf {
 
             }
 
-            try (InputStream is = new ByteArrayInputStream(Base64.decodeBase64(template_parte1.getDescrizione())); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut_part1); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
-                PdfAcroForm form = getAcroForm(pdfDoc, true);
-                form.setGenerateAppearance(true);
-                Map<String, PdfFormField> fields = form.getFormFields();
-
-                String ogg = "Autorizzazione allo svolgimento dei percorsi formativi autofinanziati di cui all'istanza "
-                        + "acquisita al protocollo xxxxx del xx/xx/xxxx- ente gestore " + ista1.getSoggetto().getRAGIONESOCIALE() + " con "
-                        + "sede legale in " + ista1.getSoggetto().getSedelegale().getComune() + ", C.I.R. " + ista1.getSoggetto().getCIR() + ".";
-                if (ista1.getTipologiapercorso().getTipocorso().equals(TipoCorso.FINANZIATO)) {
-                    ogg = "Autorizzazione allo svolgimento dei percorsi formativi finanziati di cui all'istanza "
-                            + "acquisita al protocollo xxxxx del xx/xx/xxxx- ente gestore " + ista1.getSoggetto().getRAGIONESOCIALE() + " con "
-                            + "sede legale in " + ista1.getSoggetto().getSedelegale().getComune() + ", C.I.R. " + ista1.getSoggetto().getCIR() + ".";
-                }
-
-                String ART1 = "Su proposta del Dirigente responsabile del Servizio 3 \"Sistema di Accreditamento della Formazione "
-                        + "Professionale e Certificazione delle Competenze\" si autorizza l'ente di formazione " + ista1.getSoggetto().getRAGIONESOCIALE()
-                        + ", con sede legale in Santa " + ista1.getSoggetto().getSedelegale().getComune()
-                        + ", accreditato con D.D.G. n° " + ista1.getSoggetto().getDDGNUMERO() + " del " + ista1.getSoggetto().getDDGNUMERO() + ", Partita IVA "
-                        + ista1.getSoggetto().getPARTITAIVA() + ", C.I.R. " + ista1.getSoggetto().getCIR()
-                        + ", ad attuare i sottostanti percorsi formativi autofinanziati, di seguito elencati:";
-                if (ista1.getTipologiapercorso().getTipocorso().equals(TipoCorso.FINANZIATO)) {
-                    ART1 = "Su proposta del Dirigente responsabile del Servizio 3 \"Sistema di Accreditamento della Formazione "
-                            + "Professionale e Certificazione delle Competenze\" si autorizza l'ente di formazione " + ista1.getSoggetto().getRAGIONESOCIALE()
-                            + ", con sede legale in Santa " + ista1.getSoggetto().getSedelegale().getComune()
-                            + ", accreditato con D.D.G. n° " + ista1.getSoggetto().getDDGNUMERO() + " del " + ista1.getSoggetto().getDDGNUMERO() + ", Partita IVA "
-                            + ista1.getSoggetto().getPARTITAIVA() + ", C.I.R. " + ista1.getSoggetto().getCIR()
-                            + ", ad attuare i sottostanti percorsi formativi finanziati, di seguito elencati:";
-                }
-
-                setFieldsValue(form, fields, "NOMESERVIZIO", NOMESERVIZIO);
-                setFieldsValue(form, fields, "DESCRIZIONE", ogg);
-                setFieldsValue(form, fields, "DDS", "");
-                setFieldsValue(form, fields, "DDDSDATA", "");
-                setFieldsValue(form, fields, "pag1", "PAGINA 1 DI 7");
-                setFieldsValue(form, fields, "pag2", "PAGINA 2 DI 7");
-                setFieldsValue(form, fields, "pag3", "PAGINA 3 DI 7");
-                setFieldsValue(form, fields, "pag4", "PAGINA 4 DI 7");
-                setFieldsValue(form, fields, "VISTO1", VISTO1);
-                setFieldsValue(form, fields, "ART1", ART1);
-
-                fields.forEach((t, u) -> {
-                    form.partialFormFlattening(t);
-                });
-                form.flattenFields();
-
-//                BarcodeQRCode barcode = new BarcodeQRCode(ista1.getCodiceistanza() + " / DECRETOAPPROVATIVO / "
-//                        + ista1.getSoggetto().getRap_cf() + "_" + datael.toString(PATTERNDATE3));
-//                printbarcode(barcode, pdfDoc);
-            }
-
             File pdfOut_FINAL = new File(pathtemp.getDescrizione() + "DECRETO_APP_" + "_" + ista1.getCodiceistanza() + "_" + datael.toString(PATTERNDATE3) + ".F.pdf");
 
             try (PdfDocument pdf = new PdfDocument(new PdfWriter(pdfOut_FINAL))) {
                 PdfMerger merger = new PdfMerger(pdf);
-                PdfDocument firstSourcePdf = new PdfDocument(new PdfReader(pdfOut_part1));
-                merger.merge(firstSourcePdf, 1, firstSourcePdf.getNumberOfPages());
-                PdfDocument secondSourcePdf = new PdfDocument(new PdfReader(pdfOut_part2));
-                merger.merge(secondSourcePdf, 1, secondSourcePdf.getNumberOfPages());
-                firstSourcePdf.close();
-                secondSourcePdf.close();
+                PdfDocument parte1 = new PdfDocument(new PdfReader(pdfOut_part1));
+                merger.merge(parte1, 1, parte1.getNumberOfPages());
+
+                PdfDocument partecorsi = new PdfDocument(new PdfReader(pdfOut_part_corso));
+                merger.merge(partecorsi, 1, partecorsi.getNumberOfPages());
+
+                PdfDocument parte2 = new PdfDocument(new PdfReader(pdfOut_part2));
+                merger.merge(parte2, 1, parte2.getNumberOfPages());
+
+                parte1.close();
+                parte2.close();
+                partecorsi.close();
                 merger.close();
                 pdfOut_part1.delete();
                 pdfOut_part2.delete();
+                pdfOut_part_corso.delete();
             }
 
             try {
@@ -793,7 +1048,7 @@ public class Pdf {
 //                if (fdef != null) {
 //                    pdfOut_part1.delete();
                 System.out.println("tester.T.GENERADECRETOAPPROVATIVO() " + pdfOut_FINAL.getPath());
-                return pdfOut_part1;
+                return pdfOut_FINAL;
 //                }
             } catch (Exception ex1) {
                 LOGGER.severe(estraiEccezione(ex1));

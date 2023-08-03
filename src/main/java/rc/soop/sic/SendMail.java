@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import static java.nio.file.Files.probeContentType;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import javax.activation.DataHandler;
@@ -48,6 +49,7 @@ import org.json.JSONObject;
 import static rc.soop.sic.Constant.LOGGER;
 import static rc.soop.sic.Constant.RB;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE5;
+import static rc.soop.sic.Utils.datemysqltoita;
 import static rc.soop.sic.Utils.estraiEccezione;
 import rc.soop.sic.jpa.EmailTemplate;
 import rc.soop.sic.jpa.EntityOp;
@@ -59,6 +61,85 @@ import rc.soop.sic.jpa.Path;
  * @author Administrator
  */
 public class SendMail {
+
+    public static boolean inviaNotificaSP_rigettoIstanzaSOCCORSO(EntityOp eo, Istanza is1) {
+        try {
+            String DDS = is1.getDecreto().split("§")[0];
+            String DDSDATA = datemysqltoita(is1.getDecreto().split("§")[1]);
+            
+            EmailTemplate et = eo.getEm().find(EmailTemplate.class, 4L);
+            String name = "EasyLearn Notification Mail";
+            String to[] = {is1.getSoggetto().getEMAIL()};
+            String bcc[] = {eo.getEm().find(Path.class, "dest.support").getDescrizione()};
+
+            String contenthtml = StringUtils.replace(et.getHtmlmail(), "@protocolloistanza", is1.getProtocolloreg());
+            contenthtml = StringUtils.replace(contenthtml, "@dataprotocollo", is1.getProtocolloregdata());
+            contenthtml = StringUtils.replace(contenthtml, "@idistanza", String.valueOf(is1.getIdistanza()));
+            contenthtml = StringUtils.replace(contenthtml, "@codiceistanza", is1.getCodiceistanza());
+            contenthtml = StringUtils.replace(contenthtml, "@version", Constant.VERSIONAPP);
+            contenthtml = StringUtils.replace(contenthtml, "@DDSNUM", DDS);
+            contenthtml = StringUtils.replace(contenthtml, "@DDSDATA", DDSDATA);
+
+            return sendMail(name, to, null, bcc, contenthtml, et.getOggettomail(), null);
+
+        } catch (Exception ex) {
+            LOGGER.severe(estraiEccezione(ex));
+        }
+        return false;
+    }
+    public static boolean inviaNotificaSP_rigettoIstanzaSOCCORSO(EntityOp eo, Istanza is1,
+            String motivazionerigetto, List<Long> idko) {
+
+        try {
+            EmailTemplate et = eo.getEm().find(EmailTemplate.class, 3L);
+            String name = "EasyLearn Notification Mail";
+            String to[] = {is1.getSoggetto().getEMAIL()};
+            String bcc[] = {eo.getEm().find(Path.class, "dest.support").getDescrizione()};
+
+            String contenthtml = StringUtils.replace(et.getHtmlmail(), "@protocolloistanza", is1.getProtocolloreg());
+            contenthtml = StringUtils.replace(contenthtml, "@dataprotocollo", is1.getProtocolloregdata());
+            contenthtml = StringUtils.replace(contenthtml, "@idistanza", String.valueOf(is1.getIdistanza()));
+            contenthtml = StringUtils.replace(contenthtml, "@codiceistanza", is1.getCodiceistanza());
+            contenthtml = StringUtils.replace(contenthtml, "@version", Constant.VERSIONAPP);
+            contenthtml = StringUtils.replace(contenthtml, "@motivazionerigetto", motivazionerigetto);
+
+            if (!idko.isEmpty()) {
+                String eventualiallegati = "I seguenti ID identificano gli allegati che devono essere sostituiti:<br/>";
+                for (Long ko1 : idko) {
+                    eventualiallegati += String.valueOf(ko1) + "<br/>";
+                }
+                contenthtml = StringUtils.replace(contenthtml, "@eventualiallegati", eventualiallegati);
+            }
+
+            return sendMail(name, to, null, bcc, contenthtml, et.getOggettomail(), null);
+
+        } catch (Exception ex) {
+            LOGGER.severe(estraiEccezione(ex));
+        }
+        return false;
+    }
+
+    public static boolean inviaNotificaSP_rigettoIstanza(EntityOp eo, Istanza is1, String motivazionerigetto) {
+        try {
+            EmailTemplate et = eo.getEm().find(EmailTemplate.class, 2L);
+            String name = "EasyLearn Notification Mail";
+            String to[] = {is1.getSoggetto().getEMAIL()};
+            String bcc[] = {eo.getEm().find(Path.class, "dest.support").getDescrizione()};
+
+            String contenthtml = StringUtils.replace(et.getHtmlmail(), "@protocolloistanza", is1.getProtocolloreg());
+            contenthtml = StringUtils.replace(contenthtml, "@dataprotocollo", is1.getProtocolloregdata());
+            contenthtml = StringUtils.replace(contenthtml, "@idistanza", String.valueOf(is1.getIdistanza()));
+            contenthtml = StringUtils.replace(contenthtml, "@codiceistanza", is1.getCodiceistanza());
+            contenthtml = StringUtils.replace(contenthtml, "@version", Constant.VERSIONAPP);
+            contenthtml = StringUtils.replace(contenthtml, "@motivazionerigetto", motivazionerigetto);
+
+            return sendMail(name, to, null, bcc, contenthtml, et.getOggettomail(), null);
+
+        } catch (Exception ex) {
+            LOGGER.severe(estraiEccezione(ex));
+        }
+        return false;
+    }
 
     public static boolean inviaNotificaADMIN_presentazioneIstanza(EntityOp eo, Istanza is1) {
 
@@ -72,8 +153,8 @@ public class SendMail {
             String contenthtml = StringUtils.replace(et.getHtmlmail(), "@nomesoggetto", is1.getSoggetto().getRAGIONESOCIALE());
             contenthtml = StringUtils.replace(contenthtml, "@idistanza", String.valueOf(is1.getIdistanza()));
             contenthtml = StringUtils.replace(contenthtml, "@codiceistanza", is1.getCodiceistanza());
-            contenthtml = StringUtils.replace(contenthtml, "@version", Constant.VERSIONAPP);            
-            
+            contenthtml = StringUtils.replace(contenthtml, "@version", Constant.VERSIONAPP);
+
             return sendMail(name, to, null, null, contenthtml, et.getOggettomail() + is1.getSoggetto().getRAGIONESOCIALE(), null);
 
         } catch (Exception ex) {

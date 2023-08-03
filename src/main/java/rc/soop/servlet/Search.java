@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.servlet.ServletException;
@@ -67,7 +66,7 @@ public class Search extends HttpServlet {
                 if (res.getStatocorso().getCodicestatocorso().equals("08")) {
                     for (Corso cor : c1) {
                         if (cor.getStatocorso().getCodicestatocorso().equals("24")) {
-                            corsi += "CODICE: "+cor.getIdentificativocorso()+"<br><u>" + cor.getRepertorio().getDenominazione() + "</u> - Edizioni: " + cor.getQuantitarichiesta() + "<br/>";
+                            corsi += "CODICE: " + cor.getIdentificativocorso() + "<br><u>" + cor.getRepertorio().getDenominazione() + "</u> - Edizioni: " + cor.getQuantitarichiesta() + "<br/>";
                         }
                     }
                 } else {
@@ -109,20 +108,60 @@ public class Search extends HttpServlet {
                             + "<i class=\"fa fa-file-text\"></i></button>"
                             + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ALLEGATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\" "
                             + " onclick=\"return document.getElementById('gestall_" + res.getIdistanza() + "').submit();\"><i class=\"fa fa-file-clipboard\"></i></button>"
-                            + "&nbsp;&nbsp;"
-                            + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"SCARICA DECRETO AUT.\" data-preload='false' "
-                            + "class=\"btn btn-sm btn-bg-light btn-dark\" "
-                            + " onclick=\"return document.getElementById('generadecretotemplate1_" + res.getIdistanza() +
-                            "').submit();\"><i class=\"fa fa-file-pdf\"></i></button>"
-                            + "</form>"
-                            + "<form action=\"ADM_allegati.jsp\" method=\"POST\" target=\"_blank\" id=\"gestall_" + res.getIdistanza() + "\">"
-                            + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
-                            + "</form>"
-                            + "<form action=\"Operations\" method=\"POST\" target=\"_blank\" id=\"generadecretotemplate1_" + res.getIdistanza() + "\">"
-                            + "<input type=\"hidden\" name=\"type\" value=\"GENERADECRETOBASE\"/>"
-                            + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
-                            + "</form>"
-                            + "</div>";
+                            + "<br>";
+                    if (res.getPathfirmato() != null) {
+                        azioni
+                                += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA DECRETO AUT.\" data-preload='false' "
+                                + "class=\"btn btn-sm btn-bg-light btn-dark\" "
+                                + " onclick=\"return document.getElementById('generadecretotemplate1_" + res.getIdistanza()
+                                + "').submit();\"><i class=\"fa fa-file-pdf\"></i></button>"
+                                + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA DECRETO AUT.FIRMATO\" data-preload='false' "
+                                + "class=\"btn btn-sm btn-bg-light btn-success\" "
+                                + " onclick=\"return document.getElementById('scaricadecretofirmato1_" + res.getIdistanza()
+                                + "').submit();\"><i class=\"fa fa-file-pdf\"></i></button>"
+                                + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA DECRETO AUT. V2\" data-preload='false' "
+                                + "class=\"btn btn-sm btn-bg-light btn-danger\" "
+                                + " onclick=\"return document.getElementById('scaricadecretofto1_" + res.getIdistanza()
+                                + "').submit();\"><i class=\"fa fa-file-pdf\"></i></button>"
+                                + "<button type=\"button\"class=\"btn btn-sm btn-warning\"\n"
+                                + "data-bs-toggle=\"tooltip\" title=\"NOTIFICA SOGGETTO PROPONENTE\" data-preload='false' "
+                                + "onclick=\"return invianotificaddecreto('" + res.getIdistanza() + "')\" ><i class=\"fa fa-envelope\"></i>"
+                                + "</form>"
+                                + "<form action=\"ADM_allegati.jsp\" method=\"POST\" target=\"_blank\" id=\"gestall_" + res.getIdistanza() + "\">"
+                                + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
+                                + "</form>"
+                                + "<form action=\"Operations\" method=\"POST\" target=\"_blank\" id=\"generadecretotemplate1_" + res.getIdistanza() + "\">"
+                                + "<input type=\"hidden\" name=\"type\" value=\"GENERADECRETOBASE\"/>"
+                                + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
+                                + "</form>"
+                                + "<form action=\"Operations\" method=\"POST\" target=\"_blank\" id=\"scaricadecretofirmato1_" + res.getIdistanza() + "\">"
+                                + "<input type=\"hidden\" name=\"type\" value=\"SCARICADECRETOFIRMATO\"/>"
+                                + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
+                                + "</form>"
+                                + "<form action=\"Operations\" method=\"POST\" target=\"_blank\" id=\"scaricadecretofto1_" + res.getIdistanza() + "\">"
+                                + "<input type=\"hidden\" name=\"type\" value=\"GENERADECRETODDSFTO\"/>"
+                                + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
+                                + "</form>";
+                    } else {
+                        azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"SCARICA DECRETO AUT.\" data-preload='false' "
+                                + "class=\"btn btn-sm btn-bg-light btn-dark\" "
+                                + " onclick=\"return document.getElementById('generadecretotemplate1_" + res.getIdistanza() + "').submit();\"><i class=\"fa fa-file-pdf\"></i></button>"
+                                + "<a href='ADM_uploaddecretofirmato.jsp?idist=" + Utils.enc_string(String.valueOf(res.getIdistanza()))
+                                + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+                                + " class=\"btn btn-sm btn-bg-light btn-warning fan1\" data-bs-toggle=\"tooltip\" title=\"UPLOAD DECRETO FIRMATO\" data-preload='false' "
+                                + "><i class=\"fa fa-upload\"></i></a>"
+                                + "</form>"
+                                + "<form action=\"ADM_allegati.jsp\" method=\"POST\" target=\"_blank\" id=\"gestall_" + res.getIdistanza() + "\">"
+                                + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
+                                + "</form>"
+                                + "<form action=\"Operations\" method=\"POST\" target=\"_blank\" id=\"generadecretotemplate1_" + res.getIdistanza() + "\">"
+                                + "<input type=\"hidden\" name=\"type\" value=\"GENERADECRETOBASE\"/>"
+                                + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
+                                + "</form>";
+                    }
+
+                    azioni += "</div>";
+
                 }
 
                 data_value.addProperty("azioni", azioni);

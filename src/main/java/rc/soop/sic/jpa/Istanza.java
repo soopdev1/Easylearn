@@ -67,6 +67,11 @@ public class Istanza implements Serializable {
     @Column(name = "protocollosoggettodata")
     private String protocollosoggettodata;
 
+    @Column(name = "protocolloreg")
+    private String protocolloreg;
+    @Column(name = "protocolloregdata")
+    private String protocolloregdata;
+
     @Column(name = "pathfirmato")
     private String pathfirmato;
     @Column(name = "datainvio")
@@ -174,6 +179,22 @@ public class Istanza implements Serializable {
 
     public void setDatagestione(String datagestione) {
         this.datagestione = datagestione;
+    }
+
+    public String getProtocolloreg() {
+        return protocolloreg;
+    }
+
+    public void setProtocolloreg(String protocolloreg) {
+        this.protocolloreg = protocolloreg;
+    }
+
+    public String getProtocolloregdata() {
+        return protocolloregdata;
+    }
+
+    public void setProtocolloregdata(String protocolloregdata) {
+        this.protocolloregdata = protocolloregdata;
     }
 
     public String getDatacreazione() {
