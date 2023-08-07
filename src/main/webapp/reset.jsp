@@ -10,7 +10,7 @@
 <html lang="en">
     <!--begin::Head-->
     <head><base href="">
-        <title><%=Constant.NAMEAPP%></title>
+        <title><%=Constant.NAMEAPP%>: Reset password</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->

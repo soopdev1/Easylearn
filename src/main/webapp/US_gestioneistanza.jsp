@@ -26,12 +26,10 @@
                 EntityOp eo = new EntityOp();
                 SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
                 List<Istanza> ist_l = eo.getIstanzeSoggetto(so);
-
-
     %>
     <!--begin::Head-->
     <head><base href="">
-        <title><%=Constant.NAMEAPP%> - Dashboard</title>
+        <title><%=Constant.NAMEAPP%>: Gestione Istanze</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->

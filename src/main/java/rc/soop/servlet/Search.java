@@ -38,17 +38,36 @@ public class Search extends HttpServlet {
     private static final String APPJSON = "application/json";
     private static final String CONTENTTYPE = "Content-Type";
 
+    protected void list_istanze_user(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        try (PrintWriter out = response.getWriter()) {
+            JsonObject jMembers = new JsonObject();
+            JsonArray data = new JsonArray();
+            String statoistanza = getRequestValue(request, "statoistanza");
+            String tipopercorso = getRequestValue(request, "tipopercorso");
+
+            List<Istanza> result = new EntityOp().list_istanze_adm(tipopercorso, statoistanza);
+            jMembers.addProperty(ITOTALRECORDS, result.size());
+            jMembers.addProperty(ITOTALDISPLAY, result.size());
+            jMembers.addProperty(SECHO, 0);
+            jMembers.addProperty(SCOLUMS, "");
+            AtomicInteger at = new AtomicInteger(1);
+            
+            
+            
+        }
+
+    }
+
     protected void list_istanze_adm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try (PrintWriter out = response.getWriter()) {
             JsonObject jMembers = new JsonObject();
             JsonArray data = new JsonArray();
-
             String statoistanza = getRequestValue(request, "statoistanza");
             String tipopercorso = getRequestValue(request, "tipopercorso");
-
             List<Istanza> result = new EntityOp().list_istanze_adm(tipopercorso, statoistanza);
-
             jMembers.addProperty(ITOTALRECORDS, result.size());
             jMembers.addProperty(ITOTALDISPLAY, result.size());
             jMembers.addProperty(SECHO, 0);
@@ -62,7 +81,6 @@ public class Search extends HttpServlet {
                 data_value.addProperty("corsi", res.getSoggetto().getRAGIONESOCIALE());
                 String corsi = "<b>Tipologia Percorsi: " + res.getTipologiapercorso().getNometipologia() + "</b><br/><hr>";
                 List<Corso> c1 = new EntityOp().getCorsiIstanza(res);
-
                 if (res.getStatocorso().getCodicestatocorso().equals("08")) {
                     for (Corso cor : c1) {
                         if (cor.getStatocorso().getCodicestatocorso().equals("24")) {
@@ -74,11 +92,9 @@ public class Search extends HttpServlet {
                         corsi += "<u>" + cor.getRepertorio().getDenominazione() + "</u>- Edizioni: " + cor.getQuantitarichiesta() + "<br/>";
                     }
                 }
-
                 data_value.addProperty("corsi", corsi);
                 data_value.addProperty("protocollo", res.getProtocollosoggetto() + " " + res.getProtocollosoggettodata());
                 data_value.addProperty("data", res.getDatainvio());
-
                 data_value.addProperty("stato", res.getStatocorso().getHtmldescr());
 
                 String azioni = "<i class='fa fa-hourglass'></i>";
@@ -90,6 +106,9 @@ public class Search extends HttpServlet {
                             + "<i class=\"fa fa-file-text\"></i></button>"
                             + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ALLEGATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\" "
                             + " onclick=\"return document.getElementById('gestall_" + res.getIdistanza() + "').submit();\"><i class=\"fa fa-file-clipboard\"></i></button>"
+                            //+ "<a href='ADM_protocollaistanza.jsp?idist=" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+                            //+ " class=\"btn btn-sm btn-bg-light btn-warning text-dark fan1\" data-bs-toggle=\"tooltip\" title=\"PROTOCOLLA ISTANZA\" data-preload='false' "
+                            //+ "\"><i class=\"fa fa-stamp\"></i></a>"
                             + "&nbsp;&nbsp;"
                             + "<a href='ADM_approvaistanza.jsp?idist=" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
                             + " class=\"btn btn-sm btn-bg-light btn-success fan1\" data-bs-toggle=\"tooltip\" title=\"APPROVA ISTANZA\" data-preload='false' "
@@ -125,7 +144,7 @@ public class Search extends HttpServlet {
                                 + "').submit();\"><i class=\"fa fa-file-pdf\"></i></button>"
                                 + "<button type=\"button\"class=\"btn btn-sm btn-warning\"\n"
                                 + "data-bs-toggle=\"tooltip\" title=\"NOTIFICA SOGGETTO PROPONENTE\" data-preload='false' "
-                                + "onclick=\"return invianotificaddecreto('" + res.getIdistanza() + "')\" ><i class=\"fa fa-envelope\"></i>"
+                                + "onclick=\"return invianotificaddecreto('" + res.getIdistanza() + "')\" ><i class=\"fa fa-envelope\"></i></button>"
                                 + "</form>"
                                 + "<form action=\"ADM_allegati.jsp\" method=\"POST\" target=\"_blank\" id=\"gestall_" + res.getIdistanza() + "\">"
                                 + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
@@ -332,6 +351,9 @@ public class Search extends HttpServlet {
                     break;
                 case "list_istanze_adm":
                     list_istanze_adm(request, response);
+                    break;
+                case "list_istanze_user":
+                    list_istanze_user(request, response);
                     break;
                 default: {
                     String p = request.getContextPath();

@@ -22,11 +22,10 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
-                SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
     %>
     <!--begin::Head-->
     <head><base href="">
-        <title><%=Constant.NAMEAPP%> - Dashboard</title>
+        <title><%=Constant.NAMEAPP%>: Elenco Allievi</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->

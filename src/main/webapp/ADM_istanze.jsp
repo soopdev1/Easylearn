@@ -19,12 +19,10 @@
         switch (verifysession) {
             case 1: {
                 EntityOp e = new EntityOp();
-                List<Istanza> dagestire = e.getIstanzedaGestire();
-                List<Istanza> gestite = e.getIstanzeGestite();
     %>
     <!--begin::Head-->
     <head><base href="">
-        <title><%=Constant.NAMEAPP%> - Dashboard</title>
+        <title><%=Constant.NAMEAPP%>: Gestione Istanze</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->

@@ -4,13 +4,14 @@
     Author     : Administrator
 --%>
 
+<%@page import="rc.soop.sic.Constant"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
-        <title>ERROR 500</title>
+        <title><%=Constant.NAMEAPP%>: ERROR 500</title>
         <link rel="stylesheet" href="assets/css/errorpage.css" />
     </head>
     <body>

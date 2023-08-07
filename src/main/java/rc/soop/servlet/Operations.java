@@ -40,6 +40,7 @@ import static rc.soop.sic.Pdf.checkFirmaQRpdfA;
 import rc.soop.sic.SendMail;
 import rc.soop.sic.Utils;
 import static rc.soop.sic.Utils.calcolaPercentuale;
+import static rc.soop.sic.Utils.datemysqltoita;
 import static rc.soop.sic.Utils.estraiEccezione;
 import static rc.soop.sic.Utils.fd;
 import static rc.soop.sic.Utils.formatDoubleforMysql;
@@ -289,6 +290,30 @@ public class Operations extends HttpServlet {
         }
     }
 
+    protected void PROTOCOLLAISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String idist = Utils.dec_string(getRequestValue(request, "idist"));
+
+        EntityOp ep1 = new EntityOp();
+        try {
+            Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(idist));
+            if (is1 != null) {
+                String PROT = getRequestValue(request, "prot_num");
+                String DATAPROT = datemysqltoita(getRequestValue(request, "prot_dat"));
+                is1.setProtocolloreg(PROT);
+                is1.setProtocolloregdata(DATAPROT);
+                ep1.merge(is1);
+                ep1.commit();
+                ep1.close();
+                redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
+            } else {
+                redirect(request, response, "Page_message.jsp?esito=KORI_IS1");
+            }
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KORI_IS2");
+        }
+    }
+    
     protected void RIGETTAISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
         String idist = Utils.dec_string(getRequestValue(request, "idist"));
@@ -1573,6 +1598,7 @@ public class Operations extends HttpServlet {
         try {
 
             SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
+            
 //            Istanza is = (Istanza) request.getSession().getAttribute("is_memory");
 
             String codiceis = generaId(30);
@@ -1740,6 +1766,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "RIGETTAISTANZA":
                     RIGETTAISTANZA(request, response);
+                    break;
+                case "PROTOCOLLAISTANZA":
+                    PROTOCOLLAISTANZA(request, response);
                     break;
                 case "GENERADECRETODDSFTO":
                     GENERADECRETODDSFTO(request, response);

@@ -24,7 +24,7 @@
     %>
     <!--begin::Head-->
     <head><base href="">
-        <title><%=Constant.NAMEAPP%> - Dashboard</title>
+        <title><%=Constant.NAMEAPP%>: Commissione Esame</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->

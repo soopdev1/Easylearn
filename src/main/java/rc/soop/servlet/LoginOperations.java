@@ -24,6 +24,18 @@ public class LoginOperations extends HttpServlet {
     //SPID
     //https://github.com/italia/spid-spring
     protected void logout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            request.getSession().setAttribute("us_memory", null);
+            request.getSession().setAttribute("us_cod", null);
+            request.getSession().setAttribute("us_pwd", null);
+            request.getSession().setAttribute("us_rolecod", null);
+            request.getSession().setAttribute("us_mail", null);
+            request.getSession().setAttribute("ses_idcorso", null);
+            request.getSession().setAttribute("ses_idist", null);
+            request.getSession().setAttribute("ses_idalleg", null);
+            request.getSession().setAttribute("ses_idcorso", null);
+        } catch (Exception e) {
+        }
         request.getSession().invalidate();
         redirect(request, response, "login.jsp");
     }

@@ -41,7 +41,7 @@
     %>
     <!--begin::Head-->
     <head><base href="">
-        <title><%=Constant.NAMEAPP%> - Dashboard</title>
+        <title><%=Constant.NAMEAPP%>: Gestione istanza</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->

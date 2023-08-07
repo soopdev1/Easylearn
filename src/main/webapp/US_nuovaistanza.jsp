@@ -28,7 +28,7 @@
     %>
     <!--begin::Head-->
     <head><base href="">
-        <title><%=Constant.NAMEAPP%> - Dashboard</title>
+        <title><%=Constant.NAMEAPP%>: Nuova Istanza</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->
@@ -122,12 +122,6 @@
                                                         <option value="">Scegli...</option>                                                                
                                                         <%for (Scheda_Attivita sa : sche1) {
                                                                 boolean ok = true;
-                                                                //                                                                for (Corso cor : c1) {
-                                                                //                                                                  if (cor.getSchedaattivita().getIdschedaattivita().equals(
-                                                                //                                                                sa.getIdschedaattivita())) {
-                                                                //                                                                  ok = false;
-                                                                //                                                            }
-                                                                //                                                      }
                                                                 if (ok) {
                                                         %>
                                                         <option value="<%=sa.getRepertorio().getIdrepertorio()%>;<%=sa.getIdschedaattivita()%>" >
