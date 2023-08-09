@@ -45,7 +45,7 @@ public class Scheda_Attivita implements Serializable {
     @Column(name = "titoloattestato")
     private String titoloattestato;
 
-        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+        @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
 @JoinColumn(name = "codicecertificazione")
     private Certificazione certificazioneuscita;
 

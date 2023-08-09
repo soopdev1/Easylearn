@@ -47,15 +47,15 @@ public class Istanza implements Serializable {
     @Column(name = "codiceistanza")
     private String codiceistanza;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "idsoggetto")
     private SoggettoProponente soggetto;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "tipologiapercorso")
     private Tipologia_Percorso tipologiapercorso;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "stato")
     private CorsoStato statocorso;
 

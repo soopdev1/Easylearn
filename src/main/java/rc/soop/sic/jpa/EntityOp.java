@@ -241,13 +241,20 @@ public class EntityOp {
         return (List<Competenze>) q.getResultList();
     }
 
+    public User getUserbyUSR(String username) {
+        TypedQuery q = this.em.createNamedQuery("user.byUsername", User.class);
+        q.setParameter("username", username);
+        q.setMaxResults(1);
+        return q.getResultList().isEmpty() ? null : (User) q.getSingleResult();
+    }
+
     public Certificazione getCertif(String nome) {
         TypedQuery q = this.em.createNamedQuery("cert.name", Certificazione.class);
         q.setParameter("nome", nome);
         q.setMaxResults(1);
         return q.getResultList().isEmpty() ? null : (Certificazione) q.getSingleResult();
     }
-    
+
     public IncrementalCorso getIC(Corso c1) {
         TypedQuery q = this.em.createNamedQuery("inc.corso", IncrementalCorso.class);
         q.setParameter("corso", c1);
@@ -260,7 +267,7 @@ public class EntityOp {
         q.setParameter("moduloformativo", c1);
         return (List<Moduli_Docenti>) q.getResultList();
     }
-    
+
     public List<Information> list_info(Istanza is1) {
         TypedQuery q = this.em.createNamedQuery("info.istanza", Information.class);
         q.setParameter("istanza", is1);
@@ -316,7 +323,7 @@ public class EntityOp {
         return out;
     }
 
-    public List<Istanza> list_istanze_adm(String tipologiapercorso,String statoistanza) {
+    public List<Istanza> list_istanze_adm(String tipologiapercorso, String statoistanza) {
         HashMap<String, Object> param = new HashMap<>();
         String sql = "SELECT i FROM Istanza i  WHERE i.statocorso.codicestatocorso IN ('07','08','09','10') ";
 
@@ -330,7 +337,36 @@ public class EntityOp {
             sql += "i.statocorso.codicestatocorso = :statoistanza";
             param.put("statoistanza", statoistanza);
         }
+        TypedQuery<Istanza> q = this.em.createQuery(sql, Istanza.class);
+
+        if (param.isEmpty()) {
+            q.setMaxResults(500);
+        }
+
+        param.entrySet().forEach(m -> {
+            q.setParameter(m.getKey(), m.getValue());
+        });
+
+        return q.getResultList().isEmpty() ? new ArrayList() : (List<Istanza>) q.getResultList();
+    }
+    
+    public List<Istanza> list_istanze_user(SoggettoProponente sp, String tipologiapercorso, String statoistanza) {
+        HashMap<String, Object> param = new HashMap<>();
+        String sql = "SELECT i FROM Istanza i WHERE i.soggetto=:soggetto ";
+        param.put("soggetto", sp);
         
+        if (!tipologiapercorso.equals("")) {
+            sql += !sql.toUpperCase().contains("WHERE") ? "WHERE " : " AND ";
+            sql += "i.tipologiapercorso.idtipopercorso = :tipologiapercorso";
+            param.put("tipologiapercorso", Long.valueOf(tipologiapercorso));
+        }
+        if (!statoistanza.equals("")) {
+            sql += !sql.toUpperCase().contains("WHERE") ? "WHERE " : " AND ";
+            sql += "i.statocorso.codicestatocorso = :statoistanza";
+            param.put("statoistanza", statoistanza);
+        }        
+        sql+=" ORDER BY i.idistanza DESC";
+
         TypedQuery<Istanza> q = this.em.createQuery(sql, Istanza.class);
 
         if (param.isEmpty()) {

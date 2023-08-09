@@ -72,7 +72,7 @@ function selezionaCorso() {
 
 //ON CHANGE COMPETENZE TRASVERSALI
 function selezionaCT(idcompetenza) {
-    alert(idcompetenza);
+    //alert(idcompetenza);
 }
 
 
@@ -143,6 +143,10 @@ function validateForm() {
         var stageore = parseInt($("#stageore").val());
         var maxallievi = parseInt($("#maxallievi").val());
 
+
+        var el_mx1 = durataore * eler_max / 100.0;
+        var el_mi1 = durataore * eler_min / 100.0;
+
         if (durataore < ore_min || durataore > ore_max) {
             $('errorMsgContainer').alert();
             const errorWrapper = document.querySelector('#errorMsgContainer');
@@ -157,11 +161,13 @@ function validateForm() {
             errorWrapper.innerHTML = '<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Attenzione</strong> La durata di ore in stage non rientra nel range previsto dal corso (' + stage_min + ' - ' + stage_max + '). Inserire un valore in questo range.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi avviso"></div>';
             errorWrapper.scrollIntoView();
             valid = false;
-        } else if (elearning < eler_min || elearning > eler_max) {
+        } else if (elearning < el_mi1 || elearning > el_mx1) {
             $('errorMsgContainer').alert();
             const errorWrapper = document.querySelector('#errorMsgContainer');
             errorWrapper.innerHTML = '';
-            errorWrapper.innerHTML = '<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Attenzione</strong> La percentuale di ore in eLearning non rientra nel range previsto dal corso (' + eler_min + '% - ' + eler_max + '%). Inserire un valore in questo range.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi avviso"></div>';
+            errorWrapper.innerHTML = '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                    '<strong>Attenzione</strong> Le ore di eLearning non rientra nel range previsto dal corso (' 
+                    + el_mi1 + ' - ' + el_mx1 + '). Inserire un valore in questo range.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi avviso"></div>';
             errorWrapper.scrollIntoView();
             valid = false;
         } else if (numeroallievi > maxallievi) {

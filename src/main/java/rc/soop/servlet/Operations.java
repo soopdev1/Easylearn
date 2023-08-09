@@ -313,7 +313,7 @@ public class Operations extends HttpServlet {
             redirect(request, response, "Page_message.jsp?esito=KORI_IS2");
         }
     }
-    
+
     protected void RIGETTAISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
         String idist = Utils.dec_string(getRequestValue(request, "idist"));
@@ -1595,14 +1595,12 @@ public class Operations extends HttpServlet {
 
     protected void ADDCORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String closewindow = getRequestValue(request, "closewindow");
+        SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
         try {
-
-            SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
-            
-//            Istanza is = (Istanza) request.getSession().getAttribute("is_memory");
 
             String codiceis = generaId(30);
             EntityOp e = new EntityOp();
+
             e.begin();
 
 //            if (is != null) {

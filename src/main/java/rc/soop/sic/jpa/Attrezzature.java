@@ -58,7 +58,7 @@ public class Attrezzature implements Serializable {
     @Column(name = "numeroinventario")
     private String numeroinventario;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "idcorso")
     private Corso corso;
     

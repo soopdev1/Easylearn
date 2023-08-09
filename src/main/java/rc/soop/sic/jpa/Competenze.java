@@ -44,7 +44,7 @@ public class Competenze implements Serializable {
     @Column(name = "descrizione", columnDefinition = "LONGTEXT")
     private String descrizione;
 
-        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+        @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
 @JoinColumn(name = "idrepertorio")
     private Repertorio repertorio;
     

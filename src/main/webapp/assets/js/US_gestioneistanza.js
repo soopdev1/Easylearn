@@ -1,21 +1,65 @@
+var table;
+
 $(document).ready(function () {
-    $('#tab_dt1').DataTable({
-        dom: '<if<t>lp>',
+    table = $('#tab_dt1').DataTable({
+        dom: '<Bif<t>lp>',
+        buttons: [
+            {
+                extend: 'excelHtml5',
+                className: 'btn btn-sm btn-primary',
+                text: '<i class="fa fa-file-excel"></i>',
+                titleAttr: 'Esporta in Excel',
+                exportOptions: {
+                    columns: [5, 1, 2, 3] //Your Column value those you want
+                }
+            }
+        ],
         lengthMenu: [[10, 50, 100, -1], [10, 50, 100, "Tutto"]],
         columnDefs: [
             {orderable: false, targets: 0},
             {orderable: false, targets: 1},
             {orderable: false, targets: 2},
             {type: "date-eu", targets: 3},
-            {orderable: false, targets: 4}
+            {orderable: false, targets: 4},
+            {visible: false, targets: 5}
         ],
         order: [[3, 'desc']],
         language: {
             url: 'assets/plugins/DataTables/it-IT.json'
+        },
+        responsive: true,
+        processing: true,
+        ajax: {
+            url: 'Search',
+            type: 'POST',
+            data: function (d) {
+                d.type = 'list_istanze_user';
+                d.statoistanza = $('#statoistanza').val();
+                d.tipopercorso = $('#tipopercorso').val();
+            }
+        },
+        columns: [
+            {data: 'stato', orderable: false},
+            {data: 'id'},
+            {data: 'corsi'},
+            {data: 'data', type: "date-eu"},
+            {data: 'azioni', orderable: false},
+            {data: 'statovisual'}
+        ]
+    });
+    Fancybox.bind(".fan1", {
+        groupAll: false, // Group all items
+        on: {
+            closing: (fancybox) => {
+                refreshtable();
+            }
         }
     });
 });
 
+function refreshtable() {
+    table.ajax.reload(null, false);
+}
 
 function sendistanza(idistanza) {
     var ok = false;
@@ -23,7 +67,7 @@ function sendistanza(idistanza) {
     $.confirm({
         title: 'Conferma Operazione',
         content: "Confermi di voler presentare l'istanza con ID <b>" + idistanza +
-                "</b> ? Confermi di accettare e sottoscrivere l'istanza in tutte le sue parti come da visualizzazione a sistema della stessa?"+
+                "</b> ? Confermi di accettare e sottoscrivere l'istanza in tutte le sue parti come da visualizzazione a sistema della stessa?" +
                 " L'operazione non potrà essere annullata.",
         theme: 'bootstrap',
         columnClass: 'col-md-9',

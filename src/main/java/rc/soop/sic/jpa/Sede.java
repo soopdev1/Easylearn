@@ -35,7 +35,7 @@ public class Sede implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "idsede")
     Long idsede;
-        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+        @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
 @JoinColumn(name = "sedetipo", referencedColumnName = "idtiposede")
     TipoSede tipo;
     @Column(name = "indirizzo")
@@ -47,7 +47,7 @@ public class Sede implements Serializable {
     @Column(name = "provincia")
     private String provincia;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "idsoggetto")
     SoggettoProponente soggetto;
 

@@ -30,12 +30,12 @@ public class Conoscenze implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "idconoscenze")
     private Long idconoscenze;
-    
+
     @Column(name = "descrizione", columnDefinition = "LONGTEXT")
     private String descrizione;
-    
-        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-@JoinColumn(name = "idcompetenze")
+
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinColumn(name = "idcompetenze")
     private Competenze competenza;
 
     public Conoscenze() {
@@ -64,7 +64,7 @@ public class Conoscenze implements Serializable {
     public void setCompetenza(Competenze competenza) {
         this.competenza = competenza;
     }
-        
+
     @Override
     public boolean equals(final Object obj) {
         if (this == obj) {

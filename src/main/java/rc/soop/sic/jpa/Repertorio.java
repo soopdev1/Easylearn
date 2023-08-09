@@ -63,11 +63,11 @@ public class Repertorio implements Serializable {
     @Column(name = "descrizione", columnDefinition = "LONGTEXT")
     private String descrizione;
 
-        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+        @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
 @JoinColumn(name = "codicelivellocertificazione")
     private Livello_Certificazione livelloeqf;
 
-        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+        @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
 @JoinColumn(name = "codicecertificazione")
     private Certificazione qualificarilasciata;
 
@@ -89,11 +89,11 @@ public class Repertorio implements Serializable {
     @Column(name = "normativarif", columnDefinition = "LONGTEXT")
     private String normativarif;
 
-        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+        @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
 @JoinColumn(name = "tipologia")
     private Tipologia_Repertorio tipologia;
 
-        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+        @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
 @JoinColumn(name = "tipologiacategoria")
     private Categoria_Repertorio tipologiacategoria;
 

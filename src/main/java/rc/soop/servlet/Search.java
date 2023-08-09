@@ -40,28 +40,139 @@ public class Search extends HttpServlet {
 
     protected void list_istanze_user(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        EntityOp ep = new EntityOp();
 
         try (PrintWriter out = response.getWriter()) {
             JsonObject jMembers = new JsonObject();
             JsonArray data = new JsonArray();
+            SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
             String statoistanza = getRequestValue(request, "statoistanza");
             String tipopercorso = getRequestValue(request, "tipopercorso");
-
-            List<Istanza> result = new EntityOp().list_istanze_adm(tipopercorso, statoistanza);
+            List<Istanza> result = ep.list_istanze_user(so, tipopercorso, statoistanza);
             jMembers.addProperty(ITOTALRECORDS, result.size());
             jMembers.addProperty(ITOTALDISPLAY, result.size());
             jMembers.addProperty(SECHO, 0);
             jMembers.addProperty(SCOLUMS, "");
             AtomicInteger at = new AtomicInteger(1);
-            
-            
-            
+
+            result.forEach(res -> {
+
+                String labelallegati = "GESTIONE ALLEGATI";
+                int maxcorsi = res.getTipologiapercorso().getMaxcorsi();
+                List<Corso> c1 = ep.getCorsiIstanza(res);
+                boolean addcorso = (maxcorsi > c1.size());
+                boolean salvaistanza = true;
+                boolean eliminaistanza = true;
+                boolean modificacorso = true;
+                boolean inviaistanza = false;
+                boolean consultaistanza = false;
+
+                if (!res.getStatocorso().getCodicestatocorso().equals("01")) {
+                    addcorso = false;
+                    salvaistanza = false;
+                    modificacorso = false;
+                }
+
+                switch (res.getStatocorso().getCodicestatocorso()) {
+                    case "02": {
+                        inviaistanza = true;
+                        consultaistanza = true;
+                        break;
+                    }
+                    case "07": {
+                        eliminaistanza = false;
+                        consultaistanza = true;
+                        break;
+                    }
+                    case "10": {
+                        //SOCCORSO ISTRUTTORIO
+                        eliminaistanza = false;
+                        consultaistanza = true;
+                        inviaistanza = true;
+                        labelallegati = "GESTISCI SOCCORSO ISTRUTTORIO";
+                        break;
+                    }
+                    default:
+                        break;
+                }
+
+                JsonObject data_value = new JsonObject();
+                data_value.addProperty(RECORDID, at.get());
+                data_value.addProperty("stato", res.getStatocorso().getHtmlicon());
+                data_value.addProperty("id", res.getIdistanza());
+
+                String corsi = "<b>Tipologia Percorsi: " + res.getTipologiapercorso().getNometipologia() + "</b><br/><hr>";
+                for (Corso cor : c1) {
+                    corsi += "<u>" + cor.getRepertorio().getDenominazione() + "</u>- Edizioni: " + cor.getQuantitarichiesta() + "<br/>";
+
+                    if (modificacorso) {
+                        corsi += "<form action=\"US_programmacorsi.jsp\" method=\"POST\" target=\"_blank\">"
+                                + "<input type=\"hidden\" name=\"idcorso\" value=\"" + Utils.enc_string(String.valueOf(cor.getIdcorso())) + "\"/>"
+                                + cor.getStatocorso().getHtmlicon() + " | "
+                                + "<button type=\"submit\"class=\"btn btn-sm btn-primary\" data-bs-toggle=\"tooltip\" title=\"MODIFICA DETTAGLI CORSO\" data-preload='false'><i class=\"fa fa-edit\"></i></button>";
+
+                        if (c1.size() > 1) {
+                            corsi += " | <button type=\"button\"class=\"btn btn-sm btn-danger\" data-bs-toggle=\"tooltip\" title=\"RIMUOVI CORSO DA ISTANZA\" data-preload='false'"
+                                    + "onclick=\"return deletecorsofromistance('" + cor.getIdcorso() + "')\"><i class=\"fa fa-trash-arrow-up\"></i></button>";
+                        }
+                        corsi += "</form>";
+
+                    }
+                }
+
+                data_value.addProperty("corsi", corsi);
+                data_value.addProperty("data", res.getProtocollosoggettodata());
+
+                String azioni = "<form action=\"US_showistanza.jsp\" method=\"POST\" target=\"_blank\">"
+                        + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>";
+
+                if (consultaistanza) {
+                    azioni += "<button type=\"submit\"class=\"btn btn-sm btn-primary\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ISTANZA\"data-preload='false'><i class=\"fa fa-file-text\"></i></button> | ";
+                }
+                if (addcorso) {
+                    azioni += "<a href=\"US_addcorsoistanza.jsp?idist=" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\" data-fancybox data-type='iframe' "
+                            + "data-bs-toggle=\"tooltip\" title=\"AGGIUNGI CORSO AD ISTANZA\" data-preload='false' data-width='100%' data-height='100%' "
+                            + "class=\"btn btn-sm btn-bg-light btn-primary fan1\"><i class=\"fa fa-plus-circle\"></i></a> | ";
+                }
+                if (salvaistanza) {
+                    azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VERIFICA E SALVA ISTANZA\" data-preload='false' "
+                            + "class=\"btn btn-sm btn-bg-light btn-success\" onclick=\"return saveistanza('" + res.getIdistanza() + "')\"><i class=\"fa fa-save\"></i></button> | ";
+                } else if (inviaistanza) {
+                    azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"INVIA ISTANZA\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
+                            + "onclick=\"return sendistanza('" + res.getIdistanza() + "')\"><i class=\"fa fa-envelope\"></i></button> |";
+                }
+
+                if (eliminaistanza) {
+                    azioni += "<button type=\"button\"class=\"btn btn-sm btn-bg-light btn-danger\" data-bs-toggle=\"tooltip\" title=\"ELIMINA ISTANZA\" data-preload='false' " + ""
+                            + "onclick=\"return deleteistanza('<%=is1.getIdistanza()%>')\"><i class=\"fa fa-remove\"></i></button> |";
+                }
+
+                azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"" + labelallegati + "\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\""
+                        + "onclick=\"return document.getElementById('gestall_" + res.getIdistanza() + "').submit();\"><i class=\"fa fa-file-clipboard\"></i></button>"
+                        + "</form>"
+                        + "<form action=\"US_gestioneallegati.jsp\" method=\"POST\" target=\"_blank\" id=\"gestall_" + res.getIdistanza() + "\">"
+                        + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
+                        + "</form>";
+
+                data_value.addProperty("azioni", azioni);
+                data_value.addProperty("statovisual", res.getStatocorso().getNome());
+                data.add(data_value);
+                at.addAndGet(1);
+            });
+            jMembers.add(AADATA, data);
+            response.setContentType(APPJSON);
+            response.setHeader(CONTENTTYPE, APPJSON);
+            out.print(jMembers.toString());
+
         }
 
     }
 
     protected void list_istanze_adm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        EntityOp ep = new EntityOp();
+
         try (PrintWriter out = response.getWriter()) {
             JsonObject jMembers = new JsonObject();
             JsonArray data = new JsonArray();
@@ -78,9 +189,8 @@ public class Search extends HttpServlet {
                 data_value.addProperty(RECORDID, at.get());
                 data_value.addProperty("id", res.getIdistanza());
                 data_value.addProperty("soggetto", res.getSoggetto().getRAGIONESOCIALE());
-                data_value.addProperty("corsi", res.getSoggetto().getRAGIONESOCIALE());
                 String corsi = "<b>Tipologia Percorsi: " + res.getTipologiapercorso().getNometipologia() + "</b><br/><hr>";
-                List<Corso> c1 = new EntityOp().getCorsiIstanza(res);
+                List<Corso> c1 = ep.getCorsiIstanza(res);
                 if (res.getStatocorso().getCodicestatocorso().equals("08")) {
                     for (Corso cor : c1) {
                         if (cor.getStatocorso().getCodicestatocorso().equals("24")) {

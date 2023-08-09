@@ -56,11 +56,11 @@ public class SoggettoProponente implements Serializable {
     @Column(name = "DDGDATA")
     private String DDGDATA;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "sedelegale")
     Sede sedelegale;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "sedeoperativa")
     Sede sedeoperativa;
 
@@ -77,7 +77,7 @@ public class SoggettoProponente implements Serializable {
     private String rap_luogonascita;
     @Column(name = "rap_datanascita")
     private String rap_datanascita;
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "rap_sede")
     Sede rap_sede;
     @Column(name = "rap_carica")

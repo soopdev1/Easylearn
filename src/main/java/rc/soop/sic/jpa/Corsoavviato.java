@@ -39,11 +39,11 @@ public class Corsoavviato implements Serializable {
     @Column(name = "idcorsoavviato")
     private Long idcorsoavviato;
 
-        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+        @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
 @JoinColumn(name = "idsoggetto")
     private SoggettoProponente soggetto;
 
-        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+        @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
 @JoinColumn(name = "idistanza")
     private Istanza istanza;
 
@@ -61,7 +61,7 @@ public class Corsoavviato implements Serializable {
     @Column(name = "elencoallievi")
     private String elencoallievi;
 
-        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+        @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
 @JoinColumn(name = "stato")
     private CorsoStato statocorso;
 

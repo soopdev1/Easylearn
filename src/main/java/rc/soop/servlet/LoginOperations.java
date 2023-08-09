@@ -55,7 +55,6 @@ public class LoginOperations extends HttpServlet {
                     HttpSession se = request.getSession();
                     se.setAttribute("us_memory", user);
                     se.setAttribute("us_cod", user.getUsername());
-                    se.setAttribute("us_pwd", user.getPassword());
                     se.setAttribute("us_rolecod", user.getTipo());
                     se.setAttribute("us_mail", user.getEmail());
                     EntityOp.trackingAction(username, "LOGIN OK");

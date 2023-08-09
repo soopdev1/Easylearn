@@ -23,9 +23,7 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
-                EntityOp eo = new EntityOp();
-                SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
-                List<Istanza> ist_l = eo.getIstanzeSoggetto(so);
+                List<Tipologia_Percorso> per1 = Engine.tipo_percorso_attivi();
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -105,6 +103,40 @@
                                             </div>
                                             <hr>-->
                                             <div class="card-body py-3">
+                                                <div class="col-md-12 row">
+                                                    <div class="col-md-6">
+                                                        <label>Tipo Percorso</label>
+                                                        <select aria-label="Scegli..." 
+                                                                data-placeholder="Scegli Tipologia percorso" 
+                                                                class="form-select form-select-solid form-select-lg fw-bold" 
+                                                                name="tipopercorso"
+                                                                id="tipopercorso" onchange="return refreshtable();"
+                                                                >
+                                                            <option value="">...</option>  
+                                                            <%for (Tipologia_Percorso t1 : per1) {%>
+                                                            <option value="<%=t1.getIdtipopercorso()%>"><%=t1.getNometipologia().toUpperCase()%></option>  
+                                                            <%}%>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label>Stato Istanza</label>
+                                                        <select aria-label="Scegli..." 
+                                                                data-placeholder="Scegli Tipologia percorso" 
+                                                                class="form-select form-select-solid form-select-lg fw-bold" 
+                                                                name="statoistanza"
+                                                                id="statoistanza" onchange="return refreshtable();"
+                                                                >
+                                                            <option value="">...</option>  
+                                                            <option value="01">ISTANZA IN PREPARAZIONE</option>  
+                                                            <option value="02">ISTANZA PRONTA DA INVIARE</option>  
+                                                            <option value="07">ISTANZA INVIATA</option>  
+                                                            <option value="08">ISTANZA APPROVATA</option>  
+                                                            <option value="09">ISTANZA RIGETTATA</option>  
+                                                            <option value="10">ISTANZA RIGETTATA - SOC.ISTR.</option>  
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <hr>
                                                 <!--begin::Table container-->
                                                 <div class="table-responsive ">
                                                     <!--begin::Table-->
@@ -115,137 +147,14 @@
                                                                 <th class="p-2 w-50px">Stato</th>
                                                                 <th class="p-2 w-50px">ID</th>
                                                                 <th class="p-2 min-w-120px">Corsi</th>
-                                                                <th class="p-2 w-80px">Data protocollo</th>
+                                                                <th class="p-2 w-80px">Data Creazione</th>
                                                                 <th class="p-2 min-w-120px">Azioni</th>
+                                                                <th class="p-2 w-50px" style="display: none;">Stato</th>
                                                             </tr>
                                                         </thead>
                                                         <!--end::Table head-->
                                                         <!--begin::Table body-->
-                                                        <tbody>
-                                                            <%for (Istanza is1 : ist_l) {
-                                                                        String labelallegati = "GESTIONE ALLEGATI";
-                                                                    Tipologia_Percorso tp1 = is1.getTipologiapercorso();
-                                                                    int maxcorsi = tp1.getMaxcorsi();
-                                                                    List<Corso> c1 = eo.getCorsiIstanza(is1);
-                                                                    boolean addcorso = (maxcorsi > c1.size());
-                                                                    boolean salvaistanza = true;
-                                                                    boolean eliminaistanza = true;
-                                                                    boolean modificacorso = true;
-                                                                    boolean inviaistanza = false;
-                                                                    boolean consultaistanza = false;
-                                                                    
-                                                                    
-                                                                    if (!is1.getStatocorso().getCodicestatocorso().equals("01")) {
-                                                                        addcorso = false;
-                                                                        salvaistanza = false;
-                                                                        modificacorso = false;
-                                                                    }
-                                                                    if (is1.getStatocorso().getCodicestatocorso().equals("02")) {
-                                                                        inviaistanza = true;
-                                                                        consultaistanza = true;
-                                                                    }
-                                                                    if (is1.getStatocorso().getCodicestatocorso().equals("07")) {
-                                                                        eliminaistanza = false;
-                                                                        consultaistanza = true;
-                                                                    }
-
-                                                                    if (is1.getStatocorso().getCodicestatocorso().equals("10")) { //SOCCORSO ISTRUTTORIO
-                                                                        eliminaistanza = false;
-                                                                        consultaistanza = true;
-                                                                        inviaistanza = true;
-                                                                        labelallegati = "GESTISCI SOCCORSO ISTRUTTORIO";
-                                                                    }
-
-                                                            %>
-                                                            <tr>
-                                                                <td class="p-2 w-50px">
-                                                                    <%=is1.getStatocorso().getHtmlicon()%>
-                                                                </td>
-                                                                <td class="p-2 w-50px">
-                                                                    <%=is1.getIdistanza()%>
-                                                                </td>                                    
-                                                                <td class="p-2 min-w-120px">
-                                                                    <b>Tipologia Percorsi: <%=tp1.getNometipologia()%></b> (Max <%=maxcorsi%>)<br/><hr>
-                                                                    <%for (Corso cor : c1) {%>
-                                                                    <u><%=cor.getRepertorio().getDenominazione()%></u> 
-                                                                    - Edizioni: <%=cor.getQuantitarichiesta()%><br/>
-
-                                                                    <%if (modificacorso) {%>
-                                                                    <form action="US_programmacorsi.jsp" method="POST" target="_blank">
-                                                                        <input type="hidden" name="idcorso" value="<%=Utils.enc_string(String.valueOf(cor.getIdcorso()))%>"/>
-                                                                        <%=cor.getStatocorso().getHtmlicon()%> |
-                                                                        <button type="submit"class="btn btn-sm btn-primary"
-                                                                                data-bs-toggle="tooltip" title="MODIFICA DETTAGLI CORSO" 
-                                                                                data-preload='false'><i class="fa fa-edit"></i></button>
-                                                                            <%if (c1.size() > 1) {%>
-                                                                        | <button type="button"class="btn btn-sm btn-danger"
-                                                                                  data-bs-toggle="tooltip" title="RIMUOVI CORSO DA ISTANZA" 
-                                                                                  data-preload='false'
-                                                                                  onclick="return deletecorsofromistance('<%=cor.getIdcorso()%>')"
-                                                                                  ><i class="fa fa-trash-arrow-up"></i>
-                                                                        </button>
-                                                                        <%}%>
-                                                                    </form>
-                                                                    <%}%>
-                                                                    <hr>
-                                                                    <%}%>
-                                                                </td>
-                                                                <td class="p-2 w-80px">
-                                                                    <%=is1.getDatacreazione()%>
-                                                                </td> 
-                                                                <td class="p-2 min-w-120px" style="white-space: nowrap; overflow: hidden; text-overflow:ellipsis;">
-                                                                    <form action="US_showistanza.jsp" method="POST" target="_blank">
-                                                                        <input type="hidden" name="idist" value="<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>"/>
-
-                                                                        <%if (consultaistanza) {%>
-                                                                        <button type="submit"class="btn btn-sm btn-primary"
-                                                                                data-bs-toggle="tooltip" title="VISUALIZZA ISTANZA" 
-                                                                                data-preload='false'><i class="fa fa-file-text"></i></button> | 
-                                                                            <%}%>
-                                                                            <%if (addcorso) {%>
-                                                                        <a href="US_addcorsoistanza.jsp?idist=<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>"
-                                                                           data-fancybox data-type='iframe' 
-                                                                           data-bs-toggle="tooltip" title="AGGIUNGI CORSO AD ISTANZA" 
-                                                                           data-preload='false' data-width='100%' data-height='100%' 
-                                                                           class="btn btn-sm btn-bg-light btn-primary fan1">
-                                                                            <i class="fa fa-plus-circle"></i>
-                                                                        </a> | 
-                                                                        <%}%>
-                                                                        <%if (salvaistanza) {%>
-                                                                        <button type="button" data-bs-toggle="tooltip" title="VERIFICA E SALVA ISTANZA" 
-                                                                                data-preload='false'  
-                                                                                class="btn btn-sm btn-bg-light btn-success"
-                                                                                onclick="return saveistanza('<%=is1.getIdistanza()%>')"><i class="fa fa-save"></i>
-                                                                        </button> | 
-                                                                        <%} else if (inviaistanza) {%>
-                                                                        <button type="button" data-bs-toggle="tooltip" title="INVIA ISTANZA" 
-                                                                                data-preload='false'  
-                                                                                class="btn btn-sm btn-bg-light btn-success"
-                                                                                onclick="return sendistanza('<%=is1.getIdistanza()%>')"><i class="fa fa-envelope"></i>
-                                                                        </button> | 
-                                                                        <%}%>
-                                                                        <%if (eliminaistanza) {%>
-                                                                        <button type="button"class="btn btn-sm btn-bg-light btn-danger"
-                                                                                data-bs-toggle="tooltip" title="ELIMINA ISTANZA" 
-                                                                                data-preload='false'
-                                                                                onclick="return deleteistanza('<%=is1.getIdistanza()%>')"><i class="fa fa-remove"></i>
-                                                                        </button> | 
-                                                                        <%}%>
-
-                                                                        <button type="button"  
-                                                                                data-bs-toggle="tooltip" title="<%=labelallegati%>" 
-                                                                                data-preload='false' 
-                                                                                class="btn btn-sm btn-bg-light btn-secondary"
-                                                                                onclick="return document.getElementById('gestall_<%=is1.getIdistanza()%>').submit();">
-                                                                            <i class="fa fa-file-clipboard"></i>
-                                                                        </button>
-                                                                    </form>
-                                                                    <form action="US_gestioneallegati.jsp" method="POST" target="_blank" id="gestall_<%=is1.getIdistanza()%>">
-                                                                        <input type="hidden" name="idist" value="<%=Utils.enc_string(String.valueOf(is1.getIdistanza()))%>"/>
-                                                                    </form>       
-                                                                </td>
-                                                            </tr>
-                                                            <%}%>        
+                                                        <tbody>                                                                
                                                         </tbody>
                                                         <!--end::Table body-->
                                                     </table>

@@ -50,7 +50,7 @@ public class Calendario_Formativo implements Serializable {
     @Column(name = "nomemodulo", columnDefinition = "LONGTEXT")
     private String nomemodulo;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "idcorso")
     private Corso corsodiriferimento;
 
@@ -69,7 +69,7 @@ public class Calendario_Formativo implements Serializable {
     @Column(name = "ore")
     private double ore;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "idcompetenze")
     private Competenze_Trasversali competenzetrasversali;
 
