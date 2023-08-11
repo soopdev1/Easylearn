@@ -12,7 +12,6 @@ import static rc.soop.sic.Utils.estraiEccezione;
 import static rc.soop.sic.Utils.getRequestValue;
 import static rc.soop.sic.Utils.redirect;
 import rc.soop.sic.jpa.EntityOp;
-import rc.soop.sic.jpa.Istanza;
 import rc.soop.sic.jpa.User;
 
 /**
@@ -21,8 +20,6 @@ import rc.soop.sic.jpa.User;
  */
 public class LoginOperations extends HttpServlet {
 
-    //SPID
-    //https://github.com/italia/spid-spring
     protected void logout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             request.getSession().setAttribute("us_memory", null);
@@ -74,20 +71,20 @@ public class LoginOperations extends HttpServlet {
                             break;
                         default:
                             EntityOp.trackingAction(username, "LOGIN KO TIPO USER");
-                            exitredirect.append("ERROR1");
+                            exitredirect.append("ERROR LOGIN");
                             break;
                     }
                 } else {
                     EntityOp.trackingAction(username, "LOGIN KO 1");
-                    exitredirect.append("ERROR1");
+                    exitredirect.append("ERROR LOGIN");
                 }
             } else {
                 EntityOp.trackingAction(username, "LOGIN KO 2");
-                exitredirect.append("ERROR2");
+                exitredirect.append("ERROR LOGIN");
             }
         } else {
             EntityOp.trackingAction(username, "LOGIN KO 3");
-            exitredirect.append("ERROR3");
+            exitredirect.append("ERROR LOGIN");
         }
 
         try (PrintWriter pw = response.getWriter()) {

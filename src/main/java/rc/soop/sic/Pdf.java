@@ -524,7 +524,7 @@ public class Pdf {
             try (InputStream is = new FileInputStream(template_part1.getDescrizione()); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut_part1); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
                 form.setGenerateAppearance(true);
-                Map<String, PdfFormField> fields = form.getFormFields();
+                Map<String, PdfFormField> fields = form.getAllFormFields();
 
                 setFieldsValue(form, fields, "Prot", ista1.getProtocollosoggetto());
                 setFieldsValue(form, fields, "del", ista1.getProtocollosoggettodata());
@@ -562,7 +562,7 @@ public class Pdf {
 
                 PdfAcroForm form2 = getAcroForm(pdfDoc2, true);
                 form2.setGenerateAppearance(true);
-                Map<String, PdfFormField> fields2 = form2.getFormFields();
+                Map<String, PdfFormField> fields2 = form2.getAllFormFields();
 
                 setFieldsValue(form2, fields2, "Titolo Conseguito", "Assistente all'autonomia ed alla comunicazione dei disabili");
 
@@ -593,7 +593,7 @@ public class Pdf {
 
                 PdfAcroForm form3 = getAcroForm(pdfDoc3, true);
                 form3.setGenerateAppearance(true);
-                Map<String, PdfFormField> fields3 = form3.getFormFields();
+                Map<String, PdfFormField> fields3 = form3.getAllFormFields();
 
                 setFieldsValue(form3, fields3, "CITTA", ista1.getSoggetto().getSedelegale().getComune());
                 setFieldsValue(form3, fields3, "DATA", new DateTime().toString(PATTERNDATE4));
@@ -610,7 +610,7 @@ public class Pdf {
 
                 PdfAcroForm form4 = getAcroForm(pdfDoc4, true);
                 form4.setGenerateAppearance(true);
-                Map<String, PdfFormField> fields4 = form4.getFormFields();
+                Map<String, PdfFormField> fields4 = form4.getAllFormFields();
 
                 setFieldsValue(form4, fields4, "CITTA", ista1.getSoggetto().getSedelegale().getComune());
                 setFieldsValue(form4, fields4, "DATA", new DateTime().toString(PATTERNDATE4));
@@ -699,7 +699,7 @@ public class Pdf {
             try (InputStream is = new ByteArrayInputStream(Base64.decodeBase64(template_parte_corso.getDescrizione())); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut_part_corso); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
                 form.setGenerateAppearance(true);
-                Map<String, PdfFormField> fields = form.getFormFields();
+                Map<String, PdfFormField> fields = form.getAllFormFields();
 
                 setFieldsValue(form, fields, "DDS", DDS);
                 setFieldsValue(form, fields, "DDSDATA", DDSDATA);
@@ -753,7 +753,7 @@ public class Pdf {
             try (InputStream is = new ByteArrayInputStream(Base64.decodeBase64(template_parte1.getDescrizione())); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut_part1); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
                 form.setGenerateAppearance(true);
-                Map<String, PdfFormField> fields = form.getFormFields();
+                Map<String, PdfFormField> fields = form.getAllFormFields();
 
                 String ogg = "Autorizzazione allo svolgimento dei percorsi formativi autofinanziati di cui all'istanza "
                         + "acquisita al protocollo xxxxx del xx/xx/xxxx- ente gestore " + ista1.getSoggetto().getRAGIONESOCIALE() + " con "
@@ -804,7 +804,7 @@ public class Pdf {
             try (InputStream is = new ByteArrayInputStream(Base64.decodeBase64(template_parte2.getDescrizione())); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut_part2); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
                 form.setGenerateAppearance(true);
-                Map<String, PdfFormField> fields = form.getFormFields();
+                Map<String, PdfFormField> fields = form.getAllFormFields();
 
                 setFieldsValue(form, fields, "NOMESERVIZIO", NOMESERVIZIO);
                 setFieldsValue(form, fields, "RAGIONESOCIALE", ista1.getSoggetto().getRAGIONESOCIALE());
@@ -889,7 +889,7 @@ public class Pdf {
             try (InputStream is = new ByteArrayInputStream(Base64.decodeBase64(template_parte_corso.getDescrizione())); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut_part_corso); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
                 form.setGenerateAppearance(true);
-                Map<String, PdfFormField> fields = form.getFormFields();
+                Map<String, PdfFormField> fields = form.getAllFormFields();
 
                 setFieldsValue(form, fields, "DDS", "");
                 setFieldsValue(form, fields, "DDDSDATA", "");
@@ -943,7 +943,7 @@ public class Pdf {
             try (InputStream is = new ByteArrayInputStream(Base64.decodeBase64(template_parte1.getDescrizione())); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut_part1); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
                 form.setGenerateAppearance(true);
-                Map<String, PdfFormField> fields = form.getFormFields();
+                Map<String, PdfFormField> fields = form.getAllFormFields();
 
                 String ogg = "Autorizzazione allo svolgimento dei percorsi formativi autofinanziati di cui all'istanza "
                         + "acquisita al protocollo xxxxx del xx/xx/xxxx- ente gestore " + ista1.getSoggetto().getRAGIONESOCIALE() + " con "
@@ -994,7 +994,7 @@ public class Pdf {
             try (InputStream is = new ByteArrayInputStream(Base64.decodeBase64(template_parte2.getDescrizione())); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut_part2); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
                 form.setGenerateAppearance(true);
-                Map<String, PdfFormField> fields = form.getFormFields();
+                Map<String, PdfFormField> fields = form.getAllFormFields();
 
                 setFieldsValue(form, fields, "NOMESERVIZIO", NOMESERVIZIO);
                 setFieldsValue(form, fields, "RAGIONESOCIALE", ista1.getSoggetto().getRAGIONESOCIALE());
@@ -1077,7 +1077,7 @@ public class Pdf {
             try (InputStream is = new FileInputStream(template.getDescrizione()); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut_part1); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
                 form.setGenerateAppearance(true);
-                Map<String, PdfFormField> fields = form.getFormFields();
+                Map<String, PdfFormField> fields = form.getAllFormFields();
 
                 setFieldsValue(form, fields, "ddg", "187 DEL " + datael.toString(PATTERNDATE4));
                 setFieldsValue(form, fields, "dataprot", datael.toString(PATTERNDATE4));

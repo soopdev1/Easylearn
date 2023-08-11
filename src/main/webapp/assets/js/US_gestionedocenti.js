@@ -1,8 +1,8 @@
 $(document).ready(function () {
     $('#tab_dt1').DataTable({
         dom: '<if<t>lp>',
-        lengthMenu: [[10, 50, 100, -1], [10, 50, 100, "Tutto"]],
-        order: [[1, 'asc']],
+        lengthMenu: [[50, 100, -1], [50, 100, "Tutto"]],
+        order: [[0, 'asc']],
         language: {
             url: 'assets/plugins/DataTables/it-IT.json'
         },
@@ -14,13 +14,11 @@ $(document).ready(function () {
             data: {'type': 'list_docenti'}
         },
         columns: [
-            {data: 'stato', orderable: false},
             {data: 'cognome'},
             {data: 'nome'},
             {data: 'cf'},
             {data: 'titolo'},
-            {data: 'profiloprof'},
-            {data: 'azioni', orderable: false}
+            {data: 'profiloprof'}
         ]
     });
 });

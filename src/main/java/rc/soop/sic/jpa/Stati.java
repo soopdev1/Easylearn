@@ -13,5 +13,6 @@ public enum Stati {
     DISABILITATO,
     CHECK,
     ATTIVO,
-    INATTIVO
+    INATTIVO,
+    RITIRATO
 }

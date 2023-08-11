@@ -5,14 +5,23 @@
 package rc.soop.sic.jpa;
 
 import java.io.Serializable;
+import java.util.Date;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import static rc.soop.sic.jpa.Stati.ABILITATO;
 
@@ -20,6 +29,9 @@ import static rc.soop.sic.jpa.Stati.ABILITATO;
  *
  * @author Administrator
  */
+@NamedQueries(value = {
+    @NamedQuery(name = "allievi.soggetto", query = "SELECT i FROM Allievi i WHERE i.soggetto=:soggetto ORDER BY i.cognome ASC"),
+})
 @Entity
 @Table(name = "allievi")
 public class Allievi implements Serializable {
@@ -37,6 +49,14 @@ public class Allievi implements Serializable {
     @Column(name = "codicefiscale")
     private String codicefiscale;
 
+    @Column(name = "datanascita")
+    @Temporal(TemporalType.DATE)
+    private Date datanascita;
+
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinColumn(name = "idsoggetto")
+    private SoggettoProponente soggetto;
+    
     @Enumerated(EnumType.STRING)
     @Column(name = "statoallievo")
     private Stati statoallievo;
@@ -52,14 +72,20 @@ public class Allievi implements Serializable {
 
     public String getEtichettastato() {
         switch (this.statoallievo) {
+            case ATTIVO:
+                this.etichettastato = "<i class='fa fa-check'></i> Attivo";
+                break;
             case ABILITATO:
                 this.etichettastato = "<i class='fa fa-check'></i> Abilitato";
                 break;
             case DISABILITATO:
                 this.etichettastato = "<i class='fa fa-lock'></i> Disabilitato";
                 break;
+            case RITIRATO:
+                this.etichettastato = "<i class='fa fa-remove'></i> Ritirato";
+                break;
             case CHECK:
-                this.etichettastato = "<i class='fa fa-warning'></i> Da Verificare";
+                this.etichettastato = "<i class='fa fa-warning'></i> In attesa";
                 break;
             default:
                 this.etichettastato = "";
@@ -113,6 +139,14 @@ public class Allievi implements Serializable {
         this.telefono = telefono;
     }
 
+    public SoggettoProponente getSoggetto() {
+        return soggetto;
+    }
+
+    public void setSoggetto(SoggettoProponente soggetto) {
+        this.soggetto = soggetto;
+    }
+
     public Long getIdallievi() {
         return idallievi;
     }
@@ -127,6 +161,14 @@ public class Allievi implements Serializable {
 
     public void setStatoallievo(Stati statoallievo) {
         this.statoallievo = statoallievo;
+    }
+
+    public Date getDatanascita() {
+        return datanascita;
+    }
+
+    public void setDatanascita(Date datanascita) {
+        this.datanascita = datanascita;
     }
     
     

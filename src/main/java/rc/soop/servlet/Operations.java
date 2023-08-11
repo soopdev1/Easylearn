@@ -18,7 +18,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -36,7 +35,6 @@ import static rc.soop.sic.Constant.sdf_PATTERNDATE5;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE6;
 import rc.soop.sic.Engine;
 import rc.soop.sic.Pdf;
-import static rc.soop.sic.Pdf.checkFirmaQRpdfA;
 import rc.soop.sic.SendMail;
 import rc.soop.sic.Utils;
 import static rc.soop.sic.Utils.calcolaPercentuale;
@@ -48,6 +46,7 @@ import static rc.soop.sic.Utils.generaId;
 import static rc.soop.sic.Utils.generateIdentifier;
 import static rc.soop.sic.Utils.getMimeType;
 import static rc.soop.sic.Utils.getRequestValue;
+import static rc.soop.sic.Utils.isAdmin;
 import static rc.soop.sic.Utils.normalize;
 import static rc.soop.sic.Utils.normalizeUTF8;
 import static rc.soop.sic.Utils.parseIntR;
@@ -62,7 +61,6 @@ import rc.soop.sic.jpa.Competenze_Trasversali;
 import rc.soop.sic.jpa.Conoscenze;
 import rc.soop.sic.jpa.Corso;
 import rc.soop.sic.jpa.CorsoStato;
-import rc.soop.sic.jpa.Corsoavviato;
 import rc.soop.sic.jpa.Docente;
 import rc.soop.sic.jpa.EntityOp;
 import rc.soop.sic.jpa.IncrementalCorso;
@@ -88,560 +86,453 @@ import rc.soop.sic.jpa.User;
 public class Operations extends HttpServlet {
 
     protected void INVIANOTIFICADECRETO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
         JsonObject resp_out = new JsonObject();
+        if (isAdmin(request.getSession())) {
+            try {
+                String IDISTANZA = getRequestValue(request, "IDISTANZA");
+                EntityOp ep1 = new EntityOp();
+                Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(IDISTANZA));
+                if (is1 != null) {
 
-        try {
-            String IDISTANZA = getRequestValue(request, "IDISTANZA");
-            EntityOp ep1 = new EntityOp();
-            Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(IDISTANZA));
-            if (is1 != null) {
-
-                boolean sendmail = SendMail.inviaNotificaSP_rigettoIstanzaSOCCORSO(ep1, is1);
-                if (sendmail) {
-                    resp_out.addProperty("result",
-                            true);
+                    boolean sendmail = SendMail.inviaNotificaSP_rigettoIstanzaSOCCORSO(ep1, is1);
+                    if (sendmail) {
+                        resp_out.addProperty("result",
+                                true);
+                    } else {
+                        resp_out.addProperty("result",
+                                false);
+                        resp_out.addProperty("message",
+                                "Errore durante l'invio della mail. Riprovare in seguito.");
+                    }
                 } else {
                     resp_out.addProperty("result",
                             false);
                     resp_out.addProperty("message",
-                            "Errore durante l'invio della mail. Riprovare in seguito.");
+                            "Errore: ISTANZA NON TROVATA.");
                 }
-            } else {
+            } catch (Exception ex1) {
                 resp_out.addProperty("result",
                         false);
                 resp_out.addProperty("message",
-                        "Errore: ISTANZA NON TROVATA.");
+                        "Errore: " + estraiEccezione(ex1));
+                EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
             }
-        } catch (Exception ex1) {
+        } else {
             resp_out.addProperty("result",
                     false);
             resp_out.addProperty("message",
-                    "Errore: " + estraiEccezione(ex1));
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+                    "Errore: NON AUTORIZZATO.");
         }
-
         try (PrintWriter out = response.getWriter()) {
             out.print(resp_out.toString());
         }
     }
 
     protected void SCARICADECRETOFIRMATO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        if (isAdmin(request.getSession())) {
 
-        String idist = Utils.dec_string(getRequestValue(request, "idist"));
+            String idist = Utils.dec_string(getRequestValue(request, "idist"));
 
-        EntityOp ep1 = new EntityOp();
+            EntityOp ep1 = new EntityOp();
 
-        try {
-            Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(idist));
-            if (is1 != null) {
+            try {
+                Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(idist));
+                if (is1 != null) {
 
-                String mimeType = "application/pdf";
+                    String mimeType = "application/pdf";
 
-                response.setContentType(mimeType);
-                String headerKey = "Content-Disposition";
-                String headerValue = format("attach; filename=\"%s\"",
-                        Utils.generaId(50)
-                        + MimeTypes.getDefaultMimeTypes().forName(mimeType).getExtension());
-                response.setHeader(headerKey, headerValue);
-                response.setContentLength(-1);
-                try (OutputStream outStream = response.getOutputStream()) {
-                    outStream.write(Base64.decodeBase64(is1.getPathfirmato()));
+                    response.setContentType(mimeType);
+                    String headerKey = "Content-Disposition";
+                    String headerValue = format("attach; filename=\"%s\"",
+                            Utils.generaId(50)
+                            + MimeTypes.getDefaultMimeTypes().forName(mimeType).getExtension());
+                    response.setHeader(headerKey, headerValue);
+                    response.setContentLength(-1);
+                    try (OutputStream outStream = response.getOutputStream()) {
+                        outStream.write(Base64.decodeBase64(is1.getPathfirmato()));
+                    }
+                } else {
+                    redirect(request, response, "404.jsp");
                 }
-            } else {
+            } catch (Exception ex1) {
+                ex1.printStackTrace();
+                EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
                 redirect(request, response, "404.jsp");
             }
-        } catch (Exception ex1) {
-            ex1.printStackTrace();
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        } else {
             redirect(request, response, "404.jsp");
         }
 
     }
 
     protected void GENERADECRETOBASE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String idist = Utils.dec_string(getRequestValue(request, "idist"));
+        if (isAdmin(request.getSession())) {
 
-        EntityOp ep1 = new EntityOp();
+            String idist = Utils.dec_string(getRequestValue(request, "idist"));
 
-        try {
-            Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(idist));
-            if (is1 != null) {
-                File temp1 = Pdf.GENERADECRETOBASE(ep1, is1);
+            EntityOp ep1 = new EntityOp();
 
-                String mimeType = Files.probeContentType(temp1.toPath());
-                if (mimeType == null) {
-                    mimeType = "application/pdf";
+            try {
+                Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(idist));
+                if (is1 != null) {
+                    File temp1 = Pdf.GENERADECRETOBASE(ep1, is1);
+
+                    String mimeType = Files.probeContentType(temp1.toPath());
+                    if (mimeType == null) {
+                        mimeType = "application/pdf";
+                    }
+                    response.setContentType(mimeType);
+                    String headerKey = "Content-Disposition";
+                    String headerValue = format("attach; filename=\"%s\"", temp1.getName());
+                    response.setHeader(headerKey, headerValue);
+                    response.setContentLength(-1);
+                    try (OutputStream outStream = response.getOutputStream()) {
+                        outStream.write(FileUtils.readFileToByteArray(temp1));
+                    }
+                } else {
+                    redirect(request, response, "404.jsp");
                 }
-                response.setContentType(mimeType);
-                String headerKey = "Content-Disposition";
-                String headerValue = format("attach; filename=\"%s\"", temp1.getName());
-                response.setHeader(headerKey, headerValue);
-                response.setContentLength(-1);
-                try (OutputStream outStream = response.getOutputStream()) {
-                    outStream.write(FileUtils.readFileToByteArray(temp1));
-                }
-            } else {
+            } catch (Exception ex1) {
+                ex1.printStackTrace();
+                EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
                 redirect(request, response, "404.jsp");
             }
-        } catch (Exception ex1) {
-            ex1.printStackTrace();
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        } else {
             redirect(request, response, "404.jsp");
         }
 
     }
 
     protected void GENERADECRETODDSFTO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String idist = Utils.dec_string(getRequestValue(request, "idist"));
+        if (isAdmin(request.getSession())) {
 
-        EntityOp ep1 = new EntityOp();
+            String idist = Utils.dec_string(getRequestValue(request, "idist"));
 
-        try {
-            Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(idist));
-            if (is1 != null) {
-                File temp1 = Pdf.GENERADECRETODDSFTO(ep1, is1);
+            EntityOp ep1 = new EntityOp();
 
-                String mimeType = Files.probeContentType(temp1.toPath());
-                if (mimeType == null) {
-                    mimeType = "application/pdf";
+            try {
+                Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(idist));
+                if (is1 != null) {
+                    File temp1 = Pdf.GENERADECRETODDSFTO(ep1, is1);
+
+                    String mimeType = Files.probeContentType(temp1.toPath());
+                    if (mimeType == null) {
+                        mimeType = "application/pdf";
+                    }
+                    response.setContentType(mimeType);
+                    String headerKey = "Content-Disposition";
+                    String headerValue = format("attach; filename=\"%s\"", temp1.getName());
+                    response.setHeader(headerKey, headerValue);
+                    response.setContentLength(-1);
+                    try (OutputStream outStream = response.getOutputStream()) {
+                        outStream.write(FileUtils.readFileToByteArray(temp1));
+                    }
+                } else {
+                    redirect(request, response, "404.jsp");
                 }
-                response.setContentType(mimeType);
-                String headerKey = "Content-Disposition";
-                String headerValue = format("attach; filename=\"%s\"", temp1.getName());
-                response.setHeader(headerKey, headerValue);
-                response.setContentLength(-1);
-                try (OutputStream outStream = response.getOutputStream()) {
-                    outStream.write(FileUtils.readFileToByteArray(temp1));
-                }
-            } else {
+            } catch (Exception ex1) {
+                ex1.printStackTrace();
+                EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
                 redirect(request, response, "404.jsp");
             }
-        } catch (Exception ex1) {
-            ex1.printStackTrace();
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        } else {
             redirect(request, response, "404.jsp");
         }
 
     }
 
     protected void APPROVAISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
-        String idist = Utils.dec_string(getRequestValue(request, "idist"));
+        if (isAdmin(request.getSession())) {
 
-        EntityOp ep1 = new EntityOp();
+            String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
+            String idist = Utils.dec_string(getRequestValue(request, "idist"));
 
-        try {
-            Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(idist));
-            if (is1 != null) {
-                List<Corso> c1 = ep1.getCorsiIstanza(is1);
-                ep1.begin();
+            EntityOp ep1 = new EntityOp();
 
-                for (Corso c2 : c1) {
-                    String corsoapproved = getRequestValue(request, "OK_" + c2.getIdcorso());
-                    if (corsoapproved.equalsIgnoreCase("on")) {
-                        c2.setStatocorso(ep1.getEm().find(CorsoStato.class, "24"));
+            try {
+                Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(idist));
+                if (is1 != null) {
+                    List<Corso> c1 = ep1.getCorsiIstanza(is1);
+                    ep1.begin();
 
-                        if (is1.getTipologiapercorso().getTipocorso().equals(TipoCorso.FINANZIATO)) {
-                            String CIP = getRequestValue(request, "CIP_" + c2.getIdcorso());
-                            String CUP = getRequestValue(request, "CUP_" + c2.getIdcorso());
-                            String ID = getRequestValue(request, "ID_" + c2.getIdcorso());
-                            String CS = getRequestValue(request, "CS_" + c2.getIdcorso());
-                            String ED = getRequestValue(request, "ED_" + c2.getIdcorso());
-                            c2.setCip_corso(CIP);
-                            c2.setCup_corso(CUP);
-                            c2.setId_corso(ID);
-                            c2.setCs_corso(CS);
-                            c2.setEd_corso(ED);
-                            c2.setIdentificativocorso(CIP + "/" + CUP + "/" + ID + "/" + CS + "/" + ED);
-                        } else {
-                            IncrementalCorso ics = new IncrementalCorso();
-                            ics.setCorso(c2);
-                            try {
-                                EntityOp ep2 = new EntityOp();
-                                ep2.begin();
-                                ep2.persist(ics);
-                                ep2.commit();
-                                ep2.close();
-                            } catch (Exception ex2) {
-                                ex2.printStackTrace();
+                    for (Corso c2 : c1) {
+                        String corsoapproved = getRequestValue(request, "OK_" + c2.getIdcorso());
+                        if (corsoapproved.equalsIgnoreCase("on")) {
+                            c2.setStatocorso(ep1.getEm().find(CorsoStato.class, "24"));
+
+                            if (is1.getTipologiapercorso().getTipocorso().equals(TipoCorso.FINANZIATO)) {
+                                String CIP = getRequestValue(request, "CIP_" + c2.getIdcorso());
+                                String CUP = getRequestValue(request, "CUP_" + c2.getIdcorso());
+                                String ID = getRequestValue(request, "ID_" + c2.getIdcorso());
+                                String CS = getRequestValue(request, "CS_" + c2.getIdcorso());
+                                String ED = getRequestValue(request, "ED_" + c2.getIdcorso());
+                                c2.setCip_corso(CIP);
+                                c2.setCup_corso(CUP);
+                                c2.setId_corso(ID);
+                                c2.setCs_corso(CS);
+                                c2.setEd_corso(ED);
+                                c2.setIdentificativocorso(CIP + "/" + CUP + "/" + ID + "/" + CS + "/" + ED);
+                            } else {
+                                IncrementalCorso ics = new IncrementalCorso();
+                                ics.setCorso(c2);
+                                try {
+                                    EntityOp ep2 = new EntityOp();
+                                    ep2.begin();
+                                    ep2.persist(ics);
+                                    ep2.commit();
+                                    ep2.close();
+                                } catch (Exception ex2) {
+                                    ex2.printStackTrace();
+                                }
+                                IncrementalCorso ics2 = ep1.getIC(c2);
+                                c2.setIdentificativocorso(new DateTime().year().getAsText() + "/AUT/" + StringUtils.leftPad(String.valueOf(ics2.getIdincrementalcorso()), 4, "0"));
                             }
-                            IncrementalCorso ics2 = ep1.getIC(c2);
-                            c2.setIdentificativocorso(new DateTime().year().getAsText() + "/AUT/" + StringUtils.leftPad(String.valueOf(ics2.getIdincrementalcorso()), 4, "0"));
+                        } else {
+                            c2.setStatocorso(ep1.getEm().find(CorsoStato.class, "25"));
                         }
-                    } else {
-                        c2.setStatocorso(ep1.getEm().find(CorsoStato.class, "25"));
+                        ep1.merge(c2);
                     }
-                    ep1.merge(c2);
+                    is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "08"));
+                    is1.setDatagestione(sdf_PATTERNDATE5.format(new Date()));
+                    ep1.merge(is1);
+                    ep1.commit();
+                    ep1.close();
+                    redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
+                } else {
+                    redirect(request, response, "Page_message.jsp?esito=KORI_IS1");
                 }
-                is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "08"));
-                is1.setDatagestione(sdf_PATTERNDATE5.format(new Date()));
-                ep1.merge(is1);
-                ep1.commit();
-                ep1.close();
-                redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
-            } else {
-                redirect(request, response, "Page_message.jsp?esito=KORI_IS1");
+            } catch (Exception ex1) {
+                ex1.printStackTrace();
+                EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+                redirect(request, response, "Page_message.jsp?esito=KORI_IS2");
             }
-        } catch (Exception ex1) {
-            ex1.printStackTrace();
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
-            redirect(request, response, "Page_message.jsp?esito=KORI_IS2");
+        } else {
+            redirect(request, response, "404.jsp");
         }
     }
 
     protected void PROTOCOLLAISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String idist = Utils.dec_string(getRequestValue(request, "idist"));
+        if (isAdmin(request.getSession())) {
 
-        EntityOp ep1 = new EntityOp();
-        try {
-            Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(idist));
-            if (is1 != null) {
-                String PROT = getRequestValue(request, "prot_num");
-                String DATAPROT = datemysqltoita(getRequestValue(request, "prot_dat"));
-                is1.setProtocolloreg(PROT);
-                is1.setProtocolloregdata(DATAPROT);
-                ep1.merge(is1);
-                ep1.commit();
-                ep1.close();
-                redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
-            } else {
-                redirect(request, response, "Page_message.jsp?esito=KORI_IS1");
+            String idist = Utils.dec_string(getRequestValue(request, "idist"));
+
+            EntityOp ep1 = new EntityOp();
+            try {
+                Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(idist));
+                if (is1 != null) {
+                    String PROT = getRequestValue(request, "prot_num");
+                    String DATAPROT = datemysqltoita(getRequestValue(request, "prot_dat"));
+                    is1.setProtocolloreg(PROT);
+                    is1.setProtocolloregdata(DATAPROT);
+                    ep1.merge(is1);
+                    ep1.commit();
+                    ep1.close();
+                    redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
+                } else {
+                    redirect(request, response, "Page_message.jsp?esito=KORI_IS1");
+                }
+            } catch (Exception ex1) {
+                EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+                redirect(request, response, "Page_message.jsp?esito=KORI_IS2");
             }
-        } catch (Exception ex1) {
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
-            redirect(request, response, "Page_message.jsp?esito=KORI_IS2");
+        } else {
+            redirect(request, response, "404.jsp");
         }
     }
 
     protected void RIGETTAISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
-        String idist = Utils.dec_string(getRequestValue(request, "idist"));
+        if (isAdmin(request.getSession())) {
 
-        EntityOp ep1 = new EntityOp();
+            String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
+            String idist = Utils.dec_string(getRequestValue(request, "idist"));
 
-        try {
-            Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(idist));
-            if (is1 != null) {
-                boolean soccorsoistr = getRequestValue(request, "soccorsoistr").equalsIgnoreCase("on");
-                String motivazione = getRequestValue(request, "motivazione");
-                List<Allegati> la = ep1.list_allegati(is1, null, null, null, null);
+            EntityOp ep1 = new EntityOp();
 
-                List<Long> idko = new ArrayList<>();
+            try {
+                Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(idist));
+                if (is1 != null) {
+                    boolean soccorsoistr = getRequestValue(request, "soccorsoistr").equalsIgnoreCase("on");
+                    String motivazione = getRequestValue(request, "motivazione");
+                    List<Allegati> la = ep1.list_allegati(is1, null, null, null, null);
 
-                for (Allegati a1 : la) {
-                    String checkallegato = getRequestValue(request, "soc_ko_" + a1.getIdallegati());
-                    if (checkallegato.equalsIgnoreCase("on")) {
-                        idko.add(a1.getIdallegati());
-                    }
-                }
-                ep1.begin();
-                if (soccorsoistr) {
-                    for (Long idko1 : idko) {
-                        Allegati a1 = ep1.getEm().find(Allegati.class, idko1);
-                        if (a1 != null) {
-                            a1.setStato(ep1.getEm().find(CorsoStato.class, "31"));
-                            ep1.merge(a1);
+                    List<Long> idko = new ArrayList<>();
+
+                    for (Allegati a1 : la) {
+                        String checkallegato = getRequestValue(request, "soc_ko_" + a1.getIdallegati());
+                        if (checkallegato.equalsIgnoreCase("on")) {
+                            idko.add(a1.getIdallegati());
                         }
                     }
-                    is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "10"));
-                    //MAIL CON SOCCORSO
-                    SendMail.inviaNotificaSP_rigettoIstanzaSOCCORSO(ep1, is1, motivazione, idko);
-                } else {
-                    is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "09"));
-                    //MAIL SOLO RIGETTO
-                    SendMail.inviaNotificaSP_rigettoIstanza(ep1, is1, motivazione);
-                }
-                ep1.merge(is1);
+                    ep1.begin();
+                    if (soccorsoistr) {
+                        for (Long idko1 : idko) {
+                            Allegati a1 = ep1.getEm().find(Allegati.class, idko1);
+                            if (a1 != null) {
+                                a1.setStato(ep1.getEm().find(CorsoStato.class, "31"));
+                                ep1.merge(a1);
+                            }
+                        }
+                        is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "10"));
+                        //MAIL CON SOCCORSO
+                        SendMail.inviaNotificaSP_rigettoIstanzaSOCCORSO(ep1, is1, motivazione, idko);
+                    } else {
+                        is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "09"));
+                        //MAIL SOLO RIGETTO
+                        SendMail.inviaNotificaSP_rigettoIstanza(ep1, is1, motivazione);
+                    }
+                    ep1.merge(is1);
 
-                Information info1 = new Information();
-                info1.setDatacreazione(new Date());
-                info1.setIstanza(is1);
-                info1.setMotivazione(motivazione);
-                info1.setUtente(utentecaricamento);
-                ep1.persist(info1);
-                ep1.commit();
-                ep1.close();
-                redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
-            } else {
-                redirect(request, response, "Page_message.jsp?esito=KORI_IS1");
+                    Information info1 = new Information();
+                    info1.setDatacreazione(new Date());
+                    info1.setIstanza(is1);
+                    info1.setMotivazione(motivazione);
+                    info1.setUtente(utentecaricamento);
+                    ep1.persist(info1);
+                    ep1.commit();
+                    ep1.close();
+                    redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
+                } else {
+                    redirect(request, response, "Page_message.jsp?esito=KORI_IS1");
+                }
+            } catch (Exception ex1) {
+                EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+                redirect(request, response, "Page_message.jsp?esito=KORI_IS2");
             }
-        } catch (Exception ex1) {
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
-            redirect(request, response, "Page_message.jsp?esito=KORI_IS2");
+        } else {
+            redirect(request, response, "404.jsp");
         }
     }
 
     protected void UPLSOST(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 //        Utils.printRequest(request);
+        if (isAdmin(request.getSession())) {
 
-        try {
-
-            EntityOp ep1 = new EntityOp();
-            String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
-//            SoggettoProponente so = ((User) request.getSession().getAttribute("us_cod")).getSoggetto();
-            Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
-            FileItemFactory factory = new DiskFileItemFactory();
-            ServletFileUpload upload = new ServletFileUpload(factory);
-            File nomefile = null;
-            List<FileItem> items = upload.parseRequest(request);
-            Iterator<FileItem> iterator = items.iterator();
-            String IDALLEGATO = null;
-            String DESCRIZIONE = null;
-            String MIME = null;
-            String codiceDOC = generateIdentifier(6);
-            while (iterator.hasNext()) {
-                FileItem item = (FileItem) iterator.next();
-                if (item.isFormField()) {
-                    if (item.getFieldName().equals("idallegato")) {
-                        IDALLEGATO = item.getString();
-                    } else if (item.getFieldName().equals("DESCRIZIONE")) {
-                        DESCRIZIONE = normalizeUTF8(normalize(item.getString()));
-                    }
-                } else {
-                    String fileName = item.getName();
-                    String estensione = fileName.substring(fileName.lastIndexOf("."));
-                    String nome = codiceDOC + new DateTime().toString(PATTERNDATE3)
-                            + RandomStringUtils.randomAlphabetic(15) + estensione;
-                    try {
-                        nomefile = new File(pathtemp.getDescrizione() + nome);
-                        item.write(nomefile);
-                        MIME = getMimeType(nomefile);
-                    } catch (Exception ex) {
-                        EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
-                        nomefile = null;
-                    }
-                }
-            }
-
-            if (nomefile != null) {
-
-                if (IDALLEGATO != null) {
-                    request.getSession().setAttribute("ses_idalleg", IDALLEGATO);
-
-                    Allegati original = ep1.getEm().find(Allegati.class, Long.valueOf(IDALLEGATO));
-                    if (original != null) {
-
-                        //CREO COPIA DI ALLEGATO PRECEDENTE "ELIMINATO"
-                        Allegati al1 = new Allegati();
-                        al1.setIstanza(original.getIstanza());
-                        al1.setCodiceallegati(original.getCodiceallegati());
-                        al1.setContent(original.getContent());
-                        al1.setDescrizione(original.getDescrizione());
-                        al1.setStato(ep1.getEm().find(CorsoStato.class, "32"));
-                        al1.setMimetype(original.getMimetype());
-                        al1.setUtentecaricamento(original.getUtentecaricamento());
-                        al1.setDatacaricamento(original.getDatacaricamento());
-
-                        ep1.begin();
-                        ep1.persist(al1);
-
-                        //AGGIORNO ALLEGATO ATTUALE
-                        original.setContent(Base64.encodeBase64String(FileUtils.readFileToByteArray(nomefile)));
-                        original.setDescrizione(DESCRIZIONE);
-                        original.setStato(ep1.getEm().find(CorsoStato.class, "30"));
-                        original.setMimetype(MIME);
-                        original.setUtentecaricamento(utentecaricamento);
-                        original.setDatacaricamento(new Date());
-                        ep1.merge(original);
-                        ep1.commit();
-                        ep1.close();
-                        redirect(request, response, "Page_message.jsp?esito=OK_UPAL");
-                    } else {
-                        redirect(request, response, "Page_message.jsp?esito=KOUP_IS1");
-                    }
-                } else {
-                    redirect(request, response, "Page_message.jsp?esito=KOUP_IS2");
-                }
-            } else {
-                redirect(request, response, "Page_message.jsp?esito=KOUP_IS3");
-            }
-
-        } catch (Exception ex1) {
-            ex1.printStackTrace();
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
-            redirect(request, response, "Page_message.jsp?esito=KOUP_IS4");
-        }
-
-    }
-
-    protected void UPLDECAUT(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-
-            EntityOp ep1 = new EntityOp();
-            String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
-            Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
-            FileItemFactory factory = new DiskFileItemFactory();
-            ServletFileUpload upload = new ServletFileUpload(factory);
-            File nomefile = null;
-            List<FileItem> items = upload.parseRequest(request);
-            Iterator<FileItem> iterator = items.iterator();
-            String IDIST = null;
-            String DDSNUMERO = null;
-            String DDSDATA = null;
-            while (iterator.hasNext()) {
-                FileItem item = (FileItem) iterator.next();
-                if (item.isFormField()) {
-                    if (item.getFieldName().equals("idist")) {
-                        IDIST = item.getString();
-                    } else if (item.getFieldName().equals("DDSNUMERO")) {
-                        DDSNUMERO = normalizeUTF8(normalize(item.getString()));
-                    } else if (item.getFieldName().equals("DDSDATA")) {
-                        DDSDATA = normalizeUTF8(normalize(item.getString()));
-                    }
-                } else {
-                    String fileName = item.getName();
-                    String estensione = fileName.substring(fileName.lastIndexOf("."));
-                    String nome = "DDUPL" + new DateTime().toString(PATTERNDATE3)
-                            + RandomStringUtils.randomAlphabetic(15) + estensione;
-                    try {
-                        nomefile = new File(pathtemp.getDescrizione() + nome);
-                        item.write(nomefile);
-                    } catch (Exception ex) {
-                        EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
-                        nomefile = null;
-                    }
-                }
-            }
-
-            if (nomefile != null) {
-
-                if (IDIST != null) {
-                    request.getSession().setAttribute("ses_idist", Utils.enc_string(IDIST));
-                    Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(IDIST));
-                    if (is1 != null) {
-                        is1.setDecreto(DDSNUMERO + "§" + DDSDATA);
-                        is1.setPathfirmato(Base64.encodeBase64String(FileUtils.readFileToByteArray(nomefile)));
-                        ep1.begin();
-                        ep1.merge(is1);
-                        ep1.commit();
-                        ep1.close();
-                        redirect(request, response, "Page_message.jsp?esito=OK_UPAL");
-                    } else {
-                        redirect(request, response, "Page_message.jsp?esito=KOUP_IS1");
-                    }
-                } else {
-                    redirect(request, response, "Page_message.jsp?esito=KOUP_IS2");
-                }
-            } else {
-                redirect(request, response, "Page_message.jsp?esito=KOUP_IS3");
-            }
-
-        } catch (Exception ex1) {
-            ex1.printStackTrace();
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
-            redirect(request, response, "Page_message.jsp?esito=KOUP_IS4");
-        }
-    }
-
-    protected void UPLGENERIC(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        Utils.printRequest(request);
-
-        try {
-
-            EntityOp ep1 = new EntityOp();
-            String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
-//            SoggettoProponente so = ((User) request.getSession().getAttribute("us_cod")).getSoggetto();
-            Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
-            FileItemFactory factory = new DiskFileItemFactory();
-            ServletFileUpload upload = new ServletFileUpload(factory);
-            File nomefile = null;
-            List<FileItem> items = upload.parseRequest(request);
-            Iterator<FileItem> iterator = items.iterator();
-            String IDIST = null;
-            String DESCRIZIONE = null;
-            String MIME = null;
-            String codiceDOC = generateIdentifier(6);
-            while (iterator.hasNext()) {
-                FileItem item = (FileItem) iterator.next();
-                if (item.isFormField()) {
-                    if (item.getFieldName().equals("idist")) {
-                        IDIST = item.getString();
-                    } else if (item.getFieldName().equals("DESCRIZIONE")) {
-                        DESCRIZIONE = normalizeUTF8(normalize(item.getString()));
-                    }
-                } else {
-                    String fileName = item.getName();
-                    String estensione = fileName.substring(fileName.lastIndexOf("."));
-                    String nome = codiceDOC + new DateTime().toString(PATTERNDATE3)
-                            + RandomStringUtils.randomAlphabetic(15) + estensione;
-                    try {
-                        nomefile = new File(pathtemp.getDescrizione() + nome);
-                        item.write(nomefile);
-                        MIME = getMimeType(nomefile);
-                    } catch (Exception ex) {
-                        EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
-                        nomefile = null;
-                    }
-                }
-            }
-
-            if (nomefile != null) {
-
-                if (IDIST != null) {
-                    request.getSession().setAttribute("ses_idist", Utils.enc_string(IDIST));
-                    Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(IDIST));
-                    if (is1 != null) {
-
-                        Allegati al1 = new Allegati();
-                        al1.setIstanza(is1);
-                        al1.setCodiceallegati(codiceDOC);
-                        al1.setContent(Base64.encodeBase64String(FileUtils.readFileToByteArray(nomefile)));
-                        al1.setDescrizione(DESCRIZIONE);
-                        al1.setStato(ep1.getEm().find(CorsoStato.class, "30"));
-                        al1.setMimetype(MIME);
-                        al1.setUtentecaricamento(utentecaricamento);
-                        al1.setDatacaricamento(new Date());
-
-                        ep1.begin();
-                        ep1.persist(al1);
-                        ep1.commit();
-                        ep1.close();
-                        redirect(request, response, "US_gestioneallegati.jsp");
-                    } else {
-                        redirect(request, response, "Page_message.jsp?esito=KOUP_IS1");
-                    }
-                } else {
-                    redirect(request, response, "Page_message.jsp?esito=KOUP_IS2");
-                }
-            } else {
-                redirect(request, response, "Page_message.jsp?esito=KOUP_IS3");
-            }
-
-        } catch (Exception ex1) {
-            ex1.printStackTrace();
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
-            redirect(request, response, "Page_message.jsp?esito=KOUP_IS4");
-        }
-
-    }
-
-    protected void UPLISTA1(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getSession().setAttribute("is_qrerror", "");
-        String codiceISTANZA = null;
-        boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-        if (isMultipart) {
             try {
-                EntityOp e = new EntityOp();
-                SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
-                Path pathtemp = e.getEm().find(Path.class, "path.temp");
+
+                EntityOp ep1 = new EntityOp();
+                String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
+//            SoggettoProponente so = ((User) request.getSession().getAttribute("us_cod")).getSoggetto();
+                Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
                 FileItemFactory factory = new DiskFileItemFactory();
                 ServletFileUpload upload = new ServletFileUpload(factory);
                 File nomefile = null;
                 List<FileItem> items = upload.parseRequest(request);
                 Iterator<FileItem> iterator = items.iterator();
+                String IDALLEGATO = null;
+                String DESCRIZIONE = null;
+                String MIME = null;
+                String codiceDOC = generateIdentifier(6);
                 while (iterator.hasNext()) {
                     FileItem item = (FileItem) iterator.next();
                     if (item.isFormField()) {
-                        if (item.getFieldName().equals("codice_istanza")) {
-                            codiceISTANZA = item.getString();
+                        if (item.getFieldName().equals("idallegato")) {
+                            IDALLEGATO = item.getString();
+                        } else if (item.getFieldName().equals("DESCRIZIONE")) {
+                            DESCRIZIONE = normalizeUTF8(normalize(item.getString()));
                         }
                     } else {
                         String fileName = item.getName();
                         String estensione = fileName.substring(fileName.lastIndexOf("."));
-                        String nome = "ISTANZA_" + new DateTime().toString(PATTERNDATE3) + "_SIGN_" + RandomStringUtils.randomAlphabetic(15) + estensione;
-                        nomefile = new File(pathtemp.getDescrizione() + nome);
+                        String nome = codiceDOC + new DateTime().toString(PATTERNDATE3)
+                                + RandomStringUtils.randomAlphabetic(15) + estensione;
                         try {
+                            nomefile = new File(pathtemp.getDescrizione() + nome);
+                            item.write(nomefile);
+                            MIME = getMimeType(nomefile);
+                        } catch (Exception ex) {
+                            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
+                            nomefile = null;
+                        }
+                    }
+                }
+
+                if (nomefile != null) {
+
+                    if (IDALLEGATO != null) {
+                        request.getSession().setAttribute("ses_idalleg", IDALLEGATO);
+
+                        Allegati original = ep1.getEm().find(Allegati.class, Long.valueOf(IDALLEGATO));
+                        if (original != null) {
+
+                            //CREO COPIA DI ALLEGATO PRECEDENTE "ELIMINATO"
+                            Allegati al1 = new Allegati();
+                            al1.setIstanza(original.getIstanza());
+                            al1.setCodiceallegati(original.getCodiceallegati());
+                            al1.setContent(original.getContent());
+                            al1.setDescrizione(original.getDescrizione());
+                            al1.setStato(ep1.getEm().find(CorsoStato.class, "32"));
+                            al1.setMimetype(original.getMimetype());
+                            al1.setUtentecaricamento(original.getUtentecaricamento());
+                            al1.setDatacaricamento(original.getDatacaricamento());
+
+                            ep1.begin();
+                            ep1.persist(al1);
+
+                            //AGGIORNO ALLEGATO ATTUALE
+                            original.setContent(Base64.encodeBase64String(FileUtils.readFileToByteArray(nomefile)));
+                            original.setDescrizione(DESCRIZIONE);
+                            original.setStato(ep1.getEm().find(CorsoStato.class, "30"));
+                            original.setMimetype(MIME);
+                            original.setUtentecaricamento(utentecaricamento);
+                            original.setDatacaricamento(new Date());
+                            ep1.merge(original);
+                            ep1.commit();
+                            ep1.close();
+                            redirect(request, response, "Page_message.jsp?esito=OK_UPAL");
+                        } else {
+                            redirect(request, response, "Page_message.jsp?esito=KOUP_IS1");
+                        }
+                    } else {
+                        redirect(request, response, "Page_message.jsp?esito=KOUP_IS2");
+                    }
+                } else {
+                    redirect(request, response, "Page_message.jsp?esito=KOUP_IS3");
+                }
+
+            } catch (Exception ex1) {
+                ex1.printStackTrace();
+                EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+                redirect(request, response, "Page_message.jsp?esito=KOUP_IS4");
+            }
+        } else {
+            redirect(request, response, "404.jsp");
+        }
+
+    }
+
+    protected void UPLDECAUT(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        if (isAdmin(request.getSession())) {
+
+            try {
+
+                EntityOp ep1 = new EntityOp();
+                String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
+                Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
+                FileItemFactory factory = new DiskFileItemFactory();
+                ServletFileUpload upload = new ServletFileUpload(factory);
+                File nomefile = null;
+                List<FileItem> items = upload.parseRequest(request);
+                Iterator<FileItem> iterator = items.iterator();
+                String IDIST = null;
+                String DDSNUMERO = null;
+                String DDSDATA = null;
+                while (iterator.hasNext()) {
+                    FileItem item = (FileItem) iterator.next();
+                    if (item.isFormField()) {
+                        if (item.getFieldName().equals("idist")) {
+                            IDIST = item.getString();
+                        } else if (item.getFieldName().equals("DDSNUMERO")) {
+                            DDSNUMERO = normalizeUTF8(normalize(item.getString()));
+                        } else if (item.getFieldName().equals("DDSDATA")) {
+                            DDSDATA = normalizeUTF8(normalize(item.getString()));
+                        }
+                    } else {
+                        String fileName = item.getName();
+                        String estensione = fileName.substring(fileName.lastIndexOf("."));
+                        String nome = "DDUPL" + new DateTime().toString(PATTERNDATE3)
+                                + RandomStringUtils.randomAlphabetic(15) + estensione;
+                        try {
+                            nomefile = new File(pathtemp.getDescrizione() + nome);
                             item.write(nomefile);
                         } catch (Exception ex) {
                             EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
@@ -650,124 +541,123 @@ public class Operations extends HttpServlet {
                     }
                 }
 
-                if (nomefile != null && codiceISTANZA != null) {
-                    //CONTROLLO QRCODE
-                    //CONTROLLO FIRMA DIGITALE
-                    try {
-                        Path qrcrop = e.getEm().find(Path.class, "pdf.qr.crop");
-                        String res = checkFirmaQRpdfA("ISTANZA", codiceISTANZA,
-                                nomefile, so.getRap_cf(), qrcrop.getDescrizione());
-                        if (!res.equals("OK")) {
-                            request.getSession().setAttribute("is_qrerror", res);
-                            redirect(request, response, "US_upload.jsp?codice_istanza=" + codiceISTANZA + "&esito=KO5");
+                if (nomefile != null) {
+
+                    if (IDIST != null) {
+                        request.getSession().setAttribute("ses_idist", Utils.enc_string(IDIST));
+                        Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(IDIST));
+                        if (is1 != null) {
+                            is1.setDecreto(DDSNUMERO + "§" + DDSDATA);
+                            is1.setPathfirmato(Base64.encodeBase64String(FileUtils.readFileToByteArray(nomefile)));
+                            ep1.begin();
+                            ep1.merge(is1);
+                            ep1.commit();
+                            ep1.close();
+                            redirect(request, response, "Page_message.jsp?esito=OK_UPAL");
                         } else {
-                            try {
-                                Istanza is = e.getIstanza(so, codiceISTANZA);
-                                e.begin();
-                                is.setPathfirmato(nomefile.getPath());
-                                e.merge(is);
-                                e.commit();
-                                e.close();
-                                request.getSession().setAttribute("is_memory", is);
-                                redirect(request, response, "US_upload.jsp?codice_istanza=" + codiceISTANZA + "&esito=OK");
-                            } catch (Exception ex1) {
-                                EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
-                                redirect(request, response, "US_upload.jsp?codice_istanza=" + codiceISTANZA + "&esito=KO6");
-                            }
+                            redirect(request, response, "Page_message.jsp?esito=KOUP_IS1");
                         }
-                    } catch (Exception ex0) {
-                        EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex0));
-                        redirect(request, response, "US_upload.jsp?codice_istanza=" + codiceISTANZA + "&esito=KO2");
+                    } else {
+                        redirect(request, response, "Page_message.jsp?esito=KOUP_IS2");
                     }
                 } else {
-                    redirect(request, response, "US_upload.jsp?codice_istanza=" + codiceISTANZA + "&esito=KO1");
+                    redirect(request, response, "Page_message.jsp?esito=KOUP_IS3");
                 }
-            } catch (Exception ex) {
-                EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
-                redirect(request, response, "US_upload.jsp?codice_istanza=" + codiceISTANZA + "&esito=KO3");
+
+            } catch (Exception ex1) {
+                ex1.printStackTrace();
+                EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+                redirect(request, response, "Page_message.jsp?esito=KOUP_IS4");
             }
         } else {
-            redirect(request, response, "US_upload.jsp?codice_istanza=" + codiceISTANZA + "&esito=KO4");
+            redirect(request, response, "404.jsp");
         }
     }
 
-    protected void ELIMINAISTANZAFIRMATA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-            SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
-            String codiceis = getRequestValue(request, "codice_istanza");
-            EntityOp e = new EntityOp();
+    protected void UPLGENERIC(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+//        Utils.printRequest(request);
+        if (isAdmin(request.getSession())) {
 
-            Istanza is = e.getIstanza(so, codiceis);
+            try {
 
-            e.begin();
-            is.setPathfirmato(null);
-            e.merge(is);
-            e.commit();
-            e.close();
-            request.getSession().setAttribute("is_memory", is);
-            redirect(request, response, "US_gestioneistanza.jsp");
-        } catch (Exception ex) {
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
-            redirect(request, response, "US_gestioneistanza.jsp?esito=KO");
-        }
-    }
-
-    protected void SCARICAPDFTEST(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-            EntityOp e = new EntityOp();
-            File cons2 = new File(e.getEm().find(Path.class, "pdf.temp").getDescrizione());
-            if (cons2.exists() && cons2.canRead()) {
-                String mimeType = Files.probeContentType(cons2.toPath());
-                if (mimeType == null) {
-                    mimeType = "application/pdf";
+                EntityOp ep1 = new EntityOp();
+                String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
+//            SoggettoProponente so = ((User) request.getSession().getAttribute("us_cod")).getSoggetto();
+                Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
+                FileItemFactory factory = new DiskFileItemFactory();
+                ServletFileUpload upload = new ServletFileUpload(factory);
+                File nomefile = null;
+                List<FileItem> items = upload.parseRequest(request);
+                Iterator<FileItem> iterator = items.iterator();
+                String IDIST = null;
+                String DESCRIZIONE = null;
+                String MIME = null;
+                String codiceDOC = generateIdentifier(6);
+                while (iterator.hasNext()) {
+                    FileItem item = (FileItem) iterator.next();
+                    if (item.isFormField()) {
+                        if (item.getFieldName().equals("idist")) {
+                            IDIST = item.getString();
+                        } else if (item.getFieldName().equals("DESCRIZIONE")) {
+                            DESCRIZIONE = normalizeUTF8(normalize(item.getString()));
+                        }
+                    } else {
+                        String fileName = item.getName();
+                        String estensione = fileName.substring(fileName.lastIndexOf("."));
+                        String nome = codiceDOC + new DateTime().toString(PATTERNDATE3)
+                                + RandomStringUtils.randomAlphabetic(15) + estensione;
+                        try {
+                            nomefile = new File(pathtemp.getDescrizione() + nome);
+                            item.write(nomefile);
+                            MIME = getMimeType(nomefile);
+                        } catch (Exception ex) {
+                            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
+                            nomefile = null;
+                        }
+                    }
                 }
-                response.setContentType(mimeType);
-                String headerKey = "Content-Disposition";
-                String headerValue = format("attach; filename=\"%s\"", cons2.getName());
-                response.setHeader(headerKey, headerValue);
-                response.setContentLength(-1);
-                try (OutputStream outStream = response.getOutputStream()) {
-                    outStream.write(FileUtils.readFileToByteArray(cons2));
+
+                if (nomefile != null) {
+
+                    if (IDIST != null) {
+                        request.getSession().setAttribute("ses_idist", Utils.enc_string(IDIST));
+                        Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(IDIST));
+                        if (is1 != null) {
+
+                            Allegati al1 = new Allegati();
+                            al1.setIstanza(is1);
+                            al1.setCodiceallegati(codiceDOC);
+                            al1.setContent(Base64.encodeBase64String(FileUtils.readFileToByteArray(nomefile)));
+                            al1.setDescrizione(DESCRIZIONE);
+                            al1.setStato(ep1.getEm().find(CorsoStato.class, "30"));
+                            al1.setMimetype(MIME);
+                            al1.setUtentecaricamento(utentecaricamento);
+                            al1.setDatacaricamento(new Date());
+
+                            ep1.begin();
+                            ep1.persist(al1);
+                            ep1.commit();
+                            ep1.close();
+                            redirect(request, response, "US_gestioneallegati.jsp");
+                        } else {
+                            redirect(request, response, "Page_message.jsp?esito=KOUP_IS1");
+                        }
+                    } else {
+                        redirect(request, response, "Page_message.jsp?esito=KOUP_IS2");
+                    }
+                } else {
+                    redirect(request, response, "Page_message.jsp?esito=KOUP_IS3");
                 }
+
+            } catch (Exception ex1) {
+                ex1.printStackTrace();
+                EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+                redirect(request, response, "Page_message.jsp?esito=KOUP_IS4");
             }
-
-        } catch (Exception ex) {
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
-            redirect(request, response, "ADM_visdco.jsp?esito=KO");
+        } else {
+            redirect(request, response, "404.jsp");
         }
-    }
 
-    protected void SCARICADECRETOISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-            SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
-
-            String codiceis = getRequestValue(request, "codice_istanza");
-            EntityOp e = new EntityOp();
-            Istanza is;
-            if (so == null) {
-                is = e.getIstanza(codiceis);
-            } else {
-                is = e.getIstanza(so, codiceis);
-            }
-            File cons2 = new File(is.getDecreto());
-            if (cons2.exists() && cons2.canRead()) {
-                String mimeType = Files.probeContentType(cons2.toPath());
-                if (mimeType == null) {
-                    mimeType = "application/pdf";
-                }
-                response.setContentType(mimeType);
-                String headerKey = "Content-Disposition";
-                String headerValue = format("attach; filename=\"%s\"", cons2.getName());
-                response.setHeader(headerKey, headerValue);
-                response.setContentLength(-1);
-                try (OutputStream outStream = response.getOutputStream()) {
-                    outStream.write(FileUtils.readFileToByteArray(cons2));
-                }
-            }
-        } catch (Exception ex) {
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
-            redirect(request, response, "US_gestioneistanza.jsp?esito=KO");
-        }
     }
 
     protected void VISUALDOC(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -795,189 +685,6 @@ public class Operations extends HttpServlet {
 
         } catch (Exception ex1) {
 
-        }
-    }
-
-    protected void SCARICAISTANZAFIRMATA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-        try {
-            SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
-
-            String codiceis = getRequestValue(request, "codice_istanza");
-            EntityOp e = new EntityOp();
-            Istanza is;
-            if (so == null) {
-                is = e.getIstanza(codiceis);
-            } else {
-                is = e.getIstanza(so, codiceis);
-            }
-
-            File cons2 = new File(is.getPathfirmato());
-            if (cons2.exists() && cons2.canRead()) {
-                String mimeType = Files.probeContentType(cons2.toPath());
-                if (mimeType == null) {
-                    mimeType = "application/pdf";
-                }
-                response.setContentType(mimeType);
-                String headerKey = "Content-Disposition";
-                String headerValue = format("attach; filename=\"%s\"", cons2.getName());
-                response.setHeader(headerKey, headerValue);
-                response.setContentLength(-1);
-                try (OutputStream outStream = response.getOutputStream()) {
-                    outStream.write(FileUtils.readFileToByteArray(cons2));
-                }
-            }
-        } catch (Exception ex) {
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
-            redirect(request, response, "US_gestioneistanza.jsp?esito=KO");
-        }
-
-    }
-
-    protected void GENERAISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        Utils.printRequest(request);
-
-        try {
-            SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
-            String codiceis = getRequestValue(request, "codice_istanza");
-            EntityOp e = new EntityOp();
-
-            Istanza is = e.getIstanza(so, codiceis);
-
-            if (is != null) {
-
-                File cons2 = Pdf.GENERAISTANZA(is);
-                if (Pdf.checkPDF(cons2)) {
-                    String mimeType = Files.probeContentType(cons2.toPath());
-                    if (mimeType == null) {
-                        mimeType = "application/pdf";
-                    }
-                    response.setContentType(mimeType);
-                    String headerKey = "Content-Disposition";
-                    String headerValue = format("attach; filename=\"%s\"", cons2.getName());
-                    response.setHeader(headerKey, headerValue);
-                    response.setContentLength(-1);
-                    try (OutputStream outStream = response.getOutputStream()) {
-                        outStream.write(FileUtils.readFileToByteArray(cons2));
-                    }
-                } else {
-                    redirect(request, response, "404.jsp");
-                }
-
-            } else {
-                redirect(request, response, "US_gestioneistanza.jsp?esito=KO1");
-            }
-        } catch (Exception ex) {
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
-            redirect(request, response, "US_gestioneistanza.jsp?esito=KO");
-        }
-
-    }
-
-    protected void SALVACORSI(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-            SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
-            String codiceis = getRequestValue(request, "codice_istanza");
-            EntityOp e = new EntityOp();
-
-            Istanza is = e.getIstanza(so, codiceis);
-
-            if (is != null) {
-                e.begin();
-                is.setStatocorso(e.getEm().find(CorsoStato.class, "02"));
-                e.merge(is);
-
-                e.flush();
-                e.commit();
-                e.close();
-                HttpSession se = request.getSession();
-                se.setAttribute("is_memory", is);
-                redirect(request, response, "US_gestioneistanza.jsp");
-            } else {
-                redirect(request, response, "US_gestioneistanza.jsp?esito=KO1");
-            }
-        } catch (Exception ex) {
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
-            redirect(request, response, "US_gestioneistanza.jsp?esito=KO");
-        }
-
-    }
-
-    protected void NOMINACOMMISSIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Utils.printRequest(request);
-        try {
-            EntityOp e = new EntityOp();
-            Long idc = Long.valueOf(getRequestValue(request, "idcorso"));
-            Corsoavviato c = e.getEm().find(Corsoavviato.class, idc);
-
-            String pres = getRequestValue(request, "pres");
-            String membri = getRequestValue(request, "membri");
-
-            c.setPresidentecommissione(pres);
-            c.setMembricommissione(membri);
-
-            e.begin();
-            e.merge(c);
-            e.flush();
-            e.commit();
-            e.close();
-            redirect(request, response, "ADM_commissione.jsp?esito=OK&idcorso=" + idc);
-        } catch (Exception ex) {
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
-            redirect(request, response, "US_gestionecorsi.jsp?esito=KO");
-        }
-    }
-
-    protected void CONCLUDICORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-            EntityOp e = new EntityOp();
-            Long idc = Long.valueOf(getRequestValue(request, "idcorso"));
-            Corsoavviato c = e.getEm().find(Corsoavviato.class, idc);
-            c.setStatocorso(e.getEm().find(CorsoStato.class, "21"));
-            e.begin();
-            e.persist(c);
-            e.flush();
-            e.commit();
-            e.close();
-            redirect(request, response, "US_gestionecorsi.jsp?esito=OK");
-        } catch (Exception ex) {
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
-            redirect(request, response, "US_gestionecorsi.jsp?esito=KO");
-        }
-    }
-
-    protected void AVVIANUOVOCORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        Utils.printRequest(request);
-        try {
-            SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
-            EntityOp e = new EntityOp();
-
-            String codiceistanza = getRequestValue(request, "codiceistanza");
-            String datainizio = getRequestValue(request, "datainizio");
-            String datafine = getRequestValue(request, "datafine");
-
-            String docenti = getRequestValue(request, "docenti");
-            String allievi = getRequestValue(request, "allievi");
-
-            Corsoavviato ca = new Corsoavviato();
-
-            ca.setDatafine(sdf_PATTERNDATE6.parse(datafine));
-            ca.setDatainizio(sdf_PATTERNDATE6.parse(datainizio));
-            ca.setElencoallievi(allievi);
-            ca.setElencodocenti(docenti);
-            ca.setIstanza(e.getIstanza(so, codiceistanza));
-            ca.setSoggetto(so);
-            ca.setStatocorso(e.getEm().find(CorsoStato.class, "20"));
-
-            e.begin();
-            e.persist(ca);
-            e.flush();
-            e.commit();
-            e.close();
-            redirect(request, response, "US_nuovocorso.jsp?esito=ADDED");
-        } catch (Exception ex) {
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
-            redirect(request, response, "US_compilacorsi.jsp?esito=KO");
         }
     }
 
@@ -1442,9 +1149,6 @@ public class Operations extends HttpServlet {
     }
 
     protected void SALVAPIANIFICAZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-        Utils.printRequest(request);
-
         EntityOp ep1 = new EntityOp();
         List<Lingua> language = ep1.getLingue();
         List<Competenze_Trasversali> comp_tr = (List<Competenze_Trasversali>) ep1.findAll(Competenze_Trasversali.class);
@@ -1717,41 +1421,11 @@ public class Operations extends HttpServlet {
                 case "ADDCORSO":
                     ADDCORSO(request, response);
                     break;
-                case "SALVACORSI":
-                    SALVACORSI(request, response);
-                    break;
-                case "GENERAISTANZA":
-                    GENERAISTANZA(request, response);
-                    break;
-                case "UPLISTA1":
-                    UPLISTA1(request, response);
-                    break;
-                case "SCARICAISTANZAFIRMATA":
-                    SCARICAISTANZAFIRMATA(request, response);
-                    break;
-                case "ELIMINAISTANZAFIRMATA":
-                    ELIMINAISTANZAFIRMATA(request, response);
-                    break;
                 case "VISUALDOC":
                     VISUALDOC(request, response);
                     break;
                 case "APPROVAISTANZA":
                     APPROVAISTANZA(request, response);
-                    break;
-                case "SCARICADECRETOISTANZA":
-                    SCARICADECRETOISTANZA(request, response);
-                    break;
-                case "SCARICAPDFTEST":
-                    SCARICAPDFTEST(request, response);
-                    break;
-                case "AVVIANUOVOCORSO":
-                    AVVIANUOVOCORSO(request, response);
-                    break;
-                case "CONCLUDICORSO":
-                    CONCLUDICORSO(request, response);
-                    break;
-                case "NOMINACOMMISSIONE":
-                    NOMINACOMMISSIONE(request, response);
                     break;
                 case "UPLGENERIC":
                     UPLGENERIC(request, response);

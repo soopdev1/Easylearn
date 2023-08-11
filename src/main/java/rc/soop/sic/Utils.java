@@ -9,6 +9,12 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import static java.math.BigDecimal.ROUND_HALF_DOWN;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import java.nio.file.Files;
@@ -379,8 +385,8 @@ public class Utils {
         }
         return "";
     }
-    
-    public static String datemysqltoita(String ing){
+
+    public static String datemysqltoita(String ing) {
         try {
             return Constant.sdf_PATTERNDATE4.format(Constant.sdf_PATTERNDATE6.parse(ing));
         } catch (Exception ex) {
@@ -388,5 +394,28 @@ public class Utils {
         }
         return ing;
     }
+
+    public static String normalizeSP(String ing) {
+        CharsetDecoder utf8Decoder = Charset.forName("UTF-8").newDecoder();
+        utf8Decoder.onMalformedInput(CodingErrorAction.IGNORE);
+        utf8Decoder.onUnmappableCharacter(CodingErrorAction.IGNORE);
+        try {
+            CharBuffer parsed = utf8Decoder.decode(ByteBuffer.wrap(ing.trim().getBytes(StandardCharsets.US_ASCII)));
+            return parsed.toString();
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+            return "";
+        }
+    }
     
+    
+    public static boolean isAdmin(HttpSession session){
+        try {
+            return session.getAttribute("us_rolecod").toString().equals("1");
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+        }
+        return false;
+    }
+
 }

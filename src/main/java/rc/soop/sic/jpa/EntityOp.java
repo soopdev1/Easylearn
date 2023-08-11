@@ -193,6 +193,12 @@ public class EntityOp {
         q.setParameter("soggetto", s);
         return (List<Istanza>) q.getResultList();
     }
+    
+    public List<Allievi> getAllieviSoggetto(SoggettoProponente s) {
+        TypedQuery q = this.em.createNamedQuery("allievi.soggetto", Allievi.class);
+        q.setParameter("soggetto", s);
+        return (List<Allievi>) q.getResultList();
+    }
 
     public Tipologia_Percorso getTipoPercorsoIstanza(Istanza is) {
         try {

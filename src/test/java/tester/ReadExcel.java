@@ -6,10 +6,21 @@ package tester;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -23,6 +34,7 @@ import rc.soop.sic.jpa.Categoria_Repertorio;
 import rc.soop.sic.jpa.Certificazione;
 import rc.soop.sic.jpa.Competenze;
 import rc.soop.sic.jpa.Conoscenze;
+import rc.soop.sic.jpa.Docente;
 import rc.soop.sic.jpa.EntityOp;
 import rc.soop.sic.jpa.Livello_Certificazione;
 import rc.soop.sic.jpa.Professioni;
@@ -523,7 +535,7 @@ public class ReadExcel {
     public static void main(String[] args) {
         try {
             List<ExcelValues> l_v = new ArrayList<>();
-            String fileLocation = "C:\\mnt\\demo\\ESTRAZIONE_REPERTORIO_v2.xlsx";
+            String fileLocation = "C:\\mnt\\demo\\Estrazione S.ARF 25_07_2023.xlsx";
             AtomicInteger maxfogli = new AtomicInteger(0);
             try (FileInputStream file = new FileInputStream(new File(fileLocation)); XSSFWorkbook workbook = new XSSFWorkbook(file)) {
                 maxfogli.set(workbook.getNumberOfSheets());
@@ -565,22 +577,74 @@ public class ReadExcel {
             //FOGLIO 2 - ELENCO ABILITA
 //            inserisci_abilita(l_v);
             //FOGLIO 3 - ELENCO CONOSCENZE
-            inserisci_conoscenze(l_v);
+            //inserisci_conoscenze(l_v);
             //FOGLIO 4 - ASSOCIA REPERTORIO CON PROFESSIONI
 //            repertorio_e_professioni(l_v);
-//            EntityOp e = new EntityOp();
-//            e.begin();
-//            List<Integer> righe = l_v.stream().filter(c -> c.getFoglio() == 0).map(c1 -> c1.getRiga()).distinct().collect(Collectors.toList());
+            EntityOp e = new EntityOp();
+            e.begin();
+            List<Integer> righe = l_v.stream().filter(c -> c.getFoglio() == 0).map(c1 -> c1.getRiga()).distinct().collect(Collectors.toList());
 //
-//            righe.forEach(f1 -> {
+            righe.forEach(f1 -> {
 //
-//                List<ExcelValues> contentfoglio1 = l_v.stream().filter(c -> c.getFoglio() == 0 && c.getRiga() == f1).distinct().collect(Collectors.toList());
+                List<ExcelValues> contentfoglio1 = l_v.stream().filter(c -> c.getFoglio() == 0 && c.getRiga() == f1).distinct().collect(Collectors.toList());
 //
-//                if (f1 > 0) {
+                if (f1 > 0) {
 //                    Repertorio r1 = new Repertorio();
 //                    Scheda_Attivita sa1 = new Scheda_Attivita();
 //
-//                    contentfoglio1.forEach(f2 -> {
+                    Docente do1 = new Docente();
+                    StringBuilder sb_titst = new StringBuilder();
+
+                    StringBuilder sb_areaf = new StringBuilder();
+
+                    StringBuilder sb_profi = new StringBuilder();
+
+                    contentfoglio1.forEach(f2 -> {
+                        switch (f2.getColonna()) {
+                            case 0: {
+                                do1.setNome(f2.getValue().trim().toUpperCase());
+                                break;
+                            }
+                            case 1: {
+                                do1.setCognome(f2.getValue().trim().toUpperCase());
+                                break;
+                            }
+                            case 2: {
+                                do1.setCodicefiscale(f2.getValue().trim().toUpperCase());
+                                break;
+                            }
+                            case 3:
+                            case 4: {
+                                sb_titst.append(f2.getValue().trim().toUpperCase()).append(" ");
+                                break;
+                            }
+                            case 5: {
+                                sb_areaf.append(f2.getValue().trim().toUpperCase());
+                                break;
+                            }
+                            case 6: {
+                                sb_profi.append(f2.getValue().trim().toUpperCase());
+                                break;
+                            }
+                        }
+                    });
+                    do1.setTitolostudio(Utils.normalizeSP(sb_titst.toString().trim()));
+                    if (sb_profi.toString().trim().equals("")) {
+                        do1.setProfiloprof("FORMATORE");
+                    } else {
+                        do1.setProfiloprof(Utils.normalizeSP(sb_profi.toString()));
+                    }
+
+                    if (sb_areaf.toString().trim().equals("")) {
+                        do1.setTipologia("AREA FUNZIONALE 3 - EROGAZIONE");
+                    } else {
+                        do1.setTipologia(Utils.normalizeSP(sb_areaf.toString().trim()));
+                    }
+
+                    if (do1.getTipologia().contains("EROGAZIONE")) {
+                        e.persist(do1);
+                    }
+
 //
 //                        switch (f2.getColonna()) {
 //                            case 0: {
@@ -736,11 +800,11 @@ public class ReadExcel {
 ////                        System.out.println(r1.getIdrepertorio() + " SCHEDA -> " + sa1.getIdschedaattivita());
 //                    }
 //
-//                }
-//            });
+                }
+            });
 //
-//            e.commit();
-//            e.close();
+            e.commit();
+            e.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }

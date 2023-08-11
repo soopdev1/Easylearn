@@ -87,13 +87,11 @@
                                                         <!--begin::Table head-->
                                                         <thead>
                                                             <tr>
-                                                                <th class="p-2">Stato</th>
                                                                 <th class="p-2">Cognome</th>
                                                                 <th class="p-2">Nome</th>
                                                                 <th class="p-2">Codice Fiscale</th>
                                                                 <th class="p-2">Titolo di studio</th>
                                                                 <th class="p-2">Profilo Professionale</th>
-                                                                <th class="p-2">Azioni</th>
                                                             </tr>
                                                         </thead>
                                                         <!--end::Table head-->

@@ -4,15 +4,18 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import rc.soop.sic.Constant;
 import rc.soop.sic.Utils;
 import static rc.soop.sic.Utils.estraiEccezione;
 import static rc.soop.sic.Utils.getRequestValue;
+import static rc.soop.sic.Utils.isAdmin;
 import static rc.soop.sic.Utils.redirect;
 import rc.soop.sic.jpa.Allievi;
 import rc.soop.sic.jpa.Corso;
@@ -170,15 +173,23 @@ public class Search extends HttpServlet {
 
     protected void list_istanze_adm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        String statoistanza = getRequestValue(request, "statoistanza");
+        String tipopercorso = getRequestValue(request, "tipopercorso");
         EntityOp ep = new EntityOp();
-
+        List<Istanza> result;
+        try {
+            if (isAdmin(request.getSession())) {
+                result = ep.list_istanze_adm(tipopercorso, statoistanza);
+            } else {
+                result = new ArrayList<>();
+            }
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+            result = new ArrayList<>();
+        }
         try (PrintWriter out = response.getWriter()) {
             JsonObject jMembers = new JsonObject();
             JsonArray data = new JsonArray();
-            String statoistanza = getRequestValue(request, "statoistanza");
-            String tipopercorso = getRequestValue(request, "tipopercorso");
-            List<Istanza> result = new EntityOp().list_istanze_adm(tipopercorso, statoistanza);
             jMembers.addProperty(ITOTALRECORDS, result.size());
             jMembers.addProperty(ITOTALDISPLAY, result.size());
             jMembers.addProperty(SECHO, 0);
@@ -331,16 +342,15 @@ public class Search extends HttpServlet {
 //                String edit = "";
                 JsonObject data_value = new JsonObject();
                 data_value.addProperty(RECORDID, at.get());
-                data_value.addProperty("stato", res.getEtichettastato());
+                data_value.addProperty("ruolo", res.getTipologia());
+//                data_value.addProperty("stato", res.getEtichettastato());
                 data_value.addProperty("cognome", res.getCognome());
                 data_value.addProperty("nome", res.getNome());
                 data_value.addProperty("cf", res.getCodicefiscale());
                 data_value.addProperty("titolo", res.getTitolostudio());
-                data_value.addProperty("tipologia", res.getTipologia());
                 data_value.addProperty("profiloprof", res.getProfiloprof());
-                data_value.addProperty("azioni", "<i class='fa fa-hourglass'></i>");
+//                data_value.addProperty("azioni", "<i class='fa fa-hourglass'></i>");
                 data.add(data_value);
-
                 at.addAndGet(1);
             });
             jMembers.add(AADATA, data);
@@ -352,12 +362,25 @@ public class Search extends HttpServlet {
 
     protected void list_allievi(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        List<Allievi> result;
+        try {
+
+            if (isAdmin(request.getSession())) {
+                result = new EntityOp().findAll(Allievi.class);
+            } else {
+                SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
+                result = new EntityOp().getAllieviSoggetto(so);
+            }
+
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+            result = new ArrayList<>();
+        }
+
         try (PrintWriter out = response.getWriter()) {
             JsonObject jMembers = new JsonObject();
             JsonArray data = new JsonArray();
-
-            List<Allievi> result = new EntityOp().findAll(Allievi.class);
-
             jMembers.addProperty(ITOTALRECORDS, result.size());
             jMembers.addProperty(ITOTALDISPLAY, result.size());
             jMembers.addProperty(SECHO, 0);
@@ -372,8 +395,6 @@ public class Search extends HttpServlet {
 //                        + "<input type='hidden' name='type' value='showPDF'/>"
 //                        + "<input type='hidden' name='ido' value='' />"
 //                        + "</form>";
-//
-//                String edit = "";
                 JsonObject data_value = new JsonObject();
                 data_value.addProperty(RECORDID, at.get());
                 data_value.addProperty("stato", res.getEtichettastato());
@@ -396,6 +417,11 @@ public class Search extends HttpServlet {
 
     protected void list_sedi_soggetto(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        
+        
+        
+        
         try (PrintWriter out = response.getWriter()) {
             JsonObject jMembers = new JsonObject();
             JsonArray data = new JsonArray();
