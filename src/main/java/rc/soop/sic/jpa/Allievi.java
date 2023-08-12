@@ -30,7 +30,7 @@ import static rc.soop.sic.jpa.Stati.ABILITATO;
  * @author Administrator
  */
 @NamedQueries(value = {
-    @NamedQuery(name = "allievi.soggetto", query = "SELECT i FROM Allievi i WHERE i.soggetto=:soggetto ORDER BY i.cognome ASC"),
+    @NamedQuery(name = "allievi.soggetto", query = "SELECT i FROM Allievi i WHERE i.soggetto=:soggetto AND i.statoallievo<>:inattivo ORDER BY i.cognome ASC"),
 })
 @Entity
 @Table(name = "allievi")
@@ -66,6 +66,51 @@ public class Allievi implements Serializable {
     
     @Column(name = "telefono")
     private String telefono;
+
+    @Column(name = "numdocid")
+    private String numdocid;
+    
+    @Column(name = "datadocid")
+    @Temporal(TemporalType.DATE)
+    private Date datadocid;
+    
+    @Column(name = "titolostudio")
+    private String titolostudio;
+    
+    @Column(name = "catprot", nullable = false, columnDefinition = "TINYINT(1)")
+    private boolean catprot;
+
+    public String getNumdocid() {
+        return numdocid;
+    }
+
+    public void setNumdocid(String numdocid) {
+        this.numdocid = numdocid;
+    }
+
+    public Date getDatadocid() {
+        return datadocid;
+    }
+
+    public void setDatadocid(Date datadocid) {
+        this.datadocid = datadocid;
+    }
+
+    public String getTitolostudio() {
+        return titolostudio;
+    }
+
+    public void setTitolostudio(String titolostudio) {
+        this.titolostudio = titolostudio;
+    }
+
+    public boolean isCatprot() {
+        return catprot;
+    }
+
+    public void setCatprot(boolean catprot) {
+        this.catprot = catprot;
+    }
 
     @Transient
     private String etichettastato;

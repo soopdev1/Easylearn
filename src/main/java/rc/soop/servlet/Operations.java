@@ -54,6 +54,7 @@ import static rc.soop.sic.Utils.parseLongR;
 import static rc.soop.sic.Utils.redirect;
 import rc.soop.sic.jpa.Abilita;
 import rc.soop.sic.jpa.Allegati;
+import rc.soop.sic.jpa.Allievi;
 import rc.soop.sic.jpa.Attrezzature;
 import rc.soop.sic.jpa.Calendario_Formativo;
 import rc.soop.sic.jpa.Competenze;
@@ -75,6 +76,7 @@ import rc.soop.sic.jpa.Repertorio;
 import rc.soop.sic.jpa.Scheda_Attivita;
 import rc.soop.sic.jpa.Sede;
 import rc.soop.sic.jpa.SoggettoProponente;
+import rc.soop.sic.jpa.Stati;
 import rc.soop.sic.jpa.TipoCorso;
 import rc.soop.sic.jpa.Tipologia_Percorso;
 import rc.soop.sic.jpa.User;
@@ -84,6 +86,32 @@ import rc.soop.sic.jpa.User;
  * @author Raffaele
  */
 public class Operations extends HttpServlet {
+
+    protected void ADDALLIEVO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        String COGNOME = normalizeUTF8(getRequestValue(request, "COGNOME"));
+        String NOME = normalizeUTF8(getRequestValue(request, "NOME"));
+        String CODICEFISCALE = normalizeUTF8(getRequestValue(request, "CODICEFISCALE"));
+        String TELEFONO = normalizeUTF8(getRequestValue(request, "TELEFONO"));
+        String EMAIL = normalizeUTF8(getRequestValue(request, "EMAIL"));
+        String DOCID = normalizeUTF8(getRequestValue(request, "DOCID"));
+
+        Allievi al1 = new Allievi();
+        al1.setCognome(COGNOME);
+        al1.setNome(NOME);
+        al1.setCodicefiscale(CODICEFISCALE);
+        al1.setTelefono(TELEFONO);
+        al1.setEmail(EMAIL);
+        al1.setNumdocid(DOCID);
+        try {
+            al1.setDatadocid(sdf_PATTERNDATE6.parse(getRequestValue(request, "DATEDOCID")));
+        } catch (Exception ex1) {
+            al1.setDatadocid(null);
+        }
+        
+        
+
+    }
 
     protected void INVIANOTIFICADECRETO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JsonObject resp_out = new JsonObject();
@@ -244,7 +272,7 @@ public class Operations extends HttpServlet {
     protected void APPROVAISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (isAdmin(request.getSession())) {
 
-            String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
+//            String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
             String idist = Utils.dec_string(getRequestValue(request, "idist"));
 
             EntityOp ep1 = new EntityOp();
@@ -271,7 +299,7 @@ public class Operations extends HttpServlet {
                                 c2.setId_corso(ID);
                                 c2.setCs_corso(CS);
                                 c2.setEd_corso(ED);
-                                c2.setIdentificativocorso(CIP + "/" + CUP + "/" + ID + "/" + CS + "/" + ED);
+                                c2.setIdentificativocorso("ID" + ID + "/CS" + CS + "/ED" + ED);
                             } else {
                                 IncrementalCorso ics = new IncrementalCorso();
                                 ics.setCorso(c2);
@@ -506,7 +534,7 @@ public class Operations extends HttpServlet {
             try {
 
                 EntityOp ep1 = new EntityOp();
-                String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
+//                String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
                 Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
                 FileItemFactory factory = new DiskFileItemFactory();
                 ServletFileUpload upload = new ServletFileUpload(factory);
@@ -519,12 +547,18 @@ public class Operations extends HttpServlet {
                 while (iterator.hasNext()) {
                     FileItem item = (FileItem) iterator.next();
                     if (item.isFormField()) {
-                        if (item.getFieldName().equals("idist")) {
-                            IDIST = item.getString();
-                        } else if (item.getFieldName().equals("DDSNUMERO")) {
-                            DDSNUMERO = normalizeUTF8(normalize(item.getString()));
-                        } else if (item.getFieldName().equals("DDSDATA")) {
-                            DDSDATA = normalizeUTF8(normalize(item.getString()));
+                        switch (item.getFieldName()) {
+                            case "idist":
+                                IDIST = item.getString();
+                                break;
+                            case "DDSNUMERO":
+                                DDSNUMERO = normalizeUTF8(normalize(item.getString()));
+                                break;
+                            case "DDSDATA":
+                                DDSDATA = normalizeUTF8(normalize(item.getString()));
+                                break;
+                            default:
+                                break;
                         }
                     } else {
                         String fileName = item.getName();
@@ -571,6 +605,85 @@ public class Operations extends HttpServlet {
             }
         } else {
             redirect(request, response, "404.jsp");
+        }
+    }
+
+    protected void UPLDOCALLIEVO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+
+            EntityOp ep1 = new EntityOp();
+            String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
+//            SoggettoProponente so = ((User) request.getSession().getAttribute("us_cod")).getSoggetto();
+            Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
+            FileItemFactory factory = new DiskFileItemFactory();
+            ServletFileUpload upload = new ServletFileUpload(factory);
+            File nomefile = null;
+            List<FileItem> items = upload.parseRequest(request);
+            Iterator<FileItem> iterator = items.iterator();
+            String IDALLIEVO = null;
+            String DESCRIZIONE = null;
+            String MIME = null;
+            String codiceDOC = generateIdentifier(6);
+            while (iterator.hasNext()) {
+                FileItem item = (FileItem) iterator.next();
+                if (item.isFormField()) {
+                    if (item.getFieldName().equals("idallievo")) {
+                        IDALLIEVO = item.getString();
+                    } else if (item.getFieldName().equals("DESCRIZIONE")) {
+                        DESCRIZIONE = normalizeUTF8(normalize(item.getString()));
+                    }
+                } else {
+                    String fileName = item.getName();
+                    String estensione = fileName.substring(fileName.lastIndexOf("."));
+                    String nome = codiceDOC + new DateTime().toString(PATTERNDATE3)
+                            + RandomStringUtils.randomAlphabetic(15) + estensione;
+                    try {
+                        nomefile = new File(pathtemp.getDescrizione() + nome);
+                        item.write(nomefile);
+                        MIME = getMimeType(nomefile);
+                    } catch (Exception ex) {
+                        EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
+                        nomefile = null;
+                    }
+                }
+            }
+
+            if (nomefile != null) {
+
+                if (IDALLIEVO != null) {
+                    request.getSession().setAttribute("ses_idallievo", Utils.enc_string(IDALLIEVO));
+                    Allievi all0 = ep1.getEm().find(Allievi.class, Long.valueOf(IDALLIEVO));
+                    if (all0 != null) {
+
+                        Allegati al1 = new Allegati();
+                        al1.setAllievi(all0);
+                        al1.setCodiceallegati(codiceDOC);
+                        al1.setContent(Base64.encodeBase64String(FileUtils.readFileToByteArray(nomefile)));
+                        al1.setDescrizione(DESCRIZIONE);
+                        al1.setStato(ep1.getEm().find(CorsoStato.class, "30"));
+                        al1.setMimetype(MIME);
+                        al1.setUtentecaricamento(utentecaricamento);
+                        al1.setDatacaricamento(new Date());
+
+                        ep1.begin();
+                        ep1.persist(al1);
+                        ep1.commit();
+                        ep1.close();
+                        redirect(request, response, "US_allegatiallievi.jsp");
+                    } else {
+                        redirect(request, response, "Page_message.jsp?esito=KOUP_AL1");
+                    }
+                } else {
+                    redirect(request, response, "Page_message.jsp?esito=KOUP_AL2");
+                }
+            } else {
+                redirect(request, response, "Page_message.jsp?esito=KOUP_IS3");
+            }
+
+        } catch (Exception ex1) {
+            ex1.printStackTrace();
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KOUP_IS4");
         }
     }
 
@@ -785,6 +898,41 @@ public class Operations extends HttpServlet {
                         false);
                 resp_out.addProperty("message",
                         "Errore: ISTANZA NON TROVATA.");
+            }
+
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+    }
+
+    protected void DELETEALLIEVO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JsonObject resp_out = new JsonObject();
+        try {
+
+            EntityOp ep1 = new EntityOp();
+            Allievi al1 = ep1.getEm().find(Allievi.class, Long.valueOf(getRequestValue(request, "IDALLIEVO")));
+
+            if (al1 != null) {
+                ep1.begin();
+                al1.setStatoallievo(Stati.INATTIVO);
+                ep1.merge(al1);
+                ep1.commit();
+                ep1.close();
+                resp_out.addProperty("result",
+                        true);
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "Errore: ALLEGATO NON TROVATO.");
             }
 
         } catch (Exception ex1) {
@@ -1412,6 +1560,9 @@ public class Operations extends HttpServlet {
                 case "DELETEDOCUMENT":
                     DELETEDOCUMENT(request, response);
                     break;
+                case "DELETEALLIEVO":
+                    DELETEALLIEVO(request, response);
+                    break;
                 case "SAVEISTANZA":
                     SAVEISTANZA(request, response);
                     break;
@@ -1429,6 +1580,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "UPLGENERIC":
                     UPLGENERIC(request, response);
+                    break;
+                case "UPLDOCALLIEVO":
+                    UPLDOCALLIEVO(request, response);
                     break;
                 case "UPLSOST":
                     UPLSOST(request, response);
@@ -1453,6 +1607,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "INVIANOTIFICADECRETO":
                     INVIANOTIFICADECRETO(request, response);
+                    break;
+                case "ADDALLIEVO":
+                    ADDALLIEVO(request, response);
                     break;
                 default:
                     break;

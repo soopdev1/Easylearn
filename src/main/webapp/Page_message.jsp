@@ -23,8 +23,6 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
-
-
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -92,6 +90,14 @@
                                         case "KOUP_IS2": {
                                             ty = "alert-danger";
                                             html = "<i class='fa fa-exclamation-triangle'></i> ERRORE! Impossibile caricare il documento. Istanza non trovata, riprovare."
+                                                    + " <hr>"
+                                                    + "<button class='btn btn-danger' onclick='history.back()'><i class='fa fa-backward'></i> Torna Indietro</button>";
+                                            break;
+                                        }
+                                        case "KOUP_AL1":
+                                        case "KOUP_AL2": {
+                                            ty = "alert-danger";
+                                            html = "<i class='fa fa-exclamation-triangle'></i> ERRORE! Impossibile caricare il documento. Allievo non trovato, riprovare."
                                                     + " <hr>"
                                                     + "<button class='btn btn-danger' onclick='history.back()'><i class='fa fa-backward'></i> Torna Indietro</button>";
                                             break;

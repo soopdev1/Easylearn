@@ -49,6 +49,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import org.joda.time.DateTime;
 import static rc.soop.sic.Constant.PATTERNDATE2;
 import static rc.soop.sic.Constant.PATTERNDATE3;
+import rc.soop.sic.jpa.Allievi;
 import rc.soop.sic.jpa.EntityOp;
 import rc.soop.sic.jpa.User;
 
@@ -416,6 +417,11 @@ public class Utils {
             Constant.LOGGER.severe(estraiEccezione(ex));
         }
         return false;
+    }
+    
+    
+    public static void ricavaDatidaCF(Allievi al1){
+        
     }
 
 }

@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import rc.soop.sic.Constant;
+import static rc.soop.sic.Constant.sdf_PATTERNDATE4;
 import rc.soop.sic.Utils;
 import static rc.soop.sic.Utils.estraiEccezione;
 import static rc.soop.sic.Utils.getRequestValue;
@@ -24,6 +25,7 @@ import rc.soop.sic.jpa.EntityOp;
 import rc.soop.sic.jpa.Istanza;
 import rc.soop.sic.jpa.Sede;
 import rc.soop.sic.jpa.SoggettoProponente;
+import rc.soop.sic.jpa.Stati;
 import rc.soop.sic.jpa.User;
 
 /**
@@ -401,9 +403,25 @@ public class Search extends HttpServlet {
                 data_value.addProperty("cognome", res.getCognome());
                 data_value.addProperty("nome", res.getNome());
                 data_value.addProperty("cf", res.getCodicefiscale());
+                data_value.addProperty("data", sdf_PATTERNDATE4.format(res.getDatanascita()));
                 data_value.addProperty("email", res.getEmail());
                 data_value.addProperty("telefono", res.getTelefono());
-                data_value.addProperty("azioni", "<i class='fa fa-hourglass'></i>");
+
+                String azioni
+                        = "<a href=\"US_allegatiallievi.jsp?idallievo=" + Utils.enc_string(String.valueOf(res.getIdallievi())) + "\" data-fancybox data-type='iframe' "
+                        + "data-bs-toggle=\"tooltip\" title=\"GESTIONE ALLEGATI\" "
+                        + "data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary fan1\">"
+                        + "<i class=\"fa fa-file-clipboard\"></i></a>";
+
+                if (res.getStatoallievo().equals(Stati.CHECK)) {
+                    azioni += " | <button type=\"button\"class=\"btn btn-sm btn-bg-light btn-danger\""
+                            + " data-bs-toggle=\"tooltip\" title=\"ELIMINA ANAGRAFICA ALLIEVO\""
+                            + " data-preload='false'"
+                            + " onclick=\"return rimuoviallievo('" + res.getIdallievi() + "','" + res.getCodicefiscale() + "')\"><i class=\"fa fa-remove\"></i>"
+                            + " </button>";
+                }
+
+                data_value.addProperty("azioni", azioni);
                 data.add(data_value);
 
                 at.addAndGet(1);
@@ -417,11 +435,7 @@ public class Search extends HttpServlet {
 
     protected void list_sedi_soggetto(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        
-        
-        
-        
+
         try (PrintWriter out = response.getWriter()) {
             JsonObject jMembers = new JsonObject();
             JsonArray data = new JsonArray();

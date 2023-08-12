@@ -4,11 +4,9 @@
     Author     : raf
 --%>
 
-<%@page import="java.util.List"%>
-<%@page import="rc.soop.sic.jpa.EntityOp"%>
-<%@page import="rc.soop.sic.jpa.Istanza"%>
-<%@page import="rc.soop.sic.Utils"%>
 <%@page import="rc.soop.sic.Constant"%>
+<%@page import="rc.soop.sic.jpa.EntityOp"%>
+<%@page import="rc.soop.sic.Utils"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,246 +14,157 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
+                EntityOp eo = new EntityOp();
     %>
     <!--begin::Head-->
     <head><base href="">
-        <title><%=Constant.NAMEAPP%>: Aggiungi anagrafica allievo</title>
+        <title><%=Constant.NAMEAPP%>: Aggiungi anagrafica allievi</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->
         <link rel="stylesheet" href="assets/css/gfont.css" />
         <!--end::Fonts-->
         <!--begin::Page Vendor Stylesheets(used by this page)-->
-        <link href="assets/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet" type="text/css" />
-        <link href="assets/plugins/DataTables/datatables.min.css" rel="stylesheet" type="text/css" />
-        <!--end::Page Vendor Stylesheets-->
-        <!--begin::Global Stylesheets Bundle(used by all pages)-->
         <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
-        <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />        
+        <link href="assets/plugins/DataTables/datatables.min.css" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="assets/plugins/jquery-confirm.3.3.2.min.css">
+
+        <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+        <link href="assets/css/plus.css" rel="stylesheet" type="text/css" />
+
         <!--end::Global Stylesheets Bundle-->
     </head>
     <!--end::Head-->
     <!--begin::Body-->
-    <body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed">
+    <body id="kt_body">
         <!--begin::Main-->
         <!--begin::Root-->
-        <div class="d-flex flex-column flex-root">
-            <!--begin::Page-->
-            <div class="page d-flex flex-row flex-column-fluid">
-                <!--begin::Wrapper-->
-                <div class="wrapper d-flex flex-column flex-row-fluid" id="kt_wrapper">
-                    <!--begin::Header-->
-                    <jsp:include page="menu/header1.jsp" /> 
-                    <!--end::Header-->
-                    <!--begin::Content wrapper-->
-                    <div class="d-flex flex-column-fluid">
-                        <jsp:include page="menu/menuUS1.jsp" /> 
-                        <!--begin::Container-->
-                        <div class="d-flex flex-column flex-column-fluid container-fluid">
-                            <!--begin::Post-->
-                            <div class="content flex-column-fluid" id="kt_content">
-                                <!--begin::Row-->
-                                <!--end::Row-->
-                                <!--begin::Row-->
-                                <!--end::Row-->
-                                <!--begin::Row-->
-                                <div class="row g-10">
-                                    <!--begin::Col-->
-                                    <div class="col-xl-12">
-                                        <!--begin::Tables Widget 3-->
-                                        <div class="card h-xl-100">
-                                            <!--begin::Header-->
-                                            <div class="card-header border-0 pt-5">
-                                                <h3 class="card-title align-items-start flex-column">
-                                                    <span class="card-label fw-bolder fs-3 mb-1">AVVIA NUOVO CORSO</span>
-                                                    <span class="text-muted mt-1 fw-bold fs-7">Avvio di un nuovo corso facente parte di una Istanza di autorizzazione allo svolgimento ACCETTATA.</span>
-                                                </h3>
-                                            </div>
-                                            <!--end::Header-->
-
-                                            <%
-                                                EntityOp en = new EntityOp();
-                                                List<Istanza> accettate = en.getIstanzeAccettateAvvioCorsi(session);
-                                            %>
-                                            <!--begin::Body-->
-                                            <form action="Operations" method="POST">
-                                                <input type="hidden" name="type" value="AVVIANUOVOCORSO" />
-                                                <div class="card-body py-3">
-                                                    <!--begin::Table container-->
-                                                    <div class="row mb-6">
-                                                        <!--begin::Label-->
-                                                        <label class="col-lg-4 col-form-label required fw-bold fs-6">ISTANZA DI AUTORIZZAZIONE</label>
-                                                        <!--end::Label-->
-                                                        <!--begin::Col-->
-                                                        <div class="col-lg-8">
-                                                            <!--begin::Row-->
-                                                            <div class="row">
-                                                                <!--begin::Col-->
-                                                                <div class="col-lg-12 fv-row">
-                                                                    <select aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
-                                                                            class="form-select form-select-solid form-select-lg fw-bold" name="codiceistanza" required>
-                                                                        <%for (Istanza is1 : accettate) {%>
-                                                                        <option value="<%=is1.getCodiceistanza()%>">PROTOCOLLO <%=is1.getProtocollosoggetto()%> DEL <%=is1.getProtocollosoggettodata()%> - DECRETO n. 100 DEL  12/12/2022</option>
-                                                                        <%}%>
-                                                                    </select>
-                                                                </div>
-                                                                <!--end::Col-->
-                                                                <!--begin::Col-->
-                                                                <!--end::Col-->
-                                                            </div>
-                                                            <!--end::Row-->
-                                                        </div>
-                                                        <!--end::Col-->
-                                                    </div>
-                                                    <hr>
-
-                                                    <div class="row mb-6">
-                                                        <!--begin::Label-->
-                                                        <label class="col-lg-4 col-form-label required fw-bold fs-6">Data Inizio</label>
-                                                        <!--end::Label-->
-                                                        <!--begin::Col-->
-                                                        <div class="col-lg-8">
-                                                            <!--begin::Row-->
-                                                            <div class="row">
-                                                                <!--begin::Col-->
-                                                                <div class="col-lg-12 fv-row">
-                                                                    <input type="date" name="datainizio" 
-                                                                           class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" 
-                                                                           required/>
-                                                                </div>
-                                                                <!--end::Col-->
-                                                                <!--begin::Col-->
-                                                                <!--end::Col-->
-                                                            </div>
-                                                            <!--end::Row-->
-                                                        </div>
-                                                        <!--end::Col-->
-                                                    </div>
-                                                    <div class="row mb-6">
-                                                        <!--begin::Label-->
-                                                        <label class="col-lg-4 col-form-label required fw-bold fs-6">Data Fine</label>
-                                                        <!--end::Label-->
-                                                        <!--begin::Col-->
-                                                        <div class="col-lg-8">
-                                                            <!--begin::Row-->
-                                                            <div class="row">
-                                                                <!--begin::Col-->
-                                                                <div class="col-lg-12 fv-row">
-                                                                    <input type="date" name="datafine" 
-                                                                           class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" 
-                                                                           required/>
-                                                                </div>
-                                                                <!--end::Col-->
-                                                                <!--begin::Col-->
-                                                                <!--end::Col-->
-                                                            </div>
-                                                            <!--end::Row-->
-                                                        </div>
-                                                        <!--end::Col-->
-                                                    </div>
-
-                                                    <div class="row mb-6">
-                                                        <!--begin::Label-->
-                                                        <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                            <span class="required">Elenco Docenti</span>
-                                                            <a onclick="return false;" data-bs-toggle="tooltip" data-bs-placement="top" title="Selezione nuovo codice dall'elenco">
-                                                                <i class="fas fa-exclamation-circle ms-1 fs-7"></i>
-                                                            </a>
-                                                        </label>
-                                                        <!--end::Label-->
-                                                        <!--begin::Col-->
-                                                        <div class="col-lg-8 fv-row">
-                                                            <select aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
-                                                                    class="form-select form-select-solid form-select-lg fw-bold" name="docenti" required multiple>
-                                                                <option value="">Scegli...</option>
-                                                                <option value="D1">Docente Numero Uno</option>
-                                                                <option value="D2">Docente Numero Due</option>
-                                                            </select>
-                                                        </div>
-                                                        <!--end::Col-->
-                                                    </div>
-                                                    <div class="row mb-6">
-                                                        <!--begin::Label-->
-                                                        <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                            <span class="required">Elenco Allievi</span>
-                                                            <a onclick="return false;" data-bs-toggle="tooltip" data-bs-placement="top" title="Selezione nuovo codice dall'elenco">
-                                                                <i class="fas fa-exclamation-circle ms-1 fs-7"></i>
-                                                            </a>
-                                                        </label>
-                                                        <!--end::Label-->
-                                                        <!--begin::Col-->
-                                                        <div class="col-lg-8 fv-row">
-                                                            <select name="allievi" aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
-                                                                    class="form-select form-select-solid form-select-lg fw-bold" required multiple>
-                                                                <option value="">Scegli...</option>
-                                                                <option value="A1">Allievo Numero Uno</option>
-                                                                <option value="A2">Allievo Numero Due</option>
-                                                                <option value="A3">Allievo Numero Tre</option>
-                                                                <option value="A4">Allievo Numero Quattro</option>
-                                                                <option value="A5">Allievo Numero Cinque</option>
-                                                                <option value="A6">Allievo Numero Sei</option>
-                                                                <option value="A7">Allievo Numero Sette</option>
-                                                                <option value="A8">Allievo Numero Otto</option>
-                                                                <option value="A9">Allievo Numero Nove</option>                                                                
-                                                            </select>
-                                                        </div>
-                                                        <!--end::Col-->
-                                                    </div>                                                
-                                                    <div class="container">
-                                                        <div class="row">
-                                                            <div class="col-12">
-                                                                <div aria-live="polite" id="errorMsgContainer"></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <hr>
-                                                    <p class="mb-0">
-                                                        <button type="submit" class="btn btn-primary btn-circled">
-                                                            <i class="fa fa-save"></i> SALVA DATI
-                                                        </button>
-                                                    </p>
-                                                    <!--end::Table container-->
-                                                </div>
-                                            </form>
-                                            <!--begin::Body-->
-                                        </div>
-                                        <!--end::Tables Widget 3-->
-                                    </div>
-
-                                </div>
-                                <!--end::Row-->
-                            </div>
-                            <!--end::Post-->
-                            <!--begin::Footer-->
-                            <jsp:include page="menu/footer1.jsp" /> 
-                            <!--end::Footer-->
+        <!--begin::Row-->
+        <!--end::Row-->
+        <!--begin::Row-->
+        <!--end::Row-->
+        <!--begin::Row-->
+        <div class="row">
+            <!--begin::Col-->
+            <form method="POST" action="Operations" onsubmit="return controllasalvataggio();">
+                <input type="hidden" name="type" value="ADDALLIEVO"/>
+                <div class="col-xl-12">
+                    <div class="card h-xl-100">
+                        <div class="card-header border-0 pt-5">
+                            <h3 class="card-title align-items-start flex-column">
+                                <span class="card-label fw-bolder fs-3 mb-1">NUOVO ALLIEVO</span>
+                            </h3>
+                            <button class="btn btn-lg btn-success"><i class="fa fa-save"></i> SALVA DATI</button>
                         </div>
-                        <!--end::Container-->
+                        <div class="card-body py-3">
+                            <div class="row col-md-12 col-form-label">
+                                <div class="alert alert-danger"  id="messageerror" style="display: none;">
+                                    ERRORE: 
+                                </div>
+                            </div>
+                            <div class="row col-md-12">
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>COGNOME</b></span>
+                                </label>
+                                <div class="col-md-3 col-form-label fs-6">
+                                    <input type="text" 
+                                           name="COGNOME"
+                                           id="COGNOME"
+                                           onkeyup="return checkNoSpecialChar(this)"
+                                           class="form-control" required maxlength="50" />
+                                </div>
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>NOME</b></span>
+                                </label>
+                                <div class="col-md-3 col-form-label fs-6">
+                                    <input type="text" 
+                                           name="NOME"
+                                           id="NOME"
+                                           onkeyup="return checkNoSpecialChar(this)"
+                                           class="form-control" required maxlength="50" />
+                                </div>
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>CODICE FISCALE</b></span>
+                                </label>
+                                <div class="col-md-3 col-form-label fs-6">
+                                    <input type="text" 
+                                           name="CODICEFISCALE"
+                                           id="CODICEFISCALE"
+                                           onkeyup="return fieldNOSPecial_1(this.id);"
+                                           class ="form-control" required maxlength="16" />
+                                </div>
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>NUMERO DI TELEFONO (SENZA +39)</b></span>
+                                </label>
+                                <div class="col-md-3 col-form-label fs-6">
+                                    <input type="text" 
+                                           name="TELEFONO"
+                                           id="TELEFONO"
+                                           class="form-control intvalue" required maxlength="12" />
+                                </div>
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>INDIRIZZO EMAIL</b></span>
+                                </label>
+                                <div class="col-md-3 col-form-label fs-6">
+                                    <input type="text" 
+                                           name="EMAIL"
+                                           id="EMAIL"
+                                           class="form-control mailvalue" required maxlength="100"/>
+                                </div>
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>NUMERO DOC.ID.</b></span>
+                                </label>
+                                <div class="col-md-3 col-form-label fs-6">
+                                    <input type="text" 
+                                           name="DOCID"
+                                           id="DOCID"
+                                           onkeyup="return checkNoSpecialChar(this)"
+                                           class="form-control" required maxlength="20"/>
+                                </div>
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>SCADENZA DOC.ID.</b></span>
+                                </label>
+                                <div class="col-md-3 col-form-label fs-6">
+                                    <input type="date" 
+                                           name="DATEDOCID"
+                                           id="DATEDOCID"
+                                           class="form-control mailvalue" required maxlength="100"/>
+                                </div>
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>TITOLO DI STUDIO</b></span>
+                                </label>
+                                <div class="col-md-3 col-form-label fs-6">
+                                    <input type="text" 
+                                           name="TITSTUDIO"
+                                           id="TITSTUDIO"
+                                           onkeyup="return checkNoSpecialChar(this)"
+                                           class="form-control" required maxlength="100"/>
+                                </div>
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>APPARTENENTE A CATEGORIE PROTETTE</b></span>
+                                </label>
+                                <div class="col-md-3 col-form-label fs-6">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch" 
+                                               id="CATPROT"
+                                               name="CATPROT"/>
+                                        <label class="form-check-label" 
+                                               for="CATPROT">SI/NO</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <!--end::Content wrapper-->
+                    <!--end::Tables Widget 3-->
                 </div>
-                <!--end::Wrapper-->
-            </div>
-            <!--end::Page-->
+            </form>
+
+            <!--end::Col-->
+            <!--begin::Col-->
+            <!--end::Col-->
         </div>
-        <!--end::Root-->
-        <!--begin::Drawers-->
-        <!--begin::Activities drawer-->
-        <!--end::Activities drawer-->
-        <!--begin::Chat drawer-->
-        <!--end::Chat drawer-->
-        <!--end::Drawers-->
-        <!--end::Main-->
-        <!--begin::Engage drawers-->
-        <!--begin::Demos drawer-->
-        <!--end::Demos drawer-->
-        <!--begin::Help drawer-->
-        <!--end::Help drawer-->
-        <!--end::Engage drawers-->
-        <!--begin::Engage toolbar-->
-        <!--end::Engage toolbar-->
-        <!--begin::Scrolltop-->
+        <!--end::Row-->
         <div id="kt_scrolltop" class="scrolltop" data-kt-scrolltop="true">
             <!--begin::Svg Icon | path: icons/duotune/arrows/arr066.svg-->
             <span class="svg-icon">
@@ -269,22 +178,20 @@
         <!--end::Scrolltop-->
         <!--begin::Javascript-->
         <script>var hostUrl = "assets/";</script>
+
         <!--begin::Global Javascript Bundle(used by all pages)-->
-        <script src="assets/plugins/global/plugins.bundle.js"></script>
-        <script src="assets/js/scripts.bundle.js"></script>
+
         <!--end::Global Javascript Bundle-->
         <!--begin::Page Vendors Javascript(used by this page)-->
-        <script src="assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
-        <script src="assets/plugins/DataTables/datatables.min.js"></script>
         <!--end::Page Vendors Javascript-->
         <!--begin::Page Custom Javascript(used by this page)-->
-        <script src="assets/js/widgets.bundle.js"></script>
-        <script src="assets/js/custom/widgets.js"></script>
-        <script src="assets/js/custom/apps/chat/chat.js"></script>
-        <script src="assets/js/custom/utilities/modals/create-app.js"></script>
-        <script src="assets/js/custom/utilities/modals/create-campaign.js"></script>
-        <script src="assets/js/custom/utilities/modals/users-search.js"></script>
+        <script src="assets/plugins/global/plugins.bundle.js"></script>
+        <script src="assets/js/scripts.bundle.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
+        <script src="assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
+        <script src="assets/js/common.js"></script>
+        <script src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
+        <script src="assets/js/US_aggiungiallievo.js"></script>
 
         <!--end::Page Custom Javascript-->
         <!--end::Javascript-->

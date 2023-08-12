@@ -193,10 +193,11 @@ public class EntityOp {
         q.setParameter("soggetto", s);
         return (List<Istanza>) q.getResultList();
     }
-    
+
     public List<Allievi> getAllieviSoggetto(SoggettoProponente s) {
         TypedQuery q = this.em.createNamedQuery("allievi.soggetto", Allievi.class);
         q.setParameter("soggetto", s);
+        q.setParameter("inattivo", Stati.INATTIVO);
         return (List<Allievi>) q.getResultList();
     }
 
@@ -293,6 +294,14 @@ public class EntityOp {
                 trackingAction("SERVICE", estraiEccezione(ex0));
             }
 
+        } else if (a1 != null) {
+            try {
+                TypedQuery q = this.em.createNamedQuery("allegati.allievi.ok", Allegati.class);
+                q.setParameter("allievi", a1);
+                elenco.addAll((List<Allegati>) q.getResultList());
+            } catch (Exception ex0) {
+                trackingAction("SERVICE", estraiEccezione(ex0));
+            }            
         }
         return elenco;
     }
@@ -355,12 +364,12 @@ public class EntityOp {
 
         return q.getResultList().isEmpty() ? new ArrayList() : (List<Istanza>) q.getResultList();
     }
-    
+
     public List<Istanza> list_istanze_user(SoggettoProponente sp, String tipologiapercorso, String statoistanza) {
         HashMap<String, Object> param = new HashMap<>();
         String sql = "SELECT i FROM Istanza i WHERE i.soggetto=:soggetto ";
         param.put("soggetto", sp);
-        
+
         if (!tipologiapercorso.equals("")) {
             sql += !sql.toUpperCase().contains("WHERE") ? "WHERE " : " AND ";
             sql += "i.tipologiapercorso.idtipopercorso = :tipologiapercorso";
@@ -370,8 +379,8 @@ public class EntityOp {
             sql += !sql.toUpperCase().contains("WHERE") ? "WHERE " : " AND ";
             sql += "i.statocorso.codicestatocorso = :statoistanza";
             param.put("statoistanza", statoistanza);
-        }        
-        sql+=" ORDER BY i.idistanza DESC";
+        }
+        sql += " ORDER BY i.idistanza DESC";
 
         TypedQuery<Istanza> q = this.em.createQuery(sql, Istanza.class);
 
