@@ -200,6 +200,13 @@ public class EntityOp {
         q.setParameter("inattivo", Stati.INATTIVO);
         return (List<Allievi>) q.getResultList();
     }
+    public boolean esisteAllievoCF(String codicefiscale) {
+        TypedQuery q = this.em.createNamedQuery("allievi.attivi.cf", Allievi.class);
+        q.setParameter("codicefiscale", codicefiscale);
+        q.setParameter("inattivo", Stati.INATTIVO);        
+        q.setMaxResults(1);
+        return !q.getResultList().isEmpty();
+    }
 
     public Tipologia_Percorso getTipoPercorsoIstanza(Istanza is) {
         try {
@@ -267,6 +274,13 @@ public class EntityOp {
         q.setParameter("corso", c1);
         q.setMaxResults(1);
         return q.getResultList().isEmpty() ? null : (IncrementalCorso) q.getSingleResult();
+    }
+    
+    public IstatCode getComuneCF(String codicecf) {
+        TypedQuery q = this.em.createNamedQuery("istat.codice", IstatCode.class);
+        q.setParameter("codicecf", codicecf);
+        q.setMaxResults(1);
+        return q.getResultList().isEmpty() ? null : (IstatCode) q.getSingleResult();
     }
 
     public List<Moduli_Docenti> list_moduli(Calendario_Formativo c1) {

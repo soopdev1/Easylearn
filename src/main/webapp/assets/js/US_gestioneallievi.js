@@ -17,16 +17,14 @@ $(document).ready(function () {
         },
         columns: [
             {data: 'stato', orderable: false},
+            {data: 'idallievo'},
             {data: 'cognome'},
             {data: 'nome'},
             {data: 'cf'},
             {data: 'data', type: "date-eu"},
-            {data: 'email'},
-            {data: 'telefono'},
             {data: 'azioni', orderable: false}
         ]
-    });
-    
+    });    
     Fancybox.bind(".fan1", {
     groupAll: false, // Group all items
     hideScrollbar: false,

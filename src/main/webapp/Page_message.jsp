@@ -81,11 +81,6 @@
                                             html = "<i class='fa fa-check-circle'></i> Operazione completata con successo. Chiudere questa finestra.";
                                             break;
                                         }
-                                        case "KO_FA": {
-                                            ty = "alert-success";
-                                            html = "<i class='fa fa-check-circle'></i> Operazione completata con successo. Chiudere questa finestra.";
-                                            break;
-                                        }
                                         case "KOUP_IS1":
                                         case "KOUP_IS2": {
                                             ty = "alert-danger";
@@ -114,6 +109,20 @@
                                         case "KORI_IS2": {
                                             ty = "alert-danger";
                                             html = "<i class='fa fa-exclamation-triangle'></i> ERRORE! Impossibile rigettare l'istanza. Istanza non trovata, riprovare."
+                                                    + " <hr>"
+                                                    + "<button class='btn btn-danger' onclick='history.back()'><i class='fa fa-backward'></i> Torna Indietro</button>";
+                                            break;
+                                        }
+                                        case "KO_NAL1": {
+                                            ty = "alert-danger";
+                                            html = "<i class='fa fa-exclamation-triangle'></i> ERRORE! Impossibile inserire nuovo allievo. Riprovare."
+                                                    + " <hr>"
+                                                    + "<button class='btn btn-danger' onclick='history.back()'><i class='fa fa-backward'></i> Torna Indietro</button>";
+                                            break;
+                                        }
+                                        case "KO_NAL2": {
+                                            ty = "alert-danger";
+                                            html = "<i class='fa fa-exclamation-triangle'></i> ERRORE! Impossibile inserire nuovo allievo. COdice fiscale già presente in anagrafica allievi."
                                                     + " <hr>"
                                                     + "<button class='btn btn-danger' onclick='history.back()'><i class='fa fa-backward'></i> Torna Indietro</button>";
                                             break;

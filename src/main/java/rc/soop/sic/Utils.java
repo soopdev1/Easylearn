@@ -22,6 +22,7 @@ import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.Normalizer;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Enumeration;
 import java.util.List;
@@ -408,9 +409,8 @@ public class Utils {
             return "";
         }
     }
-    
-    
-    public static boolean isAdmin(HttpSession session){
+
+    public static boolean isAdmin(HttpSession session) {
         try {
             return session.getAttribute("us_rolecod").toString().equals("1");
         } catch (Exception ex) {
@@ -418,10 +418,99 @@ public class Utils {
         }
         return false;
     }
-    
-    
-    public static void ricavaDatidaCF(Allievi al1){
-        
+
+    //CODICE FISCALE
+    private static String validateCF_regular(String cf) {
+        if (!cf.matches("^[0-9A-Z]{16}$")) {
+            return "CARATTERI NON VALIDI";
+        }
+        int s = 0;
+        String even_map = "BAFHJNPRTVCESULDGIMOQKWZYX";
+        for (int i = 0; i < 15; i++) {
+            int c = cf.charAt(i);
+            int n;
+            if ('0' <= c && c <= '9') {
+                n = c - '0';
+            } else {
+                n = c - 'A';
+            }
+            if ((i & 1) == 0) {
+                n = even_map.charAt(n) - 'A';
+            }
+            s += n;
+        }
+        if (s % 26 + 'A' != cf.charAt(15)) {
+            return "CARATTERE DI CONTROLLO NON VALIDO.";
+        }
+        return null;
+    }
+
+    public static String validateCF(String cf) {
+        try {
+            cf = cf.replaceAll("[ \t\r\n]", "");
+            cf = cf.toUpperCase();
+            switch (cf.length()) {
+                case 16:
+                    return validateCF_regular(cf);
+                default:
+                    return "LUNGHEZZA ERRATA.";
+            }
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
+    private static String ricavaMese(String letter) {
+
+        List<String[]> mesi = new ArrayList<>();
+        mesi.add(new String[]{"A", "01"});
+        mesi.add(new String[]{"B", "02"});
+        mesi.add(new String[]{"C", "03"});
+        mesi.add(new String[]{"D", "04"});
+        mesi.add(new String[]{"E", "05"});
+        mesi.add(new String[]{"H", "06"});
+        mesi.add(new String[]{"L", "07"});
+        mesi.add(new String[]{"M", "08"});
+        mesi.add(new String[]{"P", "09"});
+        mesi.add(new String[]{"R", "10"});
+        mesi.add(new String[]{"S", "11"});
+        mesi.add(new String[]{"T", "12"});
+
+        for (String[] m : mesi) {
+            if (m[0].equals(letter.trim())) {
+                return m[1];
+            }
+        }
+        return null;
+    }
+
+    public static void ricavaDatidaCF(Allievi al1) {
+        String val = validateCF(al1.getCodicefiscale());
+        if (val == null) {
+            String anno = StringUtils.substring(al1.getCodicefiscale(), 6, 8);
+            String comune = StringUtils.substring(al1.getCodicefiscale(), 11, 15);
+
+            if (parseIntR(anno) < 10) {
+                anno = "20" + anno;
+            } else {
+                anno = "19" + anno;
+            }
+            String mese = StringUtils.substring(al1.getCodicefiscale(), 8, 9);
+            String giorno = StringUtils.substring(al1.getCodicefiscale(), 9, 11);
+            String sesso;
+            if (parseIntR(giorno) < 32) {
+                sesso = "M";
+            } else {
+                sesso = "F";
+                giorno = String.valueOf(parseIntR(giorno) - 40);
+            }
+            DateTime nascita = new DateTime(parseIntR(anno), parseIntR(ricavaMese(mese)), parseIntR(giorno), 0, 0);            
+            al1.setDatanascita(nascita.toDate());
+            al1.setLuogonascita(new EntityOp().getComuneCF(comune).getNome());
+            al1.setSesso(sesso);            
+        } else {
+            System.out.println("ERRORE) " + val);
+        }
     }
 
 }

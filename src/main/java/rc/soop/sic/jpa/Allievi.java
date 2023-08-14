@@ -31,6 +31,7 @@ import static rc.soop.sic.jpa.Stati.ABILITATO;
  */
 @NamedQueries(value = {
     @NamedQuery(name = "allievi.soggetto", query = "SELECT i FROM Allievi i WHERE i.soggetto=:soggetto AND i.statoallievo<>:inattivo ORDER BY i.cognome ASC"),
+    @NamedQuery(name = "allievi.attivi.cf", query = "SELECT i FROM Allievi i WHERE i.codicefiscale=:codicefiscale AND i.statoallievo<>:inattivo")
 })
 @Entity
 @Table(name = "allievi")
@@ -56,30 +57,48 @@ public class Allievi implements Serializable {
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "idsoggetto")
     private SoggettoProponente soggetto;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(name = "statoallievo")
     private Stati statoallievo;
 
     @Column(name = "email")
     private String email;
-    
+
     @Column(name = "telefono")
     private String telefono;
 
     @Column(name = "numdocid")
     private String numdocid;
-    
+
     @Column(name = "datadocid")
     @Temporal(TemporalType.DATE)
     private Date datadocid;
     
+    @Column(name = "datainserimento")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date datainserimento;
+
     @Column(name = "titolostudio")
     private String titolostudio;
-    
+
+    @Column(name = "luogonascita")
+    private String luogonascita;
+
     @Column(name = "catprot", nullable = false, columnDefinition = "TINYINT(1)")
     private boolean catprot;
 
+    @Column(name = "sesso")
+    private String sesso;
+
+    public String getSesso() {
+        return sesso;
+    }
+
+    public void setSesso(String sesso) {
+        this.sesso = sesso;
+    }
+    
     public String getNumdocid() {
         return numdocid;
     }
@@ -88,6 +107,14 @@ public class Allievi implements Serializable {
         this.numdocid = numdocid;
     }
 
+    public Date getDatainserimento() {
+        return datainserimento;
+    }
+
+    public void setDatainserimento(Date datainserimento) {
+        this.datainserimento = datainserimento;
+    }
+    
     public Date getDatadocid() {
         return datadocid;
     }
@@ -143,11 +170,18 @@ public class Allievi implements Serializable {
         this.etichettastato = etichettastato;
     }
 
-
     public String getCognome() {
         return cognome;
     }
 
+    public String getLuogonascita() {
+        return luogonascita;
+    }
+
+    public void setLuogonascita(String luogonascita) {
+        this.luogonascita = luogonascita;
+    }
+    
     public void setCognome(String cognome) {
         this.cognome = cognome;
     }
@@ -215,8 +249,5 @@ public class Allievi implements Serializable {
     public void setDatanascita(Date datanascita) {
         this.datanascita = datanascita;
     }
-    
-    
 
-    
 }

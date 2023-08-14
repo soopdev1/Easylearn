@@ -389,17 +389,10 @@ public class Search extends HttpServlet {
             jMembers.addProperty(SCOLUMS, "");
             AtomicInteger at = new AtomicInteger(1);
             result.forEach(res -> {
-
-//                String pdf
-//                        = "<a href='javascript:void(0)' onclick='return $(\"#frm\").submit();' class='btn btn-sm btn-outline-primary m-btn m-btn--icon m-btn--icon-only m-btn--custom m-btn--pill m-btn--air' "
-//                        + "data-toggle='popover' data-placement='right' title='Visualizza File' data-content='Visualizza file documento.'><i class='far fa-file-pdf'></i></a>"
-//                        + "<form id='frm_' target='_blank' method='POST' action='Operations'>"
-//                        + "<input type='hidden' name='type' value='showPDF'/>"
-//                        + "<input type='hidden' name='ido' value='' />"
-//                        + "</form>";
                 JsonObject data_value = new JsonObject();
                 data_value.addProperty(RECORDID, at.get());
                 data_value.addProperty("stato", res.getEtichettastato());
+                data_value.addProperty("idallievo", res.getIdallievi());
                 data_value.addProperty("cognome", res.getCognome());
                 data_value.addProperty("nome", res.getNome());
                 data_value.addProperty("cf", res.getCodicefiscale());
@@ -408,7 +401,11 @@ public class Search extends HttpServlet {
                 data_value.addProperty("telefono", res.getTelefono());
 
                 String azioni
-                        = "<a href=\"US_allegatiallievi.jsp?idallievo=" + Utils.enc_string(String.valueOf(res.getIdallievi())) + "\" data-fancybox data-type='iframe' "
+                        = "<a href=\"US_showallievo.jsp?idallievo=" + Utils.enc_string(String.valueOf(res.getIdallievi())) + "\" data-fancybox data-type='iframe' "
+                        + "data-bs-toggle=\"tooltip\" title=\"DETTAGLI\" "
+                        + "data-preload='false' class=\"btn btn-sm btn-bg-light btn-primary fan1\">"
+                        + "<i class=\"fa fa-user\"></i></a> | "
+                        + "<a href=\"US_allegatiallievi.jsp?idallievo=" + Utils.enc_string(String.valueOf(res.getIdallievi())) + "\" data-fancybox data-type='iframe' "
                         + "data-bs-toggle=\"tooltip\" title=\"GESTIONE ALLEGATI\" "
                         + "data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary fan1\">"
                         + "<i class=\"fa fa-file-clipboard\"></i></a>";

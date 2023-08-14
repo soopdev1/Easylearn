@@ -189,6 +189,8 @@
         <script src="assets/js/scripts.bundle.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
         <script src="assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
+        <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
+        <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
         <script src="assets/js/common.js"></script>
         <script src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
         <script src="assets/js/US_aggiungiallievo.js"></script>

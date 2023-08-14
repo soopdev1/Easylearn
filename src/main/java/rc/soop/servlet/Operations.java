@@ -89,27 +89,51 @@ public class Operations extends HttpServlet {
 
     protected void ADDALLIEVO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        String COGNOME = normalizeUTF8(getRequestValue(request, "COGNOME"));
-        String NOME = normalizeUTF8(getRequestValue(request, "NOME"));
-        String CODICEFISCALE = normalizeUTF8(getRequestValue(request, "CODICEFISCALE"));
-        String TELEFONO = normalizeUTF8(getRequestValue(request, "TELEFONO"));
-        String EMAIL = normalizeUTF8(getRequestValue(request, "EMAIL"));
-        String DOCID = normalizeUTF8(getRequestValue(request, "DOCID"));
-
-        Allievi al1 = new Allievi();
-        al1.setCognome(COGNOME);
-        al1.setNome(NOME);
-        al1.setCodicefiscale(CODICEFISCALE);
-        al1.setTelefono(TELEFONO);
-        al1.setEmail(EMAIL);
-        al1.setNumdocid(DOCID);
         try {
+            SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
+
+            String COGNOME = normalizeUTF8(getRequestValue(request, "COGNOME"));
+            String NOME = normalizeUTF8(getRequestValue(request, "NOME"));
+            String CODICEFISCALE = normalizeUTF8(getRequestValue(request, "CODICEFISCALE"));
+            String TELEFONO = StringUtils.replace(getRequestValue(request, "TELEFONO"), "_", "");
+            String EMAIL = normalizeUTF8(getRequestValue(request, "EMAIL"));
+            String DOCID = normalizeUTF8(getRequestValue(request, "DOCID"));
+            String TITSTUDIO = normalizeUTF8(getRequestValue(request, "TITSTUDIO"));
+            boolean CATPROT = getRequestValue(request, "CATPROT").equals("on");
+
+            Allievi al1 = new Allievi();
+            al1.setCognome(COGNOME);
+            al1.setNome(NOME);
+            al1.setCodicefiscale(CODICEFISCALE);
+            al1.setTelefono(TELEFONO);
+            al1.setEmail(EMAIL);
+            al1.setNumdocid(DOCID);
             al1.setDatadocid(sdf_PATTERNDATE6.parse(getRequestValue(request, "DATEDOCID")));
+            al1.setSoggetto(so);
+            al1.setTitolostudio(TITSTUDIO);
+            al1.setCatprot(CATPROT);
+            al1.setStatoallievo(Stati.CHECK);
+            al1.setDatainserimento(new DateTime().toDate());
+
+            Utils.ricavaDatidaCF(al1);
+
+            EntityOp ep1 = new EntityOp();
+
+            if (ep1.esisteAllievoCF(CODICEFISCALE)) {
+                redirect(request, response, "Page_message.jsp?esito=KO_NAL2");
+            } else {
+                ep1.begin();
+                ep1.persist(al1);
+                ep1.commit();
+                ep1.close();
+                redirect(request, response, "Page_message.jsp?esito=OK_UPAL");
+            }
+
         } catch (Exception ex1) {
-            al1.setDatadocid(null);
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_NAL1");
+
         }
-        
-        
 
     }
 
