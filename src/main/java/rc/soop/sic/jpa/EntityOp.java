@@ -200,10 +200,24 @@ public class EntityOp {
         q.setParameter("inattivo", Stati.INATTIVO);
         return (List<Allievi>) q.getResultList();
     }
+    
+    public List<EnteStage> getEntiStageSoggetto(SoggettoProponente s) {
+        TypedQuery q = this.em.createNamedQuery("entestage.soggetto", EnteStage.class);
+        q.setParameter("soggetto", s);
+        return (List<EnteStage>) q.getResultList();
+    }
+    
     public boolean esisteAllievoCF(String codicefiscale) {
         TypedQuery q = this.em.createNamedQuery("allievi.attivi.cf", Allievi.class);
         q.setParameter("codicefiscale", codicefiscale);
         q.setParameter("inattivo", Stati.INATTIVO);        
+        q.setMaxResults(1);
+        return !q.getResultList().isEmpty();
+    }
+    public boolean esisteEnteStageSoggetto(SoggettoProponente s,String partitaiva) {
+        TypedQuery q = this.em.createNamedQuery("entestage.soggetto", EnteStage.class);
+        q.setParameter("soggetto", s);
+        q.setParameter("partitaiva", partitaiva);
         q.setMaxResults(1);
         return !q.getResultList().isEmpty();
     }

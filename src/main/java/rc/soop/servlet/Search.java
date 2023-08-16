@@ -19,8 +19,10 @@ import static rc.soop.sic.Utils.getRequestValue;
 import static rc.soop.sic.Utils.isAdmin;
 import static rc.soop.sic.Utils.redirect;
 import rc.soop.sic.jpa.Allievi;
+import rc.soop.sic.jpa.Altropersonale;
 import rc.soop.sic.jpa.Corso;
 import rc.soop.sic.jpa.Docente;
+import rc.soop.sic.jpa.EnteStage;
 import rc.soop.sic.jpa.EntityOp;
 import rc.soop.sic.jpa.Istanza;
 import rc.soop.sic.jpa.Sede;
@@ -319,6 +321,49 @@ public class Search extends HttpServlet {
 
     }
 
+    protected void list_altropersonale(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try (PrintWriter out = response.getWriter()) {
+            JsonObject jMembers = new JsonObject();
+            JsonArray data = new JsonArray();
+
+            List<Altropersonale> result = new EntityOp().findAll(Altropersonale.class);
+
+            jMembers.addProperty(ITOTALRECORDS, result.size());
+            jMembers.addProperty(ITOTALDISPLAY, result.size());
+            jMembers.addProperty(SECHO, 0);
+            jMembers.addProperty(SCOLUMS, "");
+            AtomicInteger at = new AtomicInteger(1);
+            result.forEach(res -> {
+//                String pdf
+//                        = "<a href='javascript:void(0)' onclick='return $(\"#frm\").submit();' class='btn btn-sm btn-outline-primary m-btn m-btn--icon m-btn--icon-only m-btn--custom m-btn--pill m-btn--air' "
+//                        + "data-toggle='popover' data-placement='right' title='Visualizza File' data-content='Visualizza file documento.'><i class='far fa-file-pdf'></i></a>"
+//                        + "<form id='frm_' target='_blank' method='POST' action='Operations'>"
+//                        + "<input type='hidden' name='type' value='showPDF'/>"
+//                        + "<input type='hidden' name='ido' value='' />"
+//                        + "</form>";
+//
+//                String edit = "";
+                JsonObject data_value = new JsonObject();
+                data_value.addProperty(RECORDID, at.get());
+                data_value.addProperty("ruolo", res.getTipologia());
+//                data_value.addProperty("stato", res.getEtichettastato());
+                data_value.addProperty("cognome", res.getCognome());
+                data_value.addProperty("nome", res.getNome());
+                data_value.addProperty("cf", res.getCodicefiscale());
+                data_value.addProperty("titolo", res.getTitolostudio());
+                data_value.addProperty("profiloprof", res.getProfiloprof());
+//                data_value.addProperty("azioni", "<i class='fa fa-hourglass'></i>");
+                data.add(data_value);
+                at.addAndGet(1);
+            });
+            jMembers.add(AADATA, data);
+            response.setContentType(APPJSON);
+            response.setHeader(CONTENTTYPE, APPJSON);
+            out.print(jMembers.toString());
+        }
+    }
+
     protected void list_docenti(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try (PrintWriter out = response.getWriter()) {
@@ -360,6 +405,71 @@ public class Search extends HttpServlet {
             response.setHeader(CONTENTTYPE, APPJSON);
             out.print(jMembers.toString());
         }
+    }
+
+    protected void list_enti(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        List<EnteStage> result;
+        try {
+
+            if (isAdmin(request.getSession())) {
+                result = new EntityOp().findAll(Allievi.class);
+            } else {
+                SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
+                result = new EntityOp().getEntiStageSoggetto(so);
+            }
+
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+            result = new ArrayList<>();
+        }
+
+        try (PrintWriter out = response.getWriter()) {
+            JsonObject jMembers = new JsonObject();
+            JsonArray data = new JsonArray();
+            jMembers.addProperty(ITOTALRECORDS, result.size());
+            jMembers.addProperty(ITOTALDISPLAY, result.size());
+            jMembers.addProperty(SECHO, 0);
+            jMembers.addProperty(SCOLUMS, "");
+            AtomicInteger at = new AtomicInteger(1);
+            result.forEach(res -> {
+                JsonObject data_value = new JsonObject();
+                data_value.addProperty(RECORDID, at.get());
+                data_value.addProperty("stato", res.getEtichettastato());
+                data_value.addProperty("idallievo", res.getIdentestage());
+                data_value.addProperty("cognome", res.getRAGIONESOCIALE());
+                data_value.addProperty("nome", res.getRAGIONESOCIALE());
+                data_value.addProperty("cf", res.getRAGIONESOCIALE());
+                data_value.addProperty("data", "");
+                data_value.addProperty("email", res.getEMAIL());
+                data_value.addProperty("telefono", res.getTELEFONO());
+
+                String azioni
+                        = "<a href=\"US_showente.jsp?idente=" + Utils.enc_string(String.valueOf(res.getIdentestage())) + "\" data-fancybox data-type='iframe' "
+                        + "data-bs-toggle=\"tooltip\" title=\"DETTAGLI\" "
+                        + "data-preload='false' class=\"btn btn-sm btn-bg-light btn-primary fan1\">"
+                        + "<i class=\"fa fa-user\"></i></a> | "
+                        + "<a href=\"US_allegatiente.jsp?idallievo=" + Utils.enc_string(String.valueOf(res.getIdentestage())) + "\" data-fancybox data-type='iframe' "
+                        + "data-bs-toggle=\"tooltip\" title=\"GESTIONE ALLEGATI\" "
+                        + "data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary fan1\">"
+                        + "<i class=\"fa fa-file-clipboard\"></i></a>"
+                        + " | <button type=\"button\"class=\"btn btn-sm btn-bg-light btn-danger\""
+                        + " data-bs-toggle=\"tooltip\" title=\"DISABILITA ENTE\""
+                        + " data-preload='false'"
+                        + " onclick=\"return disabilitaente('" + res.getIdentestage() + "','" + res.getPARTITAIVA()+ "')\"><i class=\"fa fa-remove\"></i>"
+                        + " </button>";
+
+                data_value.addProperty("azioni", azioni);
+                data.add(data_value);
+
+                at.addAndGet(1);
+            });
+            jMembers.add(AADATA, data);
+            response.setContentType(APPJSON);
+            response.setHeader(CONTENTTYPE, APPJSON);
+            out.print(jMembers.toString());
+        }
+
     }
 
     protected void list_allievi(HttpServletRequest request, HttpServletResponse response)
@@ -490,8 +600,14 @@ public class Search extends HttpServlet {
                 case "list_docenti":
                     list_docenti(request, response);
                     break;
+                case "list_altropersonale":
+                    list_altropersonale(request, response);
+                    break;
                 case "list_allievi":
                     list_allievi(request, response);
+                    break;
+                case "list_enti":
+                    list_enti(request, response);
                     break;
                 case "list_sedi_soggetto":
                     list_sedi_soggetto(request, response);

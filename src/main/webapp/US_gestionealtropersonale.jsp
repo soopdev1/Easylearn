@@ -24,7 +24,7 @@
     %>
     <!--begin::Head-->
     <head><base href="">
-        <title><%=Constant.NAMEAPP%>: Elenco Altro Personale</title>
+        <title><%=Constant.NAMEAPP%>: Elenco Docenti</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->
@@ -74,7 +74,7 @@
                                             <!--begin::Header-->
                                             <div class="card-header border-0 pt-5">
                                                 <h3 class="card-title align-items-start flex-column">
-                                                    <span class="card-label fw-bolder fs-3 mb-1">ELENCO ALTRO PERSONALE COINVOLTO PER LA FORMAZIONE</span>
+                                                    <span class="card-label fw-bolder fs-3 mb-1">ELENCO DOCENTI COINVOLTI PER LA FORMAZIONE</span>
                                                 </h3>
                                             </div>
                                             <!--end::Header-->
@@ -83,7 +83,7 @@
                                                 <!--begin::Table container-->
                                                 <div class="table-responsive ">
                                                     <!--begin::Table-->
-                                                    <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt1">
+                                                    <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt2">
                                                         <!--begin::Table head-->
                                                         <thead>
                                                             <tr>

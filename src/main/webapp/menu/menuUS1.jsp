@@ -27,6 +27,7 @@
     String m_4s = "";
     String m_4 = "";
     String m_4A = "";
+    String m_4B = "";
 
     String m_5s = "";
     String m_5 = "";
@@ -81,6 +82,12 @@
             m_4s = "show";
             m_4 = "menu-active-bg";
             m_4A = "active";
+            break;
+        }
+        case "US_gestionealtropersonale.jsp": {
+            m_4s = "show";
+            m_4 = "menu-active-bg";
+            m_4B = "active";
             break;
         }
         case "US_gestioneallievi.jsp": {
@@ -248,7 +255,7 @@
                             </span>
                             <!--end::Svg Icon-->
                         </span>
-                        <span class="menu-title">DOCENTI</span>
+                        <span class="menu-title">PERSONALE</span>
                     </span>
                     <div class="menu-sub menu-sub-accordion <%=m_4%>">                        
                         <div class="menu-item">
@@ -256,7 +263,17 @@
                                 <span class="menu-bullet">
                                     <span class="bullet bullet-dot"></span>
                                 </span>
-                                <span class="menu-title">Gestione Docenti</span>
+                                <span class="menu-title">Gestione Docenti/Tutor</span>
+                            </a>
+                        </div>                          
+                    </div>
+                    <div class="menu-sub menu-sub-accordion <%=m_4%>">                        
+                        <div class="menu-item">
+                            <a class="menu-link <%=m_4B%>" href="US_gestionealtropersonale.jsp">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title">Gestione Altro Personale</span>
                             </a>
                         </div>                          
                     </div>
@@ -277,16 +294,6 @@
                         <span class="menu-title">ALLIEVI</span>
                     </span>
                     <div class="menu-sub menu-sub-accordion <%=m_5%>">  
-                        <!--
-                        <div class="menu-item">
-                            <a class="menu-link <%=m_5A%>" href="US_nuovocorso.jsp">
-                                <span class="menu-bullet">
-                                    <span class="bullet bullet-dot"></span>
-                                </span>
-                                <span class="menu-title">Aggiungi Nuovo Allievo</span>
-                            </a>
-                        </div>
-                        -->
                         <div class="menu-item">
                             <a class="menu-link <%=m_5B%>" href="US_gestioneallievi.jsp">
                                 <span class="menu-bullet">
@@ -346,6 +353,7 @@
                         </div>                          
                     </div>
                 </div>
+                <%}%>
                 <div data-kt-menu-trigger="click" class="menu-item here <%=m_8s%> menu-accordion">
                     <span class="menu-link">
                         <span class="menu-icon">
@@ -398,7 +406,7 @@
                     </span>
                     <div class="menu-sub menu-sub-accordion <%=m_8%>">                        
                         <div class="menu-item">
-                            <a class="menu-link <%=m_8A%>" href="US_gestionesedi.jsp">
+                            <a class="menu-link <%=m_8A%>" href="US_entistage.jsp">
                                 <span class="menu-bullet">
                                     <span class="bullet bullet-dot"></span>
                                 </span>
@@ -407,7 +415,6 @@
                         </div>                          
                     </div>
                 </div>
-                <%}%>
             </div>
         </div>
     </div>

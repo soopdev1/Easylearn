@@ -35,8 +35,8 @@ public class Sede implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "idsede")
     Long idsede;
-        @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-@JoinColumn(name = "sedetipo", referencedColumnName = "idtiposede")
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinColumn(name = "sedetipo", referencedColumnName = "idtiposede")
     TipoSede tipo;
     @Column(name = "indirizzo")
     private String indirizzo;
@@ -50,6 +50,10 @@ public class Sede implements Serializable {
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "idsoggetto")
     SoggettoProponente soggetto;
+
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinColumn(name = "identestage")
+    EnteStage entestage;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "statosede")
@@ -145,6 +149,14 @@ public class Sede implements Serializable {
 
     public void setProvincia(String provincia) {
         this.provincia = provincia;
+    }
+
+    public EnteStage getEntestage() {
+        return entestage;
+    }
+
+    public void setEntestage(EnteStage entestage) {
+        this.entestage = entestage;
     }
 
 }

@@ -23,7 +23,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-import static rc.soop.sic.jpa.Stati.ABILITATO;
+import rc.soop.sic.Utils;
 
 /**
  *
@@ -74,7 +74,7 @@ public class Allievi implements Serializable {
     @Column(name = "datadocid")
     @Temporal(TemporalType.DATE)
     private Date datadocid;
-    
+
     @Column(name = "datainserimento")
     @Temporal(TemporalType.TIMESTAMP)
     private Date datainserimento;
@@ -98,7 +98,7 @@ public class Allievi implements Serializable {
     public void setSesso(String sesso) {
         this.sesso = sesso;
     }
-    
+
     public String getNumdocid() {
         return numdocid;
     }
@@ -114,7 +114,7 @@ public class Allievi implements Serializable {
     public void setDatainserimento(Date datainserimento) {
         this.datainserimento = datainserimento;
     }
-    
+
     public Date getDatadocid() {
         return datadocid;
     }
@@ -143,27 +143,8 @@ public class Allievi implements Serializable {
     private String etichettastato;
 
     public String getEtichettastato() {
-        switch (this.statoallievo) {
-            case ATTIVO:
-                this.etichettastato = "<i class='fa fa-check'></i> Attivo";
-                break;
-            case ABILITATO:
-                this.etichettastato = "<i class='fa fa-check'></i> Abilitato";
-                break;
-            case DISABILITATO:
-                this.etichettastato = "<i class='fa fa-lock'></i> Disabilitato";
-                break;
-            case RITIRATO:
-                this.etichettastato = "<i class='fa fa-remove'></i> Ritirato";
-                break;
-            case CHECK:
-                this.etichettastato = "<i class='fa fa-warning'></i> In attesa";
-                break;
-            default:
-                this.etichettastato = "";
-                break;
-        }
-        return etichettastato;
+        this.etichettastato = Utils.getEtichettastato(this.statoallievo);
+        return this.etichettastato;
     }
 
     public void setEtichettastato(String etichettastato) {
@@ -181,7 +162,7 @@ public class Allievi implements Serializable {
     public void setLuogonascita(String luogonascita) {
         this.luogonascita = luogonascita;
     }
-    
+
     public void setCognome(String cognome) {
         this.cognome = cognome;
     }

@@ -30,6 +30,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import rc.soop.sic.Utils;
 import static rc.soop.sic.Utils.parseIntR;
 import rc.soop.sic.jpa.Abilita;
+import rc.soop.sic.jpa.Altropersonale;
 import rc.soop.sic.jpa.Categoria_Repertorio;
 import rc.soop.sic.jpa.Certificazione;
 import rc.soop.sic.jpa.Competenze;
@@ -642,7 +643,17 @@ public class ReadExcel {
                     }
 
                     if (do1.getTipologia().contains("EROGAZIONE")) {
-                        e.persist(do1);
+//                        e.persist(do1);
+                    } else {
+                        
+                        Altropersonale ap1 = new Altropersonale();
+                        ap1.setNome(do1.getNome());
+                        ap1.setCodicefiscale(do1.getCodicefiscale());
+                        ap1.setCognome(do1.getCognome());
+                        ap1.setProfiloprof(do1.getProfiloprof());
+                        ap1.setTipologia(do1.getTipologia());
+                        ap1.setTitolostudio(do1.getTitolostudio());
+                        e.persist(ap1);
                     }
 
 //

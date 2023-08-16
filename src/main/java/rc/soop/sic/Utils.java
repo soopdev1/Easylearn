@@ -52,6 +52,12 @@ import static rc.soop.sic.Constant.PATTERNDATE2;
 import static rc.soop.sic.Constant.PATTERNDATE3;
 import rc.soop.sic.jpa.Allievi;
 import rc.soop.sic.jpa.EntityOp;
+import rc.soop.sic.jpa.Stati;
+import static rc.soop.sic.jpa.Stati.ABILITATO;
+import static rc.soop.sic.jpa.Stati.ATTIVO;
+import static rc.soop.sic.jpa.Stati.CHECK;
+import static rc.soop.sic.jpa.Stati.DISABILITATO;
+import static rc.soop.sic.jpa.Stati.RITIRATO;
 import rc.soop.sic.jpa.User;
 
 /**
@@ -510,6 +516,24 @@ public class Utils {
             al1.setSesso(sesso);            
         } else {
             System.out.println("ERRORE) " + val);
+        }
+    }
+    
+    
+    public static String getEtichettastato(Stati stato) {
+        switch (stato) {
+            case ATTIVO:
+                return "<i class='fa fa-check'></i> Attivo";
+            case ABILITATO:
+                return "<i class='fa fa-check'></i> Abilitato";
+            case DISABILITATO:
+                return "<i class='fa fa-lock'></i> Disabilitato";
+            case RITIRATO:
+                return "<i class='fa fa-remove'></i> Ritirato";
+            case CHECK:
+                return "<i class='fa fa-warning'></i> In attesa";
+            default:
+                return "";
         }
     }
 
