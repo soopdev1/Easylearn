@@ -1,32 +1,20 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
- */
-
 $(document).ready(function () {
     Inputmask({
-        mask: "999999999999",
+        mask: "99999999999",
         digits: 1,
         numericInput: true
     }).mask(".intvalue");
-    Inputmask("email").mask(".mailvalue");
+    Inputmask({
+        mask: "99999",
+        digits: 1,
+        numericInput: true
+    }).mask(".capvalue");
 });
 
 function controllasalvataggio() {
-
-    var CODICEFISCALE = $('#CODICEFISCALE').val();
-    var EMAIL = $('#EMAIL').val();
-
-    var ch1 = controllaCF(CODICEFISCALE);
-    var ch2 = controllaEmail(EMAIL);
-
-    var msg = "";
-    if (!ch1) {
-        msg = "CODICE FISCALE ERRATO, CONTROLLARE.";
-    } else if (!ch2) {
-        msg = "EMAIL ERRATA, CONTROLLARE.";
-    }
-    if (msg === "") {
+    var PIVA = $('#PIVA').val().trim();
+    var msg = controllaPartitaIVA(PIVA);
+    if (msg === "OK") {
         return true;
     } else {
         $.alert({
@@ -43,48 +31,56 @@ function controllasalvataggio() {
         });
         return false;
     }
-
 }
 
-
-
-function controllaCF(cf) {
-    var validi, i, s, set1, set2, setpari, setdisp;
-    if (cf === '') {
-        return false;
-    }
-    cf = cf.toUpperCase();
-    if (cf.length !== 16) {
-        return false;
-    }
-    validi = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    for (i = 0; i < 16; i++) {
-        if (validi.indexOf(cf.charAt(i)) === -1)
-            return false;
-    }
-    set1 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    set2 = "ABCDEFGHIJABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    setpari = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    setdisp = "BAKPLCQDREVOSFTGUHMINJWZYX";
-    s = 0;
-    for (i = 1; i <= 13; i += 2) {
-        s += setpari.indexOf(set2.charAt(set1.indexOf(cf.charAt(i))));
-    }
-    for (i = 0; i <= 14; i += 2) {
-        s += setdisp.indexOf(set2.charAt(set1.indexOf(cf.charAt(i))));
-    }
-    if (s % 26 !== cf.charCodeAt(15) - 'A'.charCodeAt(0)) {
-        return false;
-    }
-    return true;
-}
-
-function controllaEmail(email) {
-    if (email !== "") {
-        var emailFilter = /^([a-zA-Z0-9_.-])+@(([a-zA-Z0-9-])+.)+([a-zA-Z0-9]{2,4})+$/;
-        if (!emailFilter.test(email)) {
-            return false;
+function controllaPartitaIVA_OLD(pi) {
+    if (pi === '') {
+        return "IL CAMPO PARTITA IVA E' OBBLIGATORIO";
+    } else if (!/^[0-9]{11}$/.test(pi)) {
+        return 'IL CAMPO PARTITA IVA DEVE CONTENERE 11 NUMERI';
+    } else {
+        var s = 0;
+        for (var i = 0; i <= 9; i += 2) {
+            s += pi.charCodeAt(i) - '0'.charCodeAt(0);
         }
+        for (var i = 1; i <= 9; i += 2) {
+            var c = 2 * (pi.charCodeAt(i) - '0'.charCodeAt(0));
+            if (c > 9) {
+                c = c - 9;
+            }
+            s += c;
+        }
+        var controllo = (10 - s % 10) % 10;
+        if (controllo !== pi.charCodeAt(10) - '0'.charCodeAt(0)) {
+            return 'OK';
+        }
+        return "LA PARTITA IVA INSERITA NON E' FORMALMENTE CORRETTA. RIPROVARE.";
     }
-    return true;
+}
+
+function controllaPartitaIVA(pi)
+{
+    pi = pi.replace(/\s/g, "");
+    if (pi.length === 0) {
+        return "IL CAMPO PARTITA IVA E' OBBLIGATORIO";
+    } else if (pi.length !== 11) {
+        return 'IL CAMPO PARTITA IVA DEVE CONTENERE 11 NUMERI';
+    }
+    if (!/^[0-9]{11}$/.test(pi)) {
+        return 'IL CAMPO PARTITA IVA DEVE CONTENERE 11 NUMERI';
+    }
+    var s = 0;
+    for (var i = 0; i < 11; i++) {
+        var n = pi.charCodeAt(i) - "0".charCodeAt(0);
+        if ((i & 1) === 1) {
+            n *= 2;
+            if (n > 9)
+                n -= 9;
+        }
+        s += n;
+    }
+    if (s % 10 !== 0) {
+        return "LA PARTITA IVA INSERITA NON E' FORMALMENTE CORRETTA. RIPROVARE.";
+    }
+    return "OK";
 }

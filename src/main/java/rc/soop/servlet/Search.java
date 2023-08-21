@@ -411,18 +411,17 @@ public class Search extends HttpServlet {
             throws ServletException, IOException {
         List<EnteStage> result;
         try {
-
             if (isAdmin(request.getSession())) {
                 result = new EntityOp().findAll(Allievi.class);
             } else {
                 SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
                 result = new EntityOp().getEntiStageSoggetto(so);
             }
-
         } catch (Exception ex) {
             Constant.LOGGER.severe(estraiEccezione(ex));
             result = new ArrayList<>();
         }
+        System.out.println("rc.soop.servlet.Search.list_enti() " + result.size());
 
         try (PrintWriter out = response.getWriter()) {
             JsonObject jMembers = new JsonObject();
@@ -435,15 +434,15 @@ public class Search extends HttpServlet {
             result.forEach(res -> {
                 JsonObject data_value = new JsonObject();
                 data_value.addProperty(RECORDID, at.get());
-                data_value.addProperty("stato", res.getEtichettastato());
-                data_value.addProperty("idallievo", res.getIdentestage());
-                data_value.addProperty("cognome", res.getRAGIONESOCIALE());
-                data_value.addProperty("nome", res.getRAGIONESOCIALE());
-                data_value.addProperty("cf", res.getRAGIONESOCIALE());
-                data_value.addProperty("data", "");
-                data_value.addProperty("email", res.getEMAIL());
-                data_value.addProperty("telefono", res.getTELEFONO());
-
+                data_value.addProperty("idente", res.getIdentestage());
+                data_value.addProperty("ragionesociale", res.getRAGIONESOCIALE());
+                data_value.addProperty("piva", res.getPARTITAIVA());
+                data_value.addProperty("rapleg", res.getRap_cognome() + " " + res.getRap_nome());
+                data_value.addProperty("sedeleg",
+                        res.getSedelegale().getIndirizzo()
+                        + " " + res.getSedelegale().getCap()
+                        + " " + res.getSedelegale().getComune()
+                        + " (" + res.getSedelegale().getProvincia() + ")");
                 String azioni
                         = "<a href=\"US_showente.jsp?idente=" + Utils.enc_string(String.valueOf(res.getIdentestage())) + "\" data-fancybox data-type='iframe' "
                         + "data-bs-toggle=\"tooltip\" title=\"DETTAGLI\" "
@@ -456,7 +455,7 @@ public class Search extends HttpServlet {
                         + " | <button type=\"button\"class=\"btn btn-sm btn-bg-light btn-danger\""
                         + " data-bs-toggle=\"tooltip\" title=\"DISABILITA ENTE\""
                         + " data-preload='false'"
-                        + " onclick=\"return disabilitaente('" + res.getIdentestage() + "','" + res.getPARTITAIVA()+ "')\"><i class=\"fa fa-remove\"></i>"
+                        + " onclick=\"return disabilitaente('" + res.getIdentestage() + "','" + res.getPARTITAIVA() + "')\"><i class=\"fa fa-remove\"></i>"
                         + " </button>";
 
                 data_value.addProperty("azioni", azioni);

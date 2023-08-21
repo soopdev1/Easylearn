@@ -63,6 +63,7 @@ import rc.soop.sic.jpa.Conoscenze;
 import rc.soop.sic.jpa.Corso;
 import rc.soop.sic.jpa.CorsoStato;
 import rc.soop.sic.jpa.Docente;
+import rc.soop.sic.jpa.EnteStage;
 import rc.soop.sic.jpa.EntityOp;
 import rc.soop.sic.jpa.IncrementalCorso;
 import rc.soop.sic.jpa.Information;
@@ -78,6 +79,7 @@ import rc.soop.sic.jpa.Sede;
 import rc.soop.sic.jpa.SoggettoProponente;
 import rc.soop.sic.jpa.Stati;
 import rc.soop.sic.jpa.TipoCorso;
+import rc.soop.sic.jpa.TipoSede;
 import rc.soop.sic.jpa.Tipologia_Percorso;
 import rc.soop.sic.jpa.User;
 
@@ -86,6 +88,70 @@ import rc.soop.sic.jpa.User;
  * @author Raffaele
  */
 public class Operations extends HttpServlet {
+
+    protected void ADDENTEOSPITANTE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            EntityOp ep1 = new EntityOp();
+            SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
+            String RAGIONESOCIALE = normalizeUTF8(getRequestValue(request, "RAGIONESOCIALE"));
+            String PIVA = getRequestValue(request, "PIVA");
+            String ATECO = getRequestValue(request, "ATECO");
+            String SL_INDIRIZZO = normalizeUTF8(getRequestValue(request, "SL_INDIRIZZO"));
+            String SL_CAP = normalizeUTF8(getRequestValue(request, "SL_CAP"));
+            String SL_COMUNE = normalizeUTF8(getRequestValue(request, "SL_COMUNE"));
+            String SL_PROVINCIA = normalizeUTF8(getRequestValue(request, "SL_PROVINCIA"));
+            String COGNOME = normalizeUTF8(getRequestValue(request, "COGNOME"));
+            String NOME = normalizeUTF8(getRequestValue(request, "NOME"));
+            String SF_INDIRIZZO = normalizeUTF8(getRequestValue(request, "SF_INDIRIZZO"));
+            String SF_CAP = normalizeUTF8(getRequestValue(request, "SF_CAP"));
+            String SF_COMUNE = normalizeUTF8(getRequestValue(request, "SF_COMUNE"));
+            String SF_PROVINCIA = normalizeUTF8(getRequestValue(request, "SF_PROVINCIA"));
+
+            EnteStage es = new EnteStage();
+            es.setPARTITAIVA(PIVA);
+            es.setRAGIONESOCIALE(RAGIONESOCIALE);
+            es.setCODICEATECO(ATECO);
+            es.setRap_cognome(COGNOME);
+            es.setRap_nome(NOME);
+            es.setSoggetto(so);
+            es.setStatoente(Stati.ABILITATO);
+
+            Sede sl1 = new Sede();
+            sl1.setCap(SL_CAP);
+            sl1.setComune(SL_COMUNE);
+            sl1.setIndirizzo(SL_INDIRIZZO);
+            sl1.setProvincia(SL_PROVINCIA);
+            sl1.setEntestage(es);
+            sl1.setTipo(ep1.getEm().find(TipoSede.class, 1L));
+
+            Sede ss1 = new Sede();
+            ss1.setCap(SF_CAP);
+            ss1.setComune(SF_COMUNE);
+            ss1.setIndirizzo(SF_INDIRIZZO);
+            ss1.setProvincia(SF_PROVINCIA);
+            ss1.setEntestage(es);
+            ss1.setTipo(ep1.getEm().find(TipoSede.class, 4L));
+
+            if (ep1.esisteEnteStageSoggetto(so, PIVA)) {
+                redirect(request, response, "Page_message.jsp?esito=KO_NEN2");
+            } else {
+                ep1.begin();
+                ep1.persist(es);
+                ep1.persist(sl1);
+                ep1.persist(ss1);
+                es.setSedelegale(sl1);
+                ep1.merge(es);
+                ep1.commit();
+                ep1.close();
+                redirect(request, response, "Page_message.jsp?esito=OK_UPAL");
+            }
+
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_NEN2");
+        }
+
+    }
 
     protected void ADDALLIEVO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -1634,6 +1700,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "ADDALLIEVO":
                     ADDALLIEVO(request, response);
+                    break;
+                case "ADDENTEOSPITANTE":
+                    ADDENTEOSPITANTE(request, response);
                     break;
                 default:
                     break;

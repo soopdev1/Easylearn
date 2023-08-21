@@ -94,12 +94,11 @@
                                                         <!--begin::Table head-->
                                                         <thead>
                                                             <tr>
-                                                                <th class="p-2">Stato</th>
                                                                 <th class="p-2">ID</th>
-                                                                <th class="p-2">Cognome</th>
-                                                                <th class="p-2">Nome</th>
-                                                                <th class="p-2">Codice Fiscale</th>
-                                                                <th class="p-2">Data Nascita</th>
+                                                                <th class="p-2">Ragione Sociale</th>
+                                                                <th class="p-2">Partita IVA</th>
+                                                                <th class="p-2">Rappresentante Legale</th>
+                                                                <th class="p-2">Sede Legale</th>
                                                                 <th class="p-2">Azioni</th>
                                                             </tr>
                                                         </thead>

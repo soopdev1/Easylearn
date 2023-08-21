@@ -30,7 +30,7 @@ import rc.soop.sic.Utils;
  */
 @NamedQueries(value = {
     @NamedQuery(name = "entestage.soggetto", query = "SELECT i FROM EnteStage i WHERE i.soggetto=:soggetto ORDER BY i.RAGIONESOCIALE ASC"),
-    @NamedQuery(name = "entestage.soggetto.pi", query = "SELECT i FROM EnteStage i WHERE i.soggetto=:soggetto AND i.PARTITAIVA=:partitaiva")
+    @NamedQuery(name = "entestage.soggetto.pi", query = "SELECT i FROM EnteStage i WHERE i.soggetto=:soggetto AND i.PARTITAIVA=:partitaiva ORDER BY i.RAGIONESOCIALE ASC")
 })
 
 @Entity
@@ -44,8 +44,8 @@ public class EnteStage implements Serializable {
     Long identestage;
     @Column(name = "RAGIONESOCIALE")
     private String RAGIONESOCIALE;
-    @Column(name = "CODICEFISCALE")
-    private String CODICEFISCALE;
+    @Column(name = "CODICEATECO")
+    private String CODICEATECO;
     @Column(name = "PARTITAIVA")
     private String PARTITAIVA;
     @Column(name = "TELEFONO")
@@ -123,12 +123,12 @@ public class EnteStage implements Serializable {
         this.RAGIONESOCIALE = RAGIONESOCIALE;
     }
 
-    public String getCODICEFISCALE() {
-        return CODICEFISCALE;
+    public String getCODICEATECO() {
+        return CODICEATECO;
     }
 
-    public void setCODICEFISCALE(String CODICEFISCALE) {
-        this.CODICEFISCALE = CODICEFISCALE;
+    public void setCODICEATECO(String CODICEATECO) {
+        this.CODICEATECO = CODICEATECO;
     }
 
     public String getPARTITAIVA() {

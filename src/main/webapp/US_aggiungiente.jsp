@@ -4,6 +4,7 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.IstatProv"%>
 <%@page import="java.util.List"%>
 <%@page import="rc.soop.sic.jpa.Ateco"%>
 <%@page import="rc.soop.sic.Constant"%>
@@ -18,6 +19,7 @@
             case 1: {
                 EntityOp eo = new EntityOp();
                 List<Ateco> ateco = eo.findAll(Ateco.class);
+                List<IstatProv> prov = eo.findAll(IstatProv.class);
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -51,7 +53,7 @@
         <div class="row">
             <!--begin::Col-->
             <form method="POST" action="Operations" onsubmit="return controllasalvataggio();">
-                <input type="hidden" name="type" value="ADDALLIEVO"/>
+                <input type="hidden" name="type" value="ADDENTEOSPITANTE"/>
                 <div class="col-xl-12">
                     <div class="card h-xl-100">
                         <div class="card-header border-0 pt-5">
@@ -69,7 +71,6 @@
                                     <input type="text" 
                                            name="RAGIONESOCIALE"
                                            id="RAGIONESOCIALE"
-                                           onkeyup="return checkNoSpecialChar(this)"
                                            class="form-control" required maxlength="150" />
                                 </div>
                                 <label class="col-md-2 col-form-label fw-bold fs-6">
@@ -79,8 +80,7 @@
                                     <input type="text" 
                                            name="PIVA"
                                            id="PIVA"
-                                           onkeyup="return checkNoSpecialChar(this)"
-                                           class="form-control" required maxlength="13" />
+                                           class="form-control intvalue" required maxlength="11" />
                                 </div>
                                 <label class="col-md-2 col-form-label fw-bold fs-6">
                                     <span class="text-primary"><b>CODICE ATECO</b></span>
@@ -101,9 +101,8 @@
                                 </label>
                                 <div class="col-md-4 col-form-label fs-6">
                                     <input type="text" 
-                                           name="RAGIONESOCIALE"
-                                           id="RAGIONESOCIALE"
-                                           onkeyup="return checkNoSpecialChar(this)"
+                                           name="SL_INDIRIZZO"
+                                           id="SL_INDIRIZZO"
                                            class="form-control" required maxlength="150" />
                                 </div>
                                 <label class="col-md-2 col-form-label fw-bold fs-6">
@@ -111,30 +110,30 @@
                                 </label>
                                 <div class="col-md-4 col-form-label fs-6">
                                     <input type="text" 
-                                           name="RAGIONESOCIALE"
-                                           id="RAGIONESOCIALE"
-                                           onkeyup="return checkNoSpecialChar(this)"
-                                           class="form-control" required maxlength="150" />
+                                           name="SL_CAP"
+                                           id="SL_CAP"
+                                           class="form-control capvalue" required maxlength="5" />
                                 </div>
                                 <label class="col-md-2 col-form-label fw-bold fs-6">
                                     <span class="text-dark"><b>SEDE LEGALE - COMUNE</b></span>
                                 </label>
                                 <div class="col-md-4 col-form-label fs-6">
                                     <input type="text" 
-                                           name="RAGIONESOCIALE"
-                                           id="RAGIONESOCIALE"
-                                           onkeyup="return checkNoSpecialChar(this)"
+                                           name="SL_COMUNE"
+                                           id="SL_COMUNE"
                                            class="form-control" required maxlength="150" />
                                 </div>
                                 <label class="col-md-2 col-form-label fw-bold fs-6">
                                     <span class="text-dark"><b>SEDE LEGALE - PROVINCIA</b></span>
                                 </label>
                                 <div class="col-md-4 col-form-label fs-6">
-                                    <input type="text" 
-                                           name="RAGIONESOCIALE"
-                                           id="RAGIONESOCIALE"
-                                           onkeyup="return checkNoSpecialChar(this)"
-                                           class="form-control" required maxlength="150" />
+                                    <select aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
+                                            class="form-select " name="SL_PROVINCIA" required>
+                                        <option value="">Scegli...</option>
+                                        <%for (IstatProv is1 : prov) {%>
+                                        <option value="<%=is1.getIdistatprov()%>"><%=is1.getIdistatprov()%> - <%=is1.getNome()%></option>
+                                        <%}%>
+                                    </select>
                                 </div>
                             </div>
                             <div class="row col-md-12">
@@ -157,9 +156,51 @@
                                            id="NOME"
                                            onkeyup="return checkNoSpecialChar(this)"
                                            class="form-control" required maxlength="50" />
-                                </div>                                                                                                                           
+                                </div>
+                                <hr>
                             </div>
-                            <hr>
+                            <div class="row col-md-12">
+                                <h3>SEDE PRINCIPALE TIROCINIO/STAGE</h3>
+                                <label class="col-md-2 col-form-label fw-bold fs-6">
+                                    <span class="text-dark"><b>SEDE FORMATIVA - INDIRIZZO</b></span>
+                                </label>
+                                <div class="col-md-4 col-form-label fs-6">
+                                    <input type="text" 
+                                           name="SF_INDIRIZZO"
+                                           id="SF_INDIRIZZO"
+                                           class="form-control" required maxlength="150" />
+                                </div>
+                                <label class="col-md-2 col-form-label fw-bold fs-6">
+                                    <span class="text-dark"><b>SEDE FORMATIVA - CAP</b></span>
+                                </label>
+                                <div class="col-md-4 col-form-label fs-6">
+                                    <input type="text" 
+                                           name="SF_CAP"
+                                           id="SF_CAP"
+                                           class="form-control capvalue" required maxlength="5" />
+                                </div>
+                                <label class="col-md-2 col-form-label fw-bold fs-6">
+                                    <span class="text-dark"><b>SEDE FORMATIVA - COMUNE</b></span>
+                                </label>
+                                <div class="col-md-4 col-form-label fs-6">
+                                    <input type="text" 
+                                           name="SF_COMUNE"
+                                           id="SF_COMUNE"
+                                           class="form-control" required maxlength="150" />
+                                </div>
+                                <label class="col-md-2 col-form-label fw-bold fs-6">
+                                    <span class="text-dark"><b>SEDE FORMATIVA - PROVINCIA</b></span>
+                                </label>
+                                <div class="col-md-4 col-form-label fs-6">
+                                    <select aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
+                                            class="form-select " name="SF_PROVINCIA" required>
+                                        <option value="">Scegli...</option>
+                                        <%for (IstatProv is1 : prov) {%>
+                                        <option value="<%=is1.getIdistatprov()%>"><%=is1.getIdistatprov()%> - <%=is1.getNome()%></option>
+                                        <%}%>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <!--end::Tables Widget 3-->

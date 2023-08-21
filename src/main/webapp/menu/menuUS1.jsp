@@ -304,7 +304,6 @@
                         </div>                          
                     </div>
                 </div>
-                <%if (false) {%>
                 <div data-kt-menu-trigger="click" class="menu-item here <%=m_6s%> menu-accordion">
                     <span class="menu-link">
                         <span class="menu-icon">
@@ -329,6 +328,8 @@
                         </div>                          
                     </div>
                 </div>
+                <%if (false) {%>
+
                 <div data-kt-menu-trigger="click" class="menu-item here <%=m_7s%> menu-accordion" style="display: none;">
                     <span class="menu-link">
                         <span class="menu-icon">
@@ -353,7 +354,6 @@
                         </div>                          
                     </div>
                 </div>
-                <%}%>
                 <div data-kt-menu-trigger="click" class="menu-item here <%=m_8s%> menu-accordion">
                     <span class="menu-link">
                         <span class="menu-icon">
@@ -382,6 +382,8 @@
                         </div>                          
                     </div>
                 </div>
+                <%}%>
+
                 <div data-kt-menu-trigger="click" class="menu-item here <%=m_8s%> menu-accordion">
                     <span class="menu-link">
                         <span class="menu-icon">

@@ -16,12 +16,11 @@ $(document).ready(function () {
             data: {'type': 'list_enti'}
         },
         columns: [
-            {data: 'stato', orderable: false},
-            {data: 'idallievo'},
-            {data: 'cognome'},
-            {data: 'nome'},
-            {data: 'cf'},
-            {data: 'data', type: "date-eu"},
+            {data: 'idente'},
+            {data: 'ragionesociale'},
+            {data: 'piva'},
+            {data: 'rapleg'},
+            {data: 'sedeleg'},
             {data: 'azioni', orderable: false}
         ]
     });    

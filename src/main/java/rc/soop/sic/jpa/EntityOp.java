@@ -214,8 +214,9 @@ public class EntityOp {
         q.setMaxResults(1);
         return !q.getResultList().isEmpty();
     }
+    
     public boolean esisteEnteStageSoggetto(SoggettoProponente s,String partitaiva) {
-        TypedQuery q = this.em.createNamedQuery("entestage.soggetto", EnteStage.class);
+        TypedQuery q = this.em.createNamedQuery("entestage.soggetto.pi", EnteStage.class);
         q.setParameter("soggetto", s);
         q.setParameter("partitaiva", partitaiva);
         q.setMaxResults(1);
