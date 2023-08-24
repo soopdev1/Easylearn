@@ -106,7 +106,7 @@
                                     </label>
                                     <div class="col-md-2 fv-row">
                                         <input type="text" name="ORETOTALI" id="ORETOTALI"
-                                               class="form-control decimalvalue" 
+                                               class="form-control intvalue" 
                                                required />
                                     </div>
                                 </div>
@@ -117,7 +117,7 @@
                                     </label>
                                     <div class="col-md-2 fv-row">
                                         <input type="text" name="OREAULATEO" id="OREAULATEO"
-                                               class="form-control decimalvalue" 
+                                               class="form-control intvalue" 
                                                required />
                                     </div>
                                     <!--begin::Label-->
@@ -126,7 +126,7 @@
                                     </label>
                                     <div class="col-md-2 fv-row">
                                         <input type="text" name="OREAULATEC" id="OREAULATEC"
-                                               class="form-control decimalvalue" 
+                                               class="form-control intvalue" 
                                                required />
                                     </div>
                                     <label class="col-lg-2 col-form-label fw-bold fs-6" >
@@ -134,7 +134,7 @@
                                     </label>
                                     <div class="col-md-2 fv-row">
                                         <input type="text" name="OREELE" id="OREELE"
-                                               class="form-control decimalvalue" 
+                                               class="form-control intvalue" 
                                                required />
                                     </div>
                                 </div>

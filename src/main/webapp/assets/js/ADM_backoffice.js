@@ -9,9 +9,9 @@ $(document).ready(function () {
         responsive: true,
         processing: true,
         ajax: {
-            url: 'Edit',
+            url: 'Search',
             type: 'POST',
-            data: {'type': 'backoffice_tipologiapercorso'}
+            data: {'type': 'BO_LIST_TIPOLOGIAPERCORSO'}
         },
         columns: [
             {data: 'tipo'},

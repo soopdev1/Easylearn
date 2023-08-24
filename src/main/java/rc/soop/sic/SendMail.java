@@ -66,7 +66,7 @@ public class SendMail {
         try {
             String DDS = is1.getDecreto().split("§")[0];
             String DDSDATA = datemysqltoita(is1.getDecreto().split("§")[1]);
-            
+
             EmailTemplate et = eo.getEm().find(EmailTemplate.class, 4L);
             String name = "EasyLearn Notification Mail";
             String to[] = {is1.getSoggetto().getEMAIL()};
@@ -87,6 +87,7 @@ public class SendMail {
         }
         return false;
     }
+
     public static boolean inviaNotificaSP_rigettoIstanzaSOCCORSO(EntityOp eo, Istanza is1,
             String motivazionerigetto, List<Long> idko) {
 
@@ -258,7 +259,7 @@ public class SendMail {
         return false;
     }
 
-    private static boolean sendPec(EntityOp eo, String dest, String subject, String content, String fileattach) {
+    private static boolean sendPec(EntityOp eo, String[] to, String[] cc, String[] ccn, String txt, String subject, File file) {
 
         String host = eo.getEm().find(Path.class, "pec.smtp").getDescrizione();
         String port = eo.getEm().find(Path.class, "pec.port").getDescrizione();
@@ -285,20 +286,47 @@ public class SendMail {
         });
 
         try {
-            // Creazione del messaggio email
 
             MimeMessage message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(sender));
-            message.addRecipients(Message.RecipientType.TO, InternetAddress.parse(dest));
+            message.setFrom(new InternetAddress(username, sender));
+
+            // Creazione del messaggio email
+            InternetAddress[] toaddress = new InternetAddress[to.length];
+            int counter = 0;
+            for (String recipient : to) {
+                toaddress[counter] = new InternetAddress(recipient.trim());
+                counter++;
+            }
+            message.setRecipients(Message.RecipientType.TO, toaddress);
+
+            if (cc != null) {
+                InternetAddress[] ccaddress = new InternetAddress[cc.length];
+                counter = 0;
+                for (String recipient : cc) {
+                    ccaddress[counter] = new InternetAddress(recipient.trim());
+                    counter++;
+                }
+                message.setRecipients(Message.RecipientType.CC, ccaddress);
+            }
+            if (ccn != null) {
+                InternetAddress[] ccnaddress = new InternetAddress[ccn.length];
+                counter = 0;
+                for (String recipient : ccn) {
+                    ccnaddress[counter] = new InternetAddress(recipient.trim());
+                    counter++;
+                }
+                message.setRecipients(Message.RecipientType.BCC, ccnaddress);
+            }
+
             message.setSubject(subject);
 
             Multipart mp = new MimeMultipart();
             MimeBodyPart mbp1 = new MimeBodyPart();
-            mbp1.setText(content);
+            mbp1.setText(txt);
             mp.addBodyPart(mbp1);
-            if (fileattach != null) {
+            if (file != null) {
                 MimeBodyPart mbp2 = new MimeBodyPart();
-                FileDataSource fds = new FileDataSource(fileattach);
+                FileDataSource fds = new FileDataSource(file);
                 mbp2.setDataHandler(new DataHandler(fds));
                 mbp2.setFileName(fds.getName());
                 mp.addBodyPart(mbp2);
@@ -306,71 +334,71 @@ public class SendMail {
             message.setContent(mp, "text/html; charset=utf-8");
 
             // Aggiunta del listener per la ricevuta di invio
-            Transport transport = session.getTransport();
-            transport.addTransportListener(new TransportListener() {
-                @Override
-                public void messageDelivered(TransportEvent transportEvent) {
-                    // Informazioni sulla ricevuta di invio
-                    Date sentDate = new Date();
-                    Address[] recipients = transportEvent.getValidSentAddresses();
-
-                    // Stampa della ricevuta di invio
-                    LOGGER.info("------ Ricevuta di invio ------");
-                    LOGGER.log(Level.INFO, "Data e ora di invio: {0}", sdf_PATTERNDATE5.format(sentDate));
-                    try {
-                        LOGGER.log(Level.INFO, "Mittente: {0}", message.getFrom()[0]);
-                    } catch (Exception e) {
-                    }
-                    LOGGER.info("Destinatari: ");
-                    for (Address recipient : recipients) {
-                        LOGGER.info(recipient.toString());
-                    }
-                    LOGGER.info("--------------------------------");
-                }
-
-                @Override
-                public void messageNotDelivered(TransportEvent transportEvent) {
-                    // Informazioni sull'errore di invio
-                    Address[] invalidRecipients = transportEvent.getInvalidAddresses();
-                    Address[] validUnsentRecipients = transportEvent.getValidUnsentAddresses();
-
-                    // Stampa delle informazioni sull'errore di invio
-                    LOGGER.severe("------ Errore nell'invio dell'email ------");
-
-                    LOGGER.severe("Destinatari non validi: ");
-                    for (Address recipient : invalidRecipients) {
-                        LOGGER.severe(recipient.toString());
-                    }
-                    LOGGER.severe("Destinatari validi a cui non è stata inviata l'email : ");
-                    for (Address recipient : validUnsentRecipients) {
-                        LOGGER.severe(recipient.toString());
-                    }
-                    LOGGER.severe("------------------------------------------");
-                }
-
-                @Override
-                public void messagePartiallyDelivered(TransportEvent transportEvent) {
-                    // Informazioni sugli indirizzi dei destinatari parzialmente inviati
-                    Address[] validSentRecipients = transportEvent.getValidSentAddresses();
-                    Address[] validUnsentRecipients = transportEvent.getValidUnsentAddresses();
-
-                    // Stampa delle informazioni sugli indirizzi dei destinatari parzialmente inviati
-                    LOGGER.warning("------ Invio parziale dell'email ------");
-
-                    LOGGER.warning("Destinatari a cui è stata inviata correttamente: ");
-                    for (Address recipient : validSentRecipients) {
-                        LOGGER.warning(recipient.toString());
-                    }
-                    LOGGER.warning("Destinatari a cui non è stata inviata correttamente: ");
-                    for (Address recipient : validUnsentRecipients) {
-                        LOGGER.warning(recipient.toString());
-                    }
-                    LOGGER.warning("--------------------------------------");
-                }
-            });
+//            Transport transport = session.getTransport();
+//            transport.addTransportListener(new TransportListener() {
+//                @Override
+//                public void messageDelivered(TransportEvent transportEvent) {
+//                    // Informazioni sulla ricevuta di invio
+//                    Date sentDate = new Date();
+//                    Address[] recipients = transportEvent.getValidSentAddresses();
+//
+//                    // Stampa della ricevuta di invio
+//                    LOGGER.info("------ Ricevuta di invio ------");
+//                    LOGGER.log(Level.INFO, "Data e ora di invio: {0}", sdf_PATTERNDATE5.format(sentDate));
+//                    try {
+//                        LOGGER.log(Level.INFO, "Mittente: {0}", message.getFrom()[0]);
+//                    } catch (Exception e) {
+//                    }
+//                    LOGGER.info("Destinatari: ");
+//                    for (Address recipient : recipients) {
+//                        LOGGER.info(recipient.toString());
+//                    }
+//                    LOGGER.info("--------------------------------");
+//                }
+//
+//                @Override
+//                public void messageNotDelivered(TransportEvent transportEvent) {
+//                    // Informazioni sull'errore di invio
+//                    Address[] invalidRecipients = transportEvent.getInvalidAddresses();
+//                    Address[] validUnsentRecipients = transportEvent.getValidUnsentAddresses();
+//
+//                    // Stampa delle informazioni sull'errore di invio
+//                    LOGGER.severe("------ Errore nell'invio dell'email ------");
+//
+//                    LOGGER.severe("Destinatari non validi: ");
+//                    for (Address recipient : invalidRecipients) {
+//                        LOGGER.severe(recipient.toString());
+//                    }
+//                    LOGGER.severe("Destinatari validi a cui non è stata inviata l'email : ");
+//                    for (Address recipient : validUnsentRecipients) {
+//                        LOGGER.severe(recipient.toString());
+//                    }
+//                    LOGGER.severe("------------------------------------------");
+//                }
+//
+//                @Override
+//                public void messagePartiallyDelivered(TransportEvent transportEvent) {
+//                    // Informazioni sugli indirizzi dei destinatari parzialmente inviati
+//                    Address[] validSentRecipients = transportEvent.getValidSentAddresses();
+//                    Address[] validUnsentRecipients = transportEvent.getValidUnsentAddresses();
+//
+//                    // Stampa delle informazioni sugli indirizzi dei destinatari parzialmente inviati
+//                    LOGGER.warning("------ Invio parziale dell'email ------");
+//
+//                    LOGGER.warning("Destinatari a cui è stata inviata correttamente: ");
+//                    for (Address recipient : validSentRecipients) {
+//                        LOGGER.warning(recipient.toString());
+//                    }
+//                    LOGGER.warning("Destinatari a cui non è stata inviata correttamente: ");
+//                    for (Address recipient : validUnsentRecipients) {
+//                        LOGGER.warning(recipient.toString());
+//                    }
+//                    LOGGER.warning("--------------------------------------");
+//                }
+//            });
             // Invio del messaggio email
             Transport.send(message);
-            LOGGER.info("Email inviata con successo!");
+            LOGGER.info("PEC inviata con successo!");
             return true;
         } catch (Exception ex) {
             LOGGER.severe(estraiEccezione(ex));

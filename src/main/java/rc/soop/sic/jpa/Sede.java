@@ -16,6 +16,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import static rc.soop.sic.jpa.Stati.ABILITATO;
@@ -26,6 +28,10 @@ import static rc.soop.sic.jpa.Stati.DISABILITATO;
  *
  * @author Raffaele
  */
+@NamedQueries(value = {
+    @NamedQuery(name = "entestage.sediformative", 
+            query = "SELECT u FROM Sede u WHERE u.entestage=:entestage AND u.tipo=:tipo")
+})
 @Entity
 @Table(name = "sede")
 public class Sede implements Serializable {
@@ -64,20 +70,24 @@ public class Sede implements Serializable {
 
     public String getEtichettastato() {
         switch (this.statosede) {
-            case ABILITATO:
+            case ABILITATO: {
                 this.etichettastato = "<i class='fa fa-check'></i> Abilitata";
                 break;
-            case DISABILITATO:
+            }
+            case DISABILITATO: {
                 this.etichettastato = "<i class='fa fa-lock'></i> Disabilitata";
                 break;
-            case CHECK:
+            }
+            case CHECK: {
                 this.etichettastato = "<i class='fa fa-warning'></i> Da Verificare";
                 break;
-            default:
+            }
+            default: {
                 this.etichettastato = "";
                 break;
+            }
         }
-        return etichettastato;
+        return this.etichettastato;
     }
 
     public void setEtichettastato(String etichettastato) {

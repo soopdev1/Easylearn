@@ -30,6 +30,8 @@ import javax.persistence.TemporalType;
     @NamedQuery(name = "allegati.istanza.ok", query = "SELECT c FROM Allegati c WHERE c.istanza=:istanza AND c.stato.codicestatocorso<>'32'"),
     @NamedQuery(name = "allegati.allievi", query = "SELECT c FROM Allegati c WHERE c.allievi=:allievi"),
     @NamedQuery(name = "allegati.allievi.ok", query = "SELECT c FROM Allegati c WHERE c.allievi=:allievi AND c.stato.codicestatocorso<>'32'"),
+    @NamedQuery(name = "allegati.entestage", query = "SELECT c FROM Allegati c WHERE c.entestage=:entestage"),
+    @NamedQuery(name = "allegati.entestage.ok", query = "SELECT c FROM Allegati c WHERE c.entestage=:entestage AND c.stato.codicestatocorso<>'32'"),
 })
 @Entity
 @Table(name = "allegati")
@@ -72,6 +74,10 @@ public class Allegati implements Serializable {
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "idallievi")
     private Allievi allievi;
+    
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinColumn(name = "identestage")
+    private EnteStage entestage;
 
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "codicestatocorso")
@@ -199,6 +205,14 @@ public class Allegati implements Serializable {
         this.utentecaricamento = utentecaricamento;
     }
 
+    public EnteStage getEntestage() {
+        return entestage;
+    }
+
+    public void setEntestage(EnteStage entestage) {
+        this.entestage = entestage;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

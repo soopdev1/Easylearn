@@ -4,6 +4,7 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.EnteStage"%>
 <%@page import="rc.soop.sic.jpa.IstatProv"%>
 <%@page import="java.util.List"%>
 <%@page import="rc.soop.sic.jpa.Ateco"%>
@@ -17,13 +18,20 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
+                String idistS = Utils.getRequestValue(request, "idente");
+                if (idistS.equals("")) {
+                    idistS = (String) session.getAttribute("ses_idente");
+                } else {
+                    session.setAttribute("ses_idente", idistS);
+                }
                 EntityOp eo = new EntityOp();
-                List<Ateco> ateco = eo.findAll(Ateco.class);
                 List<IstatProv> prov = eo.findAll(IstatProv.class);
+                Long idist = Long.valueOf(Utils.dec_string(idistS));
+                EnteStage is1 = eo.getEm().find(EnteStage.class, idist);
     %>
     <!--begin::Head-->
     <head><base href="">
-        <title><%=Constant.NAMEAPP%>: Aggiungi anagrafica ente ospitante stage</title>
+        <title><%=Constant.NAMEAPP%>: Aggiungi sede tirocinio/stage</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->
@@ -52,116 +60,21 @@
         <!--begin::Row-->
         <div class="row">
             <!--begin::Col-->
-            <form method="POST" action="Operations" onsubmit="return controllasalvataggio();">
-                <input type="hidden" name="type" value="ADDENTEOSPITANTE"/>
+            <form method="POST" action="Operations">
+                <input type="hidden" name="type" value="ADDSEDESTAGETIROCINIOENTE"/>
+                <input type="hidden" name="idente" value="<%=is1.getIdentestage()%>"/>
+                <h1 class="text-center fs-4">Ente Ospitante Stage/Tirocinio: <%=is1.getRAGIONESOCIALE()%></h1>                                    
                 <div class="col-xl-12">
                     <div class="card h-xl-100">
                         <div class="card-header border-0 pt-5">
+
                             <h3 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bolder fs-3 mb-1">NUOVO ENTE OSPITANTE STAGE</span>
+                                <span class="card-label fw-bolder fs-3 mb-1">NUOVA SEDE TIROCINIO/STAGE</span>
                             </h3>
                             <button class="btn btn-lg btn-success"><i class="fa fa-save"></i> SALVA DATI</button>
                         </div>
                         <div class="card-body py-3">
                             <div class="row col-md-12">
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-primary"><b>RAGIONE SOCIALE</b></span>
-                                </label>
-                                <div class="col-md-4 col-form-label fs-6">
-                                    <input type="text" 
-                                           name="RAGIONESOCIALE"
-                                           id="RAGIONESOCIALE"
-                                           class="form-control" 
-                                           required maxlength="150" />
-                                </div>
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-primary"><b>PARTITA IVA</b></span>
-                                </label>
-                                <div class="col-md-4 col-form-label fs-6">
-                                    <input type="text" 
-                                           name="PIVA"
-                                           id="PIVA"
-                                           class="form-control intvalue" required maxlength="11" />
-                                </div>
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-primary"><b>CODICE ATECO</b></span>
-                                </label>
-                                <div class="col-md-4 col-form-label fs-6">
-                                    <select aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
-                                            class="form-select " name="ATECO" required>
-                                        <option value="">Scegli...</option>
-                                        <%for (Ateco is1 : ateco) {%>
-                                        <option value="<%=is1.getCodiceAteco()%>"><%=is1.getCodiceAteco()%> - <%=is1.getDescrizione()%></option>
-                                        <%}%>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row col-md-12">
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-dark"><b>SEDE LEGALE - INDIRIZZO</b></span>
-                                </label>
-                                <div class="col-md-4 col-form-label fs-6">
-                                    <input type="text" 
-                                           name="SL_INDIRIZZO"
-                                           id="SL_INDIRIZZO"
-                                           class="form-control" required maxlength="150" />
-                                </div>
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-dark"><b>SEDE LEGALE - CAP</b></span>
-                                </label>
-                                <div class="col-md-4 col-form-label fs-6">
-                                    <input type="text" 
-                                           name="SL_CAP"
-                                           id="SL_CAP"
-                                           class="form-control capvalue" required maxlength="5" />
-                                </div>
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-dark"><b>SEDE LEGALE - COMUNE</b></span>
-                                </label>
-                                <div class="col-md-4 col-form-label fs-6">
-                                    <input type="text" 
-                                           name="SL_COMUNE"
-                                           id="SL_COMUNE"
-                                           class="form-control" required maxlength="150" />
-                                </div>
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-dark"><b>SEDE LEGALE - PROVINCIA</b></span>
-                                </label>
-                                <div class="col-md-4 col-form-label fs-6">
-                                    <select aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
-                                            class="form-select " name="SL_PROVINCIA" required>
-                                        <option value="">Scegli...</option>
-                                        <%for (IstatProv is1 : prov) {%>
-                                        <option value="<%=is1.getIdistatprov()%>"><%=is1.getIdistatprov()%> - <%=is1.getNome()%></option>
-                                        <%}%>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row col-md-12">
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>RAPPRESENTANTE LEGALE: COGNOME</b></span>
-                                </label>
-                                <div class="col-md-4 col-form-label fs-6">
-                                    <input type="text" 
-                                           name="COGNOME"
-                                           id="COGNOME"
-                                           onkeyup="return checkNoSpecialChar(this)"
-                                           class="form-control" required maxlength="50" />
-                                </div>
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>RAPPRESENTANTE LEGALE: NOME</b></span>
-                                </label>
-                                <div class="col-md-4 col-form-label fs-6">
-                                    <input type="text" 
-                                           name="NOME"
-                                           id="NOME"
-                                           onkeyup="return checkNoSpecialChar(this)"
-                                           class="form-control" required maxlength="50" />
-                                </div>
-                                <hr>
-                            </div>
-                            <div class="row col-md-12">
-                                <h3>SEDE TIROCINIO/STAGE</h3>
                                 <label class="col-md-2 col-form-label fw-bold fs-6">
                                     <span class="text-dark"><b>SEDE FORMATIVA - INDIRIZZO</b></span>
                                 </label>
@@ -196,8 +109,8 @@
                                     <select aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
                                             class="form-select " name="SF_PROVINCIA" required>
                                         <option value="">Scegli...</option>
-                                        <%for (IstatProv is1 : prov) {%>
-                                        <option value="<%=is1.getIdistatprov()%>"><%=is1.getIdistatprov()%> - <%=is1.getNome()%></option>
+                                        <%for (IstatProv pr1 : prov) {%>
+                                        <option value="<%=pr1.getIdistatprov()%>"><%=pr1.getIdistatprov()%> - <%=pr1.getNome()%></option>
                                         <%}%>
                                     </select>
                                 </div>

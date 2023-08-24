@@ -3,7 +3,9 @@
     Created on : 18-feb-2022, 14.01.46
     Author     : raf
 --%>
-
+<%@page import="rc.soop.sic.jpa.Sede"%>
+<%@page import="java.util.List"%>
+<%@page import="rc.soop.sic.jpa.EnteStage"%>
 <%@page import="rc.soop.sic.jpa.Allievi"%>
 <%@page import="rc.soop.sic.Constant"%>
 <%@page import="rc.soop.sic.jpa.EntityOp"%>
@@ -15,19 +17,20 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
-                String idistS = Utils.getRequestValue(request, "idallievo");
+                String idistS = Utils.getRequestValue(request, "idente");
                 if (idistS.equals("")) {
-                    idistS = (String) session.getAttribute("ses_idallievo");
+                    idistS = (String) session.getAttribute("ses_idente");
                 } else {
-                    session.setAttribute("ses_idallievo", idistS);
+                    session.setAttribute("ses_idente", idistS);
                 }
                 EntityOp eo = new EntityOp();
                 Long idist = Long.valueOf(Utils.dec_string(idistS));
-                Allievi is1 = eo.getEm().find(Allievi.class, idist);
+                EnteStage is1 = eo.getEm().find(EnteStage.class, idist);
+                List<Sede> sedistage = eo.getSediStage(is1);
     %>
     <!--begin::Head-->
     <head><base href="">
-        <title><%=Constant.NAMEAPP%>: Anagrafica allievo</title>
+        <title><%=Constant.NAMEAPP%>: Anagrafica ente ospitante stage</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->
@@ -55,80 +58,78 @@
         <!--end::Row-->
         <!--begin::Row-->
         <div class="row">
-                <div class="col-xl-12">
-                    <div class="card h-xl-100">
-                        <div class="card-header border-0 pt-5">
-                            <h3 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bolder fs-3 mb-1">DETTAGLI ALLIEVO - ID: <%=is1.getIdallievi()%></span>
-                            </h3>
-                        </div>
-                        <div class="card-body py-3">
-                            <div class="row col-md-12">
-                                <label class="col-md-2 col-form-label fw-bold">
-                                    <span class="text-danger"><b>COGNOME</b></span>
-                                </label>
-                                <label class="col-md-2 col-form-label fw-bold">
-                                    <span><b><%=is1.getCognome()%></b></span>
-                                </label>
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>NOME</b></span>
-                                </label>
-                                <label class="col-md-2 col-form-label fw-bold">
-                                    <span><b><%=is1.getNome()%></b></span>
-                                </label>
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>CODICE FISCALE</b></span>
-                                </label>
-                                <label class="col-md-2 col-form-label fw-bold">
-                                    <span><b><%=is1.getCodicefiscale()%></b></span>
-                                </label>
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>NUMERO DI TELEFONO</b></span>
-                                </label>
-                                <label class="col-md-2 col-form-label fw-bold">
-                                    <span><b><%=is1.getTelefono()%></b></span>
-                                </label>
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>INDIRIZZO EMAIL</b></span>
-                                </label>
-                                <label class="col-md-2 col-form-label fw-bold">
-                                    <span><b><%=is1.getEmail()%></b></span>
-                                </label>
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>NUMERO DOC.ID.</b></span>
-                                </label>
-                                <label class="col-md-2 col-form-label fw-bold">
-                                    <span><b><%=is1.getNumdocid()%></b></span>
-                                </label>
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>SCADENZA DOC.ID.</b></span>
-                                </label>
-                                <label class="col-md-2 col-form-label fw-bold">
-                                    <span><b><%=Constant.sdf_PATTERNDATE4.format(is1.getDatanascita())%></b></span>
-                                </label>
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>TITOLO DI STUDIO</b></span>
-                                </label>
-                                <label class="col-md-2 col-form-label fw-bold">
-                                    <span><b><%=is1.getCognome()%></b></span>
-                                </label>
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>APPARTENENTE A CATEGORIE PROTETTE</b></span>
-                                </label>
-                                <label class="col-md-2 col-form-label fw-bold">
-                                    <span><b><%=(is1.isCatprot()) ? "SI" : "NO"%></b></span>
-                                </label>
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>DATA INSERIMENTO</b></span>
-                                </label>
-                                <label class="col-md-4 col-form-label fw-bold">
-                                    <span><b><%=Constant.sdf_PATTERNDATE5.format(is1.getDatainserimento())%></b></span>
-                                </label>
-                            </div>
+            <div class="col-xl-12">
+                <div class="card h-xl-100">
+                    <div class="card-header border-0 pt-5">
+                        <h3 class="card-title align-items-start flex-column">
+                            <span class="card-label fw-bolder fs-3 mb-1">DETTAGLI ENTE OSPITANTE STAGE - ID: <%=is1.getIdentestage()%></span>
+                        </h3>
+                    </div>
+                    <div class="card-body py-3">
+                        <div class="row col-md-12">
+                            <label class="col-md-2 col-form-label fw-bold">
+                                <span class="text-danger"><b>RAGIONE SOCIALE</b></span>
+                            </label>
+                            <label class="col-md-4 col-form-label fw-bold">
+                                <span><b><%=is1.getRAGIONESOCIALE()%></b></span>
+                            </label>
+                            <label class="col-md-2 col-form-label fw-bold fs-6">
+                                <span class="text-danger"><b>PARTITA IVA</b></span>
+                            </label>
+                            <label class="col-md-4 col-form-label fw-bold">
+                                <span><b><%=is1.getPARTITAIVA()%></b></span>
+                            </label>
+                            <label class="col-md-2 col-form-label fw-bold fs-6">
+                                <span class="text-danger"><b>CODICE ATECO</b></span>
+                            </label>
+                            <label class="col-md-4 col-form-label fw-bold">
+                                <span><b><%=is1.getCODICEATECO()%></b></span>
+                            </label>
+                            <label class="col-md-2 col-form-label fw-bold fs-6">
+                                <span class="text-danger"><b>SEDE LEGALE - INDIRIZZO COMPLETO</b></span>
+                            </label>
+                            <label class="col-md-4 col-form-label fw-bold">
+                                <span><b><%=is1.getSedelegale().getIndirizzo()%> - 
+                                        <%=is1.getSedelegale().getCap()%> - <%=is1.getSedelegale().getComune()%> (<%=is1.getSedelegale().getProvincia()%>)</b></span>
+                            </label>
+                            <label class="col-md-2 col-form-label fw-bold fs-6">
+                                <span class="text-danger"><b>RAPPRESENTANTE LEGALE - COGNOME</b></span>
+                            </label>
+                            <label class="col-md-4 col-form-label fw-bold">
+                                <span><b><%=is1.getRap_cognome()%></b></span>
+                            </label>
+                            <label class="col-md-2 col-form-label fw-bold fs-6">
+                                <span class="text-danger"><b>RAPPRESENTANTE LEGALE - NOME</b></span>
+                            </label>
+                            <label class="col-md-4 col-form-label fw-bold">
+                                <span><b><%=is1.getRap_nome()%></b></span>
+                            </label>
+                            <hr>
+                            <h3>SEDI TIROCINIO/STAGE</h3>
+                            <%
+                                for (Sede s1 : sedistage) {%>
+                            <label class="col-md-2 col-form-label fw-bold fs-6">
+                                <span class="text-primary"><b>SEDE TIROCINIO/STAGE - ID</b></span>
+                            </label>
+                            <label class="col-md-4 col-form-label fw-bold">
+                                <span><b><%=s1.getIdsede()%></b></span>
+                            </label>
+                            <label class="col-md-2 col-form-label fw-bold fs-6">
+                                <span class="text-primary"><b>SEDE TIROCINIO/STAGE - INDIRIZZO COMPLETO</b></span>
+                            </label>
+                            <label class="col-md-4 col-form-label fw-bold">
+                                <span><b><%=s1.getIndirizzo()%> - 
+                                        <%=s1.getCap()%> - <%=s1.getComune()%> (<%=s1.getProvincia()%>)</b></span>
+                            </label>
+
+                            <%}
+
+                            %>
                         </div>
                     </div>
-                    <!--end::Tables Widget 3-->
                 </div>
+                <!--end::Tables Widget 3-->
+            </div>
         </div>
         <!--end::Row-->
         <div id="kt_scrolltop" class="scrolltop" data-kt-scrolltop="true">

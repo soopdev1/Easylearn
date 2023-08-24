@@ -57,7 +57,7 @@
         EntityOp eo = new EntityOp();
         Long idist = Long.valueOf(Utils.dec_string(idistS));
         Istanza is1 = eo.getEm().find(Istanza.class, idist);
-        List<Allegati> la = eo.list_allegati(is1, null, null, null, null);
+        List<Allegati> la = eo.list_allegati(is1, null, null, null, null,null);
     %>
     <body id="kt_body">
         <!--begin::Main-->

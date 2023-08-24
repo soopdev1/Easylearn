@@ -34,6 +34,16 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
+                String idistS = Utils.getRequestValue(request, "idtipop");
+                if (idistS.equals("")) {
+                    idistS = (String) session.getAttribute("ses_idtipop");
+                } else {
+                    session.setAttribute("ses_idtipop", idistS);
+                }
+                EntityOp eo = new EntityOp();
+                Long idist = Long.valueOf(Utils.dec_string(idistS));
+                Tipologia_Percorso is1 = eo.getEm().find(Tipologia_Percorso.class, idist);
+    
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -64,12 +74,13 @@
         <div class="row">
             <!--begin::Col-->
             <form method="POST" action="Operations">
-                <input type="hidden" name="type" value="BO_ADDTIPOPERCORSO"/>
+                <input type="hidden" name="type" value="BO_EDIT_TIPOPERCORSO"/>
+                <input type="hidden" name="idptipop" value="<%=is1.getIdtipopercorso()%>"/>
                 <div class="col-xl-12">
                     <div class="card h-xl-100">
                         <div class="card-header border-0 pt-5">
                             <h3 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bolder fs-3 mb-1">INSERISCI NUOVA TIPOLOGIA PERCORSO</span>
+                                <span class="card-label fw-bolder fs-3 mb-1">MODIFICA TIPOLOGIA PERCORSO - ID <%=is1.getIdtipopercorso()%></span>
                             </h3>
                             <button class="btn btn-lg btn-success"><i class="fa fa-save"></i> SALVA DATI</button>
                         </div>
@@ -84,15 +95,8 @@
                                     <span class="text-danger"><b>TIPOLOGIA FINANZIAMENTO</b></span>
                                 </label>
                                 <div class="col-md-4 col-form-label fs-6">
-                                    <select 
-                                        id="TIPOPERCORSO"
-                                        name="TIPOPERCORSO" aria-label="Scegli..." 
-                                        data-control="select2" data-placeholder="Scegli..." 
-                                        class="form-select" required>
-                                        <option value=""></option>
-                                        <option value="<%=TipoCorso.AUTOFINANZIATO%>"><%=TipoCorso.AUTOFINANZIATO%></option>
-                                        <option value="<%=TipoCorso.FINANZIATO%>"><%=TipoCorso.FINANZIATO%></option>
-                                    </select>
+                                    <input type="text" 
+                                           class="form-control" readonly  value="<%=is1.getTipocorso().toString()%>"/>
                                 </div>
                                 <label class="col-md-2 col-form-label fw-bold fs-6">
                                     <span class="text-danger"><b>DESCRIZIONE</b></span>
@@ -101,7 +105,7 @@
                                     <input type="text" 
                                            name="DESCRIZIONE"
                                            id="DESCRIZIONE"
-                                           class="form-control" required />
+                                           class="form-control" required value="<%=is1.getNometipologia()%>"/>
                                 </div>
                                 <label class="col-md-2 col-form-label fw-bold fs-6">
                                     <span class="text-danger"><b>DATA INIZIO</b></span>
@@ -109,7 +113,7 @@
                                 <div class="col-md-4 col-form-label fs-6">
                                     <input type="date" name="DATAINIZIO" id="DATAINIZIO"
                                            class="form-control" 
-                                           required/>
+                                           required value="<%=Constant.sdf_PATTERNDATE6.format(is1.getDatastart())%>"/>
                                 </div>    
                                 <label class="col-md-2 col-form-label fw-bold fs-6">
                                     <span class="text-danger"><b>DATA FINE</b></span>
@@ -117,7 +121,7 @@
                                 <div class="col-md-4 col-form-label fs-6">
                                     <input type="date" name="DATAFINE" id="DATAFINE"
                                            class="form-control" 
-                                           required/>
+                                           required value="<%=Constant.sdf_PATTERNDATE6.format(is1.getDataend())%>"/>
                                 </div>    
                                 <label class="col-md-2 col-form-label fw-bold fs-6">
                                     <span class="text-danger"><b>NUMERO MASSIMO EDIZIONI</b></span>
@@ -126,7 +130,7 @@
                                     <input type="text" 
                                            name="MAXEDIZIONI"
                                            id="MAXEDIZIONI"
-                                           class="form-control intvalue" required/>
+                                           class="form-control intvalue" required value="<%=is1.getMaxedizioni()%>"/>
                                 </div>    
                                 <label class="col-md-2 col-form-label fw-bold fs-6">
                                     <span class="text-danger"><b>NUMERO MASSIMO PERCORSI</b></span>
@@ -135,7 +139,7 @@
                                     <input type="text" 
                                            name="MAXCORSI"
                                            id="MAXCORSI"
-                                           class="form-control intvalue" required/>
+                                           class="form-control intvalue" required value="<%=is1.getMaxcorsi()%>"/>
                                 </div>    
                                    
                             </div>

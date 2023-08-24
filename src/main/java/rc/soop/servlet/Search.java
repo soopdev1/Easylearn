@@ -11,7 +11,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.joda.time.DateTime;
 import rc.soop.sic.Constant;
+import static rc.soop.sic.Constant.PATTERNDATE4;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE4;
 import rc.soop.sic.Utils;
 import static rc.soop.sic.Utils.estraiEccezione;
@@ -28,6 +30,7 @@ import rc.soop.sic.jpa.Istanza;
 import rc.soop.sic.jpa.Sede;
 import rc.soop.sic.jpa.SoggettoProponente;
 import rc.soop.sic.jpa.Stati;
+import rc.soop.sic.jpa.Tipologia_Percorso;
 import rc.soop.sic.jpa.User;
 
 /**
@@ -86,7 +89,9 @@ public class Search extends HttpServlet {
                         consultaistanza = true;
                         break;
                     }
-                    case "07": {
+                    case "07":
+                    case "08":
+                    case "09": {
                         eliminaistanza = false;
                         consultaistanza = true;
                         break;
@@ -136,11 +141,13 @@ public class Search extends HttpServlet {
                 if (consultaistanza) {
                     azioni += "<button type=\"submit\"class=\"btn btn-sm btn-primary\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ISTANZA\"data-preload='false'><i class=\"fa fa-file-text\"></i></button> | ";
                 }
+
                 if (addcorso) {
                     azioni += "<a href=\"US_addcorsoistanza.jsp?idist=" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\" data-fancybox data-type='iframe' "
                             + "data-bs-toggle=\"tooltip\" title=\"AGGIUNGI CORSO AD ISTANZA\" data-preload='false' data-width='100%' data-height='100%' "
                             + "class=\"btn btn-sm btn-bg-light btn-primary fan1\"><i class=\"fa fa-plus-circle\"></i></a> | ";
                 }
+
                 if (salvaistanza) {
                     azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VERIFICA E SALVA ISTANZA\" data-preload='false' "
                             + "class=\"btn btn-sm btn-bg-light btn-success\" onclick=\"return saveistanza('" + res.getIdistanza() + "')\"><i class=\"fa fa-save\"></i></button> | ";
@@ -151,7 +158,7 @@ public class Search extends HttpServlet {
 
                 if (eliminaistanza) {
                     azioni += "<button type=\"button\"class=\"btn btn-sm btn-bg-light btn-danger\" data-bs-toggle=\"tooltip\" title=\"ELIMINA ISTANZA\" data-preload='false' " + ""
-                            + "onclick=\"return deleteistanza('<%=is1.getIdistanza()%>')\"><i class=\"fa fa-remove\"></i></button> |";
+                            + "onclick=\"return deleteistanza('<%=is1.getIdistanza()%>')\"><i class=\"fa fa-remove\"></i></button> | ";
                 }
 
                 azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"" + labelallegati + "\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\""
@@ -223,89 +230,108 @@ public class Search extends HttpServlet {
                 data_value.addProperty("stato", res.getStatocorso().getHtmldescr());
 
                 String azioni = "<i class='fa fa-hourglass'></i>";
-                if (res.getStatocorso().getCodicestatocorso().equals("07")) {//DA GESTIRE
-                    azioni = "<div class=\"p-2 min-w-150px btn-group btn-group-justified\" role=\"group\" aria-label=\"Basic example\">"
-                            + "<form action=\"US_showistanza.jsp\" method=\"POST\" target=\"_blank\">"
-                            + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
-                            + "<button type=\"submit\"class=\"btn btn-sm btn-primary\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ISTANZA PRESENTATA\" data-preload='false'>"
-                            + "<i class=\"fa fa-file-text\"></i></button>"
-                            + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ALLEGATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\" "
-                            + " onclick=\"return document.getElementById('gestall_" + res.getIdistanza() + "').submit();\"><i class=\"fa fa-file-clipboard\"></i></button>"
-                            //+ "<a href='ADM_protocollaistanza.jsp?idist=" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
-                            //+ " class=\"btn btn-sm btn-bg-light btn-warning text-dark fan1\" data-bs-toggle=\"tooltip\" title=\"PROTOCOLLA ISTANZA\" data-preload='false' "
-                            //+ "\"><i class=\"fa fa-stamp\"></i></a>"
-                            + "&nbsp;&nbsp;"
-                            + "<a href='ADM_approvaistanza.jsp?idist=" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
-                            + " class=\"btn btn-sm btn-bg-light btn-success fan1\" data-bs-toggle=\"tooltip\" title=\"APPROVA ISTANZA\" data-preload='false' "
-                            + "\"><i class=\"fa fa-check\"></i></a>"
-                            + "<a href='ADM_rigettaistanza.jsp?idist=" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
-                            + " class=\"btn btn-sm btn-bg-light btn-danger fan1\" data-bs-toggle=\"tooltip\" title=\"RIGETTA ISTANZA\" data-preload='false' "
-                            + "\"><i class=\"fa fa-remove\"></i></a>"
-                            + "</form>"
-                            + "<form action=\"ADM_allegati.jsp\" method=\"POST\" target=\"_blank\" id=\"gestall_" + res.getIdistanza() + "\">"
-                            + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/></form></div>";
-                } else if (res.getStatocorso().getCodicestatocorso().equals("08")) { //APPROVATA
-                    azioni = "<div class=\"p-2 min-w-150px btn-group btn-group-justified\" role=\"group\" aria-label=\"Basic example\">"
-                            + "<form action=\"US_showistanza.jsp\" method=\"POST\" target=\"_blank\">"
-                            + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
-                            + "<button type=\"submit\"class=\"btn btn-sm btn-primary\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ISTANZA PRESENTATA\" data-preload='false'>"
-                            + "<i class=\"fa fa-file-text\"></i></button>"
-                            + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ALLEGATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\" "
-                            + " onclick=\"return document.getElementById('gestall_" + res.getIdistanza() + "').submit();\"><i class=\"fa fa-file-clipboard\"></i></button>"
-                            + "<br>";
-                    if (res.getPathfirmato() != null) {
-                        azioni
-                                += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA DECRETO AUT.\" data-preload='false' "
-                                + "class=\"btn btn-sm btn-bg-light btn-dark\" "
-                                + " onclick=\"return document.getElementById('generadecretotemplate1_" + res.getIdistanza()
-                                + "').submit();\"><i class=\"fa fa-file-pdf\"></i></button>"
-                                + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA DECRETO AUT.FIRMATO\" data-preload='false' "
-                                + "class=\"btn btn-sm btn-bg-light btn-success\" "
-                                + " onclick=\"return document.getElementById('scaricadecretofirmato1_" + res.getIdistanza()
-                                + "').submit();\"><i class=\"fa fa-file-pdf\"></i></button>"
-                                + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA DECRETO AUT. V2\" data-preload='false' "
-                                + "class=\"btn btn-sm btn-bg-light btn-danger\" "
-                                + " onclick=\"return document.getElementById('scaricadecretofto1_" + res.getIdistanza()
-                                + "').submit();\"><i class=\"fa fa-file-pdf\"></i></button>"
-                                + "<button type=\"button\"class=\"btn btn-sm btn-warning\"\n"
-                                + "data-bs-toggle=\"tooltip\" title=\"NOTIFICA SOGGETTO PROPONENTE\" data-preload='false' "
-                                + "onclick=\"return invianotificaddecreto('" + res.getIdistanza() + "')\" ><i class=\"fa fa-envelope\"></i></button>"
+
+                switch (res.getStatocorso().getCodicestatocorso()) {
+                    case "07": {
+                        //DA GESTIRE
+                        azioni = "<div class=\"p-2 min-w-150px btn-group btn-group-justified\" role=\"group\" aria-label=\"Basic example\">"
+                                + "<form action=\"US_showistanza.jsp\" method=\"POST\" target=\"_blank\">"
+                                + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
+                                + "<button type=\"submit\"class=\"btn btn-sm btn-primary\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ISTANZA PRESENTATA\" data-preload='false'>"
+                                + "<i class=\"fa fa-file-text\"></i></button>"
+                                + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ALLEGATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\" "
+                                + " onclick=\"return document.getElementById('gestall_" + res.getIdistanza() + "').submit();\"><i class=\"fa fa-file-clipboard\"></i></button>"
+                                //+ "<a href='ADM_protocollaistanza.jsp?idist=" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+                                //+ " class=\"btn btn-sm btn-bg-light btn-warning text-dark fan1\" data-bs-toggle=\"tooltip\" title=\"PROTOCOLLA ISTANZA\" data-preload='false' "
+                                //+ "\"><i class=\"fa fa-stamp\"></i></a>"
+                                + "&nbsp;&nbsp;"
+                                + "<a href='ADM_approvaistanza.jsp?idist=" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+                                + " class=\"btn btn-sm btn-bg-light btn-success fan1\" data-bs-toggle=\"tooltip\" title=\"APPROVA ISTANZA\" data-preload='false' "
+                                + "\"><i class=\"fa fa-check\"></i></a>"
+                                + "<a href='ADM_rigettaistanza.jsp?idist=" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+                                + " class=\"btn btn-sm btn-bg-light btn-danger fan1\" data-bs-toggle=\"tooltip\" title=\"RIGETTA ISTANZA\" data-preload='false' "
+                                + "\"><i class=\"fa fa-remove\"></i></a>"
                                 + "</form>"
                                 + "<form action=\"ADM_allegati.jsp\" method=\"POST\" target=\"_blank\" id=\"gestall_" + res.getIdistanza() + "\">"
-                                + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
-                                + "</form>"
-                                + "<form action=\"Operations\" method=\"POST\" target=\"_blank\" id=\"generadecretotemplate1_" + res.getIdistanza() + "\">"
-                                + "<input type=\"hidden\" name=\"type\" value=\"GENERADECRETOBASE\"/>"
-                                + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
-                                + "</form>"
-                                + "<form action=\"Operations\" method=\"POST\" target=\"_blank\" id=\"scaricadecretofirmato1_" + res.getIdistanza() + "\">"
-                                + "<input type=\"hidden\" name=\"type\" value=\"SCARICADECRETOFIRMATO\"/>"
-                                + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
-                                + "</form>"
-                                + "<form action=\"Operations\" method=\"POST\" target=\"_blank\" id=\"scaricadecretofto1_" + res.getIdistanza() + "\">"
-                                + "<input type=\"hidden\" name=\"type\" value=\"GENERADECRETODDSFTO\"/>"
-                                + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
-                                + "</form>";
-                    } else {
-                        azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"SCARICA DECRETO AUT.\" data-preload='false' "
-                                + "class=\"btn btn-sm btn-bg-light btn-dark\" "
-                                + " onclick=\"return document.getElementById('generadecretotemplate1_" + res.getIdistanza() + "').submit();\"><i class=\"fa fa-file-pdf\"></i></button>"
-                                + "<a href='ADM_uploaddecretofirmato.jsp?idist=" + Utils.enc_string(String.valueOf(res.getIdistanza()))
-                                + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
-                                + " class=\"btn btn-sm btn-bg-light btn-warning fan1\" data-bs-toggle=\"tooltip\" title=\"UPLOAD DECRETO FIRMATO\" data-preload='false' "
-                                + "><i class=\"fa fa-upload\"></i></a>"
-                                + "</form>"
-                                + "<form action=\"ADM_allegati.jsp\" method=\"POST\" target=\"_blank\" id=\"gestall_" + res.getIdistanza() + "\">"
-                                + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
-                                + "</form>"
-                                + "<form action=\"Operations\" method=\"POST\" target=\"_blank\" id=\"generadecretotemplate1_" + res.getIdistanza() + "\">"
-                                + "<input type=\"hidden\" name=\"type\" value=\"GENERADECRETOBASE\"/>"
-                                + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
-                                + "</form>";
+                                + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/></form></div>";
+                        break;
                     }
-
-                    azioni += "</div>";
-
+                    case "09":
+                    case "10": {
+                        azioni = "<div class=\"p-2 min-w-150px btn-group btn-group-justified\" role=\"group\" aria-label=\"Basic example\">"
+                                + "<form action=\"US_showistanza.jsp\" method=\"POST\" target=\"_blank\">"
+                                + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
+                                + "<button type=\"submit\"class=\"btn btn-sm btn-primary\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ISTANZA PRESENTATA\" data-preload='false'>"
+                                + "<i class=\"fa fa-file-text\"></i></button>"
+                                + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ALLEGATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\" "
+                                + " onclick=\"return document.getElementById('gestall_" + res.getIdistanza() + "').submit();\"><i class=\"fa fa-file-clipboard\"></i></button>";
+                        break;
+                    }
+                    case "08": {
+                        //APPROVATA
+                        azioni = "<div class=\"p-2 min-w-150px btn-group btn-group-justified\" role=\"group\" aria-label=\"Basic example\">"
+                                + "<form action=\"US_showistanza.jsp\" method=\"POST\" target=\"_blank\">"
+                                + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
+                                + "<button type=\"submit\"class=\"btn btn-sm btn-primary\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ISTANZA PRESENTATA\" data-preload='false'>"
+                                + "<i class=\"fa fa-file-text\"></i></button>"
+                                + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ALLEGATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\" "
+                                + " onclick=\"return document.getElementById('gestall_" + res.getIdistanza() + "').submit();\"><i class=\"fa fa-file-clipboard\"></i></button>"
+                                + "<br>";
+                        if (res.getPathfirmato() != null) {
+                            azioni
+                                    += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA DECRETO AUT.\" data-preload='false' "
+                                    + "class=\"btn btn-sm btn-bg-light btn-dark\" "
+                                    + " onclick=\"return document.getElementById('generadecretotemplate1_" + res.getIdistanza()
+                                    + "').submit();\"><i class=\"fa fa-file-pdf\"></i></button>"
+                                    + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA DECRETO AUT.FIRMATO\" data-preload='false' "
+                                    + "class=\"btn btn-sm btn-bg-light btn-success\" "
+                                    + " onclick=\"return document.getElementById('scaricadecretofirmato1_" + res.getIdistanza()
+                                    + "').submit();\"><i class=\"fa fa-file-pdf\"></i></button>"
+                                    + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA DECRETO AUT. V2\" data-preload='false' "
+                                    + "class=\"btn btn-sm btn-bg-light btn-danger\" "
+                                    + " onclick=\"return document.getElementById('scaricadecretofto1_" + res.getIdistanza()
+                                    + "').submit();\"><i class=\"fa fa-file-pdf\"></i></button>"
+                                    + "<button type=\"button\"class=\"btn btn-sm btn-warning\"\n"
+                                    + "data-bs-toggle=\"tooltip\" title=\"NOTIFICA SOGGETTO PROPONENTE\" data-preload='false' "
+                                    + "onclick=\"return invianotificaddecreto('" + res.getIdistanza() + "')\" ><i class=\"fa fa-envelope\"></i></button>"
+                                    + "</form>"
+                                    + "<form action=\"ADM_allegati.jsp\" method=\"POST\" target=\"_blank\" id=\"gestall_" + res.getIdistanza() + "\">"
+                                    + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
+                                    + "</form>"
+                                    + "<form action=\"Operations\" method=\"POST\" target=\"_blank\" id=\"generadecretotemplate1_" + res.getIdistanza() + "\">"
+                                    + "<input type=\"hidden\" name=\"type\" value=\"GENERADECRETOBASE\"/>"
+                                    + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
+                                    + "</form>"
+                                    + "<form action=\"Operations\" method=\"POST\" target=\"_blank\" id=\"scaricadecretofirmato1_" + res.getIdistanza() + "\">"
+                                    + "<input type=\"hidden\" name=\"type\" value=\"SCARICADECRETOFIRMATO\"/>"
+                                    + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
+                                    + "</form>"
+                                    + "<form action=\"Operations\" method=\"POST\" target=\"_blank\" id=\"scaricadecretofto1_" + res.getIdistanza() + "\">"
+                                    + "<input type=\"hidden\" name=\"type\" value=\"GENERADECRETODDSFTO\"/>"
+                                    + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
+                                    + "</form>";
+                        } else {
+                            azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"SCARICA DECRETO AUT.\" data-preload='false' "
+                                    + "class=\"btn btn-sm btn-bg-light btn-dark\" "
+                                    + " onclick=\"return document.getElementById('generadecretotemplate1_" + res.getIdistanza() + "').submit();\"><i class=\"fa fa-file-pdf\"></i></button>"
+                                    + "<a href='ADM_uploaddecretofirmato.jsp?idist=" + Utils.enc_string(String.valueOf(res.getIdistanza()))
+                                    + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+                                    + " class=\"btn btn-sm btn-bg-light btn-warning fan1\" data-bs-toggle=\"tooltip\" title=\"UPLOAD DECRETO FIRMATO\" data-preload='false' "
+                                    + "><i class=\"fa fa-upload\"></i></a>"
+                                    + "</form>"
+                                    + "<form action=\"ADM_allegati.jsp\" method=\"POST\" target=\"_blank\" id=\"gestall_" + res.getIdistanza() + "\">"
+                                    + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
+                                    + "</form>"
+                                    + "<form action=\"Operations\" method=\"POST\" target=\"_blank\" id=\"generadecretotemplate1_" + res.getIdistanza() + "\">"
+                                    + "<input type=\"hidden\" name=\"type\" value=\"GENERADECRETOBASE\"/>"
+                                    + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
+                                    + "</form>";
+                        }
+                        azioni += "</div>";
+                        break;
+                    }
+                    default:
+                        break;
                 }
 
                 data_value.addProperty("azioni", azioni);
@@ -409,6 +435,7 @@ public class Search extends HttpServlet {
 
     protected void list_enti(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         List<EnteStage> result;
         try {
             if (isAdmin(request.getSession())) {
@@ -421,7 +448,6 @@ public class Search extends HttpServlet {
             Constant.LOGGER.severe(estraiEccezione(ex));
             result = new ArrayList<>();
         }
-        System.out.println("rc.soop.servlet.Search.list_enti() " + result.size());
 
         try (PrintWriter out = response.getWriter()) {
             JsonObject jMembers = new JsonObject();
@@ -448,15 +474,19 @@ public class Search extends HttpServlet {
                         + "data-bs-toggle=\"tooltip\" title=\"DETTAGLI\" "
                         + "data-preload='false' class=\"btn btn-sm btn-bg-light btn-primary fan1\">"
                         + "<i class=\"fa fa-user\"></i></a> | "
-                        + "<a href=\"US_allegatiente.jsp?idallievo=" + Utils.enc_string(String.valueOf(res.getIdentestage())) + "\" data-fancybox data-type='iframe' "
+                        + "<a href=\"US_aggiungisedeente.jsp?idente=" + Utils.enc_string(String.valueOf(res.getIdentestage())) + "\" data-fancybox data-type='iframe' "
+                        + "data-bs-toggle=\"tooltip\" title=\"AGGIUNGI SEDE TIROCINIO/STAGE\" "
+                        + "data-preload='false' class=\"btn btn-sm btn-bg-light btn-warning fan1\">"
+                        + "<i class=\"fa fa-plus\"></i></a> | "
+                        + "<a href=\"US_allegatiente.jsp?idente=" + Utils.enc_string(String.valueOf(res.getIdentestage())) + "\" data-fancybox data-type='iframe' "
                         + "data-bs-toggle=\"tooltip\" title=\"GESTIONE ALLEGATI\" "
                         + "data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary fan1\">"
-                        + "<i class=\"fa fa-file-clipboard\"></i></a>"
-                        + " | <button type=\"button\"class=\"btn btn-sm btn-bg-light btn-danger\""
-                        + " data-bs-toggle=\"tooltip\" title=\"DISABILITA ENTE\""
-                        + " data-preload='false'"
-                        + " onclick=\"return disabilitaente('" + res.getIdentestage() + "','" + res.getPARTITAIVA() + "')\"><i class=\"fa fa-remove\"></i>"
-                        + " </button>";
+                        + "<i class=\"fa fa-file-clipboard\"></i></a>";
+                //+ " | <button type=\"button\"class=\"btn btn-sm btn-bg-light btn-danger\""
+                //+ " data-bs-toggle=\"tooltip\" title=\"DISABILITA ENTE\""
+                //+ " data-preload='false'"
+                //+ " onclick=\"return disabilitaente('" + res.getIdentestage() + "','" + res.getPARTITAIVA() + "')\"><i class=\"fa fa-remove\"></i>"
+                //+ " </button>";
 
                 data_value.addProperty("azioni", azioni);
                 data.add(data_value);
@@ -581,6 +611,45 @@ public class Search extends HttpServlet {
         }
     }
 
+    protected void BO_LIST_TIPOLOGIAPERCORSO(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try (PrintWriter out = response.getWriter()) {
+            JsonObject jMembers = new JsonObject();
+            JsonArray data = new JsonArray();
+
+            List<Tipologia_Percorso> result = (List<Tipologia_Percorso>) new EntityOp().findAll(Tipologia_Percorso.class);
+
+            jMembers.addProperty(ITOTALRECORDS, result.size());
+            jMembers.addProperty(ITOTALDISPLAY, result.size());
+            jMembers.addProperty(SECHO, 0);
+            jMembers.addProperty(SCOLUMS, "");
+            AtomicInteger at = new AtomicInteger(1);
+            result.forEach(res -> {
+
+                JsonObject data_value = new JsonObject();
+                data_value.addProperty(RECORDID, at.get());
+                data_value.addProperty("tipo", res.getTipocorso().name());
+                data_value.addProperty("descrizione", res.getNometipologia());
+                data_value.addProperty("datastart", new DateTime(res.getDatastart()).toString(PATTERNDATE4));
+                data_value.addProperty("dataend", new DateTime(res.getDataend()).toString(PATTERNDATE4));
+                data_value.addProperty("stato", res.getEtichettastato());
+                data_value.addProperty("maxcorsi", res.getMaxcorsi());
+                data_value.addProperty("maxedizioni", res.getMaxedizioni());
+                String azioni = "<a href=\"ADM_edittipopercorso.jsp?idtipop=" + Utils.enc_string(String.valueOf(res.getIdtipopercorso())) + "\" data-fancybox data-type='iframe' "
+                        + "data-bs-toggle=\"tooltip\" title=\"MODIFICA TIPOLOGIA PERCORSO\" data-preload='false' data-width='100%' data-height='100%' "
+                        + "class=\"btn btn-sm btn-bg-light btn-warning fan1\"><i class=\"fa fa-edit\"></i></a>";
+                data_value.addProperty("azioni", azioni);
+                data.add(data_value);
+
+                at.addAndGet(1);
+            });
+            jMembers.add(AADATA, data);
+            response.setContentType(APPJSON);
+            response.setHeader(CONTENTTYPE, APPJSON);
+            out.print(jMembers.toString());
+        }
+    }
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -616,6 +685,9 @@ public class Search extends HttpServlet {
                     break;
                 case "list_istanze_user":
                     list_istanze_user(request, response);
+                    break;
+                case "BO_LIST_TIPOLOGIAPERCORSO":
+                    BO_LIST_TIPOLOGIAPERCORSO(request, response);
                     break;
                 default: {
                     String p = request.getContextPath();

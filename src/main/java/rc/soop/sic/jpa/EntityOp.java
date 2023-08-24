@@ -117,6 +117,13 @@ public class EntityOp {
         return q.getResultList().isEmpty() ? null : (Istanza) q.getSingleResult();
     }
 
+    public List<Sede> getSediStage(EnteStage es) {
+        TypedQuery q = this.em.createNamedQuery("entestage.sediformative", Sede.class);
+        q.setParameter("entestage", es);
+        q.setParameter("tipo", this.em.find(TipoSede.class, 4L));
+        return (List<Sede>) q.getResultList();
+    }
+
     public List<Corso> getCorsiIstanza(Istanza is) {
         TypedQuery q = this.em.createNamedQuery("corso.istanza", Istanza.class);
         q.setParameter("codiceistanza", is);
@@ -200,22 +207,22 @@ public class EntityOp {
         q.setParameter("inattivo", Stati.INATTIVO);
         return (List<Allievi>) q.getResultList();
     }
-    
+
     public List<EnteStage> getEntiStageSoggetto(SoggettoProponente s) {
         TypedQuery q = this.em.createNamedQuery("entestage.soggetto", EnteStage.class);
         q.setParameter("soggetto", s);
         return (List<EnteStage>) q.getResultList();
     }
-    
+
     public boolean esisteAllievoCF(String codicefiscale) {
         TypedQuery q = this.em.createNamedQuery("allievi.attivi.cf", Allievi.class);
         q.setParameter("codicefiscale", codicefiscale);
-        q.setParameter("inattivo", Stati.INATTIVO);        
+        q.setParameter("inattivo", Stati.INATTIVO);
         q.setMaxResults(1);
         return !q.getResultList().isEmpty();
     }
-    
-    public boolean esisteEnteStageSoggetto(SoggettoProponente s,String partitaiva) {
+
+    public boolean esisteEnteStageSoggetto(SoggettoProponente s, String partitaiva) {
         TypedQuery q = this.em.createNamedQuery("entestage.soggetto.pi", EnteStage.class);
         q.setParameter("soggetto", s);
         q.setParameter("partitaiva", partitaiva);
@@ -290,7 +297,7 @@ public class EntityOp {
         q.setMaxResults(1);
         return q.getResultList().isEmpty() ? null : (IncrementalCorso) q.getSingleResult();
     }
-    
+
     public IstatCode getComuneCF(String codicecf) {
         TypedQuery q = this.em.createNamedQuery("istat.codice", IstatCode.class);
         q.setParameter("codicecf", codicecf);
@@ -310,11 +317,9 @@ public class EntityOp {
         return (List<Information>) q.getResultList();
     }
 
-    public List<Allegati> list_allegati(Istanza is1, Corso c1, Corsoavviato c2, Docente d1, Allievi a1) {
-
-        List<Allegati> elenco = new ArrayList<>();
+    public List<Allegati> list_allegati(Istanza is1, Corso c1, Corsoavviato c2, Docente d1, Allievi a1, EnteStage es1) {
+        List<Allegati> elenco = new ArrayList<>();       
         if (is1 != null) {
-
             try {
                 TypedQuery q = this.em.createNamedQuery("allegati.istanza.ok", Allegati.class);
                 q.setParameter("istanza", is1);
@@ -322,7 +327,14 @@ public class EntityOp {
             } catch (Exception ex0) {
                 trackingAction("SERVICE", estraiEccezione(ex0));
             }
-
+        } else if (es1 != null) {
+            try {
+                TypedQuery q = this.em.createNamedQuery("allegati.entestage.ok", Allegati.class);
+                q.setParameter("entestage", es1);
+                elenco.addAll((List<Allegati>) q.getResultList());
+            } catch (Exception ex0) {
+                trackingAction("SERVICE", estraiEccezione(ex0));
+            }
         } else if (a1 != null) {
             try {
                 TypedQuery q = this.em.createNamedQuery("allegati.allievi.ok", Allegati.class);
@@ -330,7 +342,7 @@ public class EntityOp {
                 elenco.addAll((List<Allegati>) q.getResultList());
             } catch (Exception ex0) {
                 trackingAction("SERVICE", estraiEccezione(ex0));
-            }            
+            }
         }
         return elenco;
     }

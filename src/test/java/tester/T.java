@@ -22,13 +22,13 @@ import rc.soop.sic.jpa.Istanza;
 public class T {
 
     public static void main(String[] args) {
-        EntityOp ep1 = new EntityOp();
+//        EntityOp ep1 = new EntityOp();
+//        String[] to = {"developers@smartoop.it"};
+//        SendMail.sendPec(ep1, to, null, null, "TEST INVIO PEC PIATTAFORMA AUTORIZZAZIONE CORSI", "TEST INVIO PEC PIATTAFORMA AUTORIZZAZIONE CORSI", null);
 
-        Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf("26"));
-
-        Pdf.GENERADECRETODDSFTO(ep1, is1);
-        
-        
+//        Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf("26"));
+//
+//        Pdf.GENERADECRETODDSFTO(ep1, is1);
 //        double d = 1500.0;
 //        
 //        System.out.println("tester.T.main() "+Utils.roundDoubleandFormat(d, 2));

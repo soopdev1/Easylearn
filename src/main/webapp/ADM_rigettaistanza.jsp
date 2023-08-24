@@ -26,7 +26,7 @@
                 EntityOp eo = new EntityOp();
                 Long idc1 = Long.valueOf(Utils.dec_string(idist));
                 Istanza is1 = eo.getEm().find(Istanza.class, idc1);
-                List<Allegati> la = eo.list_allegati(is1, null, null, null, null);
+                List<Allegati> la = eo.list_allegati(is1, null, null, null, null,null);
     %>
     <!--begin::Head-->
     <head><base href="">

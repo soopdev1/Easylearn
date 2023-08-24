@@ -8,14 +8,14 @@ function verificasalvataggiodati() {
     var ok = false;
     $.ajax({
         url: 'Operations',
-        type: 'POST',
+        type: 'POST',        
         data: {
-            'type': 'CHECKMODULO',
-            'IDOCORSO': idcorsodasalvare,
-            'ORETOTALI': ORETOTALI,
-            'OREAULATEO': OREAULATEO,
-            'OREAULATEC': OREAULATEC,
-            'OREELE': OREELE
+            "type": "CHECKMODULO",
+            "IDOCORSO": idcorsodasalvare,
+            "ORETOTALI": ORETOTALI,
+            "OREAULATEO": OREAULATEO,
+            "OREAULATEC": OREAULATEC,
+            "OREELE": OREELE
         },
         dataType: 'json',
         async: false,
@@ -48,9 +48,7 @@ function check_abilita_competenze() {
     $('.compicon').css('display', 'none');
     $('.checkboxesr input[type=checkbox]').each(function () {
         var completeid = $(this).attr('id');
-//        var idch = completeid.split('_')[1];
         var idcompetenza = completeid.split('_')[2];
-
         if (completeid.startsWith("AB")) {
             if (this.checked) {
                 $('#comp_' + idcompetenza).css('display', '');
@@ -69,5 +67,10 @@ $(document).ready(function () {
         digits: 1,
         numericInput: true
     }).mask(".decimalvalue");
+    Inputmask({
+        mask: "9999",
+        digits: 1,
+        numericInput: true
+    }).mask(".intvalue");
     return check_abilita_competenze();
 });

@@ -37,7 +37,6 @@ import rc.soop.sic.Engine;
 import rc.soop.sic.Pdf;
 import rc.soop.sic.SendMail;
 import rc.soop.sic.Utils;
-import static rc.soop.sic.Utils.calcolaPercentuale;
 import static rc.soop.sic.Utils.datemysqltoita;
 import static rc.soop.sic.Utils.estraiEccezione;
 import static rc.soop.sic.Utils.fd;
@@ -52,6 +51,7 @@ import static rc.soop.sic.Utils.normalizeUTF8;
 import static rc.soop.sic.Utils.parseIntR;
 import static rc.soop.sic.Utils.parseLongR;
 import static rc.soop.sic.Utils.redirect;
+import static rc.soop.sic.Utils.roundDoubleandFormat;
 import rc.soop.sic.jpa.Abilita;
 import rc.soop.sic.jpa.Allegati;
 import rc.soop.sic.jpa.Allievi;
@@ -88,6 +88,93 @@ import rc.soop.sic.jpa.User;
  * @author Raffaele
  */
 public class Operations extends HttpServlet {
+
+    protected void BO_EDIT_TIPOPERCORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            EntityOp ep1 = new EntityOp();
+            Tipologia_Percorso tc = ep1.getEm().find(Tipologia_Percorso.class, Long.valueOf(getRequestValue(request, "idptipop")));
+            String DESCRIZIONE = normalizeUTF8(getRequestValue(request, "DESCRIZIONE"));
+            tc.setDataend(sdf_PATTERNDATE6.parse(getRequestValue(request, "DATAFINE")));
+            tc.setDatastart(sdf_PATTERNDATE6.parse(getRequestValue(request, "DATAINIZIO")));
+            tc.setNometipologia(DESCRIZIONE);
+            tc.setMaxcorsi(parseIntR(getRequestValue(request, "MAXCORSI")));
+            tc.setMaxedizioni(parseIntR(getRequestValue(request, "MAXEDIZIONI")));
+            ep1.begin();
+            ep1.merge(tc);
+            ep1.commit();
+            ep1.close();
+            redirect(request, response, "Page_message.jsp?esito=OK_UPAL");
+
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_NTP1");
+        }
+
+    }
+
+    protected void BO_ADDTIPOPERCORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        try {
+
+            EntityOp ep1 = new EntityOp();
+//            SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
+
+            String TIPOPERCORSO = getRequestValue(request, "TIPOPERCORSO");
+            String DESCRIZIONE = normalizeUTF8(getRequestValue(request, "DESCRIZIONE"));
+
+            Tipologia_Percorso tc = new Tipologia_Percorso();
+            tc.setDataend(sdf_PATTERNDATE6.parse(getRequestValue(request, "DATAFINE")));
+            tc.setDatastart(sdf_PATTERNDATE6.parse(getRequestValue(request, "DATAINIZIO")));
+            tc.setNometipologia(DESCRIZIONE);
+            tc.setTipocorso(TipoCorso.valueOf(TIPOPERCORSO));
+            tc.setStatotipologiapercorso(Stati.ABILITATO);
+            tc.setMaxcorsi(parseIntR(getRequestValue(request, "MAXCORSI")));
+            tc.setMaxedizioni(parseIntR(getRequestValue(request, "MAXEDIZIONI")));
+            ep1.begin();
+            ep1.persist(tc);
+            ep1.commit();
+            ep1.close();
+            redirect(request, response, "Page_message.jsp?esito=OK_UPAL");
+
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_NTP1");
+        }
+
+    }
+
+    protected void ADDSEDESTAGETIROCINIOENTE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+
+            EntityOp ep1 = new EntityOp();
+//            SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
+
+            EnteStage es = ep1.getEm().find(EnteStage.class, Long.valueOf(getRequestValue(request, "idente")));
+
+            String SF_INDIRIZZO = normalizeUTF8(getRequestValue(request, "SF_INDIRIZZO"));
+            String SF_CAP = normalizeUTF8(getRequestValue(request, "SF_CAP"));
+            String SF_COMUNE = normalizeUTF8(getRequestValue(request, "SF_COMUNE"));
+            String SF_PROVINCIA = normalizeUTF8(getRequestValue(request, "SF_PROVINCIA"));
+
+            Sede ss1 = new Sede();
+            ss1.setCap(SF_CAP);
+            ss1.setComune(SF_COMUNE);
+            ss1.setIndirizzo(SF_INDIRIZZO);
+            ss1.setProvincia(SF_PROVINCIA);
+            ss1.setEntestage(es);
+            ss1.setTipo(ep1.getEm().find(TipoSede.class, 4L));
+
+            ep1.begin();
+            ep1.persist(ss1);
+            ep1.commit();
+            ep1.close();
+            redirect(request, response, "Page_message.jsp?esito=OK_UPAL");
+
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_NSED1");
+        }
+    }
 
     protected void ADDENTEOSPITANTE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
@@ -471,7 +558,7 @@ public class Operations extends HttpServlet {
                 if (is1 != null) {
                     boolean soccorsoistr = getRequestValue(request, "soccorsoistr").equalsIgnoreCase("on");
                     String motivazione = getRequestValue(request, "motivazione");
-                    List<Allegati> la = ep1.list_allegati(is1, null, null, null, null);
+                    List<Allegati> la = ep1.list_allegati(is1, null, null, null, null, null);
 
                     List<Long> idko = new ArrayList<>();
 
@@ -695,6 +782,85 @@ public class Operations extends HttpServlet {
             }
         } else {
             redirect(request, response, "404.jsp");
+        }
+    }
+
+    protected void UPLDOCENTE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+
+            EntityOp ep1 = new EntityOp();
+            String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
+//            SoggettoProponente so = ((User) request.getSession().getAttribute("us_cod")).getSoggetto();
+            Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
+            FileItemFactory factory = new DiskFileItemFactory();
+            ServletFileUpload upload = new ServletFileUpload(factory);
+            File nomefile = null;
+            List<FileItem> items = upload.parseRequest(request);
+            Iterator<FileItem> iterator = items.iterator();
+            String IDENTE = null;
+            String DESCRIZIONE = null;
+            String MIME = null;
+            String codiceDOC = generateIdentifier(6);
+            while (iterator.hasNext()) {
+                FileItem item = (FileItem) iterator.next();
+                if (item.isFormField()) {
+                    if (item.getFieldName().equals("idente")) {
+                        IDENTE = item.getString();
+                    } else if (item.getFieldName().equals("DESCRIZIONE")) {
+                        DESCRIZIONE = normalizeUTF8(normalize(item.getString()));
+                    }
+                } else {
+                    String fileName = item.getName();
+                    String estensione = fileName.substring(fileName.lastIndexOf("."));
+                    String nome = codiceDOC + new DateTime().toString(PATTERNDATE3)
+                            + RandomStringUtils.randomAlphabetic(15) + estensione;
+                    try {
+                        nomefile = new File(pathtemp.getDescrizione() + nome);
+                        item.write(nomefile);
+                        MIME = getMimeType(nomefile);
+                    } catch (Exception ex) {
+                        EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
+                        nomefile = null;
+                    }
+                }
+            }
+
+            if (nomefile != null) {
+
+                if (IDENTE != null) {
+                    request.getSession().setAttribute("ses_idente", Utils.enc_string(IDENTE));
+                    EnteStage all0 = ep1.getEm().find(EnteStage.class, Long.valueOf(IDENTE));
+                    if (all0 != null) {
+
+                        Allegati al1 = new Allegati();
+                        al1.setEntestage(all0);
+                        al1.setCodiceallegati(codiceDOC);
+                        al1.setContent(Base64.encodeBase64String(FileUtils.readFileToByteArray(nomefile)));
+                        al1.setDescrizione(DESCRIZIONE);
+                        al1.setStato(ep1.getEm().find(CorsoStato.class, "30"));
+                        al1.setMimetype(MIME);
+                        al1.setUtentecaricamento(utentecaricamento);
+                        al1.setDatacaricamento(new Date());
+
+                        ep1.begin();
+                        ep1.persist(al1);
+                        ep1.commit();
+                        ep1.close();
+                        redirect(request, response, "US_allegatiente.jsp");
+                    } else {
+                        redirect(request, response, "Page_message.jsp?esito=KOUP_EN1");
+                    }
+                } else {
+                    redirect(request, response, "Page_message.jsp?esito=KOUP_EN2");
+                }
+            } else {
+                redirect(request, response, "Page_message.jsp?esito=KOUP_IS3");
+            }
+
+        } catch (Exception ex1) {
+            ex1.printStackTrace();
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KOUP_IS4");
         }
     }
 
@@ -1207,8 +1373,8 @@ public class Operations extends HttpServlet {
                 ct.setNomemodulo(NOMEMODULO);
                 ct.setOre(ORETOTALI);
                 ct.setOre_aula(OREAULATEC + OREAULATEO);
-                ct.setOre_teorica_aula(OREAULATEC);
-                ct.setOre_tecnica_operativa(OREAULATEO);
+                ct.setOre_teorica_aula(OREAULATEO);
+                ct.setOre_tecnica_operativa(OREAULATEC);
                 ct.setOre_teorica_el(OREELE);
                 ct.setTipomodulo("MODULOFORMATIVO");
                 ep1.begin();
@@ -1238,59 +1404,54 @@ public class Operations extends HttpServlet {
 
         if (co1 != null) {
 
-            double mx_oreteo = Utils.calcolaPercentuale(String.valueOf(co1.getDurataore()), String.valueOf(60));
-            double mx_oretec = Utils.calcolaPercentuale(String.valueOf(co1.getDurataore()), String.valueOf(40));
+            double min_oretec = Utils.calcolaPercentuale(String.valueOf(co1.getDurataore()), String.valueOf(60));
 
-            double oremaxlearn = calcolaPercentuale(String.valueOf(co1.getDurataore()), String.valueOf(co1.getElearningperc()));
-
+            //  double mx_oreteo = Utils.calcolaPercentuale(String.valueOf(co1.getDurataore()), String.valueOf(60));
+            //  double mx_oretec = Utils.calcolaPercentuale(String.valueOf(co1.getDurataore()), String.valueOf(40));
+            //  double oremaxlearn = calcolaPercentuale(String.valueOf(co1.getDurataore()), String.valueOf(co1.getElearningperc()));
+            double oremaxlearn = fd(String.valueOf(co1.getElearningperc()));
             double ORETOTALI = fd(formatDoubleforMysql(Utils.getRequestValue(request, "ORETOTALI")));
             double OREELE = fd(formatDoubleforMysql(Utils.getRequestValue(request, "OREELE")));
-
             double OREAULATEO = fd(formatDoubleforMysql(Utils.getRequestValue(request, "OREAULATEO")));
             double OREAULATEC = fd(formatDoubleforMysql(Utils.getRequestValue(request, "OREAULATEC")));
-
             List<Calendario_Formativo> calendar = ep1.calendario_formativo_corso_solomoduli(co1);
             AtomicDouble orepian = new AtomicDouble(0.0);
             AtomicDouble orelearning = new AtomicDouble(0.0);
-
             AtomicDouble ore_pteo = new AtomicDouble(0.0);
             AtomicDouble ore_ptec = new AtomicDouble(0.0);
-
             calendar.forEach(c1 -> {
                 orepian.addAndGet(Double.parseDouble(String.valueOf(c1.getOre())));
                 orelearning.addAndGet(Double.parseDouble(String.valueOf(c1.getOre_teorica_el())));
                 ore_pteo.addAndGet(Double.parseDouble(String.valueOf(c1.getOre_teorica_aula())));
                 ore_ptec.addAndGet(Double.parseDouble(String.valueOf(c1.getOre_tecnica_operativa())));
             });
-
             double dapian = fd(String.valueOf(co1.getDurataore())) - orepian.get();
             double dapianEL = oremaxlearn - orelearning.get();
-
             boolean check_oretotali = orepian.get() + ORETOTALI <= fd(String.valueOf(co1.getDurataore()));
             boolean check_elearning = orelearning.get() + OREELE <= oremaxlearn;
             boolean check_sum = (ORETOTALI - OREAULATEO - OREAULATEC - OREELE) == 0;
 
-            boolean check_teoria = ore_pteo.get() + OREAULATEO <= mx_oreteo;
-            boolean check_tecnic = ore_ptec.get() + OREAULATEC <= mx_oretec;
-
+            boolean check_tecnic = dapian - (ore_pteo.get() + orelearning.get() + OREAULATEO + OREELE) >= (min_oretec - ore_ptec.get() - OREAULATEC);
+//            boolean check_teoria = ore_pteo.get() + OREAULATEO <= mx_oreteo;
+//            boolean check_tecnic = ore_ptec.get() + OREAULATEC <= mx_oretec;
             if (!check_oretotali) {
                 resp_out.addProperty("result", false);
-                resp_out.addProperty("message", "Ore superiori a quelle consentite.<br>Ore residue da pianificare: " + dapian);
-            } else if (!check_teoria) {
-                resp_out.addProperty("result", false);
-                resp_out.addProperty("message",
-                        "Ore di aula teorica superiori al massimo consentito (60% del totale corso). Massime ore di questa tipologia pianificabili: " + (mx_oreteo - ore_pteo.get()));
+                resp_out.addProperty("message", "Ore superiori a quelle consentite.<br>Ore residue da pianificare: " + roundDoubleandFormat(dapian, 0));
+//            } else if (!check_teoria) {
+//                resp_out.addProperty("result", false);
+//                resp_out.addProperty("message",
+//                        "Ore di aula teorica superiori al massimo consentito (60% del totale corso). Massime ore di questa tipologia pianificabili: " + (mx_oreteo - ore_pteo.get()));
             } else if (!check_tecnic) {
                 resp_out.addProperty("result", false);
                 resp_out.addProperty("message",
-                        "Ore di aula tecnico/operativa superiori al massimo consentito (40% del totale corso). Massime ore di questa tipologia pianificabili: " + (mx_oretec - ore_ptec.get()));
+                        "E' necessario che le ore pianificate di tipo TECNICO/OPERATIVA siano almeno il 60% del totale del corso (" + roundDoubleandFormat(min_oretec, 0) + " SU " + String.valueOf(co1.getDurataore()) + "). Controllare.");
             } else if (!check_elearning) {
                 resp_out.addProperty("result", false);
-                resp_out.addProperty("message", "Ore e-learning superiori a quelle consentite.<br>Ore residue e-learning da pianificare: " + dapianEL);
+                resp_out.addProperty("message", "Ore e-learning superiori a quelle consentite.<br>Ore residue e-learning da pianificare: " + roundDoubleandFormat(dapianEL, 0));
             } else if (!check_sum) {
                 resp_out.addProperty("result", false);
                 resp_out.addProperty("message", "La somma delle ore inserite ORE AULA TEORICA + ORE AULA TECNICO/OPERATIVA + ORE E-LEARNING ("
-                        + (OREAULATEO + OREAULATEC + OREELE) + ") non corrisponde alle ORE TOTALI (" + ORETOTALI + ") inserite . Controllare.");
+                        + roundDoubleandFormat((OREAULATEO + OREAULATEC + OREELE), 0) + ") non corrisponde alle ORE TOTALI (" + roundDoubleandFormat(ORETOTALI, 0) + ") inserite . Controllare.");
             } else {
                 resp_out.addProperty("result", true);
                 resp_out.addProperty("message", "");
@@ -1674,6 +1835,9 @@ public class Operations extends HttpServlet {
                 case "UPLDOCALLIEVO":
                     UPLDOCALLIEVO(request, response);
                     break;
+                case "UPLDOCENTE":
+                    UPLDOCENTE(request, response);
+                    break;
                 case "UPLSOST":
                     UPLSOST(request, response);
                     break;
@@ -1703,6 +1867,15 @@ public class Operations extends HttpServlet {
                     break;
                 case "ADDENTEOSPITANTE":
                     ADDENTEOSPITANTE(request, response);
+                    break;
+                case "ADDSEDESTAGETIROCINIOENTE":
+                    ADDSEDESTAGETIROCINIOENTE(request, response);
+                    break;
+                case "BO_ADDTIPOPERCORSO":
+                    BO_ADDTIPOPERCORSO(request, response);
+                    break;
+                case "BO_EDIT_TIPOPERCORSO":
+                    BO_EDIT_TIPOPERCORSO(request, response);
                     break;
                 default:
                     break;

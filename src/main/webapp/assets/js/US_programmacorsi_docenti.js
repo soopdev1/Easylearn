@@ -56,4 +56,9 @@ $(document).ready(function () {
         digits: 1,
         numericInput: true
     }).mask(".decimalvalue");
+    Inputmask({
+        mask: "9999",
+        digits: 1,
+        numericInput: true
+    }).mask(".intvalue");
 });

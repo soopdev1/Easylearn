@@ -466,7 +466,6 @@
         <script src="assets/js/custom/utilities/modals/create-campaign.js"></script>
         <script src="assets/js/custom/utilities/modals/users-search.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
-        <script src="assets/js/US_nuovocorso.js"></script>
         <!--end::Page Custom Javascript-->
         <!--end::Javascript-->
     </body>

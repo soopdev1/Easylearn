@@ -148,7 +148,7 @@
                                                     <input type="text" 
                                                            name="ORE_<%=c1.getIdcalendarioformativo()%>"
                                                            id="ORE_<%=c1.getIdcalendarioformativo()%>"
-                                                           class="form-control decimalvalue" />
+                                                           class="form-control intvalue" />
                                                 </td>
                                             </tr>
                                             <%} else if (c1.getTipomodulo().equals("MODULOFORMATIVO")) {%>
@@ -172,7 +172,7 @@
                                                     <input type="text" 
                                                            name="ORE_<%=c1.getIdcalendarioformativo()%>"
                                                            id="ORE_<%=c1.getIdcalendarioformativo()%>"
-                                                           class="form-control decimalvalue" />
+                                                           class="form-control intvalue" />
                                                 </td>
                                             </tr>
                                             <%}%>

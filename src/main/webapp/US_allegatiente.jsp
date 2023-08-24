@@ -1,9 +1,10 @@
 <%-- 
-    Document   : ADM_dashboard
-    Created on : 18-feb-2022, 14.01.46
+    Document   : US_allegatiallievi
+    Created on : 12 ago 2023, 14:18:44
     Author     : raf
 --%>
-
+<%@page import="rc.soop.sic.jpa.EnteStage"%>
+<%@page import="rc.soop.sic.jpa.Allievi"%>
 <%@page import="rc.soop.sic.jpa.Information"%>
 <%@page import="rc.soop.sic.jpa.Allegati"%>
 <%@page import="rc.soop.sic.jpa.Tipologia_Percorso"%>
@@ -51,19 +52,16 @@
     <!--begin::Body-->
     <%
 
-        String idistS = Utils.getRequestValue(request, "idist");
+        String idistS = Utils.getRequestValue(request, "idente");
         if (idistS.equals("")) {
-            idistS = (String) session.getAttribute("ses_idist");
+            idistS = (String) session.getAttribute("ses_idente");
         } else {
-            session.setAttribute("ses_idist", idistS);
+            session.setAttribute("ses_idente", idistS);
         }
         EntityOp eo = new EntityOp();
         Long idist = Long.valueOf(Utils.dec_string(idistS));
-        Istanza is1 = eo.getEm().find(Istanza.class, idist);
-        List<Allegati> la = eo.list_allegati(is1, null, null, null, null, null);
-        List<Information> info1 = eo.list_info(is1);
-        boolean showinfo = !info1.isEmpty();
-
+        EnteStage is1 = eo.getEm().find(EnteStage.class, idist);
+        List<Allegati> la = eo.list_allegati(null, null, null, null, null, is1);
     %>
     <body id="kt_body">
         <!--begin::Main-->
@@ -93,70 +91,14 @@
                                     <!--begin::Col-->
                                     <div class="col-xl-12">
                                         <!--begin::Tables Widget 3-->
-                                        <h1 class="text-center fs-4">Id Istanza <%=is1.getIdistanza()%> - Codice Istanza: <%=is1.getCodiceistanza()%></h1>                                    
+                                        <h1 class="text-center fs-4">Ente Ospitante Stage/Tirocinio: <%=is1.getRAGIONESOCIALE()%></h1>                                    
                                     </div>
-                                    <!--end::Col-->
-                                    <!--begin::Col-->
-                                    <!--end::Col-->
                                 </div>
                                 <!--end::Row-->
                                 <div class="card h-xl-100">
                                     <!--begin::Header-->
-
-                                    <%if (is1.getStatocorso().getCodicestatocorso().equals("06")
-                                                || is1.getStatocorso().getCodicestatocorso().equals("07")
-                                                || is1.getStatocorso().getCodicestatocorso().equals("08")) {
-
-                                        } else {%>
-
-                                    <%if (is1.getStatocorso().getCodicestatocorso().equals("10")) {%>    
-                                    <div class="card-header border-0 pt-5 bg-warning">
-                                        <h3 class="card-title align-items-start flex-column">
-                                            <span class="card-label fw-bolder fs-3 mb-1">SOCCORSO ISTRUTTORIO</span>
-                                        </h3>
-                                    </div>
-                                    <%if (showinfo) {%>
-                                    <%
-                                        for (Information info2 : info1) {
-                                    %>
-
-                                    <div class="card-body py-3 bg-warning">
-                                        <hr>
-                                        <div class="row row-border col-md-12 p-5">
-                                            <!--begin::Label-->
-                                            <label class="col-lg-3 col-form-label fw-bold fs-6" >
-                                                <span class="text-dark"><b>UTENTE:</b></span>
-                                            </label>
-                                            <div class="col-md-9 fv-row">
-                                                <span class="text-dark"><%=info2.getUtente()%></span>
-                                            </div>
-                                        </div>
-                                        <div class="row row-border col-md-12 p-5">
-                                            <!--begin::Label-->
-                                            <label class="col-lg-3 col-form-label fw-bold fs-6" >
-                                                <span class="text-dark"><b>DATA:</b></span>
-                                            </label>
-                                            <div class="col-md-9 fv-row">
-                                                <span class="text-dark"><%=Constant.sdf_PATTERNDATE5.format(info2.getDatacreazione())%></span>
-                                            </div>
-                                        </div>
-                                        <div class="row row-border col-md-12 p-5">
-                                            <!--begin::Label-->
-                                            <label class="col-lg-3 col-form-label fw-bold fs-6" >
-                                                <span class="text-dark"><b>MOTIVAZIONE:</b></span>
-                                            </label>
-                                            <div class="col-md-9 fv-row">
-                                                <span class="text-dark"><%=info2.getMotivazione()%></span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <%}%>
-                                    <%}%>
-                                    <%}%>
-
-                                    <form action="Operations?type=UPLGENERIC" method="post"  enctype="multipart/form-data">
-                                        <input type="hidden" name="idist" value="<%=is1.getIdistanza()%>"/>
+                                    <form action="Operations?type=UPLDOCENTE" method="post"  enctype="multipart/form-data">
+                                        <input type="hidden" name="idente" value="<%=is1.getIdentestage()%>"/>
 
                                         <div class="card-header border-0 pt-5">
                                             <h3 class="card-title align-items-start flex-column">
@@ -188,8 +130,6 @@
                                         </div>
                                     </form>
                                     <hr>
-                                    <%}%>
-
                                     <div class="card-header border-0 pt-5">
                                         <h3 class="card-title align-items-start flex-column">
                                             <span class="card-label fw-bolder fs-3 mb-1">ELENCO ALLEGATI</span>
@@ -237,20 +177,12 @@
                                                                         data-preload='false'
                                                                         ><i class="fa fa-file-alt"></i>
                                                                 </button>
-                                                                <%if (is1.getStatocorso().getCodicestatocorso().equals("06")
-                                                                            || is1.getStatocorso().getCodicestatocorso().equals("07")
-                                                                            || is1.getStatocorso().getCodicestatocorso().equals("08")
-                                                                            || is1.getStatocorso().getCodicestatocorso().equals("10")) {
-
-                                                                    } else {%>
                                                                 | 
-
                                                                 <button type="button"class="btn btn-sm btn-bg-light btn-danger"
                                                                         data-bs-toggle="tooltip" title="ELIMINA DOCUMENTO" 
                                                                         data-preload='false'
                                                                         onclick="return deletedoc('<%=d2.getIdallegati()%>')"><i class="fa fa-remove"></i>
                                                                 </button>
-                                                                <%}%>
 
                                                                 <%if (d2.getStato().getCodicestatocorso().equals("31")) {%>
 
@@ -265,9 +197,7 @@
                                                             </form>
                                                         </td>      
                                                     </tr>
-                                                    <%}
-                                                    %>
-
+                                                    <%}%>
                                                 </tbody>
                                             </table>
                                         </div>
