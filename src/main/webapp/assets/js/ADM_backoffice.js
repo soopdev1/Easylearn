@@ -24,4 +24,12 @@ $(document).ready(function () {
             {data: 'azioni', orderable: false}
         ]
     });
+    tinymce.init({
+        selector: 'textarea',
+        toolbar: 'undo redo | bold italic underline',
+        menubar: false,
+        branding: false,
+        statusbar: false,
+        max_width: 500
+    });
 });

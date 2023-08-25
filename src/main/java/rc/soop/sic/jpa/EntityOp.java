@@ -304,6 +304,12 @@ public class EntityOp {
         q.setMaxResults(1);
         return q.getResultList().isEmpty() ? null : (IstatCode) q.getSingleResult();
     }
+    
+    public TemplateDecretoAUT getContentTemplateDescretoAUT() {
+        TypedQuery q = this.em.createNamedQuery("template.decreto.aut", TemplateDecretoAUT.class);
+        q.setMaxResults(1);
+        return q.getResultList().isEmpty() ? null : (TemplateDecretoAUT) q.getSingleResult();
+    }
 
     public List<Moduli_Docenti> list_moduli(Calendario_Formativo c1) {
         TypedQuery q = this.em.createNamedQuery("md.elencobycalendarioformativo", Moduli_Docenti.class);

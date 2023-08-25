@@ -78,6 +78,7 @@ import rc.soop.sic.jpa.Scheda_Attivita;
 import rc.soop.sic.jpa.Sede;
 import rc.soop.sic.jpa.SoggettoProponente;
 import rc.soop.sic.jpa.Stati;
+import rc.soop.sic.jpa.TemplateDecretoAUT;
 import rc.soop.sic.jpa.TipoCorso;
 import rc.soop.sic.jpa.TipoSede;
 import rc.soop.sic.jpa.Tipologia_Percorso;
@@ -89,6 +90,34 @@ import rc.soop.sic.jpa.User;
  */
 public class Operations extends HttpServlet {
 
+    protected void BO_SALVADATITEMPLATEDECRETOAUT(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        
+        try {
+            EntityOp ep1 = new EntityOp();
+            
+            TemplateDecretoAUT td = new TemplateDecretoAUT();
+            td.setDIRIGCARICA(normalizeUTF8(getRequestValue(request, "DIRIGCARICA")));
+            td.setDIRIGNOME(normalizeUTF8(getRequestValue(request, "DIRIGNOME")));
+            td.setFUNZCARICA(normalizeUTF8(getRequestValue(request, "FUNZCARICA")));
+            td.setFUNZNOME(normalizeUTF8(getRequestValue(request, "FUNZNOME")));
+            td.setNOMESERVIZIO(normalizeUTF8(getRequestValue(request, "NOMESERVIZIO")));
+            td.setVISTO1(normalizeUTF8(getRequestValue(request, "VISTO1")));
+            td.setNomeautore(request.getSession().getAttribute("us_cod").toString());
+            td.setDATAINSERIMENTO(new DateTime().toDate());
+            ep1.begin();
+            ep1.persist(td);
+            ep1.commit();
+            ep1.close();
+            
+            redirect(request, response, "ADM_backoffice.jsp?ESITO=OK1");
+
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "ADM_backoffice.jsp?ESITO=KO1");
+        }
+
+    }
+    
     protected void BO_EDIT_TIPOPERCORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             EntityOp ep1 = new EntityOp();
@@ -1876,6 +1905,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "BO_EDIT_TIPOPERCORSO":
                     BO_EDIT_TIPOPERCORSO(request, response);
+                    break;
+                case "BO_SALVADATITEMPLATEDECRETOAUT":
+                    BO_SALVADATITEMPLATEDECRETOAUT(request, response);
                     break;
                 default:
                     break;

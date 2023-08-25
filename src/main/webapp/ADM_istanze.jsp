@@ -18,7 +18,6 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
-                EntityOp e = new EntityOp();
     %>
     <!--begin::Head-->
     <head><base href="">

@@ -47,7 +47,7 @@ function invianotificaddecreto(idistanza) {
     $.confirm({
         columnClass: 'col-md-9',
         title: 'Conferma Operazione',
-        content: "Confermi di voler inviare una notifica al soggetto proponente dell'avvenuta pubblicazione del decreto autorizzativo relativo all'istanza con ID " 
+        content: "Confermi di voler inviare una notifica al soggetto proponente dell'avvenuta pubblicazione del decreto autorizzativo relativo all'istanza con ID "
                 + idistanza + " ?",
         theme: 'bootstrap',
         buttons: {
@@ -242,7 +242,10 @@ function rigettaistanza(idistanza) {
             tinymce.init({
                 selector: 'textarea',
                 toolbar: 'undo redo | bold italic underline',
-                menubar: false
+                menubar: false,
+                branding: false,
+                statusbar: false,
+                max_width: 500
             });
         }
     });

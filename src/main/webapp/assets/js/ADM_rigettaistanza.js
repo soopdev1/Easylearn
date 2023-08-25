@@ -21,7 +21,9 @@ $(document).ready(function () {
         selector: 'textarea',
         toolbar: 'undo redo | bold italic underline',
         menubar: false,
-         max_width: 500
+        branding: false,
+        statusbar: false,
+        max_width: 500
     });
 });
 

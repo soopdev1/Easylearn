@@ -669,6 +669,7 @@ public class Pdf {
     }
 
     private static final String NOMESERVIZIO = "Servizio 3 Sistema di Accreditamento della Formazione Professionale e Certificazione delle Competenze";
+    
     private static final String VISTO1 = "il D.D.G. n. 1154 del 22 settembre 2022 con il quale il Dirigente Generale del Dipartimento della "
             + "Formazione Professionale ha conferito, alla Dott.ssa Maria Josè Verde, l’incarico di Dirigente "
             + "responsabile del Servizio 3 “Sistema di Accreditamento della Formazione Professionale e "

@@ -4,6 +4,7 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.TemplateDecretoAUT"%>
 <%@page import="rc.soop.sic.jpa.EntityOp"%>
 <%@page import="java.util.List"%>
 <%@page import="rc.soop.sic.jpa.Istanza"%>
@@ -16,7 +17,8 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
-                EntityOp e = new EntityOp();
+
+                TemplateDecretoAUT templ1 = new EntityOp().getContentTemplateDescretoAUT();
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -34,6 +36,7 @@
         <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+        <script src="https://cdn.tiny.cloud/1/<%=Constant.TINYMCEKEY%>/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
         <!--end::Global Stylesheets Bundle-->
     </head>
     <!--end::Head-->
@@ -61,9 +64,45 @@
                                 <!--begin::Row-->
                                 <!--end::Row-->
                                 <!--begin::Row-->
+                                <%
+                                    String esito = Utils.getRequestValue(request, "ESITO");
+                                    boolean show = false;
+                                    String alert = "";
+                                    String icon = "";
+                                    String msg = "";
+                                    switch (esito) {
+                                        case "OK1": {
+                                            show = true;
+                                            alert = "alert-success";
+                                            icon = "fa-check-circle";
+                                            msg = "OPERAZIONE COMPLETATA CON SUCCESSO.";
+                                            break;
+                                        }
+                                        case "KO1": {
+                                            show = true;
+                                            alert = "alert-danger";
+                                            icon = "fa-exclamation-triangle";
+                                            msg = "<b>ATTENZIONE!</b> ERRORE DURANTE IL SALVATAGGIO DEI DATI. VERIFICARE I DATI INSERITI E RIPROVARE.";
+                                            break;
+                                        }
+                                        default:
+                                            break;
+                                    }
+                                    if (show) {
+                                %>
+                                <div class="row g-10">
+                                    <div class="row g-5">
+                                        <div class="col-xl-12">
+                                            <div class="alert <%=alert%>">
+                                                <i class="fa <%=icon%>"></i> <%=msg%>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <%}%>
                                 <div class="row g-10">
                                     <!--begin::Col-->
-                                    <div class="row g-5 g-lg-10">
+                                    <div class="row g-5">
                                         <div class="col-xl-12">
                                             <!--begin::Mixed Widget 18-->
                                             <div class="card">
@@ -80,12 +119,13 @@
                                                            title="AGGIUNGI NUOVA TIPOLOGIA PERCORSO" 
                                                            data-preload='false' data-width='100%' data-height='100%' 
                                                            class="btn btn-sm btn-bg-light btn-primary fan1">
-                                                            <i class="fa fa-plus-circle"></i>
+                                                            <i class="fa fa-plus-circle"></i> AGGIUNGI NUOVO
                                                         </a>
                                                     </div>
                                                 </div>
                                                 <!--end::Header-->
                                                 <!--begin::Body-->
+
                                                 <div class="card-body p-0 d-flex flex-column">
                                                     <!--begin::Items-->
                                                     <div class="card-px pt-5 pb-10 flex-grow-1">
@@ -116,80 +156,161 @@
                                                     </div>
                                                     <!--end::Section-->
                                                 </div>
-                                                <!--end::Body-->
+                                                <!--end::Body-->                                                
+
                                             </div>
                                             <!--end::Mixed Widget 18-->
                                         </div>
-
                                     </div>
                                     <!--end::Col-->
+                                    <!--begin::Col-->
+                                    <div class="row g-5">
+                                        <div class="col-xl-12">
+                                            <!--begin::Mixed Widget 18-->
+                                            <form class="form-horizontal" method="POST" action="Operations">
+                                                <input type="hidden" name="type" value="BO_SALVADATITEMPLATEDECRETOAUT" />
+                                                <div class="card">
+                                                    <!--begin::Beader-->
+                                                    <div class="card-header border-0 py-5">
+                                                        <h3 class="card-title align-items-start flex-column">
+                                                            <span class="card-label fw-bolder fs-3 mb-1">TEMPLATE DECRETO AUTORIZZATIVO <small>(Ultima modifica: <%=Constant.sdf_PATTERNDATE5.format(templ1.getDATAINSERIMENTO())%>)</small></span>
+                                                        </h3>
+                                                        <div class="card-toolbar">
+                                                            <!--begin::Menu-->
+                                                            <button
+                                                                data-bs-toggle="tooltip" 
+                                                                title="AGGIUNGI NUOVA TIPOLOGIA PERCORSO" 
+                                                                data-preload='false' data-width='100%' data-height='100%' 
+                                                                class="btn btn-sm btn-bg-light btn-primary">
+                                                                <i class="fa fa-save"></i> SALVA DATI
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <!--end::Header-->
+                                                    <!--begin::Body-->
+
+                                                    <div class="card-body p-0 d-flex flex-column">
+                                                        <!--begin::Items-->
+                                                        <div class="card-px pt-5 pb-10 flex-grow-1">
+                                                            <!--begin::Item-->
+
+                                                            <div class="row col-md-12">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label>NOME SERVIZIO</label>
+                                                                        <input type="text" class="form-control" name="NOMESERVIZIO" id="NOMESERVIZIO" required value="<%=templ1.getNOMESERVIZIO()%>"/>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label>FUNZIONARIO: CARICA</label>
+                                                                        <input type="text" class="form-control" name="FUNZCARICA" id="FUNZCARICA" required value="<%=templ1.getFUNZCARICA()%>"/>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label>FUNZIONARIO: NOME</label>
+                                                                        <input type="text" class="form-control" name="FUNZNOME" id="FUNZNOME" required value="<%=templ1.getFUNZNOME()%>"/>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label>DIRIGENTE: CARICA</label>
+                                                                        <input type="text" class="form-control" name="DIRIGCARICA" id="DIRIGCARICA" required value="<%=templ1.getDIRIGCARICA()%>"/>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label>DIRIGENTE: NOME</label>
+                                                                        <input type="text" class="form-control" name="DIRIGNOME" id="DIRIGNOME" required value="<%=templ1.getDIRIGNOME()%>"/>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label>VISTO: (TESTO DA INSERIRE)</label>
+                                                                        <textarea name="VISTO1" required><%=templ1.getVISTO1()%></textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!--end::Section-->
+                                                        </div>
+                                                        <!--end::Body-->                                                
+
+                                                    </div>
+                                                    <!--end::Mixed Widget 18-->
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <!--end::Col-->
+                                    </div>
+                                    <!--end::Row-->
                                 </div>
-                                <!--end::Row-->
+                                <!--end::Post-->
+                                <!--begin::Footer-->
+                                <jsp:include page="menu/footer1.jsp" /> 
+                                <!--end::Footer-->
                             </div>
-                            <!--end::Post-->
-                            <!--begin::Footer-->
-                            <jsp:include page="menu/footer1.jsp" /> 
-                            <!--end::Footer-->
+                            <!--end::Container-->
                         </div>
-                        <!--end::Container-->
+                        <!--end::Content wrapper-->
                     </div>
-                    <!--end::Content wrapper-->
+                    <!--end::Wrapper-->
                 </div>
-                <!--end::Wrapper-->
+                <!--end::Page-->
             </div>
-            <!--end::Page-->
-        </div>
-        <!--end::Root-->
-        <!--begin::Drawers-->
-        <!--begin::Activities drawer-->
-        <!--end::Activities drawer-->
-        <!--begin::Chat drawer-->
-        <!--end::Chat drawer-->
-        <!--end::Drawers-->
-        <!--end::Main-->
-        <!--begin::Engage drawers-->
-        <!--begin::Demos drawer-->
-        <!--end::Demos drawer-->
-        <!--begin::Help drawer-->
-        <!--end::Help drawer-->
-        <!--end::Engage drawers-->
-        <!--begin::Engage toolbar-->
-        <!--end::Engage toolbar-->
-        <!--begin::Scrolltop-->
-        <div id="kt_scrolltop" class="scrolltop" data-kt-scrolltop="true">
-            <!--begin::Svg Icon | path: icons/duotune/arrows/arr066.svg-->
-            <span class="svg-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <rect opacity="0.5" x="13" y="6" width="13" height="2" rx="1" transform="rotate(90 13 6)" fill="black" />
-                <path d="M12.5657 8.56569L16.75 12.75C17.1642 13.1642 17.8358 13.1642 18.25 12.75C18.6642 12.3358 18.6642 11.6642 18.25 11.25L12.7071 5.70711C12.3166 5.31658 11.6834 5.31658 11.2929 5.70711L5.75 11.25C5.33579 11.6642 5.33579 12.3358 5.75 12.75C6.16421 13.1642 6.83579 13.1642 7.25 12.75L11.4343 8.56569C11.7467 8.25327 12.2533 8.25327 12.5657 8.56569Z" fill="black" />
-                </svg>
-            </span>
-            <!--end::Svg Icon-->
-        </div>
-        <!--end::Scrolltop-->
-        <!--begin::Javascript-->
-        <script>var hostUrl = "assets/";</script>
-        <!--begin::Global Javascript Bundle(used by all pages)-->
-        <script src="assets/plugins/global/plugins.bundle.js"></script>
-        <script src="assets/js/scripts.bundle.js"></script>
-        <!--end::Global Javascript Bundle-->
-        <!--begin::Page Vendors Javascript(used by this page)-->
-        <script src="assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
-        <script src="assets/plugins/DataTables/jquery-3.5.1.js"></script>
-        <script src="assets/plugins/DataTables/jquery.dataTables.min.js"></script>
-        <script src="assets/plugins/DataTables/datatables.min.js"></script>
-        <script src="assets/plugins/DataTables/date-eu.js"></script>
-        <!--end::Page Vendors Javascript-->
-        <!--begin::Page Custom Javascript(used by this page)-->
-        <script src="assets/js/widgets.bundle.js"></script>
-        <script src="assets/js/custom/widgets.js"></script>
-        <script src="assets/fontawesome-6.0.0/js/all.js"></script>
-        <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
-        <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
-        <script type="text/javascript" src="assets/js/common.js"></script>
-        <script type="text/javascript" src="assets/js/ADM_backoffice.js"></script>
-        <!--end::Page Custom Javascript-->
-        <!--end::Javascript-->
+            <!--end::Root-->
+            <!--begin::Drawers-->
+            <!--begin::Activities drawer-->
+            <!--end::Activities drawer-->
+            <!--begin::Chat drawer-->
+            <!--end::Chat drawer-->
+            <!--end::Drawers-->
+            <!--end::Main-->
+            <!--begin::Engage drawers-->
+            <!--begin::Demos drawer-->
+            <!--end::Demos drawer-->
+            <!--begin::Help drawer-->
+            <!--end::Help drawer-->
+            <!--end::Engage drawers-->
+            <!--begin::Engage toolbar-->
+            <!--end::Engage toolbar-->
+            <!--begin::Scrolltop-->
+            <div id="kt_scrolltop" class="scrolltop" data-kt-scrolltop="true">
+                <!--begin::Svg Icon | path: icons/duotune/arrows/arr066.svg-->
+                <span class="svg-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <rect opacity="0.5" x="13" y="6" width="13" height="2" rx="1" transform="rotate(90 13 6)" fill="black" />
+                    <path d="M12.5657 8.56569L16.75 12.75C17.1642 13.1642 17.8358 13.1642 18.25 12.75C18.6642 12.3358 18.6642 11.6642 18.25 11.25L12.7071 5.70711C12.3166 5.31658 11.6834 5.31658 11.2929 5.70711L5.75 11.25C5.33579 11.6642 5.33579 12.3358 5.75 12.75C6.16421 13.1642 6.83579 13.1642 7.25 12.75L11.4343 8.56569C11.7467 8.25327 12.2533 8.25327 12.5657 8.56569Z" fill="black" />
+                    </svg>
+                </span>
+                <!--end::Svg Icon-->
+            </div>
+            <!--end::Scrolltop-->
+            <!--begin::Javascript-->
+            <script>var hostUrl = "assets/";</script>
+            <!--begin::Global Javascript Bundle(used by all pages)-->
+            <script src="assets/plugins/global/plugins.bundle.js"></script>
+            <script src="assets/js/scripts.bundle.js"></script>
+            <!--end::Global Javascript Bundle-->
+            <!--begin::Page Vendors Javascript(used by this page)-->
+            <script src="assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
+            <script src="assets/plugins/DataTables/jquery-3.5.1.js"></script>
+            <script src="assets/plugins/DataTables/jquery.dataTables.min.js"></script>
+            <script src="assets/plugins/DataTables/datatables.min.js"></script>
+            <script src="assets/plugins/DataTables/date-eu.js"></script>
+            <!--end::Page Vendors Javascript-->
+            <!--begin::Page Custom Javascript(used by this page)-->
+            <script src="assets/js/widgets.bundle.js"></script>
+            <script src="assets/js/custom/widgets.js"></script>
+            <script src="assets/fontawesome-6.0.0/js/all.js"></script>
+            <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
+            <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
+            <script type="text/javascript" src="assets/js/common.js"></script>
+            <script type="text/javascript" src="assets/js/ADM_backoffice.js"></script>
+
+            <!--end::Page Custom Javascript-->
+            <!--end::Javascript-->
     </body>
     <!--end::Body-->
     <%break;
