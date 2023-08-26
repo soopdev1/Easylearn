@@ -186,7 +186,6 @@
                         </div>
                     </div>
                 </div>
-                <%if (false) {%>
                 <div data-kt-menu-trigger="click" class="menu-item here <%=m_3s%> menu-accordion">
                     <span class="menu-link">
                         <span class="menu-icon">
@@ -208,7 +207,7 @@
                                 <span class="menu-bullet">
                                     <span class="bullet bullet-dot"></span>
                                 </span>
-                                <span class="menu-title">Aggiungi Nuovo Corso</span>
+                                <span class="menu-title">Aggiungi Corso</span>
                             </a>
                         </div>                          
                         <div class="menu-item">
@@ -221,7 +220,6 @@
                         </div>                          
                     </div>
                 </div>
-                <%}%>
                 <div data-kt-menu-trigger="click" class="menu-item here <%=m_4s%> menu-accordion">
                     <span class="menu-link">
                         <span class="menu-icon">

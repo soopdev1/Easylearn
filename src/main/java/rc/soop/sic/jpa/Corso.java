@@ -25,7 +25,9 @@ import javax.persistence.Table;
  * @author Raffaele
  */
 @NamedQueries(value = {
-    @NamedQuery(name = "corso.istanza", query = "SELECT c FROM Corso c WHERE c.istanza=:codiceistanza"),})
+    @NamedQuery(name = "corso.istanza", query = "SELECT c FROM Corso c WHERE c.istanza=:codiceistanza"),
+    @NamedQuery(name = "corso.istanza.start", query = "SELECT c FROM Corso c WHERE c.istanza=:istanza AND c.soggetto=:soggetto AND c.statocorso=:statocorso")
+})
 @Entity
 @Table(name = "corso")
 public class Corso implements Serializable {

@@ -23,6 +23,7 @@ import static rc.soop.sic.Utils.redirect;
 import rc.soop.sic.jpa.Allievi;
 import rc.soop.sic.jpa.Altropersonale;
 import rc.soop.sic.jpa.Corso;
+import rc.soop.sic.jpa.Corsoavviato;
 import rc.soop.sic.jpa.Docente;
 import rc.soop.sic.jpa.EnteStage;
 import rc.soop.sic.jpa.EntityOp;
@@ -47,6 +48,34 @@ public class Search extends HttpServlet {
     private static final String RECORDID = "RecordID";
     private static final String APPJSON = "application/json";
     private static final String CONTENTTYPE = "Content-Type";
+
+    protected void LISTCORSIISTANZA(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        StringBuilder o1 = new StringBuilder("<option value=''>Scegli...</option>");
+        try {
+            SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
+            EntityOp eop = new EntityOp();
+            Istanza is1 = eop.getEm().find(Istanza.class, Utils.parseLongR(getRequestValue(request, "IDIST")));
+            List<Corso> result = eop.getCorsiIstanza(is1, so);
+            for (Corso c1 : result) {
+                int edizionirichieste = c1.getQuantitarichiesta();
+                List<Corsoavviato> list = eop.getCorsiAvviati_Corsobase(c1);
+                if (edizionirichieste > list.size()) {
+                    o1.append("<option value='").append(c1.getIdcorso()).append("'>")
+                            .append(c1.getRepertorio().getDenominazione()).append(" - Edizioni richieste: ")
+                            .append(edizionirichieste).append(" - Già Avviati: ").append(list.size())
+                            .append("</option>");
+                }
+            }
+
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+        }
+
+        try (PrintWriter out = response.getWriter()) {
+            out.print(o1);
+        }
+    }
 
     protected void list_istanze_user(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -688,6 +717,9 @@ public class Search extends HttpServlet {
                     break;
                 case "BO_LIST_TIPOLOGIAPERCORSO":
                     BO_LIST_TIPOLOGIAPERCORSO(request, response);
+                    break;
+                case "LISTCORSIISTANZA":
+                    LISTCORSIISTANZA(request, response);
                     break;
                 default: {
                     String p = request.getContextPath();

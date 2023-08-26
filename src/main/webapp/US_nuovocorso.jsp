@@ -101,10 +101,19 @@
                                                                 <!--begin::Col-->
                                                                 <div class="col-lg-12 fv-row">
                                                                     <select aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
-                                                                            class="form-select form-select-solid form-select-lg fw-bold" name="codiceistanza" required>
-                                                                        <%for (Istanza is1 : accettate) {%>
-                                                                        <option value="<%=is1.getCodiceistanza()%>">PROTOCOLLO <%=is1.getProtocollosoggetto()%> DEL <%=is1.getProtocollosoggettodata()%> - DECRETO n. 100 DEL  12/12/2022</option>
-                                                                        <%}%>
+                                                                            class="form-select form-select-solid form-select-lg fw-bold" name="ISTANZA" id="ISTANZA" required>
+                                                                        <option value="">Scegli...</option>
+                                                                        <%for (Istanza is1 : accettate) {
+
+                                                                                String DDS = is1.getDecreto().split("§")[0];
+                                                                                String DDSDATA = Utils.datemysqltoita(is1.getDecreto().split("§")[1]);
+
+                                                                        %>
+                                                                        <option value="<%=is1.getIdistanza()%>">
+                                                                            ID: <%=is1.getIdistanza()%> - 
+                                                                            PROTOCOLLO <%=is1.getProtocollosoggetto()%> DEL <%=is1.getProtocollosoggettodata()%> - 
+                                                                            D.D.S. n. <%=DDS%> DEL <%=DDSDATA%></option>
+                                                                            <%}%>
                                                                     </select>
                                                                 </div>
                                                                 <!--end::Col-->
@@ -113,6 +122,28 @@
                                                             </div>
                                                             <!--end::Row-->
                                                         </div>
+
+                                                    </div>
+                                                    <div class="row mb-6">
+                                                        <label class="col-lg-4 col-form-label required fw-bold fs-6">TIPOLOGIA CORSO</label>
+                                                        <div class="col-lg-8">
+                                                            <!--begin::Row-->
+                                                            <div class="row">
+                                                                <!--begin::Col-->
+                                                                <div class="col-lg-12 fv-row">
+                                                                    <select aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
+                                                                            class="form-select form-select-solid form-select-lg fw-bold" 
+                                                                            name="CORSO" id="CORSO" required >
+                                                                    </select>
+                                                                </div>
+                                                                <!--end::Col-->
+                                                                <!--begin::Col-->
+                                                                <!--end::Col-->
+                                                            </div>
+                                                            <!--end::Row-->
+                                                        </div>
+
+
                                                         <!--end::Col-->
                                                     </div>
                                                     <hr>
@@ -292,6 +323,7 @@
         <script src="assets/js/custom/utilities/modals/create-campaign.js"></script>
         <script src="assets/js/custom/utilities/modals/users-search.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
+        <script src="assets/js/US_nuovocorso.js"></script>
 
         <!--end::Page Custom Javascript-->
         <!--end::Javascript-->

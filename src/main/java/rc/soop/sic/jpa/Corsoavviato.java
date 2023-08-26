@@ -26,8 +26,8 @@ import javax.persistence.TemporalType;
  * @author Raffaele
  */
 @NamedQueries(value = {
-    @NamedQuery(name = "corsoavviato.soggetto", query = "SELECT c FROM Corsoavviato c WHERE c.soggetto=:soggetto"),
-    @NamedQuery(name = "corsoavviato.stato", query = "SELECT c FROM Corsoavviato c WHERE c.statocorso=:stato")
+    @NamedQuery(name = "corsoavviato.stato", query = "SELECT c FROM Corsoavviato c WHERE c.statocorso=:stato"),
+    @NamedQuery(name = "corsoavviato.corsobase", query = "SELECT c FROM Corsoavviato c WHERE c.corsobase=:corsobase")
 })
 @Entity
 @Table(name = "corsoavviato")
@@ -38,14 +38,6 @@ public class Corsoavviato implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "idcorsoavviato")
     private Long idcorsoavviato;
-
-        @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-@JoinColumn(name = "idsoggetto")
-    private SoggettoProponente soggetto;
-
-        @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-@JoinColumn(name = "idistanza")
-    private Istanza istanza;
 
     @Column(name = "datainizio")
     @Temporal(TemporalType.DATE)
@@ -61,9 +53,13 @@ public class Corsoavviato implements Serializable {
     @Column(name = "elencoallievi")
     private String elencoallievi;
 
-        @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-@JoinColumn(name = "stato")
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinColumn(name = "stato")
     private CorsoStato statocorso;
+    
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinColumn(name = "idcorso")
+    private Corso corsobase;
 
     @Column(name = "presidentecommissione")
     private String presidentecommissione;
@@ -79,22 +75,6 @@ public class Corsoavviato implements Serializable {
         this.idcorsoavviato = idcorsoavviato;
     }
 
-    public SoggettoProponente getSoggetto() {
-        return soggetto;
-    }
-
-    public void setSoggetto(SoggettoProponente soggetto) {
-        this.soggetto = soggetto;
-    }
-
-    public Istanza getIstanza() {
-        return istanza;
-    }
-
-    public void setIstanza(Istanza istanza) {
-        this.istanza = istanza;
-    }
-
     public Date getDatainizio() {
         return datainizio;
     }
@@ -103,6 +83,14 @@ public class Corsoavviato implements Serializable {
         this.datainizio = datainizio;
     }
 
+    public Corso getCorsobase() {
+        return corsobase;
+    }
+
+    public void setCorsobase(Corso corsobase) {
+        this.corsobase = corsobase;
+    }
+    
     public Date getDatafine() {
         return datafine;
     }

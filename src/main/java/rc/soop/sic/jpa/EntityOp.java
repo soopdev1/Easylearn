@@ -75,7 +75,7 @@ public class EntityOp {
         this.emf.close();
     }
 
-    public List findAll(Class c) {
+    public List findAll(Class c) {        
         return this.em.createQuery("Select a FROM " + c.getSimpleName() + " a", c).getResultList();
     }
 
@@ -129,6 +129,14 @@ public class EntityOp {
         q.setParameter("codiceistanza", is);
         return (List<Corso>) q.getResultList();
     }
+    
+    public List<Corso> getCorsiIstanza(Istanza is, SoggettoProponente soggetto) {
+        TypedQuery q = this.em.createNamedQuery("corso.istanza.start", Istanza.class);
+        q.setParameter("istanza", is);
+        q.setParameter("soggetto", soggetto);
+        q.setParameter("statocorso", this.em.find(CorsoStato.class, "24"));
+        return (List<Corso>) q.getResultList();
+    }
 
     public List<Istanza> getIstanzedaGestire() {
         TypedQuery q = this.em.createNamedQuery("istanza.dagestire", Istanza.class);
@@ -147,23 +155,13 @@ public class EntityOp {
         return (List<Istanza>) q.getResultList();
     }
 
-    public static List<Corsoavviato> getCorsiAvviati_pres() {
-        try {
-            List<Corsoavviato> corsi = ((List<Corsoavviato>) new EntityOp().findAll(Corsoavviato.class)).stream()
-                    .filter(c1 -> c1.getPresidentecommissione() != null && c1.getPresidentecommissione().equals("A1")).collect(Collectors.toList());
-            return corsi;
-        } catch (Exception ex) {
-            return new ArrayList<>();
-        }
-    }
 
-    public List<Corsoavviato> getCorsiAvviati(HttpSession session) {
-        SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
-        TypedQuery q = this.em.createNamedQuery("corsoavviato.soggetto", Corsoavviato.class);
-        q.setParameter("soggetto", so);
+    public List<Corsoavviato> getCorsiAvviati_Corsobase(Corso corsobase) {
+        TypedQuery q = this.em.createNamedQuery("corsoavviato.corsobase", Corsoavviato.class);
+        q.setParameter("corsobase", corsobase);
         return (List<Corsoavviato>) q.getResultList();
     }
-
+    
     public List<Corsoavviato> getCorsiAvviati_Admin() {
         TypedQuery q = this.em.createNamedQuery("corsoavviato.stato", Corsoavviato.class);
         CorsoStato c1 = new CorsoStato();
