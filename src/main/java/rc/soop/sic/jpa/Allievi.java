@@ -31,7 +31,8 @@ import rc.soop.sic.Utils;
  */
 @NamedQueries(value = {
     @NamedQuery(name = "allievi.soggetto", query = "SELECT i FROM Allievi i WHERE i.soggetto=:soggetto AND i.statoallievo<>:inattivo ORDER BY i.cognome ASC"),
-    @NamedQuery(name = "allievi.attivi.cf", query = "SELECT i FROM Allievi i WHERE i.codicefiscale=:codicefiscale AND i.statoallievo<>:inattivo")
+    @NamedQuery(name = "allievi.attivi.cf", query = "SELECT i FROM Allievi i WHERE i.codicefiscale=:codicefiscale AND i.statoallievo<>:inattivo"),
+    @NamedQuery(name = "allievi.attivi.new", query = "SELECT i FROM Allievi i WHERE i.codicefiscale=:codicefiscale AND i.statoallievo=:check")
 })
 @Entity
 @Table(name = "allievi")

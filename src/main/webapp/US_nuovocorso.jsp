@@ -4,6 +4,9 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.Allievi"%>
+<%@page import="rc.soop.sic.jpa.User"%>
+<%@page import="rc.soop.sic.jpa.SoggettoProponente"%>
 <%@page import="java.util.List"%>
 <%@page import="rc.soop.sic.jpa.EntityOp"%>
 <%@page import="rc.soop.sic.jpa.Istanza"%>
@@ -83,10 +86,12 @@
 
                                             <%
                                                 EntityOp en = new EntityOp();
+                                                SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
+                                                List<Allievi> allievi = new EntityOp().getAllieviSoggetto(so);
                                                 List<Istanza> accettate = en.getIstanzeAccettateAvvioCorsi(session);
                                             %>
                                             <!--begin::Body-->
-                                            <form action="Operations" method="POST">
+                                            <form action="Operations" method="POST" onsubmit="return checkdatisalvati();">
                                                 <input type="hidden" name="type" value="AVVIANUOVOCORSO" />
                                                 <div class="card-body py-3">
                                                     <!--begin::Table container-->
@@ -104,10 +109,8 @@
                                                                             class="form-select form-select-solid form-select-lg fw-bold" name="ISTANZA" id="ISTANZA" required>
                                                                         <option value="">Scegli...</option>
                                                                         <%for (Istanza is1 : accettate) {
-
                                                                                 String DDS = is1.getDecreto().split("§")[0];
                                                                                 String DDSDATA = Utils.datemysqltoita(is1.getDecreto().split("§")[1]);
-
                                                                         %>
                                                                         <option value="<%=is1.getIdistanza()%>">
                                                                             ID: <%=is1.getIdistanza()%> - 
@@ -115,6 +118,7 @@
                                                                             D.D.S. n. <%=DDS%> DEL <%=DDSDATA%></option>
                                                                             <%}%>
                                                                     </select>
+                                                                    <small class="form-text text-muted">Elenco Istanza Autorizzate.</small>
                                                                 </div>
                                                                 <!--end::Col-->
                                                                 <!--begin::Col-->
@@ -135,6 +139,7 @@
                                                                             class="form-select form-select-solid form-select-lg fw-bold" 
                                                                             name="CORSO" id="CORSO" required >
                                                                     </select>
+                                                                    <small id="CORSOHelp" class="form-text text-muted"></small>
                                                                 </div>
                                                                 <!--end::Col-->
                                                                 <!--begin::Col-->
@@ -150,7 +155,7 @@
 
                                                     <div class="row mb-6">
                                                         <!--begin::Label-->
-                                                        <label class="col-lg-4 col-form-label required fw-bold fs-6">Data Inizio</label>
+                                                        <label class="col-lg-4 col-form-label required fw-bold fs-6">Data Inizio <small id="INFODATAINIZIO"></small></label>
                                                         <!--end::Label-->
                                                         <!--begin::Col-->
                                                         <div class="col-lg-8">
@@ -158,9 +163,10 @@
                                                             <div class="row">
                                                                 <!--begin::Col-->
                                                                 <div class="col-lg-12 fv-row">
-                                                                    <input type="date" name="datainizio" 
+                                                                    <input type="date" name="DATAINIZIO" id="DATAINIZIO" 
                                                                            class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" 
                                                                            required/>
+                                                                    <small class="form-text text-muted">Minimo 15 giorni a partire da oggi.</small>
                                                                 </div>
                                                                 <!--end::Col-->
                                                                 <!--begin::Col-->
@@ -180,10 +186,12 @@
                                                             <div class="row">
                                                                 <!--begin::Col-->
                                                                 <div class="col-lg-12 fv-row">
-                                                                    <input type="date" name="datafine" 
+                                                                    <input type="date" name="DATAFINE" id="DATAFINE" 
                                                                            class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" 
                                                                            required/>
+                                                                    <small id="DATAFINEHelp" class="form-text text-muted"></small>
                                                                 </div>
+                                                                <input type="hidden" id="checkend" value="0" />
                                                                 <!--end::Col-->
                                                                 <!--begin::Col-->
                                                                 <!--end::Col-->
@@ -197,19 +205,14 @@
                                                         <!--begin::Label-->
                                                         <label class="col-lg-4 col-form-label fw-bold fs-6" >
                                                             <span class="required">Elenco Docenti</span>
-                                                            <a onclick="return false;" data-bs-toggle="tooltip" data-bs-placement="top" title="Selezione nuovo codice dall'elenco">
-                                                                <i class="fas fa-exclamation-circle ms-1 fs-7"></i>
-                                                            </a>
                                                         </label>
                                                         <!--end::Label-->
                                                         <!--begin::Col-->
                                                         <div class="col-lg-8 fv-row">
                                                             <select aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
-                                                                    class="form-select form-select-solid form-select-lg fw-bold" name="docenti" required multiple>
-                                                                <option value="">Scegli...</option>
-                                                                <option value="D1">Docente Numero Uno</option>
-                                                                <option value="D2">Docente Numero Due</option>
+                                                                    class="form-select form-select-solid form-select-lg fw-bold" name="DOCENTI" id="DOCENTI" required multiple>
                                                             </select>
+                                                            <small id="DOCENTIHelp" class="form-text text-muted"></small>
                                                         </div>
                                                         <!--end::Col-->
                                                     </div>
@@ -217,26 +220,20 @@
                                                         <!--begin::Label-->
                                                         <label class="col-lg-4 col-form-label fw-bold fs-6" >
                                                             <span class="required">Elenco Allievi</span>
-                                                            <a onclick="return false;" data-bs-toggle="tooltip" data-bs-placement="top" title="Selezione nuovo codice dall'elenco">
-                                                                <i class="fas fa-exclamation-circle ms-1 fs-7"></i>
-                                                            </a>
                                                         </label>
                                                         <!--end::Label-->
                                                         <!--begin::Col-->
                                                         <div class="col-lg-8 fv-row">
-                                                            <select name="allievi" aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
+                                                            <select name="ALLIEVI" id="ALLIEVI" aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
                                                                     class="form-select form-select-solid form-select-lg fw-bold" required multiple>
                                                                 <option value="">Scegli...</option>
-                                                                <option value="A1">Allievo Numero Uno</option>
-                                                                <option value="A2">Allievo Numero Due</option>
-                                                                <option value="A3">Allievo Numero Tre</option>
-                                                                <option value="A4">Allievo Numero Quattro</option>
-                                                                <option value="A5">Allievo Numero Cinque</option>
-                                                                <option value="A6">Allievo Numero Sei</option>
-                                                                <option value="A7">Allievo Numero Sette</option>
-                                                                <option value="A8">Allievo Numero Otto</option>
-                                                                <option value="A9">Allievo Numero Nove</option>                                                                
+                                                                <%for(Allievi al1: allievi){%>
+                                                                <option value="<%=al1.getIdallievi()%>">
+                                                                    <%=al1.getCodicefiscale()%> - <%=al1.getCognome()%> <%=al1.getNome()%>
+                                                                </option>                                                                
+                                                                <%}%>
                                                             </select>
+                                                            <small id="ALLIEVIHelp" class="form-text text-muted"></small>
                                                         </div>
                                                         <!--end::Col-->
                                                     </div>                                                
@@ -250,7 +247,7 @@
                                                     <hr>
                                                     <p class="mb-0">
                                                         <button type="submit" class="btn btn-primary btn-circled">
-                                                            <i class="fa fa-save"></i> SALVA DATI
+                                                            <i class="fa fa-save"></i> SALVA DATI E CONTINUA
                                                         </button>
                                                     </p>
                                                     <!--end::Table container-->

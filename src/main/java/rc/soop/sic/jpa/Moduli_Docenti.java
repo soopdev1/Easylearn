@@ -23,7 +23,8 @@ import javax.persistence.Table;
 @NamedQueries(value = {
     @NamedQuery(name = "md.elencobydocente", query = "SELECT u FROM Moduli_Docenti u WHERE u.docente=:docente"),
     @NamedQuery(name = "md.elencobycalendarioformativo", query = "SELECT u FROM Moduli_Docenti u WHERE u.moduloformativo=:moduloformativo"),
-    @NamedQuery(name = "md.elenco", query = "SELECT u FROM Moduli_Docenti u WHERE u.docente=:docente AND u.moduloformativo=:moduloformativo")
+    @NamedQuery(name = "md.elenco", query = "SELECT u FROM Moduli_Docenti u WHERE u.docente=:docente AND u.moduloformativo=:moduloformativo"),
+    @NamedQuery(name = "md.docenti", query = "SELECT DISTINCT u.docente FROM Moduli_Docenti u WHERE u.moduloformativo.corsodiriferimento=:corso")
 })
 @Entity
 @Table(name = "moduli_docenti")
@@ -35,12 +36,12 @@ public class Moduli_Docenti implements Serializable {
     @Column(name = "idmodulidocenti")
     private Moduli_DocentiId idmodulidocenti = new Moduli_DocentiId();
 
-        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-@MapsId("iddocente")
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @MapsId("iddocente")
     private Docente docente;
 
-        @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-@MapsId("idcalendarioformativo")
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @MapsId("idcalendarioformativo")
     private Calendario_Formativo moduloformativo;
 
     @Column(name = "orepreviste")

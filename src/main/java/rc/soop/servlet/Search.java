@@ -22,6 +22,7 @@ import static rc.soop.sic.Utils.isAdmin;
 import static rc.soop.sic.Utils.redirect;
 import rc.soop.sic.jpa.Allievi;
 import rc.soop.sic.jpa.Altropersonale;
+import rc.soop.sic.jpa.Calendario_Formativo;
 import rc.soop.sic.jpa.Corso;
 import rc.soop.sic.jpa.Corsoavviato;
 import rc.soop.sic.jpa.Docente;
@@ -49,6 +50,30 @@ public class Search extends HttpServlet {
     private static final String APPJSON = "application/json";
     private static final String CONTENTTYPE = "Content-Type";
 
+    protected void LISTDOCENTICORSO(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        StringBuilder o1 = new StringBuilder("");
+        try {
+            EntityOp eop = new EntityOp();
+            Corso co1 = eop.getEm().find(Corso.class, Utils.parseLongR(getRequestValue(request, "IDCORSO")));
+            List<Docente> result = eop.list_docenti_corso(co1);
+            for (Docente c1 : result) {
+                o1.append("<option value='")
+                        .append(c1.getIddocente()).append("' selected>")
+                        .append(c1.getCognome())
+                        .append(" ")
+                        .append(c1.getNome())
+                        .append("</option>");
+            }
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+        }
+
+        try (PrintWriter out = response.getWriter()) {
+            out.print(o1);
+        }
+    }
+
     protected void LISTCORSIISTANZA(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         StringBuilder o1 = new StringBuilder("<option value=''>Scegli...</option>");
@@ -61,13 +86,15 @@ public class Search extends HttpServlet {
                 int edizionirichieste = c1.getQuantitarichiesta();
                 List<Corsoavviato> list = eop.getCorsiAvviati_Corsobase(c1);
                 if (edizionirichieste > list.size()) {
-                    o1.append("<option value='").append(c1.getIdcorso()).append("'>")
+                    o1.append("<option ")
+                            .append("data-maxday='").append(c1.getDuratagiorni()).append("'")
+                            .append("data-numall='").append(c1.getNumeroallievi()).append("'")
+                            .append(" value='").append(c1.getIdcorso()).append("'>")
                             .append(c1.getRepertorio().getDenominazione()).append(" - Edizioni richieste: ")
                             .append(edizionirichieste).append(" - Già Avviati: ").append(list.size())
                             .append("</option>");
                 }
             }
-
         } catch (Exception ex) {
             Constant.LOGGER.severe(estraiEccezione(ex));
         }
@@ -720,6 +747,9 @@ public class Search extends HttpServlet {
                     break;
                 case "LISTCORSIISTANZA":
                     LISTCORSIISTANZA(request, response);
+                    break;
+                case "LISTDOCENTICORSO":
+                    LISTDOCENTICORSO(request, response);
                     break;
                 default: {
                     String p = request.getContextPath();

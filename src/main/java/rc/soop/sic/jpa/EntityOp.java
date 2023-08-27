@@ -75,7 +75,7 @@ public class EntityOp {
         this.emf.close();
     }
 
-    public List findAll(Class c) {        
+    public List findAll(Class c) {
         return this.em.createQuery("Select a FROM " + c.getSimpleName() + " a", c).getResultList();
     }
 
@@ -129,7 +129,7 @@ public class EntityOp {
         q.setParameter("codiceistanza", is);
         return (List<Corso>) q.getResultList();
     }
-    
+
     public List<Corso> getCorsiIstanza(Istanza is, SoggettoProponente soggetto) {
         TypedQuery q = this.em.createNamedQuery("corso.istanza.start", Istanza.class);
         q.setParameter("istanza", is);
@@ -155,13 +155,12 @@ public class EntityOp {
         return (List<Istanza>) q.getResultList();
     }
 
-
     public List<Corsoavviato> getCorsiAvviati_Corsobase(Corso corsobase) {
         TypedQuery q = this.em.createNamedQuery("corsoavviato.corsobase", Corsoavviato.class);
         q.setParameter("corsobase", corsobase);
         return (List<Corsoavviato>) q.getResultList();
     }
-    
+
     public List<Corsoavviato> getCorsiAvviati_Admin() {
         TypedQuery q = this.em.createNamedQuery("corsoavviato.stato", Corsoavviato.class);
         CorsoStato c1 = new CorsoStato();
@@ -302,7 +301,7 @@ public class EntityOp {
         q.setMaxResults(1);
         return q.getResultList().isEmpty() ? null : (IstatCode) q.getSingleResult();
     }
-    
+
     public TemplateDecretoAUT getContentTemplateDescretoAUT() {
         TypedQuery q = this.em.createNamedQuery("template.decreto.aut", TemplateDecretoAUT.class);
         q.setMaxResults(1);
@@ -322,7 +321,7 @@ public class EntityOp {
     }
 
     public List<Allegati> list_allegati(Istanza is1, Corso c1, Corsoavviato c2, Docente d1, Allievi a1, EnteStage es1) {
-        List<Allegati> elenco = new ArrayList<>();       
+        List<Allegati> elenco = new ArrayList<>();
         if (is1 != null) {
             try {
                 TypedQuery q = this.em.createNamedQuery("allegati.istanza.ok", Allegati.class);
@@ -351,8 +350,18 @@ public class EntityOp {
         return elenco;
     }
 
-    public List<Docente> list_docenti_moduli(List<Docente> eldoc, List<Calendario_Formativo> calendar) {
+    public List<Docente> list_docenti_corso(Corso c1) {
+        try {
+            TypedQuery q = this.em.createNamedQuery("md.docenti", Moduli_Docenti.class);
+            q.setParameter("corso", c1);
+            return q.getResultList().isEmpty() ? new ArrayList() : (List<Docente>) q.getResultList();
+        } catch (Exception ex0) {
+            trackingAction("SERVICE", estraiEccezione(ex0));
+        }
+        return new ArrayList<>();
+    }
 
+    public List<Docente> list_docenti_moduli(List<Docente> eldoc, List<Calendario_Formativo> calendar) {
         List<Docente> out = new ArrayList<>();
         try {
             TypedQuery q = this.em.createNamedQuery("md.elenco", Moduli_Docenti.class);
@@ -362,17 +371,12 @@ public class EntityOp {
                     q.setParameter("moduloformativo", c1);
                     List<Moduli_Docenti> res = (List<Moduli_Docenti>) q.getResultList();
                     if (!res.isEmpty()) {
-
                         List<Moduli_Docenti> def = d1.getElencomoduli() == null ? new ArrayList<>() : d1.getElencomoduli();
                         def.addAll(res);
                         d1.setElencomoduli(def);
                         if (!out.contains(d1)) {
                             out.add(d1);
                         }
-//                        } else {
-//
-//                        }
-
                     }
                 }
             }
