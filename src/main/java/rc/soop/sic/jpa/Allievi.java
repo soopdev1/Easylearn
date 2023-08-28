@@ -91,7 +91,19 @@ public class Allievi implements Serializable {
 
     @Column(name = "sesso")
     private String sesso;
+    
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinColumn(name = "idcorsoavviato")
+    private Corsoavviato corsodiriferimento;
 
+    public Corsoavviato getCorsodiriferimento() {
+        return corsodiriferimento;
+    }
+
+    public void setCorsodiriferimento(Corsoavviato corsodiriferimento) {
+        this.corsodiriferimento = corsodiriferimento;
+    }
+    
     public String getSesso() {
         return sesso;
     }

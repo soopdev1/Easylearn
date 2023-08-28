@@ -409,7 +409,7 @@ public class Search extends HttpServlet {
             JsonObject jMembers = new JsonObject();
             JsonArray data = new JsonArray();
 
-            List<Altropersonale> result = new EntityOp().findAll(Altropersonale.class);
+            List<Altropersonale> result = new EntityOp().list_all_AltroPersonale();
 
             jMembers.addProperty(ITOTALRECORDS, result.size());
             jMembers.addProperty(ITOTALDISPLAY, result.size());

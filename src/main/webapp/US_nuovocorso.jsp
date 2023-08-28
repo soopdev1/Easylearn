@@ -4,6 +4,7 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.Altropersonale"%>
 <%@page import="rc.soop.sic.jpa.Allievi"%>
 <%@page import="rc.soop.sic.jpa.User"%>
 <%@page import="rc.soop.sic.jpa.SoggettoProponente"%>
@@ -87,8 +88,11 @@
                                             <%
                                                 EntityOp en = new EntityOp();
                                                 SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
-                                                List<Allievi> allievi = new EntityOp().getAllieviSoggetto(so);
+                                                List<Allievi> allievi = en.getAllieviSoggetto(so);
                                                 List<Istanza> accettate = en.getIstanzeAccettateAvvioCorsi(session);
+                                                List<Altropersonale> ap_all = en.list_all_AltroPersonale();
+                                                List<Altropersonale> direttori = en.getDirettori(ap_all);
+                                                List<Altropersonale> altrop = en.getAltroPersonale(ap_all);
                                             %>
                                             <!--begin::Body-->
                                             <form action="Operations" method="POST" onsubmit="return checkdatisalvati();">
@@ -227,7 +231,7 @@
                                                             <select name="ALLIEVI" id="ALLIEVI" aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
                                                                     class="form-select form-select-solid form-select-lg fw-bold" required multiple>
                                                                 <option value="">Scegli...</option>
-                                                                <%for(Allievi al1: allievi){%>
+                                                                <%for (Allievi al1 : allievi) {%>
                                                                 <option value="<%=al1.getIdallievi()%>">
                                                                     <%=al1.getCodicefiscale()%> - <%=al1.getCognome()%> <%=al1.getNome()%>
                                                                 </option>                                                                
@@ -236,7 +240,50 @@
                                                             <small id="ALLIEVIHelp" class="form-text text-muted"></small>
                                                         </div>
                                                         <!--end::Col-->
-                                                    </div>                                                
+                                                    </div>
+                                                    <div class="row mb-6">
+                                                        <!--begin::Label-->
+                                                        <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                            <span class="required">Direttore Corso</span>
+                                                        </label>
+                                                        <!--end::Label-->
+                                                        <!--begin::Col-->
+                                                        <div class="col-lg-8 fv-row">
+                                                            <select name="DIRETTORE" id="DIRETTORE" aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
+                                                                    class="form-select form-select-solid form-select-lg fw-bold" required>
+                                                                <option value="">Scegli...</option>
+                                                                <%for (Altropersonale al1 : direttori) {%>
+                                                                <option value="<%=al1.getIdaltropersonale()%>">
+                                                                    <%=al1.getCodicefiscale()%> - <%=al1.getCognome()%> <%=al1.getNome()%>
+                                                                </option>                                                                
+                                                                <%}%>
+                                                            </select>
+                                                            <small id="ALLIEVIHelp" class="form-text text-muted"></small>
+                                                        </div>
+                                                        <!--end::Col-->
+                                                    </div>        
+                                                    <div class="row mb-6">
+                                                        <!--begin::Label-->
+                                                        <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                            <span class="required">Elenco Altro Personale</span>
+                                                        </label>
+                                                        <!--end::Label-->
+                                                        <!--begin::Col-->
+                                                        <div class="col-lg-8 fv-row">
+                                                            <select name="ALTROP" id="ALTROP" aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
+                                                                    class="form-select form-select-solid form-select-lg fw-bold" required multiple>
+                                                                <option value="">Scegli...</option>
+                                                                <%for (Altropersonale al1 : altrop) {%>
+                                                                <option value="<%=al1.getIdaltropersonale()%>">
+                                                                    <%=al1.getCognome()%> <%=al1.getNome()%> - <%=al1.getCodicefiscale()%> (<%=al1.getProfiloprof()%>)
+                                                                </option>                                                                
+                                                                <%}%>
+                                                            </select>
+                                                            <small id="ALLIEVIHelp" class="form-text text-muted"></small>
+                                                        </div>
+                                                        <!--end::Col-->
+                                                    </div>
+
                                                     <div class="container">
                                                         <div class="row">
                                                             <div class="col-12">

@@ -1,5 +1,7 @@
 package rc.soop.servlet;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.AtomicDouble;
 import com.google.gson.JsonObject;
 import java.io.File;
@@ -55,13 +57,19 @@ import static rc.soop.sic.Utils.roundDoubleandFormat;
 import rc.soop.sic.jpa.Abilita;
 import rc.soop.sic.jpa.Allegati;
 import rc.soop.sic.jpa.Allievi;
+import rc.soop.sic.jpa.Altropersonale;
 import rc.soop.sic.jpa.Attrezzature;
 import rc.soop.sic.jpa.Calendario_Formativo;
 import rc.soop.sic.jpa.Competenze;
 import rc.soop.sic.jpa.Competenze_Trasversali;
 import rc.soop.sic.jpa.Conoscenze;
 import rc.soop.sic.jpa.Corso;
+import rc.soop.sic.jpa.CorsoAvviato_AltroPersonale;
+import rc.soop.sic.jpa.CorsoAvviato_AltroPersonaleId;
+import rc.soop.sic.jpa.CorsoAvviato_Docenti;
+import rc.soop.sic.jpa.CorsoAvviato_DocentiId;
 import rc.soop.sic.jpa.CorsoStato;
+import rc.soop.sic.jpa.Corsoavviato;
 import rc.soop.sic.jpa.Docente;
 import rc.soop.sic.jpa.EnteStage;
 import rc.soop.sic.jpa.EntityOp;
@@ -90,11 +98,106 @@ import rc.soop.sic.jpa.User;
  */
 public class Operations extends HttpServlet {
 
-    protected void BO_SALVADATITEMPLATEDECRETOAUT(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        
+    protected void AVVIANUOVOCORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
         try {
             EntityOp ep1 = new EntityOp();
-            
+
+            String ISTANZA = getRequestValue(request, "ISTANZA");
+            String CORSO = getRequestValue(request, "CORSO");
+            String DOCENTI = getRequestValue(request, "DOCENTI");
+            String ALLIEVI = getRequestValue(request, "ALLIEVI");
+            String DIRETTORE = getRequestValue(request, "DIRETTORE");
+            String ALTROP = getRequestValue(request, "ALTROP");
+
+            Corsoavviato ca = new Corsoavviato();
+            ca.setCorsobase(ep1.getEm().find(Corso.class, parseLongR(CORSO)));
+            ca.setDatafine(sdf_PATTERNDATE6.parse(getRequestValue(request, "DATAFINE")));
+            ca.setDatainizio(sdf_PATTERNDATE6.parse(getRequestValue(request, "DATAINIZIO")));
+
+            ca.setDirettore(ep1.getEm().find(Altropersonale.class, parseLongR(DIRETTORE)));
+            ca.setStatocorso(ep1.getEm().find(CorsoStato.class, "40"));
+
+            Istanza is1 = ep1.getEm().find(Istanza.class, parseLongR(ISTANZA));
+
+            if (is1.equals(ca.getCorsobase().getIstanza())) {
+                ep1.begin();
+                ep1.persist(ca);
+                ep1.commit();
+                ep1.close();
+
+                EntityOp ep2 = new EntityOp();
+                ep2.begin();
+                List<String> DOCENTIJsonList = new ObjectMapper().readValue(DOCENTI, new TypeReference<List<String>>() {
+                });
+
+                for (String a1 : DOCENTIJsonList) {
+                    Docente d1 = ep2.getEm().find(Docente.class, parseLongR(a1));
+                    if (d1 != null) {
+                        CorsoAvviato_Docenti cad = new CorsoAvviato_Docenti();
+                        cad.setIdcorsoavviatodocenti(new CorsoAvviato_DocentiId(d1.getIddocente(), ca.getIdcorsoavviato()));
+                        cad.setDocente(d1);
+                        cad.setCorsoavviato(ca);
+                        ep2.persist(cad);
+                    }
+                }
+                List<String> ALLIEVIJsonList = new ObjectMapper().readValue(ALLIEVI, new TypeReference<List<String>>() {
+                });
+
+                for (String a1 : ALLIEVIJsonList) {
+
+                    Allievi al1 = ep2.getEm().find(Allievi.class, parseLongR(a1));
+                    if (al1 != null) {
+                        al1.setCorsodiriferimento(ca);
+                        al1.setStatoallievo(Stati.AVVIO);
+                        ep2.merge(al1);
+                    }
+                }
+
+                List<String> ALTROPJsonList = new ObjectMapper().readValue(ALTROP, new TypeReference<List<String>>() {
+                });
+                for (String a1 : ALTROPJsonList) {
+
+                    Altropersonale d1 = ep2.getEm().find(Altropersonale.class, parseLongR(a1));
+                    if (d1 != null) {
+                        CorsoAvviato_AltroPersonale cad = new CorsoAvviato_AltroPersonale();
+                        cad.setIdcorsoavviatoaltropersonale(new CorsoAvviato_AltroPersonaleId(d1.getIdaltropersonale(), ca.getIdcorsoavviato()));
+                        cad.setAltropersonale(d1);
+                        cad.setCorsoavviato(ca);
+                        ep2.persist(cad);
+                    }
+                }
+
+                ep2.commit();
+                ep2.close();
+                redirect(request, response, "Page_message.jsp?esito=OK_UPAL");
+            } else {
+                //ERRORE ISTANZA
+            }
+
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            ex1.printStackTrace();
+        }
+
+//        ISTANZA : 26
+//28-Aug-2023 10:58:16.583 INFO [http-nio-8081-exec-78] rc.soop.sic.Utils.printRequest NORMAL FIELD -  : 34
+//28-Aug-2023 10:58:16.584 INFO [http-nio-8081-exec-78] rc.soop.sic.Utils.printRequest NORMAL FIELD -  : 2023-09-20
+//28-Aug-2023 10:58:16.584 INFO [http-nio-8081-exec-78] rc.soop.sic.Utils.printRequest NORMAL FIELD -  : 2023-11-20
+//28-Aug-2023 10:58:16.584 INFO [http-nio-8081-exec-78] rc.soop.sic.Utils.printRequest NORMAL FIELD - DOCENTI : 1
+//28-Aug-2023 10:58:16.585 INFO [http-nio-8081-exec-78] rc.soop.sic.Utils.printRequest NORMAL FIELD - DOCENTI : 2
+//28-Aug-2023 10:58:16.586 INFO [http-nio-8081-exec-78] rc.soop.sic.Utils.printRequest NORMAL FIELD - ALLIEVI : 5
+//28-Aug-2023 10:58:16.586 INFO [http-nio-8081-exec-78] rc.soop.sic.Utils.printRequest NORMAL FIELD - ALLIEVI : 2
+//28-Aug-2023 10:58:16.586 INFO [http-nio-8081-exec-78] rc.soop.sic.Utils.printRequest NORMAL FIELD - DIRETTORE : 208
+//28-Aug-2023 10:58:16.586 INFO [http-nio-8081-exec-78] rc.soop.sic.Utils.printRequest NORMAL FIELD - ALTROP : 94
+//28-Aug-2023 10:58:16.587 INFO [http-nio-8081-exec-78] rc.soop.sic.Utils.printRequest NORMAL FIELD - ALTROP : 57
+    }
+
+    protected void BO_SALVADATITEMPLATEDECRETOAUT(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        try {
+            EntityOp ep1 = new EntityOp();
+
             TemplateDecretoAUT td = new TemplateDecretoAUT();
             td.setDIRIGCARICA(normalizeUTF8(getRequestValue(request, "DIRIGCARICA")));
             td.setDIRIGNOME(normalizeUTF8(getRequestValue(request, "DIRIGNOME")));
@@ -108,7 +211,7 @@ public class Operations extends HttpServlet {
             ep1.persist(td);
             ep1.commit();
             ep1.close();
-            
+
             redirect(request, response, "ADM_backoffice.jsp?ESITO=OK1");
 
         } catch (Exception ex1) {
@@ -117,7 +220,7 @@ public class Operations extends HttpServlet {
         }
 
     }
-    
+
     protected void BO_EDIT_TIPOPERCORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             EntityOp ep1 = new EntityOp();
@@ -1908,6 +2011,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "BO_SALVADATITEMPLATEDECRETOAUT":
                     BO_SALVADATITEMPLATEDECRETOAUT(request, response);
+                    break;
+                case "AVVIANUOVOCORSO":
+                    AVVIANUOVOCORSO(request, response);
                     break;
                 default:
                     break;

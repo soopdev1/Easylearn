@@ -227,6 +227,25 @@ public class EntityOp {
         return !q.getResultList().isEmpty();
     }
 
+    public List<Altropersonale> list_all_AltroPersonale() {
+        TypedQuery q = this.em.createNamedQuery("altrop.all", Altropersonale.class);
+        return (List<Altropersonale>) q.getResultList();
+        
+    }
+    public List<Altropersonale> getDirettori(List<Altropersonale> result) {
+        return result.stream().filter(r1 -> r1.getProfiloprof().startsWith("DIRETTORE")).collect(Collectors.toList());
+    }
+
+    public List<Altropersonale> getAltroPersonale(List<Altropersonale> result) {
+        return result.stream().filter(
+                r1
+                -> !r1.getProfiloprof().startsWith("DIRETTORE")
+        ).collect(Collectors.toList());
+    }
+
+//    public List<Altropersonale> getDirettori(List<Altropersonale> result){
+//        
+//    }
     public Tipologia_Percorso getTipoPercorsoIstanza(Istanza is) {
         try {
             TypedQuery q = this.em.createNamedQuery("corso.istanza", Istanza.class);

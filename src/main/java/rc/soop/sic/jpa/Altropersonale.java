@@ -14,6 +14,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -25,6 +27,9 @@ import static rc.soop.sic.jpa.Stati.ABILITATO;
  *
  * @author Administrator
  */
+@NamedQueries(value = {
+    @NamedQuery(name = "altrop.all", query = "SELECT c FROM Altropersonale c ORDER BY c.cognome")
+})
 @Entity
 @Table(name = "altropersonale")
 public class Altropersonale implements Serializable {

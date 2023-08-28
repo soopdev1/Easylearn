@@ -47,12 +47,10 @@ public class Corsoavviato implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date datafine;
 
-    @Column(name = "elencodocenti")
-    private String elencodocenti;
-
-    @Column(name = "elencoallievi")
-    private String elencoallievi;
-
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinColumn(name = "direttore")
+    private Altropersonale direttore;
+    
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "stato")
     private CorsoStato statocorso;
@@ -66,6 +64,14 @@ public class Corsoavviato implements Serializable {
 
     @Column(name = "membricommissione")
     private String membricommissione;
+
+    public Altropersonale getDirettore() {
+        return direttore;
+    }
+
+    public void setDirettore(Altropersonale direttore) {
+        this.direttore = direttore;
+    }
 
     public Long getIdcorsoavviato() {
         return idcorsoavviato;
@@ -97,22 +103,6 @@ public class Corsoavviato implements Serializable {
 
     public void setDatafine(Date datafine) {
         this.datafine = datafine;
-    }
-
-    public String getElencodocenti() {
-        return elencodocenti;
-    }
-
-    public void setElencodocenti(String elencodocenti) {
-        this.elencodocenti = elencodocenti;
-    }
-
-    public String getElencoallievi() {
-        return elencoallievi;
-    }
-
-    public void setElencoallievi(String elencoallievi) {
-        this.elencoallievi = elencoallievi;
     }
 
     public CorsoStato getStatocorso() {
