@@ -105,6 +105,14 @@
                                                     + "<button class='btn btn-danger' onclick='history.back()'><i class='fa fa-backward'></i> Torna Indietro</button>";
                                             break;
                                         }
+                                        case "KOUP_CA1":
+                                        case "KOUP_CA2": {
+                                            ty = "alert-danger";
+                                            html = "<i class='fa fa-exclamation-triangle'></i> ERRORE! Impossibile caricare il documento. Corso non trovato, riprovare."
+                                                    + " <hr>"
+                                                    + "<button class='btn btn-danger' onclick='history.back()'><i class='fa fa-backward'></i> Torna Indietro</button>";
+                                            break;
+                                        }
                                         case "KOUP_IS3":
                                         case "KOUP_IS4": {
                                             ty = "alert-danger";

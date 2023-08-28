@@ -27,7 +27,8 @@ import javax.persistence.TemporalType;
  */
 @NamedQueries(value = {
     @NamedQuery(name = "corsoavviato.stato", query = "SELECT c FROM Corsoavviato c WHERE c.statocorso=:stato"),
-    @NamedQuery(name = "corsoavviato.corsobase", query = "SELECT c FROM Corsoavviato c WHERE c.corsobase=:corsobase")
+    @NamedQuery(name = "corsoavviato.corsobase", query = "SELECT c FROM Corsoavviato c WHERE c.corsobase=:corsobase"),
+    @NamedQuery(name = "corsoavviato.soggetto", query = "SELECT c FROM Corsoavviato c WHERE c.corsobase.soggetto=:soggetto")
 })
 @Entity
 @Table(name = "corsoavviato")
@@ -65,6 +66,18 @@ public class Corsoavviato implements Serializable {
     @Column(name = "membricommissione")
     private String membricommissione;
 
+    @Column(name = "datainserimento")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date datainserimento;
+
+    public Date getDatainserimento() {
+        return datainserimento;
+    }
+
+    public void setDatainserimento(Date datainserimento) {
+        this.datainserimento = datainserimento;
+    }
+    
     public Altropersonale getDirettore() {
         return direttore;
     }

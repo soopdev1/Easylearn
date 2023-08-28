@@ -349,6 +349,14 @@ public class EntityOp {
             } catch (Exception ex0) {
                 trackingAction("SERVICE", estraiEccezione(ex0));
             }
+        } else if (c2 != null) {
+            try {
+                TypedQuery q = this.em.createNamedQuery("allegati.corsoavviato.ok", Allegati.class);
+                q.setParameter("corsoavviato", c2);
+                elenco.addAll((List<Allegati>) q.getResultList());
+            } catch (Exception ex0) {
+                trackingAction("SERVICE", estraiEccezione(ex0));
+            }
         } else if (es1 != null) {
             try {
                 TypedQuery q = this.em.createNamedQuery("allegati.entestage.ok", Allegati.class);
@@ -433,6 +441,35 @@ public class EntityOp {
         return q.getResultList().isEmpty() ? new ArrayList() : (List<Istanza>) q.getResultList();
     }
 
+    public List<Corsoavviato> list_corso_user(SoggettoProponente sp, String tipologiapercorso, String statocorso) {
+        HashMap<String, Object> param = new HashMap<>();
+        
+        String sql = "SELECT c FROM Corsoavviato c WHERE c.corsobase.soggetto=:soggetto ";
+        param.put("soggetto", sp);
+        
+        if (!tipologiapercorso.equals("")) {
+            sql += !sql.toUpperCase().contains("WHERE") ? "WHERE " : " AND ";
+            sql += "c.corsobase.istanza.tipologiapercorso.idtipopercorso = :tipologiapercorso";
+            param.put("tipologiapercorso", Long.valueOf(tipologiapercorso));
+        }
+        if (!statocorso.equals("")) {
+            sql += !sql.toUpperCase().contains("WHERE") ? "WHERE " : " AND ";
+            sql += "c.statocorso.codicestatocorso = :statocorso";
+            param.put("statocorso", statocorso);
+        }
+        
+        sql += " ORDER BY c.idcorsoavviato DESC";
+        
+        TypedQuery<Corsoavviato> q = this.em.createQuery(sql, Corsoavviato.class);
+        if (param.isEmpty()) {
+            q.setMaxResults(500);
+        }
+        param.entrySet().forEach(m -> {
+            q.setParameter(m.getKey(), m.getValue());
+        });
+        return q.getResultList().isEmpty() ? new ArrayList() : (List<Corsoavviato>) q.getResultList();
+    }
+    
     public List<Istanza> list_istanze_user(SoggettoProponente sp, String tipologiapercorso, String statoistanza) {
         HashMap<String, Object> param = new HashMap<>();
         String sql = "SELECT i FROM Istanza i WHERE i.soggetto=:soggetto ";

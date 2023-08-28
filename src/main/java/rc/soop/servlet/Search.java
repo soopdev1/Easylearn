@@ -15,6 +15,7 @@ import org.joda.time.DateTime;
 import rc.soop.sic.Constant;
 import static rc.soop.sic.Constant.PATTERNDATE4;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE4;
+import static rc.soop.sic.Constant.sdf_PATTERNDATE5;
 import rc.soop.sic.Utils;
 import static rc.soop.sic.Utils.estraiEccezione;
 import static rc.soop.sic.Utils.getRequestValue;
@@ -102,6 +103,63 @@ public class Search extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             out.print(o1);
         }
+    }
+
+    protected void list_corso_user(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        EntityOp ep = new EntityOp();
+
+        try (PrintWriter out = response.getWriter()) {
+            JsonObject jMembers = new JsonObject();
+            JsonArray data = new JsonArray();
+            SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
+            String statocorso = getRequestValue(request, "statocorso");
+            String tipopercorso = getRequestValue(request, "tipopercorso");
+            List<Corsoavviato> result = ep.list_corso_user(so, tipopercorso, statocorso);
+            jMembers.addProperty(ITOTALRECORDS, result.size());
+            jMembers.addProperty(ITOTALDISPLAY, result.size());
+            jMembers.addProperty(SECHO, 0);
+            jMembers.addProperty(SCOLUMS, "");
+            AtomicInteger at = new AtomicInteger(1);
+
+            result.forEach(res -> {
+                JsonObject data_value = new JsonObject();
+                data_value.addProperty(RECORDID, at.get());
+                data_value.addProperty("stato", res.getStatocorso().getHtmlicon());
+                data_value.addProperty("id", res.getIdcorsoavviato());
+                String nome = "<b>Tipologia Percorso: " + res.getCorsobase().getIstanza().getTipologiapercorso().getNometipologia() + "</b><br/><u>" + res.getCorsobase().getRepertorio().getDenominazione() + "</u>";
+                data_value.addProperty("nome", nome);
+                data_value.addProperty("datainizio", sdf_PATTERNDATE4.format(res.getDatainizio()));
+                data_value.addProperty("datafine", sdf_PATTERNDATE4.format(res.getDatafine()));
+                data_value.addProperty("datainserimento", sdf_PATTERNDATE5.format(res.getDatainserimento()));
+                String azioni = "<form action=\"US_showcorsoavviato.jsp\" method=\"POST\" target=\"_blank\">"
+                        + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "\"/>";
+
+                if (true) {
+                    azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"RICHIEDI AVVIO CORSO\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
+                            + "onclick=\"return sendcorso('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-envelope\"></i></button> | "
+                            + "<button type=\"submit\"class=\"btn btn-sm btn-primary\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA DETTAGLI CORSO\"data-preload='false'><i class=\"fa fa-file-text\"></i></button> | ";
+                }
+
+                azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"GESTIONE ALLEGATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\""
+                        + "onclick=\"return document.getElementById('gestall_" + res.getIdcorsoavviato() + "').submit();\"><i class=\"fa fa-file-clipboard\"></i></button>"
+                        + "</form>"
+                        + "<form action=\"US_allegaticorso.jsp\" method=\"POST\" target=\"_blank\" id=\"gestall_" + res.getIdcorsoavviato() + "\">"
+                        + "<input type=\"hidden\" name=\"idcorso\" value=\"" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "\"/>"
+                        + "</form>";
+                
+                data_value.addProperty("azioni", azioni);
+                data_value.addProperty("statovisual", res.getStatocorso().getNome());
+                data.add(data_value);
+                at.addAndGet(1);
+            });
+            jMembers.add(AADATA, data);
+            response.setContentType(APPJSON);
+            response.setHeader(CONTENTTYPE, APPJSON);
+            out.print(jMembers.toString());
+
+        }
+
     }
 
     protected void list_istanze_user(HttpServletRequest request, HttpServletResponse response)
@@ -741,6 +799,9 @@ public class Search extends HttpServlet {
                     break;
                 case "list_istanze_user":
                     list_istanze_user(request, response);
+                    break;
+                case "list_corso_user":
+                    list_corso_user(request, response);
                     break;
                 case "BO_LIST_TIPOLOGIAPERCORSO":
                     BO_LIST_TIPOLOGIAPERCORSO(request, response);

@@ -117,7 +117,9 @@ public class Operations extends HttpServlet {
 
             ca.setDirettore(ep1.getEm().find(Altropersonale.class, parseLongR(DIRETTORE)));
             ca.setStatocorso(ep1.getEm().find(CorsoStato.class, "40"));
-
+                
+            ca.setDatainserimento(new DateTime().toDate());
+            
             Istanza is1 = ep1.getEm().find(Istanza.class, parseLongR(ISTANZA));
 
             if (is1.equals(ca.getCorsobase().getIstanza())) {
@@ -917,6 +919,82 @@ public class Operations extends HttpServlet {
         }
     }
 
+    protected void UPLDOCCORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+
+            EntityOp ep1 = new EntityOp();
+            String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
+            Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
+            FileItemFactory factory = new DiskFileItemFactory();
+            ServletFileUpload upload = new ServletFileUpload(factory);
+            File nomefile = null;
+            List<FileItem> items = upload.parseRequest(request);
+            Iterator<FileItem> iterator = items.iterator();
+            String IDCORSO = null;
+            String DESCRIZIONE = null;
+            String MIME = null;
+            String codiceDOC = generateIdentifier(6);
+            while (iterator.hasNext()) {
+                FileItem item = (FileItem) iterator.next();
+                if (item.isFormField()) {
+                    if (item.getFieldName().equals("idcorsoavviato")) {
+                        IDCORSO = item.getString();
+                    } else if (item.getFieldName().equals("DESCRIZIONE")) {
+                        DESCRIZIONE = normalizeUTF8(normalize(item.getString()));
+                    }
+                } else {
+                    String fileName = item.getName();
+                    String estensione = fileName.substring(fileName.lastIndexOf("."));
+                    String nome = codiceDOC + new DateTime().toString(PATTERNDATE3)
+                            + RandomStringUtils.randomAlphabetic(15) + estensione;
+                    try {
+                        nomefile = new File(pathtemp.getDescrizione() + nome);
+                        item.write(nomefile);
+                        MIME = getMimeType(nomefile);
+                    } catch (Exception ex) {
+                        EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
+                        nomefile = null;
+                    }
+                }
+            }
+
+            if (nomefile != null) {
+
+                if (IDCORSO != null) {
+                    request.getSession().setAttribute("ses_idcorso", Utils.enc_string(IDCORSO));
+                    Corsoavviato all0 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
+                    if (all0 != null) {
+                        Allegati al1 = new Allegati();
+                        al1.setCorsoavviato(all0);
+                        al1.setCodiceallegati(codiceDOC);
+                        al1.setContent(Base64.encodeBase64String(FileUtils.readFileToByteArray(nomefile)));
+                        al1.setDescrizione(DESCRIZIONE);
+                        al1.setStato(ep1.getEm().find(CorsoStato.class, "30"));
+                        al1.setMimetype(MIME);
+                        al1.setUtentecaricamento(utentecaricamento);
+                        al1.setDatacaricamento(new Date());
+                        ep1.begin();
+                        ep1.persist(al1);
+                        ep1.commit();
+                        ep1.close();
+                        redirect(request, response, "US_allegaticorso.jsp");
+                    } else {
+                        redirect(request, response, "Page_message.jsp?esito=KOUP_CA1");
+                    }
+                } else {
+                    redirect(request, response, "Page_message.jsp?esito=KOUP_CA2");
+                }
+            } else {
+                redirect(request, response, "Page_message.jsp?esito=KOUP_IS3");
+            }
+
+        } catch (Exception ex1) {
+            ex1.printStackTrace();
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KOUP_IS4");
+        }
+    }
+    
     protected void UPLDOCENTE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
 
@@ -1969,6 +2047,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "UPLDOCENTE":
                     UPLDOCENTE(request, response);
+                    break;
+                case "UPLDOCCORSO":
+                    UPLDOCCORSO(request, response);
                     break;
                 case "UPLSOST":
                     UPLSOST(request, response);

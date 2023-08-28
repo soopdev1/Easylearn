@@ -32,6 +32,8 @@ import javax.persistence.TemporalType;
     @NamedQuery(name = "allegati.allievi.ok", query = "SELECT c FROM Allegati c WHERE c.allievi=:allievi AND c.stato.codicestatocorso<>'32'"),
     @NamedQuery(name = "allegati.entestage", query = "SELECT c FROM Allegati c WHERE c.entestage=:entestage"),
     @NamedQuery(name = "allegati.entestage.ok", query = "SELECT c FROM Allegati c WHERE c.entestage=:entestage AND c.stato.codicestatocorso<>'32'"),
+    @NamedQuery(name = "allegati.corsoavviato", query = "SELECT c FROM Allegati c WHERE c.corsoavviato=:corsoavviato"),
+    @NamedQuery(name = "allegati.corsoavviato.ok", query = "SELECT c FROM Allegati c WHERE c.corsoavviato=:corsoavviato AND c.stato.codicestatocorso<>'32'"),
 })
 @Entity
 @Table(name = "allegati")
