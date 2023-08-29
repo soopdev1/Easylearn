@@ -204,6 +204,11 @@ public class EntityOp {
         q.setParameter("inattivo", Stati.INATTIVO);
         return (List<Allievi>) q.getResultList();
     }
+    public List<Allievi> getAllieviCorsoAvviato(Corsoavviato ca) {
+        TypedQuery q = this.em.createNamedQuery("allievi.corsoavviato", Allievi.class);
+        q.setParameter("corsodiriferimento", ca);
+        return (List<Allievi>) q.getResultList();
+    }
 
     public List<EnteStage> getEntiStageSoggetto(SoggettoProponente s) {
         TypedQuery q = this.em.createNamedQuery("entestage.soggetto", EnteStage.class);
@@ -243,9 +248,6 @@ public class EntityOp {
         ).collect(Collectors.toList());
     }
 
-//    public List<Altropersonale> getDirettori(List<Altropersonale> result){
-//        
-//    }
     public Tipologia_Percorso getTipoPercorsoIstanza(Istanza is) {
         try {
             TypedQuery q = this.em.createNamedQuery("corso.istanza", Istanza.class);
@@ -382,6 +384,28 @@ public class EntityOp {
             TypedQuery q = this.em.createNamedQuery("md.docenti", Moduli_Docenti.class);
             q.setParameter("corso", c1);
             return q.getResultList().isEmpty() ? new ArrayList() : (List<Docente>) q.getResultList();
+        } catch (Exception ex0) {
+            trackingAction("SERVICE", estraiEccezione(ex0));
+        }
+        return new ArrayList<>();
+    }
+    
+    public List<CorsoAvviato_Docenti> list_cavv_docenti(Corsoavviato c1) {
+        try {
+            TypedQuery q = this.em.createNamedQuery("corsoavviatodocenti.elencobycorso", CorsoAvviato_Docenti.class);
+            q.setParameter("corsoavviato", c1);
+            return q.getResultList().isEmpty() ? new ArrayList() : (List<CorsoAvviato_Docenti>) q.getResultList();
+        } catch (Exception ex0) {
+            trackingAction("SERVICE", estraiEccezione(ex0));
+        }
+        return new ArrayList<>();
+    }
+    
+    public List<CorsoAvviato_AltroPersonale> list_cavv_altropers(Corsoavviato c1) {
+        try {
+            TypedQuery q = this.em.createNamedQuery("corsoavviataltropers.elencobycorso", CorsoAvviato_AltroPersonale.class);
+            q.setParameter("corsoavviato", c1);
+            return q.getResultList().isEmpty() ? new ArrayList() : (List<CorsoAvviato_AltroPersonale>) q.getResultList();
         } catch (Exception ex0) {
             trackingAction("SERVICE", estraiEccezione(ex0));
         }

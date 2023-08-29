@@ -30,6 +30,7 @@ import rc.soop.sic.Utils;
  * @author Administrator
  */
 @NamedQueries(value = {
+    @NamedQuery(name = "allievi.corsoavviato", query = "SELECT i FROM Allievi i WHERE i.corsodiriferimento=:corsodiriferimento ORDER BY i.cognome ASC"),
     @NamedQuery(name = "allievi.soggetto", query = "SELECT i FROM Allievi i WHERE i.soggetto=:soggetto AND i.statoallievo<>:inattivo ORDER BY i.cognome ASC"),
     @NamedQuery(name = "allievi.attivi.cf", query = "SELECT i FROM Allievi i WHERE i.codicefiscale=:codicefiscale AND i.statoallievo<>:inattivo"),
     @NamedQuery(name = "allievi.attivi.new", query = "SELECT i FROM Allievi i WHERE i.codicefiscale=:codicefiscale AND i.statoallievo=:check")

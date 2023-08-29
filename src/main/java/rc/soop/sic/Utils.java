@@ -55,6 +55,7 @@ import rc.soop.sic.jpa.EntityOp;
 import rc.soop.sic.jpa.Stati;
 import static rc.soop.sic.jpa.Stati.ABILITATO;
 import static rc.soop.sic.jpa.Stati.ATTIVO;
+import static rc.soop.sic.jpa.Stati.AVVIO;
 import static rc.soop.sic.jpa.Stati.CHECK;
 import static rc.soop.sic.jpa.Stati.DISABILITATO;
 import static rc.soop.sic.jpa.Stati.RITIRATO;
@@ -532,6 +533,8 @@ public class Utils {
                 return "<i class='fa fa-remove'></i> Ritirato";
             case CHECK:
                 return "<i class='fa fa-warning'></i> In attesa";
+            case AVVIO:
+                return "<i class='fa fa-hourglass'></i> In fase di avvio";
             default:
                 return "";
         }

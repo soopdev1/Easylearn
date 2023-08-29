@@ -21,9 +21,8 @@ import javax.persistence.Table;
  * @author Administrator
  */
 @NamedQueries(value = {
-    @NamedQuery(name = "md.elencobydocente", query = "SELECT u FROM Moduli_Docenti u WHERE u.docente=:docente"),
-    @NamedQuery(name = "md.elencobycalendarioformativo", query = "SELECT u FROM Moduli_Docenti u WHERE u.moduloformativo=:moduloformativo"),
-    
+    @NamedQuery(name = "corsoavviataltropers.elencobyutente", query = "SELECT u FROM CorsoAvviato_AltroPersonale u WHERE u.altropersonale=:altropersonale"),
+    @NamedQuery(name = "corsoavviataltropers.elencobycorso", query = "SELECT u FROM CorsoAvviato_AltroPersonale u WHERE u.corsoavviato=:corsoavviato")
 })
 @Entity
 @Table(name = "corsoavviato_altropersonale")
@@ -45,7 +44,6 @@ public class CorsoAvviato_AltroPersonale implements Serializable {
 
     public CorsoAvviato_AltroPersonale() {
     }
-
 
     public Corsoavviato getCorsoavviato() {
         return corsoavviato;

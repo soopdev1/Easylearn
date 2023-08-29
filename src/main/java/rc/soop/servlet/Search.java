@@ -133,7 +133,7 @@ public class Search extends HttpServlet {
                 data_value.addProperty("datafine", sdf_PATTERNDATE4.format(res.getDatafine()));
                 data_value.addProperty("datainserimento", sdf_PATTERNDATE5.format(res.getDatainserimento()));
                 String azioni = "<form action=\"US_showcorsoavviato.jsp\" method=\"POST\" target=\"_blank\">"
-                        + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "\"/>";
+                        + "<input type=\"hidden\" name=\"idcorso\" value=\"" + res.getIdcorsoavviato() + "\"/>";
 
                 if (true) {
                     azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"RICHIEDI AVVIO CORSO\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
