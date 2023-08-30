@@ -3,6 +3,7 @@
     Created on : 18-feb-2022, 14.01.46
     Author     : raf
 --%>
+<%@page import="rc.soop.sic.jpa.Calendario_Lezioni"%>
 <%@page import="rc.soop.sic.jpa.Calendario_Formativo"%>
 <%@page import="rc.soop.sic.jpa.CorsoAvviato_AltroPersonale"%>
 <%@page import="rc.soop.sic.jpa.Allievi"%>
@@ -28,12 +29,12 @@
                 }
                 EntityOp eo = new EntityOp();
                 Corsoavviato is1 = eo.getEm().find(Corsoavviato.class, Long.valueOf(idistS));
-
                 List<CorsoAvviato_Docenti> avv_doc = eo.list_cavv_docenti(is1);
                 List<CorsoAvviato_AltroPersonale> avv_altrop = eo.list_cavv_altropers(is1);
                 List<Allievi> allievi = eo.getAllieviCorsoAvviato(is1);
                 List<Calendario_Formativo> cal_istanza = eo.calendario_formativo_corso(is1.getCorsobase());
-
+                List<Calendario_Lezioni> lezioni = eo.calendario_lezioni_corso(is1);
+                Utils.confrontaLezioniCalendario(lezioni, cal_istanza);
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -199,58 +200,86 @@
                                 </table>
                             </label>
                             <hr>
-                            <label class="col-form-label fw-bold fs-6">CALENDARIO FORMATIVO | <a class="btn btn-primary btn-sm fan1" href="US_programmacorsi_details.jsp"
-                                                               data-fancybox data-type='iframe' 
-                                                               data-bs-toggle="tooltip" title="AGGIUNGI MODULO FORMATIVO" 
-                                                               data-preload='false' data-width='75%' data-height='75%' id="addcalendariobutton">
+                            <label class="col-form-label fw-bold fs-6">CALENDARIO FORMATIVO | 
+                                <a class="btn btn-primary btn-sm fan1" href="US_calendariolezioni.jsp"
+                                   data-fancybox data-type='iframe' 
+                                   data-bs-toggle="tooltip" title="INSERISCI NUOVA LEZIONE" 
+                                   data-preload='false' data-width='75%' data-height='75%' id="addcalendariobutton">
                                     <i class="fa fa-plus-circle" ></i> Aggiungi lezione</a></label>
                             <div class="row col-md-12">
-                                
-                                <div class="col-md-6" style="border-right: 1px dashed #333;">
-                                <label class="col-form-label fw-bold fs-6">LEZIONI INSERITE</label>
-                            
-                            </div>
-                            <div class="col-md-6">
-                                <label class="col-form-label fw-bold fs-6">PRESENTE IN ISTANZA</label>
-                            
-                                <!--begin::Table container-->
-                                <div class="table-responsive">
-                                    <!--begin::Table-->
-                                    <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt1" style="border-bottom: 2px;">
-                                        <!--begin::Table head-->
-                                        <thead>
-                                            <tr>
-                                                <th class="p-2 w-50px">#</th>
-                                                <th class="p-2 w-50px">Tipologia</th>
-                                                <th class="p-2 w-150px">Descrizione</th>
-                                                <th class="p-2 w-50px">Ore Totali</th>
-                                            </tr>
-                                        </thead>
-                                        <!--end::Table head-->
-                                        <!--begin::Table body-->
-                                        <tbody>
-                                            <%
-                                                for (Calendario_Formativo c1 : cal_istanza) {
-                                                    if (c1.getTipomodulo().equals("BASE")) {%>
-                                        <tr>
-                                            <td class="p-2 w-50px"><%=c1.getCodicemodulo()%></td>
-                                            <td class="p-2 w-50px"><%=c1.getTipomodulo()%></td>
-                                            <td class="p-2 w-150px"><%=c1.getCompetenzetrasversali().getDescrizione()%></td>
-                                            <td class="p-2 w-50px"><%=Utils.roundDoubleandFormat(c1.getOre(), 1)%></td>
-                                        </tr>
-                                        <%} else if (c1.getTipomodulo().equals("MODULOFORMATIVO")) {%>
-                                        <tr>
-                                            <td class="p-2 w-50px"><%=c1.getCodicemodulo()%></td>
-                                            <td class="p-2 w-50px">MODULO FORMATIVO</td>
-                                            <td class="p-2 w-150px"><%=c1.getNomemodulo()%></td>
-                                            <td class="p-2 w-50px"><%=Utils.roundDoubleandFormat(c1.getOre(), 1)%></td>
-                                        </tr>
-                                        <%}%>
-                                        <%}%>
-                                        </tbody>
-                                    </table>
+
+                                <div class="col-md-7" style="border-right: 1px dashed #333;">
+                                    <label class="col-form-label fw-bold fs-6">LEZIONI INSERITE: <%=lezioni.size()%></label>
+                                    <div class="table-responsive">
+                                        <!--begin::Table-->
+                                        <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt0" style="border-bottom: 2px;">
+                                            <!--begin::Table head-->
+                                            <thead>
+                                                <tr>
+                                                    <th class="p-2 w-10px">#</th>
+                                                    <th class="p-2 w-50px">Data (Orario)</th>
+                                                    <th class="p-2 w-50px">Docente</th>
+                                                    <th class="p-2 w-50px">Modulo (Ore)</th>
+                                                </tr>
+                                            </thead>
+                                            <!--end::Table head-->
+                                            <!--begin::Table body-->
+                                            <tbody>
+                                                <%
+                                                    int indice = 0;
+                                                    for (Calendario_Lezioni c1 : lezioni) {
+                                                    indice++;%>
+                                                <tr>
+                                                    <td class="p-2 w-10px"><%=indice%></td>
+                                                    <td class="p-2 w-50px"><%=Constant.sdf_PATTERNDATE4.format(c1.getDatalezione())%> (<%=c1.getOrainizio()%> - <%=c1.getOrafine()%>)</td>
+                                                    <td class="p-2 w-50px"><%=c1.getDocente().getCognome()%> <%=c1.getDocente().getNome()%></td>
+                                                    <td class="p-2 w-50px"><%=c1.getCalendarioformativo().getNomemodulo()%> (<%=Utils.roundDoubleandFormat(c1.getOre(), 1)%>)</td>
+                                                </tr>
+                                                <%}%>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
+                                <div class="col-md-5">
+                                    <label class="col-form-label fw-bold fs-6">PRESENTE IN ISTANZA</label>
+                                    <!--begin::Table container-->
+                                    <div class="table-responsive">
+                                        <!--begin::Table-->
+                                        <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt1" style="border-bottom: 2px;">
+                                            <!--begin::Table head-->
+                                            <thead>
+                                                <tr>
+                                                    <th class="p-2 w-50px">Codice</th>
+                                                    <th class="p-2 w-50px">Tipologia</th>
+                                                    <th class="p-2 w-150px">Descrizione</th>
+                                                    <th class="p-2 w-50px">Ore Totali</th>
+                                                </tr>
+                                            </thead>
+                                            <!--end::Table head-->
+                                            <!--begin::Table body-->
+                                            <tbody>
+                                                <%
+                                                    for (Calendario_Formativo c1 : cal_istanza) {
+                                                        if (c1.getTipomodulo().equals("BASE")) {%>
+                                                <tr>
+                                                    <td class="p-2 w-50px"><%=c1.getCodicemodulo()%></td>
+                                                    <td class="p-2 w-50px"><%=c1.getTipomodulo()%></td>
+                                                    <td class="p-2 w-150px"><%=c1.getCompetenzetrasversali().getDescrizione()%></td>
+                                                    <td class="p-2 w-50px"><%=Utils.roundDoubleandFormat(c1.getOre(), 1)%></td>
+                                                </tr>
+                                                <%} else if (c1.getTipomodulo().equals("MODULOFORMATIVO")) {%>
+                                                <tr>
+                                                    <td class="p-2 w-50px"><%=c1.getCodicemodulo()%></td>
+                                                    <td class="p-2 w-50px">MODULO FORMATIVO</td>
+                                                    <td class="p-2 w-150px"><%=c1.getNomemodulo()%></td>
+                                                    <td class="p-2 w-50px"><%=Utils.roundDoubleandFormat(c1.getOre(), 1)%></td>
+                                                </tr>
+                                                <%}%>
+                                                <%}%>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -285,7 +314,8 @@
         <script src="assets/plugins/DataTables/jquery.dataTables.min.js"></script>
         <script src="assets/plugins/DataTables/datatables.min.js"></script>
         <script src="assets/plugins/DataTables/date-eu.js"></script>
-
+        <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
+        <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
         <script src="assets/js/US_showcorsoavviato.js"></script>
 
@@ -295,7 +325,7 @@
     <!--end::Body-->
     <%break;
             }
-
+            
             case -1:
                 Utils.redirect(request, response, "login.jsp");
                 break;

@@ -33,6 +33,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+import java.util.stream.Collectors;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -48,9 +49,13 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import org.apache.commons.lang3.StringUtils;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import org.joda.time.DateTime;
+import org.joda.time.Minutes;
 import static rc.soop.sic.Constant.PATTERNDATE2;
 import static rc.soop.sic.Constant.PATTERNDATE3;
 import rc.soop.sic.jpa.Allievi;
+import rc.soop.sic.jpa.Calendario_Formativo;
+import rc.soop.sic.jpa.Calendario_Lezioni;
+import rc.soop.sic.jpa.CorsoAvviato_Docenti;
 import rc.soop.sic.jpa.EntityOp;
 import rc.soop.sic.jpa.Stati;
 import static rc.soop.sic.jpa.Stati.ABILITATO;
@@ -463,7 +468,7 @@ public class Utils {
                     return "LUNGHEZZA ERRATA.";
             }
         } catch (Exception e) {
-            return e.getMessage();
+            return estraiEccezione(e);
         }
     }
 
@@ -511,16 +516,15 @@ public class Utils {
                 sesso = "F";
                 giorno = String.valueOf(parseIntR(giorno) - 40);
             }
-            DateTime nascita = new DateTime(parseIntR(anno), parseIntR(ricavaMese(mese)), parseIntR(giorno), 0, 0);            
+            DateTime nascita = new DateTime(parseIntR(anno), parseIntR(ricavaMese(mese)), parseIntR(giorno), 0, 0);
             al1.setDatanascita(nascita.toDate());
             al1.setLuogonascita(new EntityOp().getComuneCF(comune).getNome());
-            al1.setSesso(sesso);            
+            al1.setSesso(sesso);
         } else {
-            System.out.println("ERRORE) " + val);
+            Constant.LOGGER.log(Level.SEVERE, "ERRORE CF: {0}", val);
         }
     }
-    
-    
+
     public static String getEtichettastato(Stati stato) {
         switch (stato) {
             case ATTIVO:
@@ -538,6 +542,29 @@ public class Utils {
             default:
                 return "";
         }
+    }
+
+    public static double calcolaore(String orainizio, String orafine) {
+        try {
+            DateTime dt1 = new DateTime(2023, 1, 1, Utils.parseIntR(orainizio.split(":")[0]), Utils.parseIntR(orainizio.split(":")[1]));
+            DateTime dt2 = new DateTime(2023, 1, 1, Utils.parseIntR(orafine.split(":")[0]), Utils.parseIntR(orafine.split(":")[1]));
+            return Minutes.minutesBetween(dt1, dt2).getMinutes() / 60.0;
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+            return 0.0;
+        }
+    }
+
+    public static void confrontaLezioniCalendario(List<Calendario_Lezioni> lezioni,
+            List<Calendario_Formativo> cal_istanza) {
+        cal_istanza.forEach(c1 -> {
+            if (c1.getTipomodulo().equals("BASE") || c1.getTipomodulo().equals("MODULOFORMATIVO")) {
+                c1.setOreresidue(c1.getOre());
+                lezioni.stream().filter(l1 -> l1.getCalendarioformativo().equals(c1)).collect(Collectors.toList()).forEach(l1 -> {
+                    c1.setOreresidue(c1.getOreresidue() - l1.getOre());
+                });
+            }
+        });
     }
 
 }

@@ -60,6 +60,7 @@ import rc.soop.sic.jpa.Allievi;
 import rc.soop.sic.jpa.Altropersonale;
 import rc.soop.sic.jpa.Attrezzature;
 import rc.soop.sic.jpa.Calendario_Formativo;
+import rc.soop.sic.jpa.Calendario_Lezioni;
 import rc.soop.sic.jpa.Competenze;
 import rc.soop.sic.jpa.Competenze_Trasversali;
 import rc.soop.sic.jpa.Conoscenze;
@@ -98,6 +99,36 @@ import rc.soop.sic.jpa.User;
  */
 public class Operations extends HttpServlet {
 
+    protected void INSERISCILEZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            EntityOp ep1 = new EntityOp();
+            String CORSO = getRequestValue(request, "idcorsodasalvare");
+            String docente = getRequestValue(request, "docente");
+            String modulo = getRequestValue(request, "modulo");
+            String orai = getRequestValue(request, "orai");
+            String oraf = getRequestValue(request, "oraf");            
+            Date data = sdf_PATTERNDATE6.parse(getRequestValue(request, "data"));            
+            Calendario_Lezioni cl1 = new Calendario_Lezioni();
+            cl1.setCalendarioformativo(ep1.getEm().find(Calendario_Formativo.class, parseLongR(modulo)));
+            cl1.setCorsodiriferimento(ep1.getEm().find(Corsoavviato.class, parseLongR(CORSO)));
+            cl1.setDocente(ep1.getEm().find(Docente.class, parseLongR(docente)));
+            cl1.setDatainserimento(new Date());
+            cl1.setDatalezione(data);
+            cl1.setOrainizio(orai);
+            cl1.setOrafine(oraf);
+            cl1.setOre(Utils.calcolaore(orai, oraf));            
+            ep1.begin();
+            ep1.persist(cl1);
+            ep1.commit();
+            ep1.close();
+            redirect(request, response, "US_calendariolezioni.jsp?esito=OK");
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            ex1.printStackTrace();
+            redirect(request, response, "Page_message.jsp?esito=KO_LEZ1");
+        }
+    }
+    
     protected void AVVIANUOVOCORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         try {
@@ -181,18 +212,6 @@ public class Operations extends HttpServlet {
             EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
             ex1.printStackTrace();
         }
-
-//        ISTANZA : 26
-//28-Aug-2023 10:58:16.583 INFO [http-nio-8081-exec-78] rc.soop.sic.Utils.printRequest NORMAL FIELD -  : 34
-//28-Aug-2023 10:58:16.584 INFO [http-nio-8081-exec-78] rc.soop.sic.Utils.printRequest NORMAL FIELD -  : 2023-09-20
-//28-Aug-2023 10:58:16.584 INFO [http-nio-8081-exec-78] rc.soop.sic.Utils.printRequest NORMAL FIELD -  : 2023-11-20
-//28-Aug-2023 10:58:16.584 INFO [http-nio-8081-exec-78] rc.soop.sic.Utils.printRequest NORMAL FIELD - DOCENTI : 1
-//28-Aug-2023 10:58:16.585 INFO [http-nio-8081-exec-78] rc.soop.sic.Utils.printRequest NORMAL FIELD - DOCENTI : 2
-//28-Aug-2023 10:58:16.586 INFO [http-nio-8081-exec-78] rc.soop.sic.Utils.printRequest NORMAL FIELD - ALLIEVI : 5
-//28-Aug-2023 10:58:16.586 INFO [http-nio-8081-exec-78] rc.soop.sic.Utils.printRequest NORMAL FIELD - ALLIEVI : 2
-//28-Aug-2023 10:58:16.586 INFO [http-nio-8081-exec-78] rc.soop.sic.Utils.printRequest NORMAL FIELD - DIRETTORE : 208
-//28-Aug-2023 10:58:16.586 INFO [http-nio-8081-exec-78] rc.soop.sic.Utils.printRequest NORMAL FIELD - ALTROP : 94
-//28-Aug-2023 10:58:16.587 INFO [http-nio-8081-exec-78] rc.soop.sic.Utils.printRequest NORMAL FIELD - ALTROP : 57
     }
 
     protected void BO_SALVADATITEMPLATEDECRETOAUT(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -2095,6 +2114,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "AVVIANUOVOCORSO":
                     AVVIANUOVOCORSO(request, response);
+                    break;
+                case "INSERISCILEZIONE":
+                    INSERISCILEZIONE(request, response);
                     break;
                 default:
                     break;

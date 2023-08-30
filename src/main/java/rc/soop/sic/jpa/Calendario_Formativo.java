@@ -21,6 +21,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  *
@@ -69,6 +70,9 @@ public class Calendario_Formativo implements Serializable {
     @Column(name = "ore")
     private double ore;
 
+    @Transient
+    private double oreresidue;
+    
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "idcompetenze")
     private Competenze_Trasversali competenzetrasversali;
@@ -133,6 +137,14 @@ public class Calendario_Formativo implements Serializable {
         }
     }
 
+    public double getOreresidue() {
+        return oreresidue;
+    }
+
+    public void setOreresidue(double oreresidue) {
+        this.oreresidue = oreresidue;
+    }
+    
     public String getCtcodicelingua() {
         return ctcodicelingua;
     }

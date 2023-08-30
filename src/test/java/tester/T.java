@@ -9,6 +9,8 @@ import static java.math.BigDecimal.ROUND_HALF_DOWN;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
+import org.joda.time.DateTime;
+import org.joda.time.Minutes;
 import rc.soop.sic.Pdf;
 import rc.soop.sic.SendMail;
 import rc.soop.sic.Utils;
@@ -22,6 +24,12 @@ import rc.soop.sic.jpa.Istanza;
 public class T {
 
     public static void main(String[] args) {
+        
+        DateTime dt1 = new DateTime(2023, 1, 1, Utils.parseIntR("08"), Utils.parseIntR("30"));
+        DateTime dt2 = new DateTime(2023, 1, 1, Utils.parseIntR("17"), Utils.parseIntR("00"));
+        
+        System.out.println(Minutes.minutesBetween(dt1, dt2).getMinutes()/60.0);
+        
 //        EntityOp ep1 = new EntityOp();
 //        String[] to = {"developers@smartoop.it"};
 //        SendMail.sendPec(ep1, to, null, null, "TEST INVIO PEC PIATTAFORMA AUTORIZZAZIONE CORSI", "TEST INVIO PEC PIATTAFORMA AUTORIZZAZIONE CORSI", null);
