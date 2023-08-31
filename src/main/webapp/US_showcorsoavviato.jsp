@@ -49,7 +49,7 @@
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
         <link rel="stylesheet" href="assets/plugins/jquery-confirm.3.3.2.min.css">
         <link href="assets/plugins/DataTables/datatables.min.css" rel="stylesheet" type="text/css" />
-
+        <link rel="stylesheet" href="assets/plugins/jquery-confirm.3.3.2.min.css">
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/plus.css" rel="stylesheet" type="text/css" />
 
@@ -220,6 +220,7 @@
                                                     <th class="p-2 w-50px">Data (Orario)</th>
                                                     <th class="p-2 w-50px">Docente</th>
                                                     <th class="p-2 w-50px">Modulo (Ore)</th>
+                                                    <th class="p-2 w-50px">Ore Lezione (Tipo)</th>
                                                 </tr>
                                             </thead>
                                             <!--end::Table head-->
@@ -227,18 +228,29 @@
                                             <tbody>
                                                 <%
                                                     int indice = 0;
+                                                    int oretotl = 0;
                                                     for (Calendario_Lezioni c1 : lezioni) {
-                                                    indice++;%>
+                                                        String tl = c1.getTipolezione().equals("PRE") ? "(IN PRESENZA)" : "(FAD)";
+                                                        String orenorm = Utils.roundDoubleandFormat(c1.getOre(), 1);
+                                                        oretotl += c1.getOre();
+                                                        indice++;%>
                                                 <tr>
                                                     <td class="p-2 w-10px"><%=indice%></td>
                                                     <td class="p-2 w-50px"><%=Constant.sdf_PATTERNDATE4.format(c1.getDatalezione())%> (<%=c1.getOrainizio()%> - <%=c1.getOrafine()%>)</td>
                                                     <td class="p-2 w-50px"><%=c1.getDocente().getCognome()%> <%=c1.getDocente().getNome()%></td>
-                                                    <td class="p-2 w-50px"><%=c1.getCalendarioformativo().getNomemodulo()%> (<%=Utils.roundDoubleandFormat(c1.getOre(), 1)%>)</td>
+                                                    <td class="p-2 w-50px"><%=c1.getCalendarioformativo().getNomemodulo()%></td>
+                                                    <td class="p-2 w-50px"><%=orenorm%> <%=tl%> | 
+                                                    <button type="button"class="btn btn-sm btn-danger" data-bs-toggle="tooltip" 
+                                                            title="ELIMINA LEZIONE" data-preload='false' 
+                                                            onclick="return rimuovilezione('<%=c1.getIdcalendariolezioni()%>')">
+                                                        <i class="fa fa-trash-arrow-up"></i></button>
+                                                    </td>
                                                 </tr>
                                                 <%}%>
                                             </tbody>
                                         </table>
                                     </div>
+                                    <label class="col-form-label fw-bold fs-6 text-primary"><u>ORE TOTALI LEZIONE: <%=oretotl%></u></label>
                                 </div>
                                 <div class="col-md-5">
                                     <label class="col-form-label fw-bold fs-6">PRESENTE IN ISTANZA</label>
@@ -252,33 +264,39 @@
                                                     <th class="p-2 w-50px">Codice</th>
                                                     <th class="p-2 w-50px">Tipologia</th>
                                                     <th class="p-2 w-150px">Descrizione</th>
-                                                    <th class="p-2 w-50px">Ore Totali</th>
+                                                    <th class="p-2 w-50px">Ore Totali (Ore FAD)</th>
                                                 </tr>
                                             </thead>
                                             <!--end::Table head-->
                                             <!--begin::Table body-->
                                             <tbody>
                                                 <%
+                                                    int oretot = 0;
                                                     for (Calendario_Formativo c1 : cal_istanza) {
-                                                        if (c1.getTipomodulo().equals("BASE")) {%>
+                                                        oretot += c1.getOre();
+                                                        if (c1.getTipomodulo().equals("BASE")) {
+
+                                                %>
                                                 <tr>
                                                     <td class="p-2 w-50px"><%=c1.getCodicemodulo()%></td>
                                                     <td class="p-2 w-50px"><%=c1.getTipomodulo()%></td>
                                                     <td class="p-2 w-150px"><%=c1.getCompetenzetrasversali().getDescrizione()%></td>
-                                                    <td class="p-2 w-50px"><%=Utils.roundDoubleandFormat(c1.getOre(), 1)%></td>
+                                                    <td class="p-2 w-50px"><%=Utils.roundDoubleandFormat(c1.getOre(), 1)%> (<%=Utils.roundDoubleandFormat(c1.getOre_teorica_el(), 1)%>)</td>
                                                 </tr>
                                                 <%} else if (c1.getTipomodulo().equals("MODULOFORMATIVO")) {%>
                                                 <tr>
                                                     <td class="p-2 w-50px"><%=c1.getCodicemodulo()%></td>
                                                     <td class="p-2 w-50px">MODULO FORMATIVO</td>
                                                     <td class="p-2 w-150px"><%=c1.getNomemodulo()%></td>
-                                                    <td class="p-2 w-50px"><%=Utils.roundDoubleandFormat(c1.getOre(), 1)%></td>
+                                                    <td class="p-2 w-50px"><%=Utils.roundDoubleandFormat(c1.getOre(), 1)%> (<%=Utils.roundDoubleandFormat(c1.getOre_teorica_el(), 1)%>)
+                                                    </td>
                                                 </tr>
                                                 <%}%>
                                                 <%}%>
                                             </tbody>
                                         </table>
                                     </div>
+                                    <label class="col-form-label fw-bold fs-6 text-primary"><u>ORE TOTALI: <%=oretot%></u></label>
                                 </div>
                             </div>
                         </div>
@@ -317,6 +335,8 @@
         <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
         <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
+                <script src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
+
         <script src="assets/js/US_showcorsoavviato.js"></script>
 
         <!--end::Page Custom Javascript-->
@@ -325,7 +345,7 @@
     <!--end::Body-->
     <%break;
             }
-            
+
             case -1:
                 Utils.redirect(request, response, "login.jsp");
                 break;

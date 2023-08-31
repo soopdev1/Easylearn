@@ -39,7 +39,7 @@
         <!--begin::Page Vendor Stylesheets(used by this page)-->
         <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
-        <link href="assets/plugins/DataTables/datatables.min.css" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="assets/plugins/jquery-confirm.3.3.2.min.css">
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
 
         <!--end::Global Stylesheets Bundle-->
@@ -71,7 +71,7 @@
                         </div>
                         <div class="card-body py-3">
                             <%String esito = Utils.getRequestValue(request, "esito");
-                            if (esito.equals("OK")) {%>
+                                if (esito.equals("OK")) {%>
                             <div class="row col-md-12 col-form-label">
                                 <div class="alert alert-success">
                                     <i class="fa fa-check-circle"></i> Operazione completata! Lezione inserita con successo,
@@ -153,9 +153,23 @@
                                     </select>
                                 </div> 
                                 <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>MODULO</b></span>
+                                    <span class="text-danger"><b>TIPO LEZIONE</b></span>
                                 </label>
                                 <div class="col-md-4 col-form-label fs-6">
+                                    <select 
+                                        id="tipolez"
+                                        name="tipolez" aria-label="Scegli..." 
+                                        data-control="select2" data-placeholder="Scegli..." 
+                                        class="form-select" required>
+                                        <option value=""></option>
+                                        <option value="PRE">In presenza</option>
+                                        <option value="FAD">FAD</option>
+                                    </select>
+                                </div> 
+                                <label class="col-md-2 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>MODULO</b></span>
+                                </label>
+                                <div class="col-md-10 col-form-label fs-6">
                                     <select 
                                         id="modulo"
                                         name="modulo" aria-label="Scegli..." 
@@ -165,11 +179,15 @@
                                         <%
                                             for (Calendario_Formativo c1 : cal_istanza) {
                                                 if (c1.getTipomodulo().equals("BASE")) {%>
-                                        <option data-res="<%=c1.getOreresidue()%>" value="<%=c1.getIdcalendarioformativo()%>"><%=c1.getCodicemodulo()%> <%=c1.getTipomodulo()%> - <%=c1.getCompetenzetrasversali().getDescrizione()%> - ORE: <%=Utils.roundDoubleandFormat(c1.getOre(), 1)%> RESIDUE: <%=Utils.roundDoubleandFormat(c1.getOreresidue(), 1)%></option>
-                                        <%} else if (c1.getTipomodulo().equals("MODULOFORMATIVO")) {%>
-                                        <option data-res="<%=c1.getOreresidue()%>" value="<%=c1.getIdcalendarioformativo()%>"><%=c1.getCodicemodulo()%> MODULO FORMATIVO - <%=c1.getNomemodulo()%> - ORE: <%=Utils.roundDoubleandFormat(c1.getOre(), 1)%> RESIDUE: <%=Utils.roundDoubleandFormat(c1.getOreresidue(), 1)%></option>
-                                        <%}%>
-                                        <%}%>
+                                        <option data-res="<%=c1.getOreresidue()%>" data-resfad="<%=c1.getOreresiduefad()%>" value="<%=c1.getIdcalendarioformativo()%>"><%=c1.getCodicemodulo()%> - 
+                                            <%=c1.getTipomodulo()%> - <%=c1.getCompetenzetrasversali().getDescrizione()%> - ORE: <%=Utils.roundDoubleandFormat(c1.getOre(), 1)%> 
+                                        RESIDUE IN PRESENZA: <%=Utils.roundDoubleandFormat(c1.getOreresidue(), 1)%> - RESIDUE IN FAD: <%=Utils.roundDoubleandFormat(c1.getOreresiduefad(), 1)%></option>
+                                            <%} else if (c1.getTipomodulo().equals("MODULOFORMATIVO")) {%>
+                                        <option data-res="<%=c1.getOreresidue()%>" data-resfad="<%=c1.getOreresiduefad()%>" value="<%=c1.getIdcalendarioformativo()%>"><%=c1.getCodicemodulo()%> - 
+                                            MODULO FORMATIVO - <%=c1.getNomemodulo()%> - ORE: <%=Utils.roundDoubleandFormat(c1.getOre(), 1)%> 
+                                        RESIDUE IN PRESENZA: <%=Utils.roundDoubleandFormat(c1.getOreresidue(), 1)%> - RESIDUE IN FAD: <%=Utils.roundDoubleandFormat(c1.getOreresiduefad(), 1)%></option>
+                                            <%}%>
+                                            <%}%>
                                     </select>
                                 </div> 
                             </div>
@@ -206,8 +224,10 @@
     <!--begin::Page Custom Javascript(used by this page)-->
     <script src="assets/plugins/global/plugins.bundle.js"></script>
     <script src="assets/js/scripts.bundle.js"></script>
+
     <script src="assets/fontawesome-6.0.0/js/all.js"></script>
     <script src="assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
+    <script src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
     <script src="assets/js/US_calendariolezioni.js"></script>
 
     <!--end::Page Custom Javascript-->

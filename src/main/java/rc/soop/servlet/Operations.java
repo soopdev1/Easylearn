@@ -1,6 +1,7 @@
 package rc.soop.servlet;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.AtomicDouble;
 import com.google.gson.JsonObject;
@@ -99,6 +100,61 @@ import rc.soop.sic.jpa.User;
  */
 public class Operations extends HttpServlet {
 
+    protected void RICHIEDIAVVIOCORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Utils.printRequest(request);
+
+        JsonObject resp_out = new JsonObject();
+//        if (isAdmin(request.getSession())) {
+        try {
+            String IDCORSO = getRequestValue(request, "IDCORSO");
+            EntityOp ep1 = new EntityOp();
+            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
+            if (ca1 != null) {
+
+                List<Calendario_Formativo> cal_istanza = ep1.calendario_formativo_corso(ca1.getCorsobase());
+                List<Calendario_Lezioni> lezioni = ep1.calendario_lezioni_corso(ca1);
+                AtomicDouble ore_cal = new AtomicDouble(0.0);
+                AtomicDouble ore_lez = new AtomicDouble(0.0);
+                cal_istanza.stream().map(c1 -> c1.getOre()).collect(Collectors.toList()).forEach(c2 -> {
+                    ore_cal.addAndGet(c2);
+                });
+                lezioni.stream().map(c1 -> c1.getOre()).collect(Collectors.toList()).forEach(c2 -> {
+                    ore_lez.addAndGet(c2);
+                });
+
+                if (ore_cal.get() == ore_lez.get()) {
+                    ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "41"));
+                    ep1.begin();
+                    ep1.merge(ca1);
+                    ep1.commit();
+                    ep1.close();
+                    resp_out.addProperty("result",
+                            true);
+                } else {
+                    resp_out.addProperty("result",
+                            false);
+                    resp_out.addProperty("message",
+                            "Il numero di ore lezione pianificate (" + Utils.roundDoubleandFormat(ore_lez.get(), 1) + ") non corrisponde al numero di ore previste dal corso (" + Utils.roundDoubleandFormat(ore_cal.get(), 1) + "). Controllare.");
+                }
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "CORSO NON TROVATO.");
+            }
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+
+    }
+
     protected void INSERISCILEZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             EntityOp ep1 = new EntityOp();
@@ -106,8 +162,9 @@ public class Operations extends HttpServlet {
             String docente = getRequestValue(request, "docente");
             String modulo = getRequestValue(request, "modulo");
             String orai = getRequestValue(request, "orai");
-            String oraf = getRequestValue(request, "oraf");            
-            Date data = sdf_PATTERNDATE6.parse(getRequestValue(request, "data"));            
+            String oraf = getRequestValue(request, "oraf");
+            String tipolezione = getRequestValue(request, "tipolez");
+            Date data = sdf_PATTERNDATE6.parse(getRequestValue(request, "data"));
             Calendario_Lezioni cl1 = new Calendario_Lezioni();
             cl1.setCalendarioformativo(ep1.getEm().find(Calendario_Formativo.class, parseLongR(modulo)));
             cl1.setCorsodiriferimento(ep1.getEm().find(Corsoavviato.class, parseLongR(CORSO)));
@@ -116,7 +173,8 @@ public class Operations extends HttpServlet {
             cl1.setDatalezione(data);
             cl1.setOrainizio(orai);
             cl1.setOrafine(oraf);
-            cl1.setOre(Utils.calcolaore(orai, oraf));            
+            cl1.setOre(Utils.calcolaore(orai, oraf));
+            cl1.setTipolezione(tipolezione);
             ep1.begin();
             ep1.persist(cl1);
             ep1.commit();
@@ -128,7 +186,7 @@ public class Operations extends HttpServlet {
             redirect(request, response, "Page_message.jsp?esito=KO_LEZ1");
         }
     }
-    
+
     protected void AVVIANUOVOCORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         try {
@@ -148,11 +206,14 @@ public class Operations extends HttpServlet {
 
             ca.setDirettore(ep1.getEm().find(Altropersonale.class, parseLongR(DIRETTORE)));
             ca.setStatocorso(ep1.getEm().find(CorsoStato.class, "40"));
-                
-            ca.setDatainserimento(new DateTime().toDate());
-            
-            Istanza is1 = ep1.getEm().find(Istanza.class, parseLongR(ISTANZA));
 
+            ca.setDatainserimento(new DateTime().toDate());
+
+            Istanza is1 = ep1.getEm().find(Istanza.class, parseLongR(ISTANZA));
+            
+            ObjectMapper om = new ObjectMapper();
+            om.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+            
             if (is1.equals(ca.getCorsobase().getIstanza())) {
                 ep1.begin();
                 ep1.persist(ca);
@@ -161,7 +222,7 @@ public class Operations extends HttpServlet {
 
                 EntityOp ep2 = new EntityOp();
                 ep2.begin();
-                List<String> DOCENTIJsonList = new ObjectMapper().readValue(DOCENTI, new TypeReference<List<String>>() {
+                List<String> DOCENTIJsonList = om.readValue(DOCENTI, new TypeReference<List<String>>() {
                 });
 
                 for (String a1 : DOCENTIJsonList) {
@@ -174,7 +235,7 @@ public class Operations extends HttpServlet {
                         ep2.persist(cad);
                     }
                 }
-                List<String> ALLIEVIJsonList = new ObjectMapper().readValue(ALLIEVI, new TypeReference<List<String>>() {
+                List<String> ALLIEVIJsonList = om.readValue(ALLIEVI, new TypeReference<List<String>>() {
                 });
 
                 for (String a1 : ALLIEVIJsonList) {
@@ -187,7 +248,7 @@ public class Operations extends HttpServlet {
                     }
                 }
 
-                List<String> ALTROPJsonList = new ObjectMapper().readValue(ALTROP, new TypeReference<List<String>>() {
+                List<String> ALTROPJsonList = om.readValue(ALTROP, new TypeReference<List<String>>() {
                 });
                 for (String a1 : ALTROPJsonList) {
 
@@ -203,14 +264,16 @@ public class Operations extends HttpServlet {
 
                 ep2.commit();
                 ep2.close();
-                redirect(request, response, "Page_message.jsp?esito=OK_UPAL");
+                redirect(request, response, "US_gestionecorsi.jsp?esito=OK");
             } else {
                 //ERRORE ISTANZA
+                redirect(request, response, "Page_message.jsp?esito=KO_NCIN1");
             }
 
         } catch (Exception ex1) {
             EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
             ex1.printStackTrace();
+            redirect(request, response, "Page_message.jsp?esito=KO_NCIN2");
         }
     }
 
@@ -1013,7 +1076,7 @@ public class Operations extends HttpServlet {
             redirect(request, response, "Page_message.jsp?esito=KOUP_IS4");
         }
     }
-    
+
     protected void UPLDOCENTE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
 
@@ -1467,6 +1530,42 @@ public class Operations extends HttpServlet {
             out.print(resp_out.toString());
         }
 
+    }
+
+    protected void DELETELEZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        JsonObject resp_out = new JsonObject();
+
+        try {
+
+            EntityOp ep1 = new EntityOp();
+            Calendario_Lezioni is1 = ep1.getEm().find(Calendario_Lezioni.class, Long.valueOf(getRequestValue(request, "IDLEZIONE")));
+
+            if (is1 != null) {
+                ep1.begin();
+                ep1.remove(is1);
+                ep1.commit();
+                ep1.close();
+                resp_out.addProperty("result",
+                        true);
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "LEZIONE NON TROVATA.");
+            }
+
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
     }
 
     protected void DELETEISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -2037,6 +2136,9 @@ public class Operations extends HttpServlet {
                 case "DELETEISTANZA":
                     DELETEISTANZA(request, response);
                     break;
+                case "DELETELEZIONE":
+                    DELETELEZIONE(request, response);
+                    break;
                 case "DELETEDOCUMENT":
                     DELETEDOCUMENT(request, response);
                     break;
@@ -2117,6 +2219,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "INSERISCILEZIONE":
                     INSERISCILEZIONE(request, response);
+                    break;
+                case "RICHIEDIAVVIOCORSO":
+                    RICHIEDIAVVIOCORSO(request, response);
                     break;
                 default:
                     break;

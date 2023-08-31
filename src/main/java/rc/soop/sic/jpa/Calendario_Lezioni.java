@@ -51,6 +51,9 @@ public class Calendario_Lezioni implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date datalezione;
     
+    @Column(name = "tipolezione")
+    private String tipolezione;
+    
     @Column(name = "orainizio")
     private String orainizio;
     
@@ -69,6 +72,14 @@ public class Calendario_Lezioni implements Serializable {
     private Date datainserimento;
     
     public Calendario_Lezioni() {
+    }
+
+    public String getTipolezione() {
+        return tipolezione;
+    }
+
+    public void setTipolezione(String tipolezione) {
+        this.tipolezione = tipolezione;
     }
 
     public double getOre() {

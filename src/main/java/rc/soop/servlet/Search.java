@@ -23,7 +23,6 @@ import static rc.soop.sic.Utils.isAdmin;
 import static rc.soop.sic.Utils.redirect;
 import rc.soop.sic.jpa.Allievi;
 import rc.soop.sic.jpa.Altropersonale;
-import rc.soop.sic.jpa.Calendario_Formativo;
 import rc.soop.sic.jpa.Corso;
 import rc.soop.sic.jpa.Corsoavviato;
 import rc.soop.sic.jpa.Docente;

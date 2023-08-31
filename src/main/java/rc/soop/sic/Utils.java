@@ -559,9 +559,14 @@ public class Utils {
             List<Calendario_Formativo> cal_istanza) {
         cal_istanza.forEach(c1 -> {
             if (c1.getTipomodulo().equals("BASE") || c1.getTipomodulo().equals("MODULOFORMATIVO")) {
-                c1.setOreresidue(c1.getOre());
+                c1.setOreresidue(c1.getOre_aula());
+                c1.setOreresiduefad(c1.getOre_teorica_el());
                 lezioni.stream().filter(l1 -> l1.getCalendarioformativo().equals(c1)).collect(Collectors.toList()).forEach(l1 -> {
-                    c1.setOreresidue(c1.getOreresidue() - l1.getOre());
+                    if (l1.getTipolezione().equals("PRE")) {
+                        c1.setOreresidue(c1.getOreresidue() - l1.getOre());
+                    } else {
+                        c1.setOreresiduefad(c1.getOreresiduefad() - l1.getOre());
+                    }
                 });
             }
         });

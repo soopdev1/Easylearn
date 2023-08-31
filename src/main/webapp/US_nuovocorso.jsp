@@ -113,6 +113,9 @@
                                                                             class="form-select form-select-solid form-select-lg fw-bold" name="ISTANZA" id="ISTANZA" required>
                                                                         <option value="">Scegli...</option>
                                                                         <%for (Istanza is1 : accettate) {
+                                                                                if (is1.getDecreto() == null) {
+                                                                                    continue;
+                                                                                }
                                                                                 String DDS = is1.getDecreto().split("§")[0];
                                                                                 String DDSDATA = Utils.datemysqltoita(is1.getDecreto().split("§")[1]);
                                                                         %>

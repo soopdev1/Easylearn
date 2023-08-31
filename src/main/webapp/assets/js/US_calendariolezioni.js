@@ -24,6 +24,46 @@ function setstartdate(id, addday, attr, startdate) {
 }
 
 function checkdatisalvati() {
+
+    var tipolez = $('#tipolez').val();
+    var orai = $('#orai').val();
+    var oraf = $('#oraf').val();
+    var residue = $('#modulo option:selected').attr('data-res');
+    var residuefad = $('#modulo option:selected').attr('data-resfad');
+    var date1 = new Date('1/1/2000 ' + orai + ':00');
+    var date2 = new Date('1/1/2000 ' + oraf + ':00');
+
+    var diff = (date2 - date1) / 3600000;
+    var labelres = residue;
+    var check = diff > residue;
+    alert(tipolez);
+    if (tipolez === "FAD") {
+        check = diff > residuefad;
+        labelres = residuefad;
+    }
+
+    if (check) {
+
+        var d1 = Intl.NumberFormat('it-IT', {
+            style: 'decimal'
+        });
+
+        $.alert({
+            title: "Errore durante l'operazione!",
+            content: "Per il modulo selezionato e per il tipo di lezione selezionato il numero di ore programmate <b>(" + d1.format(diff) + ")</b> supera il numero di ore residue: <b><u>" + d1.format(labelres) + "</u></b>. Controllare.",
+            type: 'red',
+            typeAnimated: true,
+            theme: 'bootstrap',
+            columnClass: 'col-md-9',
+            buttons: {
+                confirm: {
+                    text: 'OK',
+                    btnClass: 'btn-red'
+                }
+            }
+        });
+        return false;
+    }
     return true;
 }
 

@@ -72,6 +72,9 @@ public class Calendario_Formativo implements Serializable {
 
     @Transient
     private double oreresidue;
+
+    @Transient
+    private double oreresiduefad;
     
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "idcompetenze")
@@ -135,6 +138,14 @@ public class Calendario_Formativo implements Serializable {
             });
             return sb1.toString().trim();
         }
+    }
+
+    public double getOreresiduefad() {
+        return oreresiduefad;
+    }
+
+    public void setOreresiduefad(double oreresiduefad) {
+        this.oreresiduefad = oreresiduefad;
     }
 
     public double getOreresidue() {

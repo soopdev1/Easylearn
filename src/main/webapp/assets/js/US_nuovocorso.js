@@ -50,31 +50,65 @@ $(document).ready(function () {
                         na = 0;
                     }
                 }
-                
-                $('#ALLIEVI').select2({ maximumSelectionSize: 1 });
+
+                $('#ALLIEVI').select2({maximumSelectionSize: 1});
                 $("#checkend").val(md);
                 setstartdate("DATAFINE", 15, "min", null);
-                setstartdate("DATAFINE", 15 + md, "max", null);
-                $("#DATAFINEHelp").html("Durata corso massima: <b>" + md + "</b> Giorni.");
+                //setstartdate("DATAFINE", 15 + md, "max", null);
+                $("#DATAFINEHelp").html("Durata corso indicata in istanza: <b>" + md + "</b> Giorni.");
                 $("#ALLIEVIHelp").html("Numero Massimo Allievi: <b>" + na + "</b>.");
                 $("#DOCENTIHelp").html("Elenco docenti autorizzati.");
-                
+
             }
     );
     setstartdate("DATAINIZIO", 15, "min", null);
     $('#DATAINIZIO').change(
-            function () {
+            function (e) {
                 var date = $(this).val();
-                var v1 = $("#checkend").val();
-                try {
-                    v1 = parseInt(v1);
-                } catch (e) {
-                    v1 = 0;
+                var day = new Date(date).getDay();
+                if (day === 0 || day === 6) {
+                    e.preventDefault();
+                    $(this).val("");
+                    $.alert({
+                        title: "Data non selezionabile.",
+                        content: "Il giorno scelto non è valido. Controllare.",
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            confirm: {
+                                text: 'OK',
+                                btnClass: 'btn-red'
+                            }
+                        }
+                    });
+                    return false;
+                } else {
+                    var v1 = $("#checkend").val();
+                    try {
+                        v1 = parseInt(v1);
+                    } catch (e) {
+                        v1 = 0;
+                    }
+                    setstartdate("DATAFINE", 1, "min", date);
                 }
-                setstartdate("DATAFINE", 1, "min", date);
-                setstartdate("DATAFINE", 1 + v1, "max", date);
+                //setstartdate("DATAFINE", 1 + v1, "max", date);
             }
     );
+
+//    const validate = dateString => {
+//        const day = (new Date(dateString)).getDay();
+//        if (day == 0 || day == 6) {
+//            return false;
+//        }
+//        return true;
+//    }
+//
+//// Sets the value to '' in case of an invalid date
+//    document.querySelector('input').onchange = evt => {
+//        if (!validate(evt.target.value)) {
+//            evt.target.value = '';
+//        }
+//    }
 });
 
 
@@ -97,6 +131,6 @@ function setstartdate(id, addday, attr, startdate) {
     $('#' + id).attr(attr, maxDate);
 }
 
-function checkdatisalvati(){
+function checkdatisalvati() {
     return true;
 }
