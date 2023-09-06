@@ -53,8 +53,8 @@ import org.apache.commons.codec.binary.Base64;
 import static org.apache.commons.io.FileUtils.readFileToByteArray;
 import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.apache.commons.lang3.StringUtils.replace;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import static org.apache.pdfbox.pdmodel.PDDocument.load;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -160,68 +160,67 @@ public class Pdf {
         }
         try {
             File pdfOutA = new File(replace(pdf_ing.getPath(), ".pdf", "_pdfA.pdf"));
-            try (FileInputStream in = new FileInputStream(pdf_ing)) {
-                setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
-                try (PDDocument doc = PDDocument.load(pdf_ing)) {
-                    int numPageTOT = 0;
-                    Iterator<PDPage> it1 = doc.getPages().iterator();
-                    while (it1.hasNext()) {
-                        numPageTOT++;
-                        it1.next();
-                    }
-                    PDPage page = new PDPage();
-                    doc.setVersion(1.7f);
-                    try (PDPageContentStream contents = new PDPageContentStream(doc, page)) {
-                        PDDocument docSource = PDDocument.load(in);
-                        PDFRenderer pdfRenderer = new PDFRenderer(docSource);
-                        for (int i = 0; i < numPageTOT; i++) {
-                            BufferedImage imagePage = pdfRenderer.renderImageWithDPI(i, 200);
-                            PDImageXObject pdfXOImage = createFromImage(doc, imagePage);
-                            contents.drawImage(pdfXOImage, 0, 0, page.getMediaBox().getWidth(), page.getMediaBox().getHeight());
-                        }
-                    }
-                    XMPMetadata xmp = createXMPMetadata();
-                    PDDocumentCatalog catalogue = doc.getDocumentCatalog();
-                    Calendar cal = getInstance();
-                    DublinCoreSchema dc = xmp.createAndAddDublinCoreSchema();
-                    dc.addCreator("YISU");
-                    dc.addDate(cal);
-                    PDFAIdentificationSchema id = xmp.createAndAddPFAIdentificationSchema();
-                    id.setPart(3);  //value => 2|3
-                    id.setConformance("A"); // value => A|B|U
-                    XmpSerializer serializer = new XmpSerializer();
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    serializer.serialize(xmp, baos, true);
-                    PDMetadata metadata = new PDMetadata(doc);
-                    metadata.importXMPMetadata(baos.toByteArray());
-                    catalogue.setMetadata(metadata);
-                    InputStream colorProfile = new Pdf().getClass().getResourceAsStream("/sRGB.icc");
-                    PDOutputIntent intent = new PDOutputIntent(doc, colorProfile);
-                    intent.setInfo("sRGB IEC61966-2.1");
-                    intent.setOutputCondition("sRGB IEC61966-2.1");
-                    intent.setOutputConditionIdentifier("sRGB IEC61966-2.1");
-                    intent.setRegistryName("http://www.color.org");
-                    catalogue.addOutputIntent(intent);
-                    catalogue.setLanguage("it-IT");
-                    PDViewerPreferences pdViewer = new PDViewerPreferences(page.getCOSObject());
-                    pdViewer.setDisplayDocTitle(true);
-                    catalogue.setViewerPreferences(pdViewer);
-                    PDMarkInfo mark = new PDMarkInfo(); // new PDMarkInfo(page.getCOSObject());
-                    PDStructureTreeRoot treeRoot = new PDStructureTreeRoot();
-                    catalogue.setMarkInfo(mark);
-                    catalogue.setStructureTreeRoot(treeRoot);
-                    catalogue.getMarkInfo().setMarked(true);
-                    PDDocumentInformation info = doc.getDocumentInformation();
-                    info.setCreationDate(cal);
-                    info.setModificationDate(cal);
-                    info.setAuthor("SmartOOP1");
-                    info.setProducer("SmartOOP2");
-                    info.setCreator("SmartOOP3");
-                    info.setTitle(nomepdf);
-                    info.setSubject("PDF/A");
-                    doc.save(pdfOutA);
+            setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
+            try (PDDocument doc = Loader.loadPDF(pdf_ing)) {
+                int numPageTOT = 0;
+                Iterator<PDPage> it1 = doc.getPages().iterator();
+                while (it1.hasNext()) {
+                    numPageTOT++;
+                    it1.next();
                 }
+                PDPage page = new PDPage();
+                doc.setVersion(1.7f);
+                try (PDPageContentStream contents = new PDPageContentStream(doc, page)) {
+                    PDDocument docSource = Loader.loadPDF(pdf_ing);
+                    PDFRenderer pdfRenderer = new PDFRenderer(docSource);
+                    for (int i = 0; i < numPageTOT; i++) {
+                        BufferedImage imagePage = pdfRenderer.renderImageWithDPI(i, 200);
+                        PDImageXObject pdfXOImage = createFromImage(doc, imagePage);
+                        contents.drawImage(pdfXOImage, 0, 0, page.getMediaBox().getWidth(), page.getMediaBox().getHeight());
+                    }
+                }
+                XMPMetadata xmp = createXMPMetadata();
+                PDDocumentCatalog catalogue = doc.getDocumentCatalog();
+                Calendar cal = getInstance();
+                DublinCoreSchema dc = xmp.createAndAddDublinCoreSchema();
+                dc.addCreator("YISU");
+                dc.addDate(cal);
+                PDFAIdentificationSchema id = xmp.createAndAddPDFAIdentificationSchema();
+                id.setPart(3);  //value => 2|3
+                id.setConformance("A"); // value => A|B|U
+                XmpSerializer serializer = new XmpSerializer();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                serializer.serialize(xmp, baos, true);
+                PDMetadata metadata = new PDMetadata(doc);
+                metadata.importXMPMetadata(baos.toByteArray());
+                catalogue.setMetadata(metadata);
+                InputStream colorProfile = new Pdf().getClass().getResourceAsStream("/sRGB.icc");
+                PDOutputIntent intent = new PDOutputIntent(doc, colorProfile);
+                intent.setInfo("sRGB IEC61966-2.1");
+                intent.setOutputCondition("sRGB IEC61966-2.1");
+                intent.setOutputConditionIdentifier("sRGB IEC61966-2.1");
+                intent.setRegistryName("http://www.color.org");
+                catalogue.addOutputIntent(intent);
+                catalogue.setLanguage("it-IT");
+                PDViewerPreferences pdViewer = new PDViewerPreferences(page.getCOSObject());
+                pdViewer.setDisplayDocTitle(true);
+                catalogue.setViewerPreferences(pdViewer);
+                PDMarkInfo mark = new PDMarkInfo(); // new PDMarkInfo(page.getCOSObject());
+                PDStructureTreeRoot treeRoot = new PDStructureTreeRoot();
+                catalogue.setMarkInfo(mark);
+                catalogue.setStructureTreeRoot(treeRoot);
+                catalogue.getMarkInfo().setMarked(true);
+                PDDocumentInformation info = doc.getDocumentInformation();
+                info.setCreationDate(cal);
+                info.setModificationDate(cal);
+                info.setAuthor("SmartOOP1");
+                info.setProducer("SmartOOP2");
+                info.setCreator("SmartOOP3");
+                info.setTitle(nomepdf);
+                info.setSubject("PDF/A");
+                doc.save(pdfOutA);
             }
+
             return pdfOutA;
         } catch (Exception ex) {
             LOGGER.severe(estraiEccezione(ex));
@@ -299,11 +298,8 @@ public class Pdf {
             String out = "KO";
             if (content != null) {
                 try {
-                    String qr;
-                    try (InputStream is1 = new ByteArrayInputStream(content)) {
-                        PDDocument doc = load(is1);
-                        qr = estraiResult(doc, qrcrop, 0);
-                    }
+                    PDDocument doc = Loader.loadPDF(content);
+                    String qr = estraiResult(doc, qrcrop, 0);
                     if (qr == null) {
                         return "ERRORE E1 - DOCUMENTO NON CORRISPONDE A QUANTO RICHIESTO.";
                     } else {
@@ -482,7 +478,7 @@ public class Pdf {
         try {
             setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
             if (content != null) {
-                try (InputStream is1 = new ByteArrayInputStream(content); PDDocument doc = load(is1)) {
+                try (PDDocument doc = Loader.loadPDF(content)) {
                     PDDocumentInformation info = doc.getDocumentInformation();
                     if (info.getSubject() != null) {
                         if (info.getSubject().equals("PDF/A")) {
@@ -669,7 +665,7 @@ public class Pdf {
     }
 
     private static final String NOMESERVIZIO = "Servizio 3 Sistema di Accreditamento della Formazione Professionale e Certificazione delle Competenze";
-    
+
     private static final String VISTO1 = "il D.D.G. n. 1154 del 22 settembre 2022 con il quale il Dirigente Generale del Dipartimento della "
             + "Formazione Professionale ha conferito, alla Dott.ssa Maria Josè Verde, l’incarico di Dirigente "
             + "responsabile del Servizio 3 “Sistema di Accreditamento della Formazione Professionale e "

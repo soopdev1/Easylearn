@@ -146,7 +146,7 @@ public class Search extends HttpServlet {
                         + "<form action=\"US_allegaticorso.jsp\" method=\"POST\" target=\"_blank\" id=\"gestall_" + res.getIdcorsoavviato() + "\">"
                         + "<input type=\"hidden\" name=\"idcorso\" value=\"" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "\"/>"
                         + "</form>";
-                
+
                 data_value.addProperty("azioni", azioni);
                 data_value.addProperty("statovisual", res.getStatocorso().getNome());
                 data.add(data_value);
@@ -341,6 +341,7 @@ public class Search extends HttpServlet {
                 data_value.addProperty("protocollo", res.getProtocollosoggetto() + " " + res.getProtocollosoggettodata());
                 data_value.addProperty("data", res.getDatainvio());
                 data_value.addProperty("stato", res.getStatocorso().getHtmldescr());
+                data_value.addProperty("statovisual", res.getStatocorso().getNome());
 
                 String azioni = "<i class='fa fa-hourglass'></i>";
 
@@ -671,6 +672,7 @@ public class Search extends HttpServlet {
                 }
 
                 data_value.addProperty("azioni", azioni);
+                data_value.addProperty("statovisual", Utils.getVisualstato(res.getStatoallievo()));
                 data.add(data_value);
 
                 at.addAndGet(1);
@@ -698,13 +700,6 @@ public class Search extends HttpServlet {
             jMembers.addProperty(SCOLUMS, "");
             AtomicInteger at = new AtomicInteger(1);
             result.forEach(res -> {
-//                String pdf
-//                        = "<a href='javascript:void(0)' onclick='return $(\"#frm\").submit();' class='btn btn-sm btn-outline-primary m-btn m-btn--icon m-btn--icon-only m-btn--custom m-btn--pill m-btn--air' "
-//                        + "data-toggle='popover' data-placement='right' title='Visualizza File' data-content='Visualizza file documento.'><i class='far fa-file-pdf'></i></a>"
-//                        + "<form id='frm_' target='_blank' method='POST' action='Operations'>"
-//                        + "<input type='hidden' name='type' value='showPDF'/>"
-//                        + "<input type='hidden' name='ido' value='' />"
-//                        + "</form>";
                 JsonObject data_value = new JsonObject();
                 data_value.addProperty(RECORDID, at.get());
                 data_value.addProperty("stato", res.getEtichettastato());
@@ -713,7 +708,8 @@ public class Search extends HttpServlet {
                 data_value.addProperty("cap", res.getCap());
                 data_value.addProperty("comune", res.getComune());
                 data_value.addProperty("provincia", res.getProvincia());
-                data_value.addProperty("azioni", "<i class='fa fa-hourglass'></i>");
+                data_value.addProperty("statovisual", Utils.getVisualstato(res.getStatosede()));
+
                 data.add(data_value);
                 at.addAndGet(1);
             });

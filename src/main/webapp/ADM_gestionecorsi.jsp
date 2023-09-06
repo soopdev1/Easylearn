@@ -4,6 +4,8 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.Information"%>
+<%@page import="rc.soop.sic.jpa.Tipologia_Percorso"%>
 <%@page import="rc.soop.sic.Engine"%>
 <%@page import="rc.soop.sic.jpa.User"%>
 <%@page import="rc.soop.sic.jpa.SoggettoProponente"%>
@@ -18,14 +20,14 @@
 <!DOCTYPE html>
 <html lang="en">
     <%
-
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
+                List<Tipologia_Percorso> per1 = Engine.tipo_percorso_attivi();
     %>
     <!--begin::Head-->
     <head><base href="">
-        <title><%=Constant.NAMEAPP%>: Elenco Allievi</title>
+        <title><%=Constant.NAMEAPP%>: Gestione Corsi</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->
@@ -76,37 +78,65 @@
                                             <!--begin::Header-->
                                             <div class="card-header border-0 pt-5">
                                                 <h3 class="card-title align-items-start flex-column">
-                                                    <span class="card-label fw-bolder fs-3 mb-1">ELENCO ALLIEVI</span>
+                                                    <span class="card-label fw-bolder fs-3 mb-1">Corsi di formazione professionale</span>
                                                 </h3>
-                                                <div class="card-title align-items-start flex-column">
-                                                    <a data-fancybox data-type='iframe' 
-                                                       class="btn btn-primary fan1" 
-                                                       href="US_aggiungiallievo.jsp"><i class="fa fa-plus"></i> AGGIUNGI ANAGRAFICA ALLIEVO</a>
-                                                </div>
+
                                             </div>
                                             <!--end::Header-->
-                                            <!--begin::Body-->
+                                            <!--begin::Body
+                                            <hr>-->
                                             <div class="card-body py-3">
+                                                <div class="col-md-12 row">
+                                                    <div class="col-md-6">
+                                                        <label>Tipo Percorso</label>
+                                                        <select aria-label="Scegli..." 
+                                                                data-placeholder="Scegli Tipologia percorso" 
+                                                                class="form-select form-select-solid form-select-lg fw-bold" 
+                                                                name="tipopercorso"
+                                                                id="tipopercorso" onchange="return refreshtable();"
+                                                                >
+                                                            <option value="">...</option>  
+                                                            <%for (Tipologia_Percorso t1 : per1) {%>
+                                                            <option value="<%=t1.getIdtipopercorso()%>"><%=t1.getNometipologia().toUpperCase()%></option>  
+                                                            <%}%>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label>Stato Corso</label>
+                                                        <select aria-label="Scegli..." 
+                                                                data-placeholder="Scegli Tipologia percorso" 
+                                                                class="form-select form-select-solid form-select-lg fw-bold" 
+                                                                name="statocorso"
+                                                                id="statocorso" onchange="return refreshtable();"
+                                                                >
+                                                            <option value="">...</option>  
+                                                            <option value="40">CORSO IN AVVIO</option>  
+                                                            <option value="41">CORSO IN ATTESA DI AUTORIZZAZIONE</option>  
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <hr>
                                                 <!--begin::Table container-->
                                                 <div class="table-responsive ">
                                                     <!--begin::Table-->
-                                                    <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt1">
+                                                    <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt1" style="border-bottom: 2px;">
                                                         <!--begin::Table head-->
                                                         <thead>
                                                             <tr>
-                                                                <th class="p-2">Stato</th>
-                                                                <th class="p-2">ID</th>
-                                                                <th class="p-2">Cognome</th>
-                                                                <th class="p-2">Nome</th>
-                                                                <th class="p-2">Codice Fiscale</th>
-                                                                <th class="p-2">Data Nascita</th>
-                                                                <th class="p-2">Azioni</th>
+                                                                <th class="p-2 w-50px">Stato</th>
+                                                                <th class="p-2 w-50px">ID</th>
+                                                                <th class="p-2 min-w-120px">Nome</th>
+                                                                <th class="p-2 w-50px">Data Inizio</th>
+                                                                <th class="p-2 w-50px">Data Fine</th>
+                                                                <th class="p-2 w-50px">Data Inserimento</th>
+                                                                <th class="p-2 min-w-120px">Azioni</th>
                                                                 <th class="p-2 w-50px" style="display: none;">Stato</th>
                                                             </tr>
                                                         </thead>
                                                         <!--end::Table head-->
                                                         <!--begin::Table body-->
-                                                        <tbody></tbody>
+                                                        <tbody>                                                                
+                                                        </tbody>
                                                         <!--end::Table body-->
                                                     </table>
                                                     <!--end::Table-->
@@ -176,20 +206,21 @@
         <script src="assets/plugins/DataTables/jquery.dataTables.min.js"></script>
         <script src="assets/plugins/DataTables/datatables.min.js"></script>
         <script src="assets/plugins/DataTables/date-eu.js"></script>
+        <script src="assets/plugins/DataTables/date-euro.js"></script>
         <!--end::Page Vendors Javascript-->
         <!--begin::Page Custom Javascript(used by this page)-->
         <script src="assets/js/widgets.bundle.js"></script>
         <script src="assets/js/custom/widgets.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
-
         <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
         <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
-
-
         <script type="text/javascript" src="assets/js/common.js"></script>
         <script src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
-        <script type="text/javascript" src="assets/js/US_gestioneallievi.js"></script>
+        <script type="text/javascript" src="assets/js/US_gestionecorsi.js"></script>
         <!--end::Page Custom Javascript-->
+
+
+
         <!--end::Javascript-->
     </body>
     <!--end::Body-->

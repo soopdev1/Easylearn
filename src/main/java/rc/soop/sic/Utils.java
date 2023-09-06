@@ -543,6 +543,16 @@ public class Utils {
                 return "";
         }
     }
+    public static String getVisualstato(Stati stato) {
+        switch (stato) {
+            case CHECK:
+                return "IN ATTESA";
+            case AVVIO:
+                return "IN FASE DI AVVIO";
+            default:
+                return stato.name();
+        }
+    }
 
     public static double calcolaore(String orainizio, String orafine) {
         try {

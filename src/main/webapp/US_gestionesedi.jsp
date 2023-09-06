@@ -94,7 +94,7 @@
                                                                 <th class="p-2">CAP</th>
                                                                 <th class="p-2">Comune</th>
                                                                 <th class="p-2">Provincia</th>
-                                                                <th class="p-2">Azioni</th>
+                                                                <th class="p-2 w-50px" style="display: none;">Stato</th>
                                                             </tr>
                                                         </thead>
                                                         <!--end::Table head-->

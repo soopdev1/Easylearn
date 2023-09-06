@@ -129,6 +129,7 @@
                                                             <th scope="col"><b>Data presentazione</b></th>
                                                             <th scope="col"><b>Stato</b></th>
                                                             <th scope="col"><b>Azioni</b></th>
+                                                            <th class="p-2 w-50px" style="display: none;">Stato</th>
                                                         </tr>
                                                     </thead>
                                                     <!--end::Table head-->

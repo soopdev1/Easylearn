@@ -2,7 +2,18 @@ var table;
 
 $(document).ready(function () {
     table = $('#tab_dt1').DataTable({
-        dom: '<if<t>lp>',
+        dom: '<Bif<t>lp>',
+        buttons: [
+            {
+                extend: 'excelHtml5',
+                className: 'btn btn-sm btn-primary',
+                text: '<i class="fa fa-file-excel"></i>',
+                titleAttr: 'Esporta in Excel',
+                exportOptions: {
+                    columns: [7, 1, 2, 3, 4,5] //Your Column value those you want
+                }
+            }
+        ],
         lengthMenu: [[50, 100, -1], [50, 100, "Tutto"]],
         order: [[1, 'asc']],
         language: {
@@ -22,7 +33,8 @@ $(document).ready(function () {
             {data: 'nome'},
             {data: 'cf'},
             {data: 'data', type: "date-eu"},
-            {data: 'azioni', orderable: false}
+            {data: 'azioni', orderable: false},
+            {visible: false, targets: 7,data: 'statovisual'}
         ]
     });    
     Fancybox.bind(".fan1", {

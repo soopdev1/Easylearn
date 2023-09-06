@@ -1,7 +1,18 @@
 var table;
 $(document).ready(function () {
     table = $('#tab_dt1').DataTable({
-        dom: '<if<t>lp>',
+        dom: '<Bif<t>lp>',
+        buttons: [
+            {
+                extend: 'excelHtml5',
+                className: 'btn btn-sm btn-primary',
+                text: '<i class="fa fa-file-excel"></i>',
+                titleAttr: 'Esporta in Excel',
+                exportOptions: {
+                    columns: [1, 2, 3, 4, 5] //Your Column value those you want
+                }
+            }
+        ],
         lengthMenu: [[10, 50, 100, -1], [10, 50, 100, "Tutto"]],
         order: [[3, 'desc']],
         language: {
@@ -24,7 +35,8 @@ $(document).ready(function () {
             {data: 'corsi'},
             {data: 'data', type: "date-euro"},
             {data: 'stato', orderable: false},
-            {data: 'azioni', orderable: false}
+            {data: 'azioni', orderable: false},
+            {data: 'statovisual', visible: false}
         ]
     });
 
