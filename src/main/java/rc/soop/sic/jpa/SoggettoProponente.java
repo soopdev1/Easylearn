@@ -15,6 +15,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -22,6 +24,9 @@ import javax.persistence.Table;
  *
  * @author Raffaele
  */
+@NamedQueries(value = {
+    @NamedQuery(name = "soggetto.all", query = "SELECT u FROM SoggettoProponente u ORDER BY u.RAGIONESOCIALE"),
+})
 @Entity
 @Table(name = "soggetto")
 public class SoggettoProponente implements Serializable {

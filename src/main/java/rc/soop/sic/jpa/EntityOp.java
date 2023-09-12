@@ -198,12 +198,18 @@ public class EntityOp {
         return (List<Istanza>) q.getResultList();
     }
 
+    public List<SoggettoProponente> list_soggetti() {
+        TypedQuery q = this.em.createNamedQuery("soggetto.all", SoggettoProponente.class);
+        return (List<SoggettoProponente>) q.getResultList();
+    }
+
     public List<Allievi> getAllieviSoggetto(SoggettoProponente s) {
         TypedQuery q = this.em.createNamedQuery("allievi.soggetto", Allievi.class);
         q.setParameter("soggetto", s);
         q.setParameter("inattivo", Stati.INATTIVO);
         return (List<Allievi>) q.getResultList();
     }
+
     public List<Allievi> getAllieviCorsoAvviato(Corsoavviato ca) {
         TypedQuery q = this.em.createNamedQuery("allievi.corsoavviato", Allievi.class);
         q.setParameter("corsodiriferimento", ca);
@@ -235,8 +241,9 @@ public class EntityOp {
     public List<Altropersonale> list_all_AltroPersonale() {
         TypedQuery q = this.em.createNamedQuery("altrop.all", Altropersonale.class);
         return (List<Altropersonale>) q.getResultList();
-        
+
     }
+
     public List<Altropersonale> getDirettori(List<Altropersonale> result) {
         return result.stream().filter(r1 -> r1.getProfiloprof().startsWith("DIRETTORE")).collect(Collectors.toList());
     }
@@ -276,7 +283,7 @@ public class EntityOp {
         q.setParameter("corsodiriferimento", c);
         return (List<Calendario_Lezioni>) q.getResultList();
     }
-    
+
     public List<Calendario_Formativo> calendario_formativo_corso(Corso c) {
         TypedQuery q = this.em.createNamedQuery("calendarioformativo.corso", Calendario_Formativo.class);
         q.setParameter("corsodiriferimento", c);
@@ -395,7 +402,7 @@ public class EntityOp {
         }
         return new ArrayList<>();
     }
-    
+
     public List<CorsoAvviato_Docenti> list_cavv_docenti(Corsoavviato c1) {
         try {
             TypedQuery q = this.em.createNamedQuery("corsoavviatodocenti.elencobycorso", CorsoAvviato_Docenti.class);
@@ -406,7 +413,7 @@ public class EntityOp {
         }
         return new ArrayList<>();
     }
-    
+
     public List<CorsoAvviato_AltroPersonale> list_cavv_altropers(Corsoavviato c1) {
         try {
             TypedQuery q = this.em.createNamedQuery("corsoavviataltropers.elencobycorso", CorsoAvviato_AltroPersonale.class);
@@ -473,10 +480,14 @@ public class EntityOp {
 
     public List<Corsoavviato> list_corso_user(SoggettoProponente sp, String tipologiapercorso, String statocorso) {
         HashMap<String, Object> param = new HashMap<>();
-        
-        String sql = "SELECT c FROM Corsoavviato c WHERE c.corsobase.soggetto=:soggetto ";
-        param.put("soggetto", sp);
-        
+
+        String sql = "SELECT c FROM Corsoavviato c ";
+
+        if (sp != null) {
+            sql += !sql.toUpperCase().contains("WHERE") ? "WHERE " : " AND ";
+            sql += "c.corsobase.soggetto=:soggetto ";
+            param.put("soggetto", sp);
+        }
         if (!tipologiapercorso.equals("")) {
             sql += !sql.toUpperCase().contains("WHERE") ? "WHERE " : " AND ";
             sql += "c.corsobase.istanza.tipologiapercorso.idtipopercorso = :tipologiapercorso";
@@ -487,9 +498,9 @@ public class EntityOp {
             sql += "c.statocorso.codicestatocorso = :statocorso";
             param.put("statocorso", statocorso);
         }
-        
+
         sql += " ORDER BY c.idcorsoavviato DESC";
-        
+
         TypedQuery<Corsoavviato> q = this.em.createQuery(sql, Corsoavviato.class);
         if (param.isEmpty()) {
             q.setMaxResults(500);
@@ -499,7 +510,7 @@ public class EntityOp {
         });
         return q.getResultList().isEmpty() ? new ArrayList() : (List<Corsoavviato>) q.getResultList();
     }
-    
+
     public List<Istanza> list_istanze_user(SoggettoProponente sp, String tipologiapercorso, String statoistanza) {
         HashMap<String, Object> param = new HashMap<>();
         String sql = "SELECT i FROM Istanza i WHERE i.soggetto=:soggetto ";

@@ -39,10 +39,13 @@ import rc.soop.sic.jpa.User;
  */
 public class Engine {
 
+    public static List<Tipologia_Percorso> tipo_percorso_attivi(EntityOp eo) {
+        List<Tipologia_Percorso> result = (List<Tipologia_Percorso>) eo.findAll(Tipologia_Percorso.class);
+        return result.stream().filter(p1 -> p1.getStatotipologiapercorso().equals(Stati.ATTIVO)).collect(Collectors.toList());
+    }
     public static List<Tipologia_Percorso> tipo_percorso_attivi() {
         List<Tipologia_Percorso> result = (List<Tipologia_Percorso>) new EntityOp().findAll(Tipologia_Percorso.class);
         return result.stream().filter(p1 -> p1.getStatotipologiapercorso().equals(Stati.ATTIVO)).collect(Collectors.toList());
-
     }
 
     public static List<Repertorio> repertorio_completo() {

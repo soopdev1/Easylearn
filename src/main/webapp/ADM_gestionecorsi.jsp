@@ -23,7 +23,9 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
-                List<Tipologia_Percorso> per1 = Engine.tipo_percorso_attivi();
+                EntityOp eo = new EntityOp();
+                List<Tipologia_Percorso> per1 = Engine.tipo_percorso_attivi(eo);
+                List<SoggettoProponente> solist = eo.list_soggetti();
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -60,7 +62,7 @@
                     <!--end::Header-->
                     <!--begin::Content wrapper-->
                     <div class="d-flex flex-column-fluid">
-                        <jsp:include page="menu/menuUS1.jsp" /> 
+                        <jsp:include page="menu/menuADM1.jsp" /> 
                         <!--begin::Container-->
                         <div class="d-flex flex-column flex-column-fluid container-fluid">
                             <!--begin::Post-->
@@ -87,7 +89,21 @@
                                             <hr>-->
                                             <div class="card-body py-3">
                                                 <div class="col-md-12 row">
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-4">
+                                                        <label>Soggetto Proponente</label>
+                                                        <select aria-label="Scegli..." 
+                                                                data-placeholder="Scegli Tipologia percorso" 
+                                                                class="form-select form-select-solid form-select-lg fw-bold" 
+                                                                name="soggetto"
+                                                                id="soggetto" onchange="return refreshtable();"
+                                                                >
+                                                            <option value="">...</option>  
+                                                            <%for (SoggettoProponente t1 : solist) {%>
+                                                            <option value="<%=t1.getIdsoggetto()%>"><%=t1.getRAGIONESOCIALE().toUpperCase()%></option>  
+                                                            <%}%>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-4">
                                                         <label>Tipo Percorso</label>
                                                         <select aria-label="Scegli..." 
                                                                 data-placeholder="Scegli Tipologia percorso" 
@@ -101,7 +117,7 @@
                                                             <%}%>
                                                         </select>
                                                     </div>
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-4">
                                                         <label>Stato Corso</label>
                                                         <select aria-label="Scegli..." 
                                                                 data-placeholder="Scegli Tipologia percorso" 
@@ -112,6 +128,9 @@
                                                             <option value="">...</option>  
                                                             <option value="40">CORSO IN AVVIO</option>  
                                                             <option value="41">CORSO IN ATTESA DI AUTORIZZAZIONE</option>  
+                                                            <option value="42">CORSO RIGETTATO - SOCCORSO ISTRUTTORIO</option>  
+                                                            <option value="43">CORSO APPROVATO - DA AVVIARE</option>  
+                                                            <option value="44">CORSO AVVIATO</option>  
                                                         </select>
                                                     </div>
                                                 </div>
@@ -124,6 +143,7 @@
                                                         <thead>
                                                             <tr>
                                                                 <th class="p-2 w-50px">Stato</th>
+                                                                <th class="p-2 min-w-120px">Soggetto Proponente</th>
                                                                 <th class="p-2 w-50px">ID</th>
                                                                 <th class="p-2 min-w-120px">Nome</th>
                                                                 <th class="p-2 w-50px">Data Inizio</th>
@@ -216,7 +236,7 @@
         <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
         <script type="text/javascript" src="assets/js/common.js"></script>
         <script src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
-        <script type="text/javascript" src="assets/js/US_gestionecorsi.js"></script>
+        <script type="text/javascript" src="assets/js/ADM_gestionecorsi.js"></script>
         <!--end::Page Custom Javascript-->
 
 

@@ -112,6 +112,9 @@
                                                             <option value="">...</option>  
                                                             <option value="40">CORSO IN AVVIO</option>  
                                                             <option value="41">CORSO IN ATTESA DI AUTORIZZAZIONE</option>  
+                                                            <option value="42">CORSO RIGETTATO - SOCCORSO ISTRUTTORIO</option>  
+                                                            <option value="43">CORSO APPROVATO - DA AVVIARE</option>  
+                                                            <option value="44">CORSO AVVIATO</option>   
                                                         </select>
                                                     </div>
                                                 </div>
