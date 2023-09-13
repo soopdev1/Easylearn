@@ -1,6 +1,7 @@
 var table;
 
 $(document).ready(function () {
+    
     table = $('#tab_dt1').DataTable({
         dom: '<Bif<t>lp>',
         buttons: [
@@ -10,7 +11,7 @@ $(document).ready(function () {
                 text: '<i class="fa fa-file-excel"></i>',
                 titleAttr: 'Esporta in Excel',
                 exportOptions: {
-                    columns: [8, 1, 2, 3, 4,5,6] //Your Column value those you want
+                    columns: [8, 1, 2, 3, 4, 5, 6] //Your Column value those you want
                 }
             }
         ],
@@ -40,7 +41,7 @@ $(document).ready(function () {
             {data: 'datafine', type: "date-eu"},
             {data: 'datainserimento', type: "date-euro"},
             {data: 'azioni', orderable: false},
-            {data: 'statovisual',visible: false}
+            {data: 'statovisual', visible: false}
         ]
     });
     Fancybox.bind(".fan1", {

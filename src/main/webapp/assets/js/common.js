@@ -1,16 +1,22 @@
 
-$(document).ready(Fancybox.bind(".fan1", {
-    groupAll: false, // Group all items
-    hideScrollbar: false,
-    on: {
-        closing: (fancybox) => {
-            window.location.reload();
+$(document).ready(function () {
+    Fancybox.bind(".fan1", {
+        groupAll: false, // Group all items
+        hideScrollbar: false,
+        on: {
+            closing: (fancybox) => {
+                window.location.reload();
+            }
+        },
+        fullscreen: {
+            autoStart: true
         }
-    },
-    fullscreen: {
-        autoStart: true
-    }
-}));
+    });
+    $('.form-select').select2({
+        allowClear: true,
+        language: "it"
+    });
+});
 
 
 function checkNoSpecialChar(field) {

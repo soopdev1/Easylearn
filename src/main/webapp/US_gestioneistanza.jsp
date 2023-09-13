@@ -39,7 +39,8 @@
         <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
         <link href="assets/plugins/DataTables/datatables.min.css" rel="stylesheet" type="text/css" />
-        <link rel="stylesheet" href="assets/plugins/jquery-confirm.3.3.2.min.css">
+        <link href="assets/plugins/jquery-confirm.3.3.2.min.css" rel="stylesheet" type="text/css" >
+        <link href="assets/plugins/select2/select2_v4.1.0.min.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/plus.css" rel="stylesheet" type="text/css" />
 
@@ -107,7 +108,7 @@
                                                     <div class="col-md-6">
                                                         <label>Tipo Percorso</label>
                                                         <select aria-label="Scegli..." 
-                                                                data-placeholder="Scegli Tipologia percorso" 
+                                                                data-placeholder="..." 
                                                                 class="form-select form-select-solid form-select-lg fw-bold" 
                                                                 name="tipopercorso"
                                                                 id="tipopercorso" onchange="return refreshtable();"
@@ -121,7 +122,7 @@
                                                     <div class="col-md-6">
                                                         <label>Stato Istanza</label>
                                                         <select aria-label="Scegli..." 
-                                                                data-placeholder="Scegli Tipologia percorso" 
+                                                                data-placeholder="..." 
                                                                 class="form-select form-select-solid form-select-lg fw-bold" 
                                                                 name="statoistanza"
                                                                 id="statoistanza" onchange="return refreshtable();"
@@ -232,6 +233,8 @@
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
         <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
         <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
+        <script type="text/javascript" src="assets/plugins/select2/select2_v4.1.0.min.js"></script>
+        <script type="text/javascript" src="assets/plugins/select2/i18n/it.js"></script>
         <script type="text/javascript" src="assets/js/common.js"></script>
         <script src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
         <script type="text/javascript" src="assets/js/US_gestioneistanza.js"></script>
