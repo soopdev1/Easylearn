@@ -3,6 +3,8 @@
     Created on : 18-feb-2022, 14.01.46
     Author     : raf
 --%>
+<%@page import="rc.soop.sic.jpa.User"%>
+<%@page import="rc.soop.sic.jpa.SoggettoProponente"%>
 <%@page import="rc.soop.sic.jpa.Calendario_Lezioni"%>
 <%@page import="rc.soop.sic.jpa.Calendario_Formativo"%>
 <%@page import="rc.soop.sic.jpa.CorsoAvviato_AltroPersonale"%>
@@ -35,6 +37,16 @@
                 List<Calendario_Formativo> cal_istanza = eo.calendario_formativo_corso(is1.getCorsobase());
                 List<Calendario_Lezioni> lezioni = eo.calendario_lezioni_corso(is1);
                 Utils.confrontaLezioniCalendario(lezioni, cal_istanza);
+            
+                boolean modify = true;
+                if (Utils.isAdmin(session)) {
+                    modify = false;
+                } else {
+                    SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
+                    modify = so.getIdsoggetto().equals(is1.getCorsobase().getSoggetto().getIdsoggetto()) && is1.getStatocorso().getCodicestatocorso().equals("40");
+                }
+
+
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -200,12 +212,15 @@
                                 </table>
                             </label>
                             <hr>
-                            <label class="col-form-label fw-bold fs-6">CALENDARIO FORMATIVO | 
+                            <label class="col-form-label fw-bold fs-6">CALENDARIO FORMATIVO 
+                                <%if(modify){%>
+                                | 
                                 <a class="btn btn-primary btn-sm fan1" href="US_calendariolezioni.jsp"
                                    data-fancybox data-type='iframe' 
                                    data-bs-toggle="tooltip" title="INSERISCI NUOVA LEZIONE" 
                                    data-preload='false' data-width='75%' data-height='75%' id="addcalendariobutton">
-                                    <i class="fa fa-plus-circle" ></i> Aggiungi lezione</a></label>
+                                    <i class="fa fa-plus-circle" ></i> Aggiungi lezione</a><%}%>
+                            </label>
                             <div class="row col-md-12">
 
                                 <div class="col-md-7" style="border-right: 1px dashed #333;">
@@ -239,11 +254,11 @@
                                                     <td class="p-2 w-50px"><%=Constant.sdf_PATTERNDATE4.format(c1.getDatalezione())%> (<%=c1.getOrainizio()%> - <%=c1.getOrafine()%>)</td>
                                                     <td class="p-2 w-50px"><%=c1.getDocente().getCognome()%> <%=c1.getDocente().getNome()%></td>
                                                     <td class="p-2 w-50px"><%=c1.getCalendarioformativo().getNomemodulo()%></td>
-                                                    <td class="p-2 w-50px"><%=orenorm%> <%=tl%> | 
-                                                    <button type="button"class="btn btn-sm btn-danger" data-bs-toggle="tooltip" 
-                                                            title="ELIMINA LEZIONE" data-preload='false' 
-                                                            onclick="return rimuovilezione('<%=c1.getIdcalendariolezioni()%>')">
-                                                        <i class="fa fa-trash-arrow-up"></i></button>
+                                                    <td class="p-2 w-50px"><%=orenorm%> <%=tl%> <%if(modify){%>| 
+                                                        <button type="button"class="btn btn-sm btn-danger" data-bs-toggle="tooltip" 
+                                                                title="ELIMINA LEZIONE" data-preload='false' 
+                                                                onclick="return rimuovilezione('<%=c1.getIdcalendariolezioni()%>')">
+                                                            <i class="fa fa-trash-arrow-up"></i></button><%}%>
                                                     </td>
                                                 </tr>
                                                 <%}%>
@@ -335,7 +350,7 @@
         <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
         <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
-                <script src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
+        <script src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
 
         <script src="assets/js/US_showcorsoavviato.js"></script>
 

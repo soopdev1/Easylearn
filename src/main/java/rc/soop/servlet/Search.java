@@ -112,15 +112,14 @@ public class Search extends HttpServlet {
             JsonObject jMembers = new JsonObject();
             JsonArray data = new JsonArray();
             String soggetto = getRequestValue(request, "soggetto");
-            
+
             SoggettoProponente so;
             try {
                 so = ep.getEm().find(SoggettoProponente.class, Utils.parseLongR(soggetto));
             } catch (Exception ex1) {
                 so = null;
             }
-            
-            
+
             String statocorso = getRequestValue(request, "statocorso");
             String tipopercorso = getRequestValue(request, "tipopercorso");
             List<Corsoavviato> result = ep.list_corso_user(so, tipopercorso, statocorso);
@@ -141,21 +140,25 @@ public class Search extends HttpServlet {
                 data_value.addProperty("datainizio", sdf_PATTERNDATE4.format(res.getDatainizio()));
                 data_value.addProperty("datafine", sdf_PATTERNDATE4.format(res.getDatafine()));
                 data_value.addProperty("datainserimento", sdf_PATTERNDATE5.format(res.getDatainserimento()));
-                String azioni = "<form action=\"US_showcorsoavviato.jsp\" method=\"POST\" target=\"_blank\">"
-                        + "<input type=\"hidden\" name=\"idcorso\" value=\"" + res.getIdcorsoavviato() + "\"/>";
-
-                if (true) {
-                    azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"RICHIEDI AVVIO CORSO\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
-                            + "onclick=\"return sendcorso('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-envelope\"></i></button> | "
-                            + "<button type=\"submit\"class=\"btn btn-sm btn-primary\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA DETTAGLI CORSO\"data-preload='false'><i class=\"fa fa-file-text\"></i></button> | ";
-                }
-
-                azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"GESTIONE ALLEGATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\""
+                String azioni
+                        = "<form action=\"US_showcorsoavviato.jsp\" method=\"POST\" target=\"_blank\">"
+                        + "<input type=\"hidden\" name=\"idcorso\" value=\"" + res.getIdcorsoavviato() + "\"/>"
+                        + "<button type=\"submit\"class=\"btn btn-sm btn-primary\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA DETTAGLI CORSO\"data-preload='false'><i class=\"fa fa-file-text\"></i></button>"
+                        + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"GESTIONE ALLEGATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\""
                         + "onclick=\"return document.getElementById('gestall_" + res.getIdcorsoavviato() + "').submit();\"><i class=\"fa fa-file-clipboard\"></i></button>"
                         + "</form>"
                         + "<form action=\"US_allegaticorso.jsp\" method=\"POST\" target=\"_blank\" id=\"gestall_" + res.getIdcorsoavviato() + "\">"
                         + "<input type=\"hidden\" name=\"idcorso\" value=\"" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "\"/>"
                         + "</form>";
+
+                if (res.getStatocorso().getCodicestatocorso().equals("41")) {
+
+                    azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"AUTORIZZA AVVIO CORSO\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
+                            + "onclick=\"return approvacorso('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-check-circle\"></i></button>"
+                            + "<a href='ADM_rigettacorso.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+                            + " class=\"btn btn-sm btn-bg-light btn-danger fan1\" data-bs-toggle=\"tooltip\" title=\"RIGETTA CORSO\" data-preload='false' "
+                            + "\"><i class=\"fa fa-remove\"></i></a>";
+                }
 
                 data_value.addProperty("azioni", azioni);
                 data_value.addProperty("statovisual", res.getStatocorso().getNome());
@@ -169,6 +172,7 @@ public class Search extends HttpServlet {
 
         }
     }
+
     protected void list_corso_user(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         EntityOp ep = new EntityOp();
@@ -198,14 +202,12 @@ public class Search extends HttpServlet {
                 data_value.addProperty("datainserimento", sdf_PATTERNDATE5.format(res.getDatainserimento()));
                 String azioni = "<form action=\"US_showcorsoavviato.jsp\" method=\"POST\" target=\"_blank\">"
                         + "<input type=\"hidden\" name=\"idcorso\" value=\"" + res.getIdcorsoavviato() + "\"/>";
-
-                if (true) {
+                if (res.getStatocorso().getCodicestatocorso().equals("40") || res.getStatocorso().getCodicestatocorso().equals("42")) {
                     azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"RICHIEDI AVVIO CORSO\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
-                            + "onclick=\"return sendcorso('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-envelope\"></i></button> | "
-                            + "<button type=\"submit\"class=\"btn btn-sm btn-primary\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA DETTAGLI CORSO\"data-preload='false'><i class=\"fa fa-file-text\"></i></button> | ";
+                            + "onclick=\"return sendcorso('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-envelope\"></i></button> | ";
                 }
-
-                azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"GESTIONE ALLEGATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\""
+                azioni += "<button type=\"submit\"class=\"btn btn-sm btn-primary\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA DETTAGLI CORSO\"data-preload='false'><i class=\"fa fa-file-text\"></i></button> | "
+                        + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"GESTIONE ALLEGATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\""
                         + "onclick=\"return document.getElementById('gestall_" + res.getIdcorsoavviato() + "').submit();\"><i class=\"fa fa-file-clipboard\"></i></button>"
                         + "</form>"
                         + "<form action=\"US_allegaticorso.jsp\" method=\"POST\" target=\"_blank\" id=\"gestall_" + res.getIdcorsoavviato() + "\">"

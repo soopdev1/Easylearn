@@ -29,6 +29,7 @@ import javax.persistence.TemporalType;
 
 @NamedQueries(value = {
     @NamedQuery(name = "info.istanza", query = "SELECT c FROM Information c WHERE c.istanza=:istanza"),
+    @NamedQuery(name = "info.corsoavviato", query = "SELECT c FROM Information c WHERE c.corsoavviato=:corsoavviato")
 })
 @Entity
 @Table(name = "information")
@@ -42,6 +43,10 @@ public class Information implements Serializable {
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "idistanza")
     private Istanza istanza;
+    
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinColumn(name = "idcorsoavviato")
+    private Corsoavviato corsoavviato;
 
     @Column(name = "datacreazione")
     @Temporal(TemporalType.TIMESTAMP)
@@ -54,6 +59,14 @@ public class Information implements Serializable {
     private String motivazione;
 
     public Information() {
+    }
+
+    public Corsoavviato getCorsoavviato() {
+        return corsoavviato;
+    }
+
+    public void setCorsoavviato(Corsoavviato corsoavviato) {
+        this.corsoavviato = corsoavviato;
     }
 
     public Long getId() {

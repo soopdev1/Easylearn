@@ -1,7 +1,6 @@
 var table;
 
-$(document).ready(function () {
-    
+$(document).ready(function () {    
     table = $('#tab_dt1').DataTable({
         dom: '<Bif<t>lp>',
         buttons: [
@@ -58,25 +57,24 @@ function refreshtable() {
     table.ajax.reload(null, false);
 }
 
-function sendcorso(idcorso) {
+function approvacorso(idcorso) {
     var ok = false;
     var messageko = "ERRORE GENERICO";
     $.confirm({
         title: 'Conferma Operazione',
-        content: "Confermi di voler richiedere l'avvio del corso con ID <b>" + idcorso +
-                "</b> ? Confermi di accettare e sottoscrivere tutto ciò che riguarda il calendario e relativi allegati caricati nelle apposite sezioni? L'operazione non potrà essere annullata.",
+        content: "Confermi di voler Autorizzare l'avvio del corso con ID <b>" + idcorso +"</b> ? L'operazione non potrà essere annullata.",
         theme: 'bootstrap',
         columnClass: 'col-md-9',
         buttons: {
             confirm: {
                 btnClass: 'btn-success btn-lg',
-                text: "<i class='fa fa-check'></i> SI. ACCETTO E CONFERMO", // With spaces and symbols
+                text: "<i class='fa fa-check'></i> CONFERMO", // With spaces and symbols
                 action: function () {
                     $.ajax({
                         url: 'Operations',
                         type: 'POST',
                         data: {
-                            'type': 'RICHIEDIAVVIOCORSO',
+                            'type': 'AUTORIZZAAVVIOCORSO',
                             'IDCORSO': idcorso
                         },
                         dataType: 'json',
@@ -105,7 +103,7 @@ function sendcorso(idcorso) {
                                     text: 'OK',
                                     btnClass: 'btn-success',
                                     action: function () {
-                                        location.reload(true);
+                                        refreshtable();
                                     }
                                 }
                             }
@@ -131,7 +129,7 @@ function sendcorso(idcorso) {
             ,
             cancel: {
                 btnClass: 'btn-danger btn-lg',
-                text: "<i class='fa fa-remove'></i> NO. ANNULLA INVIO" // With spaces and symbols                
+                text: "<i class='fa fa-remove'></i> NO" // With spaces and symbols                
             }
         }
     });

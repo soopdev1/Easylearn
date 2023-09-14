@@ -3,6 +3,7 @@
     Created on : 12 ago 2023, 14:18:44
     Author     : raf
 --%>
+<%@page import="rc.soop.sic.jpa.SoggettoProponente"%>
 <%@page import="rc.soop.sic.jpa.Corsoavviato"%>
 <%@page import="rc.soop.sic.jpa.EnteStage"%>
 <%@page import="rc.soop.sic.jpa.Allievi"%>
@@ -63,6 +64,17 @@
         Long idist = Long.valueOf(Utils.dec_string(idistS));
         Corsoavviato is1 = eo.getEm().find(Corsoavviato.class, idist);
         List<Allegati> la = eo.list_allegati(null, null, is1, null, null, null);
+        List<Information> info1 = eo.list_info(is1);
+        boolean showinfo = !info1.isEmpty();
+
+        boolean modify = true;
+        if (Utils.isAdmin(session)) {
+            modify = false;
+        } else {
+            SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
+            modify = so.getIdsoggetto().equals(is1.getCorsobase().getSoggetto().getIdsoggetto());
+
+        }
     %>
     <body id="kt_body">
         <!--begin::Main-->
@@ -97,6 +109,52 @@
                                 </div>
                                 <!--end::Row-->
                                 <div class="card h-xl-100">
+                                    <%if (is1.getStatocorso().getCodicestatocorso().equals("42")) {%>    
+                                    <div class="card-header border-0 pt-5 bg-warning">
+                                        <h3 class="card-title align-items-start flex-column">
+                                            <span class="card-label fw-bolder fs-3 mb-1">SOCCORSO ISTRUTTORIO</span>
+                                        </h3>
+                                    </div>
+                                    <%if (showinfo) {%>
+                                    <%
+                                        for (Information info2 : info1) {
+                                    %>
+
+                                    <div class="card-body py-3 bg-warning">
+                                        <hr>
+                                        <div class="row row-border col-md-12 p-5">
+                                            <!--begin::Label-->
+                                            <label class="col-lg-3 col-form-label fw-bold fs-6" >
+                                                <span class="text-dark"><b>UTENTE:</b></span>
+                                            </label>
+                                            <div class="col-md-9 fv-row">
+                                                <span class="text-dark"><%=info2.getUtente()%></span>
+                                            </div>
+                                        </div>
+                                        <div class="row row-border col-md-12 p-5">
+                                            <!--begin::Label-->
+                                            <label class="col-lg-3 col-form-label fw-bold fs-6" >
+                                                <span class="text-dark"><b>DATA:</b></span>
+                                            </label>
+                                            <div class="col-md-9 fv-row">
+                                                <span class="text-dark"><%=Constant.sdf_PATTERNDATE5.format(info2.getDatacreazione())%></span>
+                                            </div>
+                                        </div>
+                                        <div class="row row-border col-md-12 p-5">
+                                            <!--begin::Label-->
+                                            <label class="col-lg-3 col-form-label fw-bold fs-6" >
+                                                <span class="text-dark"><b>MOTIVAZIONE:</b></span>
+                                            </label>
+                                            <div class="col-md-9 fv-row">
+                                                <span class="text-dark"><%=info2.getMotivazione()%></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <%}%>
+                                    <%}%>
+                                    <%}%>
+                                    <%if (modify) {%>
                                     <!--begin::Header-->
                                     <form action="Operations?type=UPLDOCCORSO" method="post"  enctype="multipart/form-data">
                                         <input type="hidden" name="idcorsoavviato" value="<%=is1.getIdcorsoavviato()%>"/>
@@ -130,6 +188,8 @@
                                         </div>
                                     </form>
                                     <hr>
+                                    <%}%>
+                                    
                                     <div class="card-header border-0 pt-5">
                                         <h3 class="card-title align-items-start flex-column">
                                             <span class="card-label fw-bolder fs-3 mb-1">ELENCO ALLEGATI</span>
@@ -177,6 +237,7 @@
                                                                         data-preload='false'
                                                                         ><i class="fa fa-file-alt"></i>
                                                                 </button>
+                                                                <%if (modify) {%>
                                                                 | 
                                                                 <button type="button"class="btn btn-sm btn-bg-light btn-danger"
                                                                         data-bs-toggle="tooltip" title="ELIMINA DOCUMENTO" 
@@ -193,7 +254,8 @@
                                                                    class="btn btn-sm btn-bg-light btn-warning text-dark fan1" >
                                                                     <i class="fa fa-arrow-right-arrow-left"></i>
                                                                 </a>
-                                                                <%}%>
+                                                                <%}
+                                                                    }%>
                                                             </form>
                                                         </td>      
                                                     </tr>

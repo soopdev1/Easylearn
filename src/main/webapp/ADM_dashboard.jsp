@@ -42,8 +42,8 @@
         <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
-                <%
-        String[] contatori = Engine.contatori_home_ADMIN(session);
+        <%
+            String[] contatori = Engine.contatori_home_ADMIN(session);
         %>
 
         <!--end::Global Stylesheets Bundle-->
@@ -75,71 +75,69 @@
                                 <!--begin::Row-->
                                 <div class="row g-10">
                                     <!--begin::Col-->
-                                    <div class="row g-5 g-lg-10">
-                                        <!--begin::Col-->
-                                        <div class="col-lg-3">
-                                            <!--begin::Tiles Widget 1-->
-                                            <!--end::Tiles Widget 1-->
-                                            <!--begin::Tiles Widget 5-->
-                                            <a href="#" class="card bg-body h-150px">
-                                                <!--begin::Body-->
-                                                <div class="card-body d-flex flex-column justify-content-between">
-                                                    <!--begin::Svg Icon | path: icons/duotune/general/gen025.svg-->
-                                                    <span class="svg-icon svg-icon-dark svg-icon-2hx ms-n1 flex-grow-1">
-                                                        <i class="fa fa-file-archive"></i>
-                                                    </span>
-                                                    <!--end::Svg Icon-->
-                                                    <div class="d-flex flex-column">
-                                                        <div class="text-dark fw-bolder fs-1 mb-0 mt-5"><%=contatori[0]%></div>
-                                                        <div class="text-muted fw-bold fs-6">Istanze In Attesa</div>
-                                                    </div>
+                                    <!--begin::Col-->
+                                    <div class="col-lg-3">
+                                        <!--begin::Tiles Widget 1-->
+                                        <!--end::Tiles Widget 1-->
+                                        <!--begin::Tiles Widget 5-->
+                                        <a href="#" class="card bg-body h-150px">
+                                            <!--begin::Body-->
+                                            <div class="card-body d-flex flex-column justify-content-between">
+                                                <!--begin::Svg Icon | path: icons/duotune/general/gen025.svg-->
+                                                <span class="svg-icon svg-icon-dark svg-icon-2hx ms-n1 flex-grow-1">
+                                                    <i class="fa fa-file-archive"></i>
+                                                </span>
+                                                <!--end::Svg Icon-->
+                                                <div class="d-flex flex-column">
+                                                    <div class="text-dark fw-bolder fs-1 mb-0 mt-5"><%=contatori[0]%></div>
+                                                    <div class="text-muted fw-bold fs-6">Istanze In Attesa</div>
                                                 </div>
-                                                <!--end::Body-->
-                                            </a>
-                                            <!--end::Tiles Widget 5-->
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <!--begin::Tiles Widget 1-->
-                                            <!--end::Tiles Widget 1-->
-                                            <!--begin::Tiles Widget 5-->
-                                            <a href="#" class="card bg-body h-150px">
-                                                <!--begin::Body-->
-                                                <div class="card-body d-flex flex-column justify-content-between">
-                                                    <!--begin::Svg Icon | path: icons/duotune/general/gen025.svg-->
-                                                    <span class="svg-icon svg-icon-success svg-icon-2hx ms-n1 flex-grow-1">
-                                                        <i class="fa fa-file-archive"></i>
-                                                    </span>
-                                                    <!--end::Svg Icon-->
-                                                    <div class="d-flex flex-column">
-                                                        <div class="text-success fw-bolder fs-1 mb-0 mt-5"><%=contatori[1]%></div>
-                                                        <div class="text-muted fw-bold fs-6">Istanze Accettate</div>
-                                                    </div>
+                                            </div>
+                                            <!--end::Body-->
+                                        </a>
+                                        <!--end::Tiles Widget 5-->
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <!--begin::Tiles Widget 1-->
+                                        <!--end::Tiles Widget 1-->
+                                        <!--begin::Tiles Widget 5-->
+                                        <a href="#" class="card bg-body h-150px">
+                                            <!--begin::Body-->
+                                            <div class="card-body d-flex flex-column justify-content-between">
+                                                <!--begin::Svg Icon | path: icons/duotune/general/gen025.svg-->
+                                                <span class="svg-icon svg-icon-success svg-icon-2hx ms-n1 flex-grow-1">
+                                                    <i class="fa fa-file-archive"></i>
+                                                </span>
+                                                <!--end::Svg Icon-->
+                                                <div class="d-flex flex-column">
+                                                    <div class="text-success fw-bolder fs-1 mb-0 mt-5"><%=contatori[1]%></div>
+                                                    <div class="text-muted fw-bold fs-6">Istanze Accettate</div>
                                                 </div>
-                                                <!--end::Body-->
-                                            </a>
-                                            <!--end::Tiles Widget 5-->
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <!--begin::Tiles Widget 1-->
-                                            <!--end::Tiles Widget 1-->
-                                            <!--begin::Tiles Widget 5-->
-                                            <a href="#" class="card bg-body h-150px">
-                                                <!--begin::Body-->
-                                                <div class="card-body d-flex flex-column justify-content-between">
-                                                    <!--begin::Svg Icon | path: icons/duotune/general/gen025.svg-->
-                                                    <span class="svg-icon svg-icon-primary svg-icon-2hx ms-n1 flex-grow-1">
-                                                        <i class="fa fa-graduation-cap"></i>
-                                                    </span>
-                                                    <!--end::Svg Icon-->
-                                                    <div class="d-flex flex-column">
-                                                        <div class="text-primary fw-bolder fs-1 mb-0 mt-5"><%=contatori[3]%></div>
-                                                        <div class="text-muted fw-bold fs-6">Corsi attualmente attivi</div>
-                                                    </div>
+                                            </div>
+                                            <!--end::Body-->
+                                        </a>
+                                        <!--end::Tiles Widget 5-->
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <!--begin::Tiles Widget 1-->
+                                        <!--end::Tiles Widget 1-->
+                                        <!--begin::Tiles Widget 5-->
+                                        <a href="#" class="card bg-body h-150px">
+                                            <!--begin::Body-->
+                                            <div class="card-body d-flex flex-column justify-content-between">
+                                                <!--begin::Svg Icon | path: icons/duotune/general/gen025.svg-->
+                                                <span class="svg-icon svg-icon-primary svg-icon-2hx ms-n1 flex-grow-1">
+                                                    <i class="fa fa-graduation-cap"></i>
+                                                </span>
+                                                <!--end::Svg Icon-->
+                                                <div class="d-flex flex-column">
+                                                    <div class="text-primary fw-bolder fs-1 mb-0 mt-5"><%=contatori[3]%></div>
+                                                    <div class="text-muted fw-bold fs-6">Corsi attualmente attivi</div>
                                                 </div>
-                                                <!--end::Body-->
-                                            </a>
-                                            <!--end::Tiles Widget 5-->
-                                        </div>
+                                            </div>
+                                            <!--end::Body-->
+                                        </a>
+                                        <!--end::Tiles Widget 5-->
                                     </div>
                                     <!--end::Col-->
 

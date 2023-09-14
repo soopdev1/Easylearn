@@ -100,9 +100,39 @@ import rc.soop.sic.jpa.User;
  */
 public class Operations extends HttpServlet {
 
-    protected void RICHIEDIAVVIOCORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Utils.printRequest(request);
+    protected void AUTORIZZAAVVIOCORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JsonObject resp_out = new JsonObject();
+        try {
+            String IDCORSO = getRequestValue(request, "IDCORSO");
+            EntityOp ep1 = new EntityOp();
+            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
+            if (ca1 != null) {
+                ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "43"));
+                ep1.begin();
+                ep1.merge(ca1);
+                ep1.commit();
+                ep1.close();
+                resp_out.addProperty("result",
+                        true);
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "CORSO NON TROVATO.");
+            }
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+    }
 
+    protected void RICHIEDIAVVIOCORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JsonObject resp_out = new JsonObject();
 //        if (isAdmin(request.getSession())) {
         try {
@@ -210,10 +240,10 @@ public class Operations extends HttpServlet {
             ca.setDatainserimento(new DateTime().toDate());
 
             Istanza is1 = ep1.getEm().find(Istanza.class, parseLongR(ISTANZA));
-            
+
             ObjectMapper om = new ObjectMapper();
             om.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-            
+
             if (is1.equals(ca.getCorsobase().getIstanza())) {
                 ep1.begin();
                 ep1.persist(ca);
@@ -761,6 +791,66 @@ public class Operations extends HttpServlet {
         }
     }
 
+    protected void RIGETTACORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        if (isAdmin(request.getSession())) {
+            String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
+            String idcorso = getRequestValue(request, "idcorso");
+
+            EntityOp ep1 = new EntityOp();
+
+            try {
+                Corsoavviato is1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(idcorso));
+                if (is1 != null) {
+                    boolean soccorsoistr = getRequestValue(request, "soccorsoistr").equalsIgnoreCase("on");
+                    String motivazione = getRequestValue(request, "motivazione");
+                    List<Allegati> la = ep1.list_allegati(null, null, is1, null, null, null);
+                    List<Long> idko = new ArrayList<>();
+                    for (Allegati a1 : la) {
+                        String checkallegato = getRequestValue(request, "soc_ko_" + a1.getIdallegati());
+                        if (checkallegato.equalsIgnoreCase("on")) {
+                            idko.add(a1.getIdallegati());
+                        }
+                    }
+                    ep1.begin();
+                    if (soccorsoistr) {
+                        for (Long idko1 : idko) {
+                            Allegati a1 = ep1.getEm().find(Allegati.class, idko1);
+                            if (a1 != null) {
+                                a1.setStato(ep1.getEm().find(CorsoStato.class, "31"));
+                                ep1.merge(a1);
+                            }
+                        }
+                        is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "42"));
+                        //MAIL CON SOCCORSO
+                        //SendMail.inviaNotificaSP_rigettoIstanzaSOCCORSO(ep1, is1, motivazione, idko);
+                    } else {
+                        is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "09"));
+                        //MAIL SOLO RIGETTO
+                        //SendMail.inviaNotificaSP_rigettoIstanza(ep1, is1, motivazione);
+                    }
+                    ep1.merge(is1);
+
+                    Information info1 = new Information();
+                    info1.setDatacreazione(new Date());
+                    info1.setCorsoavviato(is1);
+                    info1.setMotivazione(motivazione);
+                    info1.setUtente(utentecaricamento);
+                    ep1.persist(info1);
+                    ep1.commit();
+                    ep1.close();
+                    redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
+                } else {
+                    redirect(request, response, "Page_message.jsp?esito=KORI_CO1");
+                }
+            } catch (Exception ex1) {
+                EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+                redirect(request, response, "Page_message.jsp?esito=KORI_CO2");
+            }
+        } else {
+            redirect(request, response, "404.jsp");
+        }
+    }
+    
     protected void RIGETTAISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (isAdmin(request.getSession())) {
 
@@ -2181,6 +2271,9 @@ public class Operations extends HttpServlet {
                 case "RIGETTAISTANZA":
                     RIGETTAISTANZA(request, response);
                     break;
+                case "RIGETTACORSO":
+                    RIGETTACORSO(request, response);
+                    break;
                 case "PROTOCOLLAISTANZA":
                     PROTOCOLLAISTANZA(request, response);
                     break;
@@ -2222,6 +2315,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "RICHIEDIAVVIOCORSO":
                     RICHIEDIAVVIOCORSO(request, response);
+                    break;
+                case "AUTORIZZAAVVIOCORSO":
+                    AUTORIZZAAVVIOCORSO(request, response);
                     break;
                 default:
                     break;

@@ -353,6 +353,11 @@ public class EntityOp {
         q.setParameter("istanza", is1);
         return (List<Information>) q.getResultList();
     }
+    public List<Information> list_info(Corsoavviato ca1) {
+        TypedQuery q = this.em.createNamedQuery("info.corsoavviato", Information.class);
+        q.setParameter("corsoavviato", ca1);
+        return (List<Information>) q.getResultList();
+    }
 
     public List<Allegati> list_allegati(Istanza is1, Corso c1, Corsoavviato c2, Docente d1, Allievi a1, EnteStage es1) {
         List<Allegati> elenco = new ArrayList<>();

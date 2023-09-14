@@ -129,6 +129,14 @@
                                                     + "<button class='btn btn-danger' onclick='history.back()'><i class='fa fa-backward'></i> Torna Indietro</button>";
                                             break;
                                         }
+                                        case "KORI_CO1":
+                                        case "KORI_CO2": {
+                                            ty = "alert-danger";
+                                            html = "<i class='fa fa-exclamation-triangle'></i> ERRORE! Impossibile rigettare il corso. Corso non trovata, riprovare."
+                                                    + " <hr>"
+                                                    + "<button class='btn btn-danger' onclick='history.back()'><i class='fa fa-backward'></i> Torna Indietro</button>";
+                                            break;
+                                        }
                                         case "KO_NAL1": {
                                             ty = "alert-danger";
                                             html = "<i class='fa fa-exclamation-triangle'></i> ERRORE! Impossibile inserire nuovo allievo. Riprovare."

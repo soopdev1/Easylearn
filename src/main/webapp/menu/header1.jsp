@@ -12,14 +12,6 @@
                     </svg>
                 </span>
             </div>
-            <div>
-                <img alt="Logo" src="assets/media/logos/logo.png" class="h-25px h-lg-30px" />
-            </div>
-            <div class="ms-5 ms-md-10">
-                <button type="button" class="btn btn-flex btn-active-color-white align-items-cenrer justify-content-center justify-content-md-between align-items-lg-cenrer flex-md-content-between bg-white bg-opacity-10 btn-color-gray-500 px-0 ps-md-6 pe-md-5 h-30px w-30px h-md-35px w-md-200px" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-start">
-                    <span class="d-none d-md-inline"><%=Constant.NAMEAPP%></span>
-                </button>
-            </div>
         </div>
         <div class="d-flex align-items-center flex-shrink-0">
             <div class="d-flex align-items-center ms-1" id="kt_header_user_menu_toggle">
@@ -27,8 +19,8 @@
                     <div class="d-none d-md-flex flex-column align-items-end justify-content-center me-2 me-md-4">
                         <span class="text-muted fs-8 fw-bold lh-1 mb-1"><%=session.getAttribute("us_cod")%></span>
                         <span class="text-white fs-8 fw-bolder lh-1"><%=User.formatUser(session.getAttribute("us_rolecod").toString())%></span>
-                        <%User u1 = (User)session.getAttribute("us_memory");
-                        if(u1.getSoggetto()!=null){%>
+                        <%User u1 = (User) session.getAttribute("us_memory");
+                            if (u1.getSoggetto() != null) {%>
                         <span class="text-white fs-5 fw-bolder lh-1"><%=u1.getSoggetto().getRAGIONESOCIALE()%></span>
                         <%}%>
                     </div>
