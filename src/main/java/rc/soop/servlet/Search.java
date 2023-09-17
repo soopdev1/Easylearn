@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -618,12 +619,14 @@ public class Search extends HttpServlet {
             throws ServletException, IOException {
 
         List<EnteStage> result;
+        AtomicInteger modify = new AtomicInteger(0);
         try {
             if (isAdmin(request.getSession())) {
-                result = new EntityOp().findAll(Allievi.class);
+                result = new EntityOp().findAll(EnteStage.class);
             } else {
                 SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
                 result = new EntityOp().getEntiStageSoggetto(so);
+                modify.addAndGet(1);
             }
         } catch (Exception ex) {
             Constant.LOGGER.severe(estraiEccezione(ex));
@@ -642,6 +645,7 @@ public class Search extends HttpServlet {
                 JsonObject data_value = new JsonObject();
                 data_value.addProperty(RECORDID, at.get());
                 data_value.addProperty("idente", res.getIdentestage());
+                data_value.addProperty("soggetto", res.getSoggetto().getRAGIONESOCIALE());
                 data_value.addProperty("ragionesociale", res.getRAGIONESOCIALE());
                 data_value.addProperty("piva", res.getPARTITAIVA());
                 data_value.addProperty("rapleg", res.getRap_cognome() + " " + res.getRap_nome());
@@ -654,12 +658,14 @@ public class Search extends HttpServlet {
                         = "<a href=\"US_showente.jsp?idente=" + Utils.enc_string(String.valueOf(res.getIdentestage())) + "\" data-fancybox data-type='iframe' "
                         + "data-bs-toggle=\"tooltip\" title=\"DETTAGLI\" "
                         + "data-preload='false' class=\"btn btn-sm btn-bg-light btn-primary fan1\">"
-                        + "<i class=\"fa fa-user\"></i></a> | "
-                        + "<a href=\"US_aggiungisedeente.jsp?idente=" + Utils.enc_string(String.valueOf(res.getIdentestage())) + "\" data-fancybox data-type='iframe' "
-                        + "data-bs-toggle=\"tooltip\" title=\"AGGIUNGI SEDE TIROCINIO/STAGE\" "
-                        + "data-preload='false' class=\"btn btn-sm btn-bg-light btn-warning fan1\">"
-                        + "<i class=\"fa fa-plus\"></i></a> | "
-                        + "<a href=\"US_allegatiente.jsp?idente=" + Utils.enc_string(String.valueOf(res.getIdentestage())) + "\" data-fancybox data-type='iframe' "
+                        + "<i class=\"fa fa-user\"></i></a> | ";
+                if (modify.get() > 0) {
+                    azioni += "<a href=\"US_aggiungisedeente.jsp?idente=" + Utils.enc_string(String.valueOf(res.getIdentestage())) + "\" data-fancybox data-type='iframe' "
+                            + "data-bs-toggle=\"tooltip\" title=\"AGGIUNGI SEDE TIROCINIO/STAGE\" "
+                            + "data-preload='false' class=\"btn btn-sm btn-bg-light btn-warning fan1\">"
+                            + "<i class=\"fa fa-plus\"></i></a> | ";
+                }
+                azioni += "<a href=\"US_allegatiente.jsp?idente=" + Utils.enc_string(String.valueOf(res.getIdentestage())) + "\" data-fancybox data-type='iframe' "
                         + "data-bs-toggle=\"tooltip\" title=\"GESTIONE ALLEGATI\" "
                         + "data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary fan1\">"
                         + "<i class=\"fa fa-file-clipboard\"></i></a>";
@@ -719,6 +725,7 @@ public class Search extends HttpServlet {
                 data_value.addProperty("data", sdf_PATTERNDATE4.format(res.getDatanascita()));
                 data_value.addProperty("email", res.getEmail());
                 data_value.addProperty("telefono", res.getTelefono());
+                data_value.addProperty("soggetto", res.getSoggetto().getRAGIONESOCIALE());
 
                 String azioni
                         = "<a href=\"US_showallievo.jsp?idallievo=" + Utils.enc_string(String.valueOf(res.getIdallievi())) + "\" data-fancybox data-type='iframe' "
@@ -754,12 +761,25 @@ public class Search extends HttpServlet {
     protected void list_sedi_soggetto(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        List<Sede> result;
+        try {
+
+            if (isAdmin(request.getSession())) {
+                result = new EntityOp().findAll(Sede.class);
+                result = result.stream().filter(f1 -> f1.getSoggetto() != null).collect(Collectors.toList());
+            } else {
+                SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
+                result = so.getSediformazione();
+            }
+
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+            result = new ArrayList<>();
+        }
+
         try (PrintWriter out = response.getWriter()) {
             JsonObject jMembers = new JsonObject();
             JsonArray data = new JsonArray();
-            SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
-
-            List<Sede> result = so.getSediformazione();
 
             jMembers.addProperty(ITOTALRECORDS, result.size());
             jMembers.addProperty(ITOTALDISPLAY, result.size());
@@ -770,13 +790,13 @@ public class Search extends HttpServlet {
                 JsonObject data_value = new JsonObject();
                 data_value.addProperty(RECORDID, at.get());
                 data_value.addProperty("stato", res.getEtichettastato());
+                data_value.addProperty("soggetto", res.getSoggetto().getRAGIONESOCIALE());
                 data_value.addProperty("tipo", res.getTipo().getNome());
                 data_value.addProperty("indirizzo", res.getIndirizzo());
                 data_value.addProperty("cap", res.getCap());
                 data_value.addProperty("comune", res.getComune());
                 data_value.addProperty("provincia", res.getProvincia());
                 data_value.addProperty("statovisual", Utils.getVisualstato(res.getStatosede()));
-
                 data.add(data_value);
                 at.addAndGet(1);
             });

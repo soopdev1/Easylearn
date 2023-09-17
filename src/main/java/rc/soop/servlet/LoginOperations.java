@@ -2,11 +2,34 @@ package rc.soop.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URI;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.dmfs.httpessentials.client.HttpRequestExecutor;
+import org.dmfs.httpessentials.exceptions.ProtocolError;
+import org.dmfs.httpessentials.exceptions.ProtocolException;
+import org.dmfs.httpessentials.httpurlconnection.HttpUrlConnectionExecutor;
+import org.dmfs.oauth2.client.BasicOAuth2AuthorizationProvider;
+import org.dmfs.oauth2.client.BasicOAuth2Client;
+import org.dmfs.oauth2.client.BasicOAuth2ClientCredentials;
+import org.dmfs.oauth2.client.OAuth2AccessToken;
+import org.dmfs.oauth2.client.OAuth2AuthorizationProvider;
+import org.dmfs.oauth2.client.OAuth2Client;
+import org.dmfs.oauth2.client.OAuth2ClientCredentials;
+import org.dmfs.oauth2.client.OAuth2InteractiveGrant;
+import org.dmfs.oauth2.client.grants.AuthorizationCodeGrant;
+import org.dmfs.oauth2.client.grants.ImplicitGrant;
+import org.dmfs.oauth2.client.scope.BasicScope;
+import org.dmfs.rfc3986.Uri;
+import org.dmfs.rfc3986.UriEncoded;
+import org.dmfs.rfc3986.encoding.Precoded;
+import org.dmfs.rfc3986.uris.LazyUri;
+import org.dmfs.rfc5545.Duration;
 import static rc.soop.sic.Constant.LOGGER;
 import static rc.soop.sic.Utils.estraiEccezione;
 import static rc.soop.sic.Utils.getRequestValue;
@@ -35,6 +58,34 @@ public class LoginOperations extends HttpServlet {
         }
         request.getSession().invalidate();
         redirect(request, response, "login.jsp");
+    }
+
+    protected void spid(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            HttpRequestExecutor executor = new HttpUrlConnectionExecutor();
+            OAuth2AuthorizationProvider provider = new BasicOAuth2AuthorizationProvider(
+                    URI.create("https://is-test.regione.sicilia.it/oauth2/authorize"),
+                    URI.create("https://is-test.regione.sicilia.it/oauth2/token"),
+                    new Duration(1, 0, 3600));
+            OAuth2ClientCredentials credentials = new BasicOAuth2ClientCredentials(
+                    "fq8aefusOqwjKNc5dkchF62ncLwa", "YTnffqNEfhfHqLTPUjfsumMaCAYa");
+            OAuth2Client client = new BasicOAuth2Client(
+                    provider,
+                    credentials,
+                    new LazyUri(new Precoded("https://tu.formati.education/demo/SPIDSERVLET")) /* Redirect URL */);
+            OAuth2InteractiveGrant grant = new AuthorizationCodeGrant(
+                    client, new BasicScope("scope"));
+            URI authorizationUrl = grant.authorizationUrl();
+            //            OAuth2AccessToken tk1 = grant.accessToken(executor);
+//            OAuth2AccessToken token = grant.withRedirect(new LazyUri(new Precoded("https://is-test.regione.sicilia.it/oauth2/token")))
+//                    .accessToken(executor);
+////            
+//            System.out.println("rc.soop.servlet.LoginOperations.spid() "+token.toString());
+
+            redirect(request, response, authorizationUrl.toString());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     protected void login(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -113,6 +164,9 @@ public class LoginOperations extends HttpServlet {
                     break;
                 case "logout":
                     logout(request, response);
+                    break;
+                case "spid":
+                    spid(request, response);
                     break;
             }
 //                case "changepassword":

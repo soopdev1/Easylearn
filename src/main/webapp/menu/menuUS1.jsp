@@ -102,6 +102,12 @@
             m_6A = "active";
             break;
         }
+        case "US_entistage.jsp": {
+            m_8s = "show";
+            m_8 = "menu-active-bg";
+            m_8A = "active";
+            break;
+        }
         default: {
             Utils.redirect(request, response, "login.jsp");
             break;
@@ -330,62 +336,7 @@
                         </div>                          
                     </div>
                 </div>
-                <%if (false) {%>
-
-                <div data-kt-menu-trigger="click" class="menu-item here <%=m_7s%> menu-accordion" style="display: none;">
-                    <span class="menu-link">
-                        <span class="menu-icon">
-                            <!--begin::Svg Icon | path: icons/duotune/general/gen025.svg-->
-                            <span class="svg-icon svg-icon-2 info">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#000000"  viewBox="0 0 32 32">
-                                    <path d="M27.783 7.936c0.959 2.313 0.502 5.074-1.379 6.955-2.071 2.071-5.201 2.395-7.634 1.022l-1.759 1.921 1.255 1.26 0.75-0.75c0.383-0.384 1.005-0.384 1.388 0l6.082 6.144c0.384 0.383 0.384 1.005 0 1.388l-2.776 2.776c-0.383 0.384-1.005 0.384-1.388 0l-6.082-6.144c-0.384-0.383-0.384-1.005 0-1.388l0.685-0.685-1.196-1.199-8.411 9.189c-0.767 0.767-2.010 0.767-2.776 0l-0.694-0.694c-0.767-0.767-0.767-2.010 0-2.776l9.582-8.025-6.364-6.381-2.010-0.001-2.326-3.74 1.872-1.875 3.825 2.341 0.025 1.968 6.438 6.463 1.873-1.568c-1.831-2.496-1.64-6.012 0.616-8.268 1.872-1.872 4.618-2.337 6.925-1.396l-4.124 4.067 3.471 3.471 4.132-4.075zM6.15 25.934c-0.383-0.383-1.004-0.383-1.388 0-0.384 0.384-0.384 1.005 0 1.389 0.384 0.383 1.005 0.383 1.388 0 0.384-0.385 0.384-1.006 0-1.389z"></path>
-                                </svg>
-                            </span>
-                            <!--end::Svg Icon-->
-                        </span>
-                        <span class="menu-title">STRUMENTAZIONE</span>
-                    </span>
-                    <div class="menu-sub menu-sub-accordion <%=m_7%>">                        
-                        <div class="menu-item">
-                            <a class="menu-link <%=m_7A%>" href="US_gestionestrumenti.jsp">
-                                <span class="menu-bullet">
-                                    <span class="bullet bullet-dot"></span>
-                                </span>
-                                <span class="menu-title">Gestione Strumentazione</span>
-                            </a>
-                        </div>                          
-                    </div>
-                </div>
-                <div data-kt-menu-trigger="click" class="menu-item here <%=m_8s%> menu-accordion">
-                    <span class="menu-link">
-                        <span class="menu-icon">
-                            <!--begin::Svg Icon | path: icons/duotune/general/gen025.svg-->
-                            <span class="svg-icon svg-icon-2 info">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
-                                     viewBox="0 0 24 24" fill="#000000" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M5 9.5C5 7.01472 7.01472 5 9.5 5C11.9853 5 14 7.01472 14 9.5C14 11.9853 11.9853 14 9.5 14C7.01472 14 5 11.9853 5 9.5Z" fill="#323232"/>
-                                    <path d="M14.3675 12.0632C14.322 12.1494 14.3413 12.2569 14.4196 12.3149C15.0012 12.7454 15.7209 13 16.5 13C18.433 13 20 11.433 20 9.5C20 7.567 18.433 6 16.5 6C15.7209 6 15.0012 6.2546 14.4196 6.68513C14.3413 6.74313 14.322 6.85058 14.3675 6.93679C14.7714 7.70219 15 8.5744 15 9.5C15 10.4256 14.7714 11.2978 14.3675 12.0632Z" fill="#323232"/>
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M4.64115 15.6993C5.87351 15.1644 7.49045 15 9.49995 15C11.5112 15 13.1293 15.1647 14.3621 15.7008C15.705 16.2847 16.5212 17.2793 16.949 18.6836C17.1495 19.3418 16.6551 20 15.9738 20H3.02801C2.34589 20 1.85045 19.3408 2.05157 18.6814C2.47994 17.2769 3.29738 16.2826 4.64115 15.6993Z" fill="#323232"/>
-                                    <path d="M14.8185 14.0364C14.4045 14.0621 14.3802 14.6183 14.7606 14.7837V14.7837C15.803 15.237 16.5879 15.9043 17.1508 16.756C17.6127 17.4549 18.33 18 19.1677 18H20.9483C21.6555 18 22.1715 17.2973 21.9227 16.6108C21.9084 16.5713 21.8935 16.5321 21.8781 16.4932C21.5357 15.6286 20.9488 14.9921 20.0798 14.5864C19.2639 14.2055 18.2425 14.0483 17.0392 14.0008L17.0194 14H16.9997C16.2909 14 15.5506 13.9909 14.8185 14.0364Z" fill="#323232"/>
-                                </svg>
-                            </span>
-                            <!--end::Svg Icon-->
-                        </span>
-                        <span class="menu-title">PARTNER</span>
-                    </span>
-                    <div class="menu-sub menu-sub-accordion <%=m_8%>">                        
-                        <div class="menu-item">
-                            <a class="menu-link <%=m_8A%>" href="US_gestionesedi.jsp">
-                                <span class="menu-bullet">
-                                    <span class="bullet bullet-dot"></span>
-                                </span>
-                                <span class="menu-title">Gestione Partner</span>
-                            </a>
-                        </div>                          
-                    </div>
-                </div>
-                <%}%>
-
+                
                 <div data-kt-menu-trigger="click" class="menu-item here <%=m_8s%> menu-accordion">
                     <span class="menu-link">
                         <span class="menu-icon">

@@ -25,6 +25,7 @@
     String m_4s = "";
     String m_4 = "";
     String m_4A = "";
+    String m_4B = "";
 
     String m_5s = "";
     String m_5 = "";
@@ -42,6 +43,10 @@
     String m_8s = "";
     String m_8 = "";
     String m_8A = "";
+    
+    String m_10s = "";
+    String m_10 = "";
+    String m_10A = "";
 
     switch (pageName) {
         case "ADM_dashboard.jsp": {
@@ -60,6 +65,42 @@
             m_3s = "show";
             m_3 = "menu-active-bg";
             m_3A = "active";
+            break;
+        }
+        case "US_gestionedocenti.jsp": {
+            m_4s = "show";
+            m_4 = "menu-active-bg";
+            m_4A = "active";
+            break;
+        }
+        case "US_gestionealtropersonale.jsp": {
+            m_4s = "show";
+            m_4 = "menu-active-bg";
+            m_4B = "active";
+            break;
+        }
+        case "ADM_gestioneallievi.jsp": {
+            m_5s = "show";
+            m_5 = "menu-active-bg";
+            m_5B = "active";
+            break;
+        }
+        case "ADM_gestionesedi.jsp": {
+            m_6s = "show";
+            m_6 = "menu-active-bg";
+            m_6A = "active";
+            break;
+        }
+        case "ADM_entistage.jsp": {
+            m_8s = "show";
+            m_8 = "menu-active-bg";
+            m_8A = "active";
+            break;
+        }
+        case "ADM_backoffice.jsp": {
+            m_10s = "show";
+            m_10 = "menu-active-bg";
+            m_10A = "active";
             break;
         }
 
@@ -166,8 +207,148 @@
                         </div>                          
                     </div>
                 </div>
+                <div data-kt-menu-trigger="click" class="menu-item here <%=m_4s%> menu-accordion">
+                    <span class="menu-link">
+                        <span class="menu-icon">
+                            <!--begin::Svg Icon | path: icons/duotune/general/gen025.svg-->
+                            <span class="svg-icon svg-icon-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
+                                     viewBox="0 0 31.312 31.312"
+                                     xml:space="preserve">
+                                    <g>
+                                        <g>
+                                            <polygon points="2.931,0.463 2.931,3.416 4.221,3.018 4.221,1.753 30.023,1.753 30.023,18.201 9.491,18.201 9.424,19.49 
+                                                     31.312,19.49 31.312,0.463 		"/>
+                                            <g>
+                                                <circle cx="4.984" cy="7.526" r="3.821"/>
+                                                <polygon points="8.227,29.104 8.227,22.302 8.227,21.661 8.227,20.791 8.47,20.791 8.825,13.885 15.416,10.471 14.55,8.801 
+                                                         8.524,11.922 6.374,11.922 4.917,13.611 3.508,11.922 0.412,12.483 0.214,19.365 1.526,19.365 1.597,20.791 1.797,20.791 
+                                                         1.797,21.661 1.797,22.302 1.797,29.104 1.534,29.104 0,29.438 0,30.85 1.306,30.85 2.83,30.6 2.844,30.85 4.531,30.85 
+                                                         4.531,29.275 4.531,29.104 4.531,22.302 5.492,22.302 5.492,29.104 5.492,29.275 5.492,30.85 7.181,30.85 7.195,30.6 
+                                                         8.718,30.85 10.024,30.85 10.024,29.438 8.491,29.104 			"/>
+                                            </g>
+                                            <rect x="11.039" y="6.235" width="16.523" height="0.483"/>
+                                            <rect x="11.039" y="4.542" width="16.523" height="0.484"/>
+                                            <rect x="11.039" y="7.887" width="16.523" height="0.484"/>
+                                            <polygon points="27.562,9.459 15.535,9.459 15.786,9.942 27.562,9.942 		"/>
+                                            <polygon points="14.427,11.594 27.562,11.594 27.562,11.111 15.423,11.111 		"/>
+                                            <polygon points="11.039,13.255 11.039,13.279 27.562,13.279 27.562,12.796 11.863,12.796 		"/>
+                                            <rect x="23.719" y="15.145" width="5.051" height="1.878"/>
+                                        </g>
+                                    </g>
+                                </svg>
+                            </span>
+                            <!--end::Svg Icon-->
+                        </span>
+                        <span class="menu-title">PERSONALE</span>
+                    </span>
+                    <div class="menu-sub menu-sub-accordion <%=m_4%>">                        
+                        <div class="menu-item">
+                            <a class="menu-link <%=m_4A%>" href="US_gestionedocenti.jsp">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title">Gestione Docenti/Tutor</span>
+                            </a>
+                        </div>                          
+                    </div>
+                    <div class="menu-sub menu-sub-accordion <%=m_4%>">                        
+                        <div class="menu-item">
+                            <a class="menu-link <%=m_4B%>" href="US_gestionealtropersonale.jsp">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title">Gestione Altro Personale</span>
+                            </a>
+                        </div>                          
+                    </div>
+                </div>
+                <div data-kt-menu-trigger="click" class="menu-item here <%=m_5s%> menu-accordion">
+                    <span class="menu-link">
+                        <span class="menu-icon">
+                            <span class="svg-icon svg-icon-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <g>
+                                        <path d="M20,21V19a4,4,0,0,0-4-4H8a4,4,0,0,0-4,4v2" fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                                        <circle cx="12" cy="7" fill="none" r="4" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                                    </g>
+                                </svg>
+                            </span>
+                            <!--end::Svg Icon-->
+                        </span>
+                        <span class="menu-title">ALLIEVI</span>
+                    </span>
+                    <div class="menu-sub menu-sub-accordion <%=m_5%>">  
+                        <div class="menu-item">
+                            <a class="menu-link <%=m_5B%>" href="ADM_gestioneallievi.jsp">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title">Gestione Allievi</span>
+                            </a>
+                        </div>                          
+                    </div>
+                </div>
+                <div data-kt-menu-trigger="click" class="menu-item here <%=m_6s%> menu-accordion">
+                    <span class="menu-link">
+                        <span class="menu-icon">
+                            <!--begin::Svg Icon | path: icons/duotune/general/gen025.svg-->
+                            <span class="svg-icon svg-icon-2 info">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#000000" viewBox="0 0 512 512">
+                                    <path d="M496 128v16a8 8 0 0 1-8 8h-24v12c0 6.627-5.373 12-12 12H60c-6.627 0-12-5.373-12-12v-12H24a8 8 0 0 1-8-8v-16a8 8 0 0 1 4.941-7.392l232-88a7.996 7.996 0 0 1 6.118 0l232 88A8 8 0 0 1 496 128zm-24 304H40c-13.255 0-24 10.745-24 24v16a8 8 0 0 0 8 8h464a8 8 0 0 0 8-8v-16c0-13.255-10.745-24-24-24zM96 192v192H60c-6.627 0-12 5.373-12 12v20h416v-20c0-6.627-5.373-12-12-12h-36V192h-64v192h-64V192h-64v192h-64V192H96z"/>
+                                </svg>
+                            </span>
+                            <!--end::Svg Icon-->
+                        </span>
+                        <span class="menu-title">SEDI</span>
+                    </span>
+                    <div class="menu-sub menu-sub-accordion <%=m_6%>">                        
+                        <div class="menu-item">
+                            <a class="menu-link <%=m_6A%>" href="ADM_gestionesedi.jsp">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title">Gestione Sedi Formative</span>
+                            </a>
+                        </div>                          
+                    </div>
+                </div>
+
+                <div data-kt-menu-trigger="click" class="menu-item here <%=m_8s%> menu-accordion">
+                    <span class="menu-link">
+                        <span class="menu-icon">
+                            <!--begin::Svg Icon | path: icons/duotune/general/gen025.svg-->
+                            <span class="svg-icon svg-icon-2 info">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
+                                     fill="#000000"viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
+                                    <path d="M37.3,31.9h21.8c1.1,0,2-0.9,2-2v-4c0-3.3-2.7-5.9-5.9-5.9H41.3c-3.3,0-5.9,2.7-5.9,5.9v4
+                                          C35.3,31,36.2,31.9,37.3,31.9z"/>
+                                    <path d="M70,24.9h-2c-0.6,0-1,0.4-1,1v4c0,4.4-3.6,7.9-7.9,7.9H37.3c-4.4,0-7.9-3.6-7.9-7.9v-4c0-0.6-0.4-1-1-1h-2
+                                          c-3.3,0-5.9,2.7-5.9,5.9v40.6c0,3.3,2.7,5.9,5.9,5.9h20c2.8,0,3.1-2.3,3.1-3.1V52.8c0-2.3,1.3-2.8,2-2.8h21.6c2.4,0,2.8-2.1,2.8-2.8
+                                          V31C76,27.6,73.3,24.9,70,24.9z"/>
+                                    <path d="M78.4,60.4H56.6c-0.6,0-1.1-0.5-1.1-1.1v-2.2c0-0.6,0.5-1.1,1.1-1.1h21.8c0.6,0,1.1,0.5,1.1,1.1v2.2
+                                          C79.5,59.9,79,60.4,78.4,60.4z M78.4,70.2H56.6c-0.6,0-1.1-0.5-1.1-1.1v-2.2c0-0.6,0.5-1.1,1.1-1.1h21.8c0.6,0,1.1,0.5,1.1,1.1v2.2
+                                          C79.5,69.7,79,70.2,78.4,70.2z M78.4,80H56.6c-0.6,0-1.1-0.5-1.1-1.1v-2.2c0-0.6,0.5-1.1,1.1-1.1h21.8c0.6,0,1.1,0.5,1.1,1.1v2.2
+                                          C79.5,79.5,79,80,78.4,80z"/>
+                                </svg>
+                            </span>
+                            <!--end::Svg Icon-->
+                        </span>
+                        <span class="menu-title">ENTI OSPITANTI STAGE</span>
+                    </span>
+                    <div class="menu-sub menu-sub-accordion <%=m_8%>">                        
+                        <div class="menu-item">
+                            <a class="menu-link <%=m_8A%>" href="ADM_entistage.jsp">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title">Gestione Enti</span>
+                            </a>
+                        </div>                          
+                    </div>
+                </div>
                 <hr>
-                    <div data-kt-menu-trigger="click" class="menu-item here menu-accordion <%=m_4s%>">
+                    <div data-kt-menu-trigger="click" class="menu-item here menu-accordion <%=m_10s%>">
                         <span class="menu-link">
                             <span class="menu-icon">
                                 <!--begin::Svg Icon | path: icons/duotune/general/gen025.svg-->
@@ -180,9 +361,9 @@
                             </span>
                             <span class="menu-title">BACK OFFICE</span>
                         </span>
-                        <div class="menu-sub menu-sub-accordion <%=m_4%>">                        
+                        <div class="menu-sub menu-sub-accordion <%=m_10%>">                        
                             <div class="menu-item">
-                                <a class="menu-link <%=m_4A%>" href="ADM_backoffice.jsp">
+                                <a class="menu-link <%=m_10A%>" href="ADM_backoffice.jsp">
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot"></span>
                                     </span>

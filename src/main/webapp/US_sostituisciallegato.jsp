@@ -58,6 +58,12 @@
         EntityOp eo = new EntityOp();
         Long idall = Long.valueOf(id_alleg);
         Allegati is1 = eo.getEm().find(Allegati.class, idall);
+        String descr = "";
+        if (is1.getIstanza() != null) {
+            descr = "Id Allegato " + is1.getIdallegati() + " - Id Istanza: " + is1.getIstanza().getIdistanza();
+        } else if (is1.getCorsoavviato() != null) {
+            descr = "Id Allegato " + is1.getIdallegati() + " - Id Corso " + is1.getCorsoavviato().getIdcorsoavviato();
+        }
 
     %>
     <body id="kt_body">
@@ -88,7 +94,7 @@
                                     <!--begin::Col-->
                                     <div class="col-xl-12">
                                         <!--begin::Tables Widget 3-->
-                                        <h1 class="text-center fs-4">Id Allegato <%=is1.getIdallegati()%> - Codice Istanza: <%=is1.getIstanza().getCodiceistanza()%></h1>                                    
+                                        <h1 class="text-center fs-4"><%=descr%></h1>                                    
                                     </div>
                                     <!--end::Col-->
                                     <!--begin::Col-->

@@ -916,7 +916,7 @@ public class Operations extends HttpServlet {
 
     protected void UPLSOST(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 //        Utils.printRequest(request);
-        if (isAdmin(request.getSession())) {
+//        if (isAdmin(request.getSession())) {
 
             try {
 
@@ -1005,9 +1005,9 @@ public class Operations extends HttpServlet {
                 EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
                 redirect(request, response, "Page_message.jsp?esito=KOUP_IS4");
             }
-        } else {
-            redirect(request, response, "404.jsp");
-        }
+//        } else {
+//            redirect(request, response, "404.jsp");
+//        }
 
     }
 

@@ -3,6 +3,7 @@
     Created on : 12 ago 2023, 14:18:44
     Author     : raf
 --%>
+<%@page import="rc.soop.sic.jpa.SoggettoProponente"%>
 <%@page import="rc.soop.sic.jpa.Allievi"%>
 <%@page import="rc.soop.sic.jpa.Information"%>
 <%@page import="rc.soop.sic.jpa.Allegati"%>
@@ -60,7 +61,14 @@
         EntityOp eo = new EntityOp();
         Long idist = Long.valueOf(Utils.dec_string(idistS));
         Allievi is1 = eo.getEm().find(Allievi.class, idist);
-        List<Allegati> la = eo.list_allegati(null, null, null, null, is1,null);
+        List<Allegati> la = eo.list_allegati(null, null, null, null, is1, null);
+        boolean modify = true;
+        if (Utils.isAdmin(session)) {
+            modify = false;
+        } else {
+            SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
+            modify = so.getIdsoggetto().equals(is1.getSoggetto().getIdsoggetto());
+        }
     %>
     <body id="kt_body">
         <!--begin::Main-->
@@ -96,9 +104,10 @@
                                 <!--end::Row-->
                                 <div class="card h-xl-100">
                                     <!--begin::Header-->
+                                    <%if (modify) {%>
+
                                     <form action="Operations?type=UPLDOCALLIEVO" method="post"  enctype="multipart/form-data">
                                         <input type="hidden" name="idallievo" value="<%=is1.getIdallievi()%>"/>
-
                                         <div class="card-header border-0 pt-5">
                                             <h3 class="card-title align-items-start flex-column">
                                                 <span class="card-label fw-bolder fs-3 mb-1">CARICA NUOVO ALLEGATO</span>
@@ -129,6 +138,7 @@
                                         </div>
                                     </form>
                                     <hr>
+                                    <%}%>
                                     <div class="card-header border-0 pt-5">
                                         <h3 class="card-title align-items-start flex-column">
                                             <span class="card-label fw-bolder fs-3 mb-1">ELENCO ALLEGATI</span>
@@ -176,6 +186,7 @@
                                                                         data-preload='false'
                                                                         ><i class="fa fa-file-alt"></i>
                                                                 </button>
+                                                                <%if (modify) {%>
                                                                 | 
                                                                 <button type="button"class="btn btn-sm btn-bg-light btn-danger"
                                                                         data-bs-toggle="tooltip" title="ELIMINA DOCUMENTO" 
@@ -192,6 +203,7 @@
                                                                    class="btn btn-sm btn-bg-light btn-warning text-dark fan1" >
                                                                     <i class="fa fa-arrow-right-arrow-left"></i>
                                                                 </a>
+                                                                <%}%>
                                                                 <%}%>
                                                             </form>
                                                         </td>      

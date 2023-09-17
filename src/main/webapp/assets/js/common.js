@@ -12,10 +12,13 @@ $(document).ready(function () {
             autoStart: true
         }
     });
-    $('.form-select').select2({
-        allowClear: true,
-        language: "it"
-    });
+    try {
+        $('.form-select').select2({
+            allowClear: true,
+            language: "it"
+        });
+    } catch (e) {
+    }
 });
 
 

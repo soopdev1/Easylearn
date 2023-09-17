@@ -527,6 +527,8 @@ public class Utils {
 
     public static String getEtichettastato(Stati stato) {
         switch (stato) {
+            case INATTIVO:
+                return "<i class='fa fa-lock'></i> Inattivo";
             case ATTIVO:
                 return "<i class='fa fa-check'></i> Attivo";
             case ABILITATO:
@@ -545,6 +547,8 @@ public class Utils {
     }
     public static String getVisualstato(Stati stato) {
         switch (stato) {
+            case INATTIVO:
+                return "NON ATTIVO";
             case CHECK:
                 return "IN ATTESA";
             case AVVIO:

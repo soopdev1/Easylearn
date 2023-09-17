@@ -18,13 +18,14 @@
 <!DOCTYPE html>
 <html lang="en">
     <%
+
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
     %>
     <!--begin::Head-->
     <head><base href="">
-        <title><%=Constant.NAMEAPP%>: Elenco Altro Personale</title>
+        <title><%=Constant.NAMEAPP%>: Elenco Enti Ospitanti Stage</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->
@@ -36,6 +37,7 @@
         <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
         <link href="assets/plugins/DataTables/datatables.min.css" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="assets/plugins/jquery-confirm.3.3.2.min.css">
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/plus.css" rel="stylesheet" type="text/css" />
 
@@ -56,7 +58,7 @@
                     <!--end::Header-->
                     <!--begin::Content wrapper-->
                     <div class="d-flex flex-column-fluid">
-                        <jsp:include page="menu/switchmenu.jsp" /> 
+                        <jsp:include page="menu/menuADM1.jsp" /> 
                         <!--begin::Container-->
                         <div class="d-flex flex-column flex-column-fluid container-fluid">
                             <!--begin::Post-->
@@ -74,7 +76,7 @@
                                             <!--begin::Header-->
                                             <div class="card-header border-0 pt-5">
                                                 <h3 class="card-title align-items-start flex-column">
-                                                    <span class="card-label fw-bolder fs-3 mb-1">ELENCO ALTRO PERSONALE COINVOLTO PER LA FORMAZIONE</span>
+                                                    <span class="card-label fw-bolder fs-3 mb-1">ELENCO ENTI OSPITANTI STAGE</span>
                                                 </h3>
                                             </div>
                                             <!--end::Header-->
@@ -83,15 +85,17 @@
                                                 <!--begin::Table container-->
                                                 <div class="table-responsive ">
                                                     <!--begin::Table-->
-                                                    <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt1">
+                                                    <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt2">
                                                         <!--begin::Table head-->
                                                         <thead>
                                                             <tr>
-                                                                <th class="p-2">Cognome</th>
-                                                                <th class="p-2">Nome</th>
-                                                                <th class="p-2">Codice Fiscale</th>
-                                                                <th class="p-2">Titolo di studio</th>
-                                                                <th class="p-2">Profilo Professionale</th>
+                                                                <th class="p-2">ID</th>
+                                                                <th class="p-2">Soggetto Proponente</th>
+                                                                <th class="p-2">Ragione Sociale</th>
+                                                                <th class="p-2">Partita IVA</th>
+                                                                <th class="p-2">Rappresentante Legale</th>
+                                                                <th class="p-2">Sede Legale</th>
+                                                                <th class="p-2">Azioni</th>
                                                             </tr>
                                                         </thead>
                                                         <!--end::Table head-->
@@ -171,14 +175,15 @@
         <script src="assets/js/widgets.bundle.js"></script>
         <script src="assets/js/custom/widgets.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
+
         <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
         <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
+
+
         <script type="text/javascript" src="assets/js/common.js"></script>
-        <script type="text/javascript" src="assets/js/US_gestionedocenti.js"></script>
+        <script src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
+        <script type="text/javascript" src="assets/js/US_entistage.js"></script>
         <!--end::Page Custom Javascript-->
-        
-        
-        
         <!--end::Javascript-->
     </body>
     <!--end::Body-->
