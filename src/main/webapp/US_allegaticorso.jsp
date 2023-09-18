@@ -76,209 +76,216 @@
 
         }
     %>
-    <body id="kt_body">
+    <body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed">
         <!--begin::Main-->
         <!--begin::Root-->
-        <div class="flex-column flex-root">
+        <div class="d-flex flex-column flex-root">
             <!--begin::Page-->
-            <div class="page flex-row flex-column-fluid">
+            <div class="page d-flex flex-row flex-column-fluid">
                 <!--begin::Wrapper-->
-                <div class="flex-column flex-row-fluid" id="kt_wrapper">
+                <div class="wrapper d-flex flex-column flex-row-fluid" id="kt_wrapper">
                     <!--begin::Header-->
+                    <jsp:include page="menu/header1.jsp" /> 
                     <!--end::Header-->
                     <!--begin::Content wrapper-->
-                    <div class="flex-column-fluid">
-                        <!--begin::Container-->
-                        <div class="flex-column flex-column-fluid container-fluid">
-                            <!--begin::Post-->
-                            <div class="content flex-column-fluid" id="kt_content">
-                                <!--begin::Row-->
-                                <!--end::Row-->
-                                <!--begin::Row-->
-                                <!--end::Row-->
-                                <!--begin::Row-->
-                                <br/>
-                                <%if (is1 != null) {%>
+                    <div class="d-flex flex-column-fluid">
+                        <jsp:include page="menu/switchmenu.jsp" /> 
+                        <!--begin::Header-->
+                        <!--end::Header-->
+                        <!--begin::Content wrapper-->
+                        <div class="flex-column-fluid">
+                            <!--begin::Container-->
+                            <div class="flex-column flex-column-fluid container-fluid">
+                                <!--begin::Post-->
+                                <div class="content flex-column-fluid" id="kt_content">
+                                    <!--begin::Row-->
+                                    <!--end::Row-->
+                                    <!--begin::Row-->
+                                    <!--end::Row-->
+                                    <!--begin::Row-->
+                                    <br/>
+                                    <%if (is1 != null) {%>
 
-                                <div class="row g-10">
-                                    <!--begin::Col-->
-                                    <div class="col-xl-12">
-                                        <!--begin::Tables Widget 3-->
-                                        <h1 class="text-center fs-4">Corso di formazione ID: <%=is1.getIdcorsoavviato()%> - Nome: <%=is1.getCorsobase().getRepertorio().getDenominazione()%></h1>                                    
-                                    </div>
-                                </div>
-                                <!--end::Row-->
-                                <div class="card h-xl-100">
-                                    <%if (is1.getStatocorso().getCodicestatocorso().equals("42")) {%>    
-                                    <div class="card-header border-0 pt-5 bg-warning">
-                                        <h3 class="card-title align-items-start flex-column">
-                                            <span class="card-label fw-bolder fs-3 mb-1">SOCCORSO ISTRUTTORIO</span>
-                                        </h3>
-                                    </div>
-                                    <%if (showinfo) {%>
-                                    <%
-                                        for (Information info2 : info1) {
-                                    %>
-
-                                    <div class="card-body py-3 bg-warning">
-                                        <hr>
-                                        <div class="row row-border col-md-12 p-5">
-                                            <!--begin::Label-->
-                                            <label class="col-lg-3 col-form-label fw-bold fs-6" >
-                                                <span class="text-dark"><b>UTENTE:</b></span>
-                                            </label>
-                                            <div class="col-md-9 fv-row">
-                                                <span class="text-dark"><%=info2.getUtente()%></span>
-                                            </div>
-                                        </div>
-                                        <div class="row row-border col-md-12 p-5">
-                                            <!--begin::Label-->
-                                            <label class="col-lg-3 col-form-label fw-bold fs-6" >
-                                                <span class="text-dark"><b>DATA:</b></span>
-                                            </label>
-                                            <div class="col-md-9 fv-row">
-                                                <span class="text-dark"><%=Constant.sdf_PATTERNDATE5.format(info2.getDatacreazione())%></span>
-                                            </div>
-                                        </div>
-                                        <div class="row row-border col-md-12 p-5">
-                                            <!--begin::Label-->
-                                            <label class="col-lg-3 col-form-label fw-bold fs-6" >
-                                                <span class="text-dark"><b>MOTIVAZIONE:</b></span>
-                                            </label>
-                                            <div class="col-md-9 fv-row">
-                                                <span class="text-dark"><%=info2.getMotivazione()%></span>
-                                            </div>
+                                    <div class="row g-10">
+                                        <!--begin::Col-->
+                                        <div class="col-xl-12">
+                                            <!--begin::Tables Widget 3-->
+                                            <h1 class="text-center fs-4">Corso di formazione ID: <%=is1.getIdcorsoavviato()%> - Nome: <%=is1.getCorsobase().getRepertorio().getDenominazione()%></h1>                                    
                                         </div>
                                     </div>
-
-                                    <%}%>
-                                    <%}%>
-                                    <%}%>
-                                    <%if (modify) {%>
-                                    <!--begin::Header-->
-                                    <form action="Operations?type=UPLDOCCORSO" method="post"  enctype="multipart/form-data">
-                                        <input type="hidden" name="idcorsoavviato" value="<%=is1.getIdcorsoavviato()%>"/>
-                                        <div class="card-header border-0 pt-5">
+                                    <!--end::Row-->
+                                    <div class="card h-xl-100">
+                                        <%if (is1.getStatocorso().getCodicestatocorso().equals("42")) {%>    
+                                        <div class="card-header border-0 pt-5 bg-warning">
                                             <h3 class="card-title align-items-start flex-column">
-                                                <span class="card-label fw-bolder fs-3 mb-1">CARICA NUOVO ALLEGATO</span>
+                                                <span class="card-label fw-bolder fs-3 mb-1">SOCCORSO ISTRUTTORIO</span>
                                             </h3>
-                                            <button class="btn btn-primary"><i class="fa fa-upload"></i> UPLOAD</button>
                                         </div>
-                                        <div class="card-body py-3">
+                                        <%if (showinfo) {%>
+                                        <%
+                                            for (Information info2 : info1) {
+                                        %>
+
+                                        <div class="card-body py-3 bg-warning">
+                                            <hr>
                                             <div class="row row-border col-md-12 p-5">
                                                 <!--begin::Label-->
-                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                    <span class="text-info"><b>SELEZIONA ALLEGATO</b></span>
+                                                <label class="col-lg-3 col-form-label fw-bold fs-6" >
+                                                    <span class="text-dark"><b>UTENTE:</b></span>
                                                 </label>
-                                                <div class="col-md-8 fv-row">
-                                                    <input class="form-control" type="file" id="formFile"name="formFile" required />
+                                                <div class="col-md-9 fv-row">
+                                                    <span class="text-dark"><%=info2.getUtente()%></span>
                                                 </div>
                                             </div>
-
                                             <div class="row row-border col-md-12 p-5">
-                                                <label class="col-lg-4 col-form-label fw-bold fs-6" >
-                                                    <span class="text-info"><b>DESCRIZIONE ALLEGATO (MAX 50 CARATTERI)</b></span>
+                                                <!--begin::Label-->
+                                                <label class="col-lg-3 col-form-label fw-bold fs-6" >
+                                                    <span class="text-dark"><b>DATA:</b></span>
                                                 </label>
-                                                <div class="col-md-8 fv-row">
-                                                    <input type="text" name="DESCRIZIONE" id="DESCRIZIONE"
-                                                           class="form-control" maxlength="50"
-                                                           placeholder="..." required />
+                                                <div class="col-md-9 fv-row">
+                                                    <span class="text-dark"><%=Constant.sdf_PATTERNDATE5.format(info2.getDatacreazione())%></span>
+                                                </div>
+                                            </div>
+                                            <div class="row row-border col-md-12 p-5">
+                                                <!--begin::Label-->
+                                                <label class="col-lg-3 col-form-label fw-bold fs-6" >
+                                                    <span class="text-dark"><b>MOTIVAZIONE:</b></span>
+                                                </label>
+                                                <div class="col-md-9 fv-row">
+                                                    <span class="text-dark"><%=info2.getMotivazione()%></span>
                                                 </div>
                                             </div>
                                         </div>
-                                    </form>
-                                    <hr>
-                                    <%}%>
-                                    
-                                    <div class="card-header border-0 pt-5">
-                                        <h3 class="card-title align-items-start flex-column">
-                                            <span class="card-label fw-bolder fs-3 mb-1">ELENCO ALLEGATI</span>
-                                        </h3>
-                                    </div>
 
-                                    <div class="card-body py-3">
-                                        <!--begin::Table container-->
-                                        <div class="table-responsive">
-                                            <!--begin::Table-->
-                                            <table class="table align-middle gy-3 table-bordered table-hover" 
-                                                   id="tab_dt1" style="border-bottom: 2px;">
-                                                <!--begin::Table head-->
-                                                <thead>
-                                                    <tr>
-                                                        <th class="p-2 w-50px">ID</th>
-                                                        <th class="p-2 w-50px">CODICE</th>
-                                                        <th class="p-2 w-150px">DESCRIZIONE</th>
-                                                        <th class="p-2 w-50px">DATA CARICAMENTO</th>
-                                                        <th class="p-2 w-50px">TIPO FILE</th>
-                                                        <th class="p-2 w-50px">STATO</th>
-                                                        <th class="p-2 w-50px">AZIONI</th>
-                                                    </tr>
-                                                </thead>
-                                                <!--end::Table head-->
-                                                <!--begin::Table body-->
-                                                <tbody>
-                                                    <%for (Allegati d2 : la) {
+                                        <%}%>
+                                        <%}%>
+                                        <%}%>
+                                        <%if (modify) {%>
+                                        <!--begin::Header-->
+                                        <form action="Operations?type=UPLDOCCORSO" method="post"  enctype="multipart/form-data">
+                                            <input type="hidden" name="idcorsoavviato" value="<%=is1.getIdcorsoavviato()%>"/>
+                                            <div class="card-header border-0 pt-5">
+                                                <h3 class="card-title align-items-start flex-column">
+                                                    <span class="card-label fw-bolder fs-3 mb-1">CARICA NUOVO ALLEGATO</span>
+                                                </h3>
+                                                <button class="btn btn-primary"><i class="fa fa-upload"></i> UPLOAD</button>
+                                            </div>
+                                            <div class="card-body py-3">
+                                                <div class="row row-border col-md-12 p-5">
+                                                    <!--begin::Label-->
+                                                    <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                        <span class="text-info"><b>SELEZIONA ALLEGATO</b></span>
+                                                    </label>
+                                                    <div class="col-md-8 fv-row">
+                                                        <input class="form-control" type="file" id="formFile"name="formFile" required />
+                                                    </div>
+                                                </div>
+
+                                                <div class="row row-border col-md-12 p-5">
+                                                    <label class="col-lg-4 col-form-label fw-bold fs-6" >
+                                                        <span class="text-info"><b>DESCRIZIONE ALLEGATO (MAX 50 CARATTERI)</b></span>
+                                                    </label>
+                                                    <div class="col-md-8 fv-row">
+                                                        <input type="text" name="DESCRIZIONE" id="DESCRIZIONE"
+                                                               class="form-control" maxlength="50"
+                                                               placeholder="..." required />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                        <hr>
+                                        <%}%>
+
+                                        <div class="card-header border-0 pt-5">
+                                            <h3 class="card-title align-items-start flex-column">
+                                                <span class="card-label fw-bolder fs-3 mb-1">ELENCO ALLEGATI</span>
+                                            </h3>
+                                        </div>
+
+                                        <div class="card-body py-3">
+                                            <!--begin::Table container-->
+                                            <div class="table-responsive">
+                                                <!--begin::Table-->
+                                                <table class="table align-middle gy-3 table-bordered table-hover" 
+                                                       id="tab_dt1" style="border-bottom: 2px;">
+                                                    <!--begin::Table head-->
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="p-2 w-50px">ID</th>
+                                                            <th class="p-2 w-50px">CODICE</th>
+                                                            <th class="p-2 w-150px">DESCRIZIONE</th>
+                                                            <th class="p-2 w-50px">DATA CARICAMENTO</th>
+                                                            <th class="p-2 w-50px">TIPO FILE</th>
+                                                            <th class="p-2 w-50px">STATO</th>
+                                                            <th class="p-2 w-50px">AZIONI</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <!--end::Table head-->
+                                                    <!--begin::Table body-->
+                                                    <tbody>
+                                                        <%for (Allegati d2 : la) {
 
 
-                                                    %>
-                                                    <tr>
-                                                        <td class="p-2 w-50px"><%=d2.getIdallegati()%></td>
-                                                        <td class="p-2 w-50px"><%=d2.getCodiceallegati()%></td>
-                                                        <td class="p-2 w-150px"><%=d2.getDescrizione()%></td>
-                                                        <td class="p-2 w-50px"><%=Constant.sdf_PATTERNDATE5.format(d2.getDatacaricamento())%></td>
-                                                        <td class="p-2 w-50px"><%=d2.getMimetype()%></td>
-                                                        <td class="p-2 w-50px"><%=d2.getStato().getHtmldescr()%></td>
-                                                        <td class="p-2 w-150px">
-                                                            <form method="POST" action="Operations" target="_blank">
-                                                                <input type="hidden" name="type" value="VISUALDOC"/>
-                                                                <input type="hidden" name="iddocument" value="<%=d2.getIdallegati()%>" />
-                                                                <button type="submit" class="btn btn-sm btn-bg-light btn-success"
-                                                                        data-bs-toggle="tooltip" title="VISUALIZZA DOCUMENTO" 
-                                                                        data-preload='false'
-                                                                        ><i class="fa fa-file-alt"></i>
-                                                                </button>
-                                                                <%if (modify) {%>
-                                                                | 
-                                                                <button type="button"class="btn btn-sm btn-bg-light btn-danger"
-                                                                        data-bs-toggle="tooltip" title="ELIMINA DOCUMENTO" 
-                                                                        data-preload='false'
-                                                                        onclick="return deletedoc('<%=d2.getIdallegati()%>')"><i class="fa fa-remove"></i>
-                                                                </button>
+                                                        %>
+                                                        <tr>
+                                                            <td class="p-2 w-50px"><%=d2.getIdallegati()%></td>
+                                                            <td class="p-2 w-50px"><%=d2.getCodiceallegati()%></td>
+                                                            <td class="p-2 w-150px"><%=d2.getDescrizione()%></td>
+                                                            <td class="p-2 w-50px"><%=Constant.sdf_PATTERNDATE5.format(d2.getDatacaricamento())%></td>
+                                                            <td class="p-2 w-50px"><%=d2.getMimetype()%></td>
+                                                            <td class="p-2 w-50px"><%=d2.getStato().getHtmldescr()%></td>
+                                                            <td class="p-2 w-150px">
+                                                                <form method="POST" action="Operations" target="_blank">
+                                                                    <input type="hidden" name="type" value="VISUALDOC"/>
+                                                                    <input type="hidden" name="iddocument" value="<%=d2.getIdallegati()%>" />
+                                                                    <button type="submit" class="btn btn-sm btn-bg-light btn-success"
+                                                                            data-bs-toggle="tooltip" title="VISUALIZZA DOCUMENTO" 
+                                                                            data-preload='false'
+                                                                            ><i class="fa fa-file-alt"></i>
+                                                                    </button>
+                                                                    <%if (modify) {%>
+                                                                    | 
+                                                                    <button type="button"class="btn btn-sm btn-bg-light btn-danger"
+                                                                            data-bs-toggle="tooltip" title="ELIMINA DOCUMENTO" 
+                                                                            data-preload='false'
+                                                                            onclick="return deletedoc('<%=d2.getIdallegati()%>')"><i class="fa fa-remove"></i>
+                                                                    </button>
 
-                                                                <%if (d2.getStato().getCodicestatocorso().equals("31")) {%>
+                                                                    <%if (d2.getStato().getCodicestatocorso().equals("31")) {%>
 
-                                                                <a href="US_sostituisciallegato.jsp?id_alleg=<%=d2.getIdallegati()%>"
-                                                                   data-fancybox data-type='iframe' 
-                                                                   data-bs-toggle="tooltip" title="SOSTITUISCI" 
-                                                                   data-preload='false' data-width='50%' data-height='50%' 
-                                                                   class="btn btn-sm btn-bg-light btn-warning text-dark fan1" >
-                                                                    <i class="fa fa-arrow-right-arrow-left"></i>
-                                                                </a>
-                                                                <%}
+                                                                    <a href="US_sostituisciallegato.jsp?id_alleg=<%=d2.getIdallegati()%>"
+                                                                       data-fancybox data-type='iframe' 
+                                                                       data-bs-toggle="tooltip" title="SOSTITUISCI" 
+                                                                       data-preload='false' data-width='50%' data-height='50%' 
+                                                                       class="btn btn-sm btn-bg-light btn-warning text-dark fan1" >
+                                                                        <i class="fa fa-arrow-right-arrow-left"></i>
+                                                                    </a>
+                                                                    <%}
                                                                     }%>
-                                                            </form>
-                                                        </td>      
-                                                    </tr>
-                                                    <%}%>
-                                                </tbody>
-                                            </table>
+                                                                </form>
+                                                            </td>      
+                                                        </tr>
+                                                        <%}%>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <%}%>
+                                    <%}%>
+                                </div>
+                                <!--end::Post-->
+                                <jsp:include page="menu/footer1.jsp" /> 
+                                <!--end::Footer-->
                             </div>
-                            <!--end::Post-->
-                            <!--begin::Footer-->
-                            <!--end::Footer-->
+                            <!--end::Container-->
                         </div>
-                        <!--end::Container-->
+                        <!--end::Content wrapper-->
                     </div>
-                    <!--end::Content wrapper-->
+                    <!--end::Wrapper-->
                 </div>
-                <!--end::Wrapper-->
+                <!--end::Page-->
             </div>
-            <!--end::Page-->
         </div>
         <!--end::Root-->
         <!--begin::Drawers-->

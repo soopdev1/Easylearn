@@ -69,7 +69,24 @@
     </head>
     <!--end::Head-->
     <!--begin::Body-->
-    <body id="kt_body">
+    <body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed">
+        <!--begin::Main-->
+        <!--begin::Root-->
+        <div class="d-flex flex-column flex-root">
+            <!--begin::Page-->
+            <div class="page d-flex flex-row flex-column-fluid">
+                <!--begin::Wrapper-->
+                <div class="wrapper d-flex flex-column flex-row-fluid" id="kt_wrapper">
+                    <!--begin::Header-->
+                    <jsp:include page="menu/header1.jsp" /> 
+                    <!--end::Header-->
+                    <!--begin::Content wrapper-->
+                    <div class="d-flex flex-column-fluid">
+                        <jsp:include page="menu/switchmenu.jsp" /> 
+                        <!--begin::Container-->
+                        <div class="d-flex flex-column flex-column-fluid container-fluid">
+                            <!--begin::Post-->
+                            <div class="content flex-column-fluid" id="kt_content">
         <!--begin::Main-->
         <!--begin::Root-->
         <!--begin::Row-->
@@ -332,6 +349,17 @@
             <!--end::Svg Icon-->
         </div>
         <!--end::Scrolltop-->
+        <jsp:include page="menu/footer1.jsp" /> 
+                                <!--end::Footer-->
+                            </div>
+                            <!--end::Container-->
+                        </div>
+                        <!--end::Content wrapper-->
+                    </div>
+                    <!--end::Wrapper-->
+                </div>
+                <!--end::Page-->
+            </div>
         <!--begin::Javascript-->
         <script>var hostUrl = "assets/";</script>
 

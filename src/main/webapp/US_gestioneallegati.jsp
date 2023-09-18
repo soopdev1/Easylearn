@@ -65,14 +65,20 @@
         boolean showinfo = !info1.isEmpty();
 
     %>
-    <body id="kt_body">
+    <body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed">
         <!--begin::Main-->
         <!--begin::Root-->
-        <div class="flex-column flex-root">
+        <div class="d-flex flex-column flex-root">
             <!--begin::Page-->
-            <div class="page flex-row flex-column-fluid">
+            <div class="page d-flex flex-row flex-column-fluid">
                 <!--begin::Wrapper-->
-                <div class="flex-column flex-row-fluid" id="kt_wrapper">
+                <div class="wrapper d-flex flex-column flex-row-fluid" id="kt_wrapper">
+                    <!--begin::Header-->
+                    <jsp:include page="menu/header1.jsp" /> 
+                    <!--end::Header-->
+                    <!--begin::Content wrapper-->
+                    <div class="d-flex flex-column-fluid">
+                        <jsp:include page="menu/switchmenu.jsp" /> 
                     <!--begin::Header-->
                     <!--end::Header-->
                     <!--begin::Content wrapper-->
@@ -278,15 +284,17 @@
                             </div>
                             <!--end::Post-->
                             <!--begin::Footer-->
+                            <jsp:include page="menu/footer1.jsp" /> 
                             <!--end::Footer-->
                         </div>
                         <!--end::Container-->
                     </div>
                     <!--end::Content wrapper-->
+                    </div>
+                    <!--end::Wrapper-->
                 </div>
-                <!--end::Wrapper-->
+                <!--end::Page-->
             </div>
-            <!--end::Page-->
         </div>
         <!--end::Root-->
         <!--begin::Drawers-->

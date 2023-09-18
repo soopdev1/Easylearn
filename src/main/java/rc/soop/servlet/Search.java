@@ -421,8 +421,9 @@ public class Search extends HttpServlet {
                                 + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
                                 + "<button type=\"submit\"class=\"btn btn-sm btn-primary\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ISTANZA PRESENTATA\" data-preload='false'>"
                                 + "<i class=\"fa fa-file-text\"></i></button>"
-                                + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ALLEGATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\" "
-                                + " onclick=\"return document.getElementById('gestall_" + res.getIdistanza() + "').submit();\"><i class=\"fa fa-file-clipboard\"></i></button>"
+                                + "<a href='ADM_allegati.jsp?idist=" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+                                + " class=\"btn btn-sm btn-bg-light btn-secondary fan1\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ALLEGATI\" data-preload='false' "
+                                + "\"><i class=\"fa fa-file-clipboard\"></i></a>"
                                 //+ "<a href='ADM_protocollaistanza.jsp?idist=" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
                                 //+ " class=\"btn btn-sm btn-bg-light btn-warning text-dark fan1\" data-bs-toggle=\"tooltip\" title=\"PROTOCOLLA ISTANZA\" data-preload='false' "
                                 //+ "\"><i class=\"fa fa-stamp\"></i></a>"
@@ -433,9 +434,7 @@ public class Search extends HttpServlet {
                                 + "<a href='ADM_rigettaistanza.jsp?idist=" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
                                 + " class=\"btn btn-sm btn-bg-light btn-danger fan1\" data-bs-toggle=\"tooltip\" title=\"RIGETTA ISTANZA\" data-preload='false' "
                                 + "\"><i class=\"fa fa-remove\"></i></a>"
-                                + "</form>"
-                                + "<form action=\"ADM_allegati.jsp\" method=\"POST\" target=\"_blank\" id=\"gestall_" + res.getIdistanza() + "\">"
-                                + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/></form></div>";
+                                + "</form></div>";
                         break;
                     }
                     case "09":
@@ -445,8 +444,10 @@ public class Search extends HttpServlet {
                                 + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
                                 + "<button type=\"submit\"class=\"btn btn-sm btn-primary\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ISTANZA PRESENTATA\" data-preload='false'>"
                                 + "<i class=\"fa fa-file-text\"></i></button>"
-                                + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ALLEGATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\" "
-                                + " onclick=\"return document.getElementById('gestall_" + res.getIdistanza() + "').submit();\"><i class=\"fa fa-file-clipboard\"></i></button>";
+                                + "<a href='ADM_allegati.jsp?idist=" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+                                + " class=\"btn btn-sm btn-bg-light btn-secondary fan1\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ALLEGATI\" data-preload='false' "
+                                + "\"><i class=\"fa fa-file-clipboard\"></i></a>"
+                                + "</form></div>";
                         break;
                     }
                     case "08": {
@@ -456,8 +457,9 @@ public class Search extends HttpServlet {
                                 + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
                                 + "<button type=\"submit\"class=\"btn btn-sm btn-primary\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ISTANZA PRESENTATA\" data-preload='false'>"
                                 + "<i class=\"fa fa-file-text\"></i></button>"
-                                + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ALLEGATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\" "
-                                + " onclick=\"return document.getElementById('gestall_" + res.getIdistanza() + "').submit();\"><i class=\"fa fa-file-clipboard\"></i></button>"
+                                + "<a href='ADM_allegati.jsp?idist=" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+                                + " class=\"btn btn-sm btn-bg-light btn-secondary fan1\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA ALLEGATI\" data-preload='false' "
+                                + "\"><i class=\"fa fa-file-clipboard\"></i></a>"
                                 + "<br>";
                         if (res.getPathfirmato() != null) {
                             azioni
@@ -476,9 +478,6 @@ public class Search extends HttpServlet {
                                     + "<button type=\"button\"class=\"btn btn-sm btn-warning\"\n"
                                     + "data-bs-toggle=\"tooltip\" title=\"NOTIFICA SOGGETTO PROPONENTE\" data-preload='false' "
                                     + "onclick=\"return invianotificaddecreto('" + res.getIdistanza() + "')\" ><i class=\"fa fa-envelope\"></i></button>"
-                                    + "</form>"
-                                    + "<form action=\"ADM_allegati.jsp\" method=\"POST\" target=\"_blank\" id=\"gestall_" + res.getIdistanza() + "\">"
-                                    + "<input type=\"hidden\" name=\"idist\" value=\"" + Utils.enc_string(String.valueOf(res.getIdistanza())) + "\"/>"
                                     + "</form>"
                                     + "<form action=\"Operations\" method=\"POST\" target=\"_blank\" id=\"generadecretotemplate1_" + res.getIdistanza() + "\">"
                                     + "<input type=\"hidden\" name=\"type\" value=\"GENERADECRETOBASE\"/>"
