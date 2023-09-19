@@ -95,20 +95,44 @@ $(document).ready(function () {
             }
     );
 
-//    const validate = dateString => {
-//        const day = (new Date(dateString)).getDay();
-//        if (day == 0 || day == 6) {
-//            return false;
-//        }
-//        return true;
-//    }
-//
-//// Sets the value to '' in case of an invalid date
-//    document.querySelector('input').onchange = evt => {
-//        if (!validate(evt.target.value)) {
-//            evt.target.value = '';
-//        }
-//    }
+    $('#DOCENTI').select2({
+        ajax: {
+            url: "Search",
+            dataType: 'json',
+            delay: 250,
+            type: "POST",
+            data: function (params) {
+                return {
+                    type: 'SELECTDOCENTE',
+                    q: params.term, // search term
+                    page: params.page
+                };
+            },
+            processResults: function (data, params) {
+                params.page = params.page || 1;
+                return {
+                    results: data.items,
+                    pagination: {
+                        more: (params.page * 30) < data.total_count
+                    }
+                };
+            },
+            cache: true
+        },
+        escapeMarkup: function (markup) {
+            return markup; // let our custom formatter work
+        },
+        minimumInputLength: 2,
+        templateResult: function (repo) {
+            if (repo.loading)
+                return repo.text;
+            return repo.full_name;
+        },
+        templateSelection: function (repo) {
+            return repo.full_name || repo.text;
+        }
+    });
+
 });
 
 

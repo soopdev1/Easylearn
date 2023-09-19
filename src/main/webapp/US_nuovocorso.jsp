@@ -88,10 +88,9 @@
                                             <%
                                                 EntityOp en = new EntityOp();
                                                 SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
-                                                List<Allievi> allievi = en.getAllieviSoggetto(so);
+                                                List<Allievi> allievi = en.getAllieviSoggettoAvvioCorso(so);
                                                 List<Istanza> accettate = en.getIstanzeAccettateAvvioCorsi(session);
                                                 List<Altropersonale> ap_all = en.list_all_AltroPersonale();
-                                                List<Altropersonale> direttori = en.getDirettori(ap_all);
                                                 List<Altropersonale> altrop = en.getAltroPersonale(ap_all);
                                             %>
                                             <!--begin::Body-->
@@ -252,16 +251,10 @@
                                                         <!--end::Label-->
                                                         <!--begin::Col-->
                                                         <div class="col-lg-8 fv-row">
-                                                            <select name="DIRETTORE" id="DIRETTORE" aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
-                                                                    class="form-select form-select-solid form-select-lg fw-bold" required>
-                                                                <option value="">Scegli...</option>
-                                                                <%for (Altropersonale al1 : direttori) {%>
-                                                                <option value="<%=al1.getIdaltropersonale()%>">
-                                                                    <%=al1.getCodicefiscale()%> - <%=al1.getCognome()%> <%=al1.getNome()%>
-                                                                </option>                                                                
-                                                                <%}%>
-                                                            </select>
-                                                            <small id="ALLIEVIHelp" class="form-text text-muted"></small>
+                                                            <input type="text" name="DIRETTORE" id="DIRETTORE" 
+                                                                           class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" 
+                                                                           required/>
+                                                                    <small class="form-text text-muted">Inserire Cognome e Nome del Direttore del Corso</small>
                                                         </div>
                                                         <!--end::Col-->
                                                     </div>        
@@ -282,7 +275,6 @@
                                                                 </option>                                                                
                                                                 <%}%>
                                                             </select>
-                                                            <small id="ALLIEVIHelp" class="form-text text-muted"></small>
                                                         </div>
                                                         <!--end::Col-->
                                                     </div>

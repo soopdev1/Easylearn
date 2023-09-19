@@ -209,6 +209,13 @@ public class EntityOp {
         q.setParameter("inattivo", Stati.INATTIVO);
         return (List<Allievi>) q.getResultList();
     }
+    
+    public List<Allievi> getAllieviSoggettoAvvioCorso(SoggettoProponente s) {
+        TypedQuery q = this.em.createNamedQuery("allievi.attivi.new", Allievi.class);
+        q.setParameter("soggetto", s);
+        q.setParameter("check", Stati.CHECK);
+        return (List<Allievi>) q.getResultList();
+    }
 
     public List<Allievi> getAllieviCorsoAvviato(Corsoavviato ca) {
         TypedQuery q = this.em.createNamedQuery("allievi.corsoavviato", Allievi.class);
@@ -483,6 +490,17 @@ public class EntityOp {
         return q.getResultList().isEmpty() ? new ArrayList() : (List<Istanza>) q.getResultList();
     }
 
+    public List<Docente> list_select_Docenti(String search) {
+        String sql = "SELECT c FROM Docente c WHERE lower(c.cognome) like CONCAT('%',:cognome,'%') "
+                + "OR lower(c.nome) like CONCAT('%',:nome,'%') ORDER BY c.cognome,c.nome";
+        TypedQuery<Docente> q = this.em.createQuery(sql, Docente.class);
+        q.setMaxResults(100);
+        q.setParameter("cognome", search.toLowerCase());
+        q.setParameter("nome", search.toLowerCase());
+        System.out.println("rc.soop.sic.jpa.EntityOp.list_select_Docenti() "+q.toString());
+        return q.getResultList().isEmpty() ? new ArrayList() : (List<Docente>) q.getResultList();
+    }
+    
     public List<Corsoavviato> list_corso_user(SoggettoProponente sp, String tipologiapercorso, String statocorso) {
         HashMap<String, Object> param = new HashMap<>();
 

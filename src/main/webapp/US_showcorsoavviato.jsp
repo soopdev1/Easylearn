@@ -37,13 +37,18 @@
                 List<Calendario_Formativo> cal_istanza = eo.calendario_formativo_corso(is1.getCorsobase());
                 List<Calendario_Lezioni> lezioni = eo.calendario_lezioni_corso(is1);
                 Utils.confrontaLezioniCalendario(lezioni, cal_istanza);
-            
+
                 boolean modify = true;
+                boolean azionicorso = false;
                 if (Utils.isAdmin(session)) {
                     modify = false;
                 } else {
                     SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
                     modify = so.getIdsoggetto().equals(is1.getCorsobase().getSoggetto().getIdsoggetto()) && is1.getStatocorso().getCodicestatocorso().equals("40");
+                    if (so.getIdsoggetto().equals(is1.getCorsobase().getSoggetto().getIdsoggetto())
+                            && (is1.getStatocorso().getCodicestatocorso().equals("43") || is1.getStatocorso().getCodicestatocorso().equals("44"))) {
+                        azionicorso = true;
+                    }
                 }
 
 
@@ -87,269 +92,323 @@
                         <div class="d-flex flex-column flex-column-fluid container-fluid">
                             <!--begin::Post-->
                             <div class="content flex-column-fluid" id="kt_content">
-        <!--begin::Main-->
-        <!--begin::Root-->
-        <!--begin::Row-->
-        <!--end::Row-->
-        <!--begin::Row-->
-        <!--end::Row-->
-        <!--begin::Row-->
-        <div class="row">
-            <div class="col-xl-12">
-                <div class="card h-xl-100">
-                    <div class="card-header border-0 pt-5">
-                        <h3 class="card-title align-items-start flex-column">
-                            <span class="card-label fw-bolder fs-3 mb-1">Dettagli Corso di formazione ID: <%=is1.getIdcorsoavviato()%> - <%=is1.getCorsobase().getIstanza().getTipologiapercorso().getNometipologia()%> - <u><%=is1.getCorsobase().getRepertorio().getDenominazione()%></u></span>
-                        </h3>
-                    </div>
-                    <div class="card-body py-3">
-                        <div class="row col-md-12">
-                            <label class="col-md-2 col-form-label fw-bold">
-                                <span class="text-danger"><b>SOGGETTO PROPONENTE:</b></span>
-                            </label>
-                            <label class="col-md-4 col-form-label fw-bold">
-                                <span><b><%=is1.getCorsobase().getSoggetto().getRAGIONESOCIALE()%></b></span>
-                            </label>
-                            <label class="col-md-2 col-form-label fw-bold fs-6">
-                                <span class="text-danger"><b>DIRETTORE:</b></span>
-                            </label>
-                            <label class="col-md-4 col-form-label fw-bold">
-                                <span><b><%=is1.getDirettore().getCognome()%> <%=is1.getDirettore().getNome()%></b></span>
-                            </label>
-                            <label class="col-md-2 col-form-label fw-bold fs-6">
-                                <span class="text-danger"><b>DATA INIZIO:</b></span>
-                            </label>
-                            <label class="col-md-4 col-form-label fw-bold">
-                                <span><b><%=Constant.sdf_PATTERNDATE4.format(is1.getDatainizio())%></b></span>
-                            </label>
-                            <label class="col-md-2 col-form-label fw-bold fs-6">
-                                <span class="text-danger"><b>DATA FINE:</b></span>
-                            </label>
-                            <label class="col-md-4 col-form-label fw-bold">
-                                <span><b><%=Constant.sdf_PATTERNDATE4.format(is1.getDatafine())%></b></span>
-                            </label>
-                            <hr>
-                            <label class="col-md-2 col-form-label fw-bold fs-6">
-                                <span class="text-danger"><b>ELENCO DOCENTI:</b></span>
-                            </label>
-                            <label class="col-md-10 col-form-label">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Cognome</th>
-                                            <th>Nome</th>
-                                            <th>Codice Fiscale</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <%for (CorsoAvviato_Docenti d1 : avv_doc) {%>
-                                        <tr>
-                                            <td>
-                                                <%=d1.getDocente().getCognome()%>
-                                            </td>
-                                            <td>
-                                                <%=d1.getDocente().getNome()%>
-                                            </td>
-                                            <td>
-                                                <%=d1.getDocente().getCodicefiscale()%>
-                                            </td>
-                                        </tr>
-                                        <%}%>
-                                    </tbody>
-                                </table>
-                            </label>
-                            <hr>
-                            <label class="col-md-2 col-form-label fw-bold fs-6">
-                                <span class="text-danger"><b>ELENCO ALLIEVI</b></span>
-                            </label>
-                            <label class="col-md-10 col-form-label">
-                                <table class="table table-hover table-row-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>Cognome</th>
-                                            <th>Nome</th>
-                                            <th>Codice Fiscale</th>
-                                            <th>Stato</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <%for (Allievi a1 : allievi) {%>
-                                        <tr>
-                                            <td>
-                                                <%=a1.getCognome()%>
-                                            </td>
-                                            <td>
-                                                <%=a1.getNome()%>
-                                            </td>
-                                            <td>
-                                                <%=a1.getCodicefiscale()%>
-                                            </td>
-                                            <td>
-                                                <%=Utils.getEtichettastato(a1.getStatoallievo())%>
-                                            </td>
+                                <!--begin::Main-->
+                                <!--begin::Root-->
+                                <!--begin::Row-->
+                                <!--end::Row-->
+                                <!--begin::Row-->
+                                <!--end::Row-->
+                                <!--begin::Row-->
+                                <div class="row">
+                                    <div class="col-xl-12">
+                                        <div class="card h-xl-100">
+                                            <div class="card-header border-0 pt-5">
+                                                <h3 class="card-title align-items-start flex-column">
+                                                    <span class="card-label fw-bolder fs-3 mb-1">Dettagli Corso di formazione ID: <%=is1.getIdcorsoavviato()%> - <%=is1.getCorsobase().getIstanza().getTipologiapercorso().getNometipologia()%> - <u><%=is1.getCorsobase().getRepertorio().getDenominazione()%></u></span>
+                                                </h3>
+                                            </div>
+                                            <div class="card-body py-3">
+                                                <div class="row col-md-12">
+                                                    <label class="col-md-2 col-form-label fw-bold">
+                                                        <span class="text-danger"><b>SOGGETTO PROPONENTE:</b></span>
+                                                    </label>
+                                                    <label class="col-md-4 col-form-label fw-bold">
+                                                        <span><b><%=is1.getCorsobase().getSoggetto().getRAGIONESOCIALE()%></b></span>
+                                                    </label>
+                                                    <label class="col-md-2 col-form-label fw-bold fs-6">
+                                                        <span class="text-danger"><b>DIRETTORE:</b></span>
+                                                        <%if (azionicorso) {%>
+                                                        <br>
+                                                        <button class="btn btn-warning btn-sm" data-preload='false' onclick="return modificadirettore('<%=is1.getIdcorsoavviato()%>');"
+                                                           data-bs-toggle="tooltip" title="MODIFICA DIRETTORE CORSO" 
+                                                           >
+                                                            <i class="fa fa-edit" ></i></button>
+                                                            <%}%>
+                                                    </label>
+                                                    <label class="col-md-4 col-form-label fw-bold">
+                                                        <span><b><%=is1.getDirettorecorso()%></b></span>
+                                                    </label>
+                                                    <label class="col-md-2 col-form-label fw-bold fs-6">
+                                                        <span class="text-danger"><b>DATA INIZIO:</b></span>
+                                                    </label>
+                                                    <label class="col-md-2 col-form-label fw-bold">
+                                                        <span><b><%=Constant.sdf_PATTERNDATE4.format(is1.getDatainizio())%></b></span>
+                                                    </label>
+                                                    <label class="col-md-2 col-form-label fw-bold fs-6">
+                                                        <span class="text-danger"><b>DATA FINE:</b></span>
+                                                    </label>
+                                                    <label class="col-md-2 col-form-label fw-bold">
+                                                        <span><b><%=Constant.sdf_PATTERNDATE4.format(is1.getDatafine())%></b></span>
+                                                    </label>
+                                                    <label class="col-md-2 col-form-label fw-bold fs-6">
+                                                        <span class="text-danger"><b>SEDE FORMATIVA:</b></span>
+                                                        <%if (azionicorso) {%>
+                                                        <br>
+                                                        <a class="btn btn-warning btn-sm fan1" href="US_calendariolezioni.jsp"
+                                                           data-fancybox data-type='iframe' 
+                                                           data-bs-toggle="tooltip" title="RICHIEDI CAMBIO SEDE FORMATIVA" 
+                                                           data-preload='false' data-width='75%' data-height='75%' id="addcalendariobutton">
+                                                            <i class="fa fa-edit" ></i></a>
+                                                            <%}%>
+                                                    </label>
+                                                    <label class="col-md-2 col-form-label fw-bold">
+                                                        <span><b><%=is1.getCorsobase().getSedescelta().getIndirizzo() + " " + is1.getCorsobase().getSedescelta().getComune() + " " + is1.getCorsobase().getSedescelta().getProvincia()%></b></span>
+                                                    </label>
+                                                    <hr>
+                                                    <label class="col-md-2 col-form-label fw-bold fs-6">
+                                                        <span class="text-danger"><b>ELENCO DOCENTI:</b></span>
+                                                        <%if (azionicorso) {%>
+                                                        <br>
+                                                        <a class="btn btn-warning btn-sm fan1" href="US_calendariolezioni.jsp"
+                                                           data-fancybox data-type='iframe' 
+                                                           data-bs-toggle="tooltip" title="MODIFICA ELENCO DOCENTI" 
+                                                           data-preload='false' data-width='75%' data-height='75%' id="addcalendariobutton">
+                                                            <i class="fa fa-edit" ></i></a>
+                                                            <%}%>
+                                                    </label>
+                                                    <label class="col-md-10 col-form-label">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Cognome</th>
+                                                                    <th>Nome</th>
+                                                                    <th>Codice Fiscale</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <%for (CorsoAvviato_Docenti d1 : avv_doc) {%>
+                                                                <tr>
+                                                                    <td>
+                                                                        <%=d1.getDocente().getCognome()%>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%=d1.getDocente().getNome()%>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%=d1.getDocente().getCodicefiscale()%>
+                                                                    </td>
+                                                                </tr>
+                                                                <%}%>
+                                                            </tbody>
+                                                        </table>
+                                                    </label>
+                                                    <hr>
+                                                    <label class="col-md-2 col-form-label fw-bold fs-6">
+                                                        <span class="text-danger"><b>ELENCO ALLIEVI</b></span>
+                                                        <%if (azionicorso) {%>
+                                                        <br>
+                                                        <a class="btn btn-warning btn-sm fan1" href="US_calendariolezioni.jsp"
+                                                           data-fancybox data-type='iframe' 
+                                                           data-bs-toggle="tooltip" title="MODIFICA ELENCO ALLIEVI" 
+                                                           data-preload='false' data-width='75%' data-height='75%' id="addcalendariobutton">
+                                                            <i class="fa fa-edit" ></i></a>
+                                                            <%}%>
+                                                    </label>
+                                                    <label class="col-md-10 col-form-label">
+                                                        <table class="table table-hover table-row-bordered">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Cognome</th>
+                                                                    <th>Nome</th>
+                                                                    <th>Codice Fiscale</th>
+                                                                    <th>Stato</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <%for (Allievi a1 : allievi) {%>
+                                                                <tr>
+                                                                    <td>
+                                                                        <%=a1.getCognome()%>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%=a1.getNome()%>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%=a1.getCodicefiscale()%>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%=Utils.getEtichettastato(a1.getStatoallievo())%>
+                                                                    </td>
 
-                                        </tr>
-                                        <%}%>
-                                    </tbody>
-                                </table>
-                            </label>
-                            <hr>
-                            <label class="col-md-2 col-form-label fw-bold fs-6">
-                                <span class="text-danger"><b>ELENCO ALTRO PERSONALE</b></span>
-                            </label>
-                            <label class="col-md-10 col-form-label">
-                                <table class="table table-hover table-row-bordered table-rounded">
-                                    <thead>
-                                        <tr>
-                                            <th>Cognome</th>
-                                            <th>Nome</th>
-                                            <th>Codice Fiscale</th>
-                                            <th>Profilo professionale</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <%for (CorsoAvviato_AltroPersonale a1 : avv_altrop) {%>
-                                        <tr>
-                                            <td>
-                                                <%=a1.getAltropersonale().getCognome()%>
-                                            </td>
-                                            <td>
-                                                <%=a1.getAltropersonale().getNome()%>
-                                            </td>
-                                            <td>
-                                                <%=a1.getAltropersonale().getCodicefiscale()%>
-                                            </td>
-                                            <td>
-                                                <%=a1.getAltropersonale().getProfiloprof()%>
-                                            </td>
+                                                                </tr>
+                                                                <%}%>
+                                                            </tbody>
+                                                        </table>
+                                                    </label>
+                                                    <hr>
+                                                    <label class="col-md-2 col-form-label fw-bold fs-6">
+                                                        <span class="text-danger"><b>ELENCO ALTRO PERSONALE</b></span>
+                                                        <%if (azionicorso) {%>
+                                                        <br>
+                                                        <a class="btn btn-warning btn-sm fan1" href="US_calendariolezioni.jsp"
+                                                           data-fancybox data-type='iframe' 
+                                                           data-bs-toggle="tooltip" title="MODIFICA ELENCO ALTRO PERSONALE" 
+                                                           data-preload='false' data-width='75%' data-height='75%' id="addcalendariobutton">
+                                                            <i class="fa fa-edit" ></i></a>
+                                                            <%}%>
+                                                    </label>
+                                                    <label class="col-md-10 col-form-label">
+                                                        <table class="table table-hover table-row-bordered table-rounded">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Cognome</th>
+                                                                    <th>Nome</th>
+                                                                    <th>Codice Fiscale</th>
+                                                                    <th>Profilo professionale</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <%for (CorsoAvviato_AltroPersonale a1 : avv_altrop) {%>
+                                                                <tr>
+                                                                    <td>
+                                                                        <%=a1.getAltropersonale().getCognome()%>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%=a1.getAltropersonale().getNome()%>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%=a1.getAltropersonale().getCodicefiscale()%>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%=a1.getAltropersonale().getProfiloprof()%>
+                                                                    </td>
 
-                                        </tr>
-                                        <%}%>
-                                    </tbody>
-                                </table>
-                            </label>
-                            <hr>
-                            <label class="col-form-label fw-bold fs-6">CALENDARIO FORMATIVO 
-                                <%if(modify){%>
-                                | 
-                                <a class="btn btn-primary btn-sm fan1" href="US_calendariolezioni.jsp"
-                                   data-fancybox data-type='iframe' 
-                                   data-bs-toggle="tooltip" title="INSERISCI NUOVA LEZIONE" 
-                                   data-preload='false' data-width='75%' data-height='75%' id="addcalendariobutton">
-                                    <i class="fa fa-plus-circle" ></i> Aggiungi lezione</a><%}%>
-                            </label>
-                            <div class="row col-md-12">
+                                                                </tr>
+                                                                <%}%>
+                                                            </tbody>
+                                                        </table>
+                                                    </label>
 
-                                <div class="col-md-7" style="border-right: 1px dashed #333;">
-                                    <label class="col-form-label fw-bold fs-6">LEZIONI INSERITE: <%=lezioni.size()%></label>
-                                    <div class="table-responsive">
-                                        <!--begin::Table-->
-                                        <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt0" style="border-bottom: 2px;">
-                                            <!--begin::Table head-->
-                                            <thead>
-                                                <tr>
-                                                    <th class="p-2 w-10px">#</th>
-                                                    <th class="p-2 w-50px">Data (Orario)</th>
-                                                    <th class="p-2 w-50px">Docente</th>
-                                                    <th class="p-2 w-50px">Modulo (Ore)</th>
-                                                    <th class="p-2 w-50px">Ore Lezione (Tipo)</th>
-                                                </tr>
-                                            </thead>
-                                            <!--end::Table head-->
-                                            <!--begin::Table body-->
-                                            <tbody>
-                                                <%
-                                                    int indice = 0;
-                                                    int oretotl = 0;
-                                                    for (Calendario_Lezioni c1 : lezioni) {
-                                                        String tl = c1.getTipolezione().equals("PRE") ? "(IN PRESENZA)" : "(FAD)";
-                                                        String orenorm = Utils.roundDoubleandFormat(c1.getOre(), 1);
-                                                        oretotl += c1.getOre();
-                                                        indice++;%>
-                                                <tr>
-                                                    <td class="p-2 w-10px"><%=indice%></td>
-                                                    <td class="p-2 w-50px"><%=Constant.sdf_PATTERNDATE4.format(c1.getDatalezione())%> (<%=c1.getOrainizio()%> - <%=c1.getOrafine()%>)</td>
-                                                    <td class="p-2 w-50px"><%=c1.getDocente().getCognome()%> <%=c1.getDocente().getNome()%></td>
-                                                    <td class="p-2 w-50px"><%=c1.getCalendarioformativo().getNomemodulo()%></td>
-                                                    <td class="p-2 w-50px"><%=orenorm%> <%=tl%> <%if(modify){%>| 
-                                                        <button type="button"class="btn btn-sm btn-danger" data-bs-toggle="tooltip" 
-                                                                title="ELIMINA LEZIONE" data-preload='false' 
-                                                                onclick="return rimuovilezione('<%=c1.getIdcalendariolezioni()%>')">
-                                                            <i class="fa fa-trash-arrow-up"></i></button><%}%>
-                                                    </td>
-                                                </tr>
-                                                <%}%>
-                                            </tbody>
-                                        </table>
+                                                    <div class="col-md-12">
+                                                        <label class="col-form-label fw-bold fs-6">CALENDARIO FORMATIVO PRESENTE IN ISTANZA</label>
+                                                        <!--begin::Table container-->
+                                                        <div class="table-responsive">
+                                                            <!--begin::Table-->
+                                                            <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt1" style="border-bottom: 2px;">
+                                                                <!--begin::Table head-->
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="p-2 w-50px">Codice</th>
+                                                                        <th class="p-2 w-50px">Tipologia</th>
+                                                                        <th class="p-2 w-150px">Descrizione</th>
+                                                                        <th class="p-2 w-50px">Ore Totali (Ore FAD)</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <!--end::Table head-->
+                                                                <!--begin::Table body-->
+                                                                <tbody>
+                                                                    <%
+                                                                        int oretot = 0;
+                                                                        for (Calendario_Formativo c1 : cal_istanza) {
+                                                                            oretot += c1.getOre();
+                                                                            if (c1.getTipomodulo().equals("BASE")) {
+
+                                                                    %>
+                                                                    <tr>
+                                                                        <td class="p-2 w-50px"><%=c1.getCodicemodulo()%></td>
+                                                                        <td class="p-2 w-50px"><%=c1.getTipomodulo()%></td>
+                                                                        <td class="p-2 w-150px"><%=c1.getCompetenzetrasversali().getDescrizione()%></td>
+                                                                        <td class="p-2 w-50px"><%=Utils.roundDoubleandFormat(c1.getOre(), 1)%> (<%=Utils.roundDoubleandFormat(c1.getOre_teorica_el(), 1)%>)</td>
+                                                                    </tr>
+                                                                    <%} else if (c1.getTipomodulo().equals("MODULOFORMATIVO")) {%>
+                                                                    <tr>
+                                                                        <td class="p-2 w-50px"><%=c1.getCodicemodulo()%></td>
+                                                                        <td class="p-2 w-50px">MODULO FORMATIVO</td>
+                                                                        <td class="p-2 w-150px"><%=c1.getNomemodulo()%></td>
+                                                                        <td class="p-2 w-50px"><%=Utils.roundDoubleandFormat(c1.getOre(), 1)%> (<%=Utils.roundDoubleandFormat(c1.getOre_teorica_el(), 1)%>)
+                                                                        </td>
+                                                                    </tr>
+                                                                    <%}%>
+                                                                    <%}%>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        <label class="col-form-label fw-bold fs-6 text-primary"><u>ORE TOTALI: <%=oretot%></u></label>
+                                                    </div>
+                                                    <hr>
+                                                    <label class="col-form-label fw-bold fs-6">CALENDARIO FORMATIVO 
+                                                        <%if (modify) {%>
+                                                        | 
+                                                        <a class="btn btn-primary btn-sm fan1" href="US_calendariolezioni.jsp"
+                                                           data-fancybox data-type='iframe' 
+                                                           data-bs-toggle="tooltip" title="INSERISCI NUOVA LEZIONE" 
+                                                           data-preload='false' data-width='75%' data-height='75%' id="addcalendariobutton">
+                                                            <i class="fa fa-plus-circle" ></i> Aggiungi lezione</a><%}%>
+                                                    </label>
+                                                    <div class="row col-md-12">
+                                                        <label class="col-form-label fw-bold fs-6">LEZIONI INSERITE: <%=lezioni.size()%></label>
+                                                        <div class="table-responsive">
+                                                            <!--begin::Table-->
+                                                            <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt0" style="border-bottom: 2px;">
+                                                                <!--begin::Table head-->
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="p-2 w-10px">#</th>
+                                                                        <th class="p-2 w-50px">Data (Orario)</th>
+                                                                        <th class="p-2 w-50px">Docente</th>
+                                                                        <th class="p-2 w-100px">Modulo Rif.</th>
+                                                                        <th class="p-2 w-50px">Ore Lezione (Tipo)</th>
+                                                                        <th class="p-2 w-10px">Azioni</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <!--end::Table head-->
+                                                                <!--begin::Table body-->
+                                                                <tbody>
+                                                                    <%
+                                                                        int indice = 0;
+                                                                        int oretotl = 0;
+                                                                        for (Calendario_Lezioni c1 : lezioni) {
+                                                                            String tl = c1.getTipolezione().equals("PRE") ? "(IN PRESENZA)" : "(FAD)";
+                                                                            String orenorm = Utils.roundDoubleandFormat(c1.getOre(), 1);
+                                                                            oretotl += c1.getOre();
+                                                                            indice++;%>
+                                                                    <tr>
+                                                                        <td class="p-2 w-10px"><%=indice%></td>
+                                                                        <td class="p-2 w-50px"><%=Constant.sdf_PATTERNDATE4.format(c1.getDatalezione())%> (<%=c1.getOrainizio()%> - <%=c1.getOrafine()%>)</td>
+                                                                        <td class="p-2 w-50px"><%=c1.getDocente().getCognome()%> <%=c1.getDocente().getNome()%></td>
+                                                                        <td class="p-2 w-50px"><%=c1.getCalendarioformativo().getNomemodulo()%></td>
+                                                                        <td class="p-2 w-50px"><%=orenorm%> <%=tl%> 
+                                                                        </td>
+                                                                        <td><%if (modify) {%>
+                                                                            <button type="button"class="btn btn-sm btn-danger" data-bs-toggle="tooltip" 
+                                                                                    title="ELIMINA LEZIONE" data-preload='false' 
+                                                                                    onclick="return rimuovilezione('<%=c1.getIdcalendariolezioni()%>')">
+                                                                                <i class="fa fa-trash-arrow-up"></i></button>
+                                                                            <%}else if(azionicorso){%>
+                                                                            <button type="button"class="btn btn-sm btn-warning" data-bs-toggle="tooltip" 
+                                                                                    title="MODIFICA LEZIONE" data-preload='false' 
+                                                                                    onclick="return rimuovilezione('<%=c1.getIdcalendariolezioni()%>')">
+                                                                                <i class="fa fa-edit"></i></button>
+                                                                            <%}%>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <%}%>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        <label class="col-form-label fw-bold fs-6 text-primary"><u>ORE TOTALI LEZIONE: <%=oretotl%></u></label>
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--end::Tables Widget 3-->
                                     </div>
-                                    <label class="col-form-label fw-bold fs-6 text-primary"><u>ORE TOTALI LEZIONE: <%=oretotl%></u></label>
                                 </div>
-                                <div class="col-md-5">
-                                    <label class="col-form-label fw-bold fs-6">PRESENTE IN ISTANZA</label>
-                                    <!--begin::Table container-->
-                                    <div class="table-responsive">
-                                        <!--begin::Table-->
-                                        <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt1" style="border-bottom: 2px;">
-                                            <!--begin::Table head-->
-                                            <thead>
-                                                <tr>
-                                                    <th class="p-2 w-50px">Codice</th>
-                                                    <th class="p-2 w-50px">Tipologia</th>
-                                                    <th class="p-2 w-150px">Descrizione</th>
-                                                    <th class="p-2 w-50px">Ore Totali (Ore FAD)</th>
-                                                </tr>
-                                            </thead>
-                                            <!--end::Table head-->
-                                            <!--begin::Table body-->
-                                            <tbody>
-                                                <%
-                                                    int oretot = 0;
-                                                    for (Calendario_Formativo c1 : cal_istanza) {
-                                                        oretot += c1.getOre();
-                                                        if (c1.getTipomodulo().equals("BASE")) {
-
-                                                %>
-                                                <tr>
-                                                    <td class="p-2 w-50px"><%=c1.getCodicemodulo()%></td>
-                                                    <td class="p-2 w-50px"><%=c1.getTipomodulo()%></td>
-                                                    <td class="p-2 w-150px"><%=c1.getCompetenzetrasversali().getDescrizione()%></td>
-                                                    <td class="p-2 w-50px"><%=Utils.roundDoubleandFormat(c1.getOre(), 1)%> (<%=Utils.roundDoubleandFormat(c1.getOre_teorica_el(), 1)%>)</td>
-                                                </tr>
-                                                <%} else if (c1.getTipomodulo().equals("MODULOFORMATIVO")) {%>
-                                                <tr>
-                                                    <td class="p-2 w-50px"><%=c1.getCodicemodulo()%></td>
-                                                    <td class="p-2 w-50px">MODULO FORMATIVO</td>
-                                                    <td class="p-2 w-150px"><%=c1.getNomemodulo()%></td>
-                                                    <td class="p-2 w-50px"><%=Utils.roundDoubleandFormat(c1.getOre(), 1)%> (<%=Utils.roundDoubleandFormat(c1.getOre_teorica_el(), 1)%>)
-                                                    </td>
-                                                </tr>
-                                                <%}%>
-                                                <%}%>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <label class="col-form-label fw-bold fs-6 text-primary"><u>ORE TOTALI: <%=oretot%></u></label>
+                                <!--end::Row-->
+                                <div id="kt_scrolltop" class="scrolltop" data-kt-scrolltop="true">
+                                    <!--begin::Svg Icon | path: icons/duotune/arrows/arr066.svg-->
+                                    <span class="svg-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                        <rect opacity="0.5" x="13" y="6" width="13" height="2" rx="1" transform="rotate(90 13 6)" fill="black" />
+                                        <path d="M12.5657 8.56569L16.75 12.75C17.1642 13.1642 17.8358 13.1642 18.25 12.75C18.6642 12.3358 18.6642 11.6642 18.25 11.25L12.7071 5.70711C12.3166 5.31658 11.6834 5.31658 11.2929 5.70711L5.75 11.25C5.33579 11.6642 5.33579 12.3358 5.75 12.75C6.16421 13.1642 6.83579 13.1642 7.25 12.75L11.4343 8.56569C11.7467 8.25327 12.2533 8.25327 12.5657 8.56569Z" fill="black" />
+                                        </svg>
+                                    </span>
+                                    <!--end::Svg Icon-->
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!--end::Tables Widget 3-->
-            </div>
-        </div>
-        <!--end::Row-->
-        <div id="kt_scrolltop" class="scrolltop" data-kt-scrolltop="true">
-            <!--begin::Svg Icon | path: icons/duotune/arrows/arr066.svg-->
-            <span class="svg-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <rect opacity="0.5" x="13" y="6" width="13" height="2" rx="1" transform="rotate(90 13 6)" fill="black" />
-                <path d="M12.5657 8.56569L16.75 12.75C17.1642 13.1642 17.8358 13.1642 18.25 12.75C18.6642 12.3358 18.6642 11.6642 18.25 11.25L12.7071 5.70711C12.3166 5.31658 11.6834 5.31658 11.2929 5.70711L5.75 11.25C5.33579 11.6642 5.33579 12.3358 5.75 12.75C6.16421 13.1642 6.83579 13.1642 7.25 12.75L11.4343 8.56569C11.7467 8.25327 12.2533 8.25327 12.5657 8.56569Z" fill="black" />
-                </svg>
-            </span>
-            <!--end::Svg Icon-->
-        </div>
-        <!--end::Scrolltop-->
-        <jsp:include page="menu/footer1.jsp" /> 
+                                <!--end::Scrolltop-->
+                                <jsp:include page="menu/footer1.jsp" /> 
                                 <!--end::Footer-->
                             </div>
                             <!--end::Container-->
@@ -360,30 +419,30 @@
                 </div>
                 <!--end::Page-->
             </div>
-        <!--begin::Javascript-->
-        <script>var hostUrl = "assets/";</script>
+            <!--begin::Javascript-->
+            <script>var hostUrl = "assets/";</script>
 
-        <!--begin::Global Javascript Bundle(used by all pages)-->
+            <!--begin::Global Javascript Bundle(used by all pages)-->
 
-        <!--end::Global Javascript Bundle-->
-        <!--begin::Page Vendors Javascript(used by this page)-->
-        <!--end::Page Vendors Javascript-->
-        <!--begin::Page Custom Javascript(used by this page)-->
-        <script src="assets/plugins/global/plugins.bundle.js"></script>
-        <script src="assets/js/scripts.bundle.js"></script>
-        <script src="assets/plugins/DataTables/jquery-3.5.1.js"></script>
-        <script src="assets/plugins/DataTables/jquery.dataTables.min.js"></script>
-        <script src="assets/plugins/DataTables/datatables.min.js"></script>
-        <script src="assets/plugins/DataTables/date-eu.js"></script>
-        <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
-        <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
-        <script src="assets/fontawesome-6.0.0/js/all.js"></script>
-        <script src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
+            <!--end::Global Javascript Bundle-->
+            <!--begin::Page Vendors Javascript(used by this page)-->
+            <!--end::Page Vendors Javascript-->
+            <!--begin::Page Custom Javascript(used by this page)-->
+            <script src="assets/plugins/global/plugins.bundle.js"></script>
+            <script src="assets/js/scripts.bundle.js"></script>
+            <script src="assets/plugins/DataTables/jquery-3.5.1.js"></script>
+            <script src="assets/plugins/DataTables/jquery.dataTables.min.js"></script>
+            <script src="assets/plugins/DataTables/datatables.min.js"></script>
+            <script src="assets/plugins/DataTables/date-eu.js"></script>
+            <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
+            <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
+            <script src="assets/fontawesome-6.0.0/js/all.js"></script>
+            <script src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
 
-        <script src="assets/js/US_showcorsoavviato.js"></script>
+            <script src="assets/js/US_showcorsoavviato.js"></script>
 
-        <!--end::Page Custom Javascript-->
-        <!--end::Javascript-->
+            <!--end::Page Custom Javascript-->
+            <!--end::Javascript-->
     </body>
     <!--end::Body-->
     <%break;

@@ -1,9 +1,9 @@
 $(document).ready(function () {
     $('#tab_dt0').DataTable({
-        dom: '<t>',
+        dom: '<f<t>>',
         lengthMenu: [[100, -1], [100, "Tutto"]],
         columnDefs: [
-            {orderable: false, targets: 1},
+            {orderable: false, targets: 5}
         ],
         order: [[0, 'asc']],
         language: {
@@ -33,8 +33,84 @@ $(document).ready(function () {
 });
 
 
-function rimuovilezione(idlezionecal){
-    
+function modificadirettore(idcorsoavviato) {
+    var nomedirettore = "KO";
+    $.ajax({
+        url: "Search",
+        type: "POST",
+        async: true,
+        data: {
+            'type': "GETDIRETTORE",
+            'IDCORSO': idcorsoavviato
+        },
+        success: function (data) {
+            nomedirettore = data;
+        },
+        error: function (data) {
+            console.log("ERRORE: " + data);
+        }
+    });
+
+    if (nomedirettore === "KO") {
+        $.alert({
+            title: "Errore durante l'operazione!",
+            content: "DIRETTORE NON TROVATO. RIPROVARE",
+            type: 'red',
+            typeAnimated: true,
+            theme: 'bootstrap',
+            columnClass: 'col-md-6',
+            buttons: {
+                confirm: {
+                    text: 'OK',
+                    btnClass: 'btn-red'
+                }
+            }
+        });
+        return false;
+    } else {
+        $.confirm({
+            title: 'Modifica Direttore Corso - ID ' + idcorsoavviato,
+            content: '<span>Direttore Attuale:' + nomedirettore + '</span>' +
+                    '<form action="" class="formName">' +
+                    '<div class="form-group">' +
+                    '<label>Enter something here</label>' +
+                    '<input type="text" placeholder="Your name" class="name form-control" required />' +
+                    '</div>' +
+                    '</form>',
+            buttons: {
+                formSubmit: {
+                    text: 'Submit',
+                    btnClass: 'btn-blue',
+                    action: function () {
+                        var name = this.$content.find('.name').val();
+                        if (!name) {
+                            $.alert('provide a valid name');
+                            return false;
+                        } else {
+                            //submit
+                            $.alert('Your name is ' + name);
+                        }
+                    }
+                },
+                cancel: function () {
+                    //close
+                }
+            },
+            onContentReady: function () {
+                // bind to events
+                var jc = this;
+                this.$content.find('form').on('submit', function (e) {
+                    // if the user submits the form by pressing enter in the field.
+                    e.preventDefault();
+                    jc.$$formSubmit.trigger('click'); // reference the button and click it
+                });
+            }
+        });
+    }
+}
+
+function rimuovilezione(idlezionecal) {
+
     var ok = false;
     var messageko = "ERRORE GENERICO";
     $.confirm({

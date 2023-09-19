@@ -48,9 +48,13 @@ public class Corsoavviato implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date datafine;
 
+    //DA RIMUOVERE
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "direttore")
     private Altropersonale direttore;
+    
+    @Column(name = "direttorecorso")
+    private String direttorecorso;
     
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "stato")
@@ -114,6 +118,14 @@ public class Corsoavviato implements Serializable {
         return datafine;
     }
 
+    public String getDirettorecorso() {
+        return direttorecorso;
+    }
+
+    public void setDirettorecorso(String direttorecorso) {
+        this.direttorecorso = direttorecorso;
+    }
+    
     public void setDatafine(Date datafine) {
         this.datafine = datafine;
     }

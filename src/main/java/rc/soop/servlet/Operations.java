@@ -226,7 +226,7 @@ public class Operations extends HttpServlet {
             String CORSO = getRequestValue(request, "CORSO");
             String DOCENTI = getRequestValue(request, "DOCENTI");
             String ALLIEVI = getRequestValue(request, "ALLIEVI");
-            String DIRETTORE = getRequestValue(request, "DIRETTORE");
+            String DIRETTORE = normalizeUTF8(getRequestValue(request, "DIRETTORE"));
             String ALTROP = getRequestValue(request, "ALTROP");
 
             Corsoavviato ca = new Corsoavviato();
@@ -234,7 +234,8 @@ public class Operations extends HttpServlet {
             ca.setDatafine(sdf_PATTERNDATE6.parse(getRequestValue(request, "DATAFINE")));
             ca.setDatainizio(sdf_PATTERNDATE6.parse(getRequestValue(request, "DATAINIZIO")));
 
-            ca.setDirettore(ep1.getEm().find(Altropersonale.class, parseLongR(DIRETTORE)));
+            ca.setDirettorecorso(DIRETTORE);
+//            ca.setDirettore(ep1.getEm().find(Altropersonale.class, parseLongR(DIRETTORE)));
             ca.setStatocorso(ep1.getEm().find(CorsoStato.class, "40"));
 
             ca.setDatainserimento(new DateTime().toDate());

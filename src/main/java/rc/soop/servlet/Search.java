@@ -51,6 +51,61 @@ public class Search extends HttpServlet {
     private static final String APPJSON = "application/json";
     private static final String CONTENTTYPE = "Content-Type";
 
+    protected void SELECTDOCENTE(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String q = request.getParameter("q");
+        
+        System.out.println("rc.soop.servlet.Search.SELECTDOCENTE(T) --> "+q);
+        List<Docente> result = new EntityOp().list_select_Docenti(q);
+        System.out.println("rc.soop.servlet.Search.SELECTDOCENTE(T) --> "+result.size());
+        
+        try (PrintWriter out = response.getWriter()) {
+            String inizio = "{ \"items\": [ ";
+            String fine = "]}";
+            String valore = "";
+            if (!result.isEmpty()) {
+                for (int i = 0; i < result.size(); i++) {
+                    valore = valore + "{"
+                            + "      \"id\": \"" + result.get(i).getIddocente() + "\","
+                            + "      \"name\": \"" + result.get(i).getCognome() + " " + result.get(i).getNome() + "\","
+                            + "      \"full_name\": \"" + result.get(i).getCognome() + " " + result.get(i).getNome() + "\""
+                            + "},";
+                }
+                String x = inizio + valore.substring(0, valore.length() - 1) + fine;
+                out.print(x);
+            } else {
+                out.print(inizio + fine);
+            }
+        }
+
+    }
+
+    protected void GETDIRETTORE(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String data = "KO";
+        try {
+            EntityOp eop = new EntityOp();
+            Corsoavviato co1 = eop.getEm().find(Corsoavviato.class, Utils.parseLongR(getRequestValue(request, "IDCORSO")));
+//            co1.getDirettore().getN
+//            List<Docente> result = eop.list_docenti_corso(co1);
+//            for (Docente c1 : result) {
+//                o1.append("<option value='")
+//                        .append(c1.getIddocente()).append("' selected>")
+//                        .append(c1.getCognome())
+//                        .append(" ")
+//                        .append(c1.getNome())
+//                        .append("</option>");
+//            }
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+        }
+
+        try (PrintWriter out = response.getWriter()) {
+            out.print(data);
+        }
+
+    }
+
     protected void LISTDOCENTICORSO(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         StringBuilder o1 = new StringBuilder("");
@@ -305,7 +360,8 @@ public class Search extends HttpServlet {
                                 + "<button type=\"submit\"class=\"btn btn-sm btn-primary\" data-bs-toggle=\"tooltip\" title=\"MODIFICA DETTAGLI CORSO\" data-preload='false'><i class=\"fa fa-edit\"></i></button>";
 
                         if (c1.size() > 1) {
-                            corsi += " | <button type=\"button\"class=\"btn btn-sm btn-danger\" data-bs-toggle=\"tooltip\" title=\"RIMUOVI CORSO DA ISTANZA\" data-preload='false'"
+                            corsi += " | <button type=\"button\"class=\"btn btn-sm btn-danger\" data-bs-toggle=\"tooltip\" "
+                                    + "title=\"RIMUOVI CORSO DA ISTANZA\" data-preload='false'"
                                     + "onclick=\"return deletecorsofromistance('" + cor.getIdcorso() + "')\"><i class=\"fa fa-trash-arrow-up\"></i></button>";
                         }
                         corsi += "</form>";
@@ -895,6 +951,12 @@ public class Search extends HttpServlet {
                     break;
                 case "LISTDOCENTICORSO":
                     LISTDOCENTICORSO(request, response);
+                    break;
+                case "GETDIRETTORE":
+                    GETDIRETTORE(request, response);
+                    break;
+                case "SELECTDOCENTE":
+                    SELECTDOCENTE(request, response);
                     break;
                 default: {
                     String p = request.getContextPath();
