@@ -38,7 +38,7 @@ function modificadirettore(idcorsoavviato) {
     $.ajax({
         url: "Search",
         type: "POST",
-        async: true,
+        async: false,
         data: {
             'type': "GETDIRETTORE",
             'IDCORSO': idcorsoavviato
@@ -69,31 +69,91 @@ function modificadirettore(idcorsoavviato) {
         return false;
     } else {
         $.confirm({
+            theme: 'bootstrap',
+            columnClass: 'col-md-9',
             title: 'Modifica Direttore Corso - ID ' + idcorsoavviato,
-            content: '<span>Direttore Attuale:' + nomedirettore + '</span>' +
-                    '<form action="" class="formName">' +
+            content: '<form action="" class="formName">' +
                     '<div class="form-group">' +
-                    '<label>Enter something here</label>' +
-                    '<input type="text" placeholder="Your name" class="name form-control" required />' +
+                    '<label>Direttore Attuale: <b>' + nomedirettore + '</b></label>' +
+                    '<input type="text" placeholder="..." class="name form-control" required />' +
                     '</div>' +
                     '</form>',
             buttons: {
                 formSubmit: {
-                    text: 'Submit',
-                    btnClass: 'btn-blue',
+                    text: "<i class='fa fa-check'></i> SALVA MODIFICA",
+                    btnClass: 'btn-success',
                     action: function () {
                         var name = this.$content.find('.name').val();
                         if (!name) {
-                            $.alert('provide a valid name');
+                            $.alert('Inserire un valore corretto.');
                             return false;
                         } else {
+
+                            var ok = false;
+                            var messageko = "ERRORE GENERICO";
                             //submit
-                            $.alert('Your name is ' + name);
+                            $.ajax({
+                                url: "Operations",
+                                type: "POST",
+                                async: false,
+                                dataType: 'json',
+                                data: {
+                                    'type': "MODIFICADIRETTORE",
+                                    'IDCORSO': idcorsoavviato,
+                                    'NAME': name
+                                },
+                                success: function (data) {
+                                    //check
+                                    if (data.result) {
+                                        ok = true;
+                                    } else {
+                                        messageko = ("ERRORE: " + data.message);
+                                    }
+                                },
+                                error: function (request, error) {
+                                    messageko = ("ERRORE: " + error);
+                                }
+                            });
+
+                            if (ok) {
+                                $.alert({
+                                    title: 'Operazione conclusa con successo!',
+                                    content: '',
+                                    type: 'success',
+                                    typeAnimated: true,
+                                    buttons: {
+                                        confirm: {
+                                            text: 'OK',
+                                            btnClass: 'btn-success',
+                                            action: function () {
+                                                window.location.reload();
+                                            }
+                                        }
+                                    }
+                                });
+                            } else {
+                                $.alert({
+                                    title: "Errore durante l'operazione!",
+                                    content: messageko,
+                                    type: 'red',
+                                    typeAnimated: true,
+                                    theme: 'bootstrap',
+                                    columnClass: 'col-md-9',
+                                    buttons: {
+                                        confirm: {
+                                            text: 'OK',
+                                            btnClass: 'btn-red'
+                                        }
+                                    }
+                                });
+                            }
+
                         }
                     }
                 },
-                cancel: function () {
-                    //close
+                cancel: {
+                    btnClass: 'btn-danger',
+                    text: "<i class='fa fa-remove'></i> CHIUDI" // With spaces and symbols                
                 }
             },
             onContentReady: function () {

@@ -26,9 +26,9 @@
                 String idistS = Utils.getRequestValue(request, "idcorso");
                 if (idistS.equals("")) {
                     idistS = (String) session.getAttribute("ses_idcorso");
-                } else {
-                    session.setAttribute("ses_idcorso", idistS);
                 }
+                session.setAttribute("ses_idcorso", idistS);
+
                 EntityOp eo = new EntityOp();
                 Corsoavviato is1 = eo.getEm().find(Corsoavviato.class, Long.valueOf(idistS));
                 List<CorsoAvviato_Docenti> avv_doc = eo.list_cavv_docenti(is1);
@@ -120,8 +120,8 @@
                                                         <%if (azionicorso) {%>
                                                         <br>
                                                         <button class="btn btn-warning btn-sm" data-preload='false' onclick="return modificadirettore('<%=is1.getIdcorsoavviato()%>');"
-                                                           data-bs-toggle="tooltip" title="MODIFICA DIRETTORE CORSO" 
-                                                           >
+                                                                data-bs-toggle="tooltip" title="MODIFICA DIRETTORE CORSO" 
+                                                                >
                                                             <i class="fa fa-edit" ></i></button>
                                                             <%}%>
                                                     </label>
@@ -144,7 +144,7 @@
                                                         <span class="text-danger"><b>SEDE FORMATIVA:</b></span>
                                                         <%if (azionicorso) {%>
                                                         <br>
-                                                        <a class="btn btn-warning btn-sm fan1" href="US_calendariolezioni.jsp"
+                                                        <a class="btn btn-warning btn-sm fan1" href="US_modificasedecorso.jsp"
                                                            data-fancybox data-type='iframe' 
                                                            data-bs-toggle="tooltip" title="RICHIEDI CAMBIO SEDE FORMATIVA" 
                                                            data-preload='false' data-width='75%' data-height='75%' id="addcalendariobutton">
@@ -374,12 +374,12 @@
                                                                                     title="ELIMINA LEZIONE" data-preload='false' 
                                                                                     onclick="return rimuovilezione('<%=c1.getIdcalendariolezioni()%>')">
                                                                                 <i class="fa fa-trash-arrow-up"></i></button>
-                                                                            <%}else if(azionicorso){%>
+                                                                                <%} else if (azionicorso) {%>
                                                                             <button type="button"class="btn btn-sm btn-warning" data-bs-toggle="tooltip" 
                                                                                     title="MODIFICA LEZIONE" data-preload='false' 
                                                                                     onclick="return rimuovilezione('<%=c1.getIdcalendariolezioni()%>')">
                                                                                 <i class="fa fa-edit"></i></button>
-                                                                            <%}%>
+                                                                                <%}%>
                                                                         </td>
                                                                     </tr>
                                                                     <%}%>

@@ -100,6 +100,70 @@ import rc.soop.sic.jpa.User;
  */
 public class Operations extends HttpServlet {
 
+    protected void MODIFICASEDECORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        try {
+            String IDCORSO = getRequestValue(request, "IDCORSO");
+            String sedescelta = getRequestValue(request, "sedescelta");
+            EntityOp ep1 = new EntityOp();
+            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
+            Sede se1 = ep1.getEm().find(Sede.class, Long.valueOf(sedescelta));
+
+            if (ca1 == null) {
+                redirect(request, response, "Page_message.jsp?esito=KO_MOSD1");
+            } else if (se1 == null) {
+                redirect(request, response, "Page_message.jsp?esito=KO_MOSD2");
+            } else {
+                ep1.begin();
+                Corso co = ca1.getCorsobase();
+                co.setSedescelta(se1);
+                ep1.merge(co);
+                //COMUNICAZIONE AD ENTE
+                ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "46"));
+                ep1.merge(ca1);
+                ep1.commit();
+                ep1.close();
+                redirect(request, response, "Page_message.jsp?esito=OK_MOSD");
+            }
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_MOSD3");
+        }
+    }
+
+    protected void MODIFICADIRETTORE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JsonObject resp_out = new JsonObject();
+        try {
+            String IDCORSO = getRequestValue(request, "IDCORSO");
+            String NAME = normalizeUTF8(getRequestValue(request, "NAME"));
+            EntityOp ep1 = new EntityOp();
+            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
+            if (ca1 != null) {
+                ca1.setDirettorecorso(NAME);
+                ep1.begin();
+                ep1.merge(ca1);
+                ep1.commit();
+                ep1.close();
+                resp_out.addProperty("result",
+                        true);
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "CORSO NON TROVATO.");
+            }
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+    }
+
     protected void AUTORIZZAAVVIOCORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JsonObject resp_out = new JsonObject();
         try {
@@ -851,7 +915,7 @@ public class Operations extends HttpServlet {
             redirect(request, response, "404.jsp");
         }
     }
-    
+
     protected void RIGETTAISTANZA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (isAdmin(request.getSession())) {
 
@@ -919,93 +983,93 @@ public class Operations extends HttpServlet {
 //        Utils.printRequest(request);
 //        if (isAdmin(request.getSession())) {
 
-            try {
+        try {
 
-                EntityOp ep1 = new EntityOp();
-                String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
+            EntityOp ep1 = new EntityOp();
+            String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
 //            SoggettoProponente so = ((User) request.getSession().getAttribute("us_cod")).getSoggetto();
-                Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
-                FileItemFactory factory = new DiskFileItemFactory();
-                ServletFileUpload upload = new ServletFileUpload(factory);
-                File nomefile = null;
-                List<FileItem> items = upload.parseRequest(request);
-                Iterator<FileItem> iterator = items.iterator();
-                String IDALLEGATO = null;
-                String DESCRIZIONE = null;
-                String MIME = null;
-                String codiceDOC = generateIdentifier(6);
-                while (iterator.hasNext()) {
-                    FileItem item = (FileItem) iterator.next();
-                    if (item.isFormField()) {
-                        if (item.getFieldName().equals("idallegato")) {
-                            IDALLEGATO = item.getString();
-                        } else if (item.getFieldName().equals("DESCRIZIONE")) {
-                            DESCRIZIONE = normalizeUTF8(normalize(item.getString()));
-                        }
-                    } else {
-                        String fileName = item.getName();
-                        String estensione = fileName.substring(fileName.lastIndexOf("."));
-                        String nome = codiceDOC + new DateTime().toString(PATTERNDATE3)
-                                + RandomStringUtils.randomAlphabetic(15) + estensione;
-                        try {
-                            nomefile = new File(pathtemp.getDescrizione() + nome);
-                            item.write(nomefile);
-                            MIME = getMimeType(nomefile);
-                        } catch (Exception ex) {
-                            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
-                            nomefile = null;
-                        }
-                    }
-                }
-
-                if (nomefile != null) {
-
-                    if (IDALLEGATO != null) {
-                        request.getSession().setAttribute("ses_idalleg", IDALLEGATO);
-
-                        Allegati original = ep1.getEm().find(Allegati.class, Long.valueOf(IDALLEGATO));
-                        if (original != null) {
-
-                            //CREO COPIA DI ALLEGATO PRECEDENTE "ELIMINATO"
-                            Allegati al1 = new Allegati();
-                            al1.setIstanza(original.getIstanza());
-                            al1.setCodiceallegati(original.getCodiceallegati());
-                            al1.setContent(original.getContent());
-                            al1.setDescrizione(original.getDescrizione());
-                            al1.setStato(ep1.getEm().find(CorsoStato.class, "32"));
-                            al1.setMimetype(original.getMimetype());
-                            al1.setUtentecaricamento(original.getUtentecaricamento());
-                            al1.setDatacaricamento(original.getDatacaricamento());
-
-                            ep1.begin();
-                            ep1.persist(al1);
-
-                            //AGGIORNO ALLEGATO ATTUALE
-                            original.setContent(Base64.encodeBase64String(FileUtils.readFileToByteArray(nomefile)));
-                            original.setDescrizione(DESCRIZIONE);
-                            original.setStato(ep1.getEm().find(CorsoStato.class, "30"));
-                            original.setMimetype(MIME);
-                            original.setUtentecaricamento(utentecaricamento);
-                            original.setDatacaricamento(new Date());
-                            ep1.merge(original);
-                            ep1.commit();
-                            ep1.close();
-                            redirect(request, response, "Page_message.jsp?esito=OK_UPAL");
-                        } else {
-                            redirect(request, response, "Page_message.jsp?esito=KOUP_IS1");
-                        }
-                    } else {
-                        redirect(request, response, "Page_message.jsp?esito=KOUP_IS2");
+            Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
+            FileItemFactory factory = new DiskFileItemFactory();
+            ServletFileUpload upload = new ServletFileUpload(factory);
+            File nomefile = null;
+            List<FileItem> items = upload.parseRequest(request);
+            Iterator<FileItem> iterator = items.iterator();
+            String IDALLEGATO = null;
+            String DESCRIZIONE = null;
+            String MIME = null;
+            String codiceDOC = generateIdentifier(6);
+            while (iterator.hasNext()) {
+                FileItem item = (FileItem) iterator.next();
+                if (item.isFormField()) {
+                    if (item.getFieldName().equals("idallegato")) {
+                        IDALLEGATO = item.getString();
+                    } else if (item.getFieldName().equals("DESCRIZIONE")) {
+                        DESCRIZIONE = normalizeUTF8(normalize(item.getString()));
                     }
                 } else {
-                    redirect(request, response, "Page_message.jsp?esito=KOUP_IS3");
+                    String fileName = item.getName();
+                    String estensione = fileName.substring(fileName.lastIndexOf("."));
+                    String nome = codiceDOC + new DateTime().toString(PATTERNDATE3)
+                            + RandomStringUtils.randomAlphabetic(15) + estensione;
+                    try {
+                        nomefile = new File(pathtemp.getDescrizione() + nome);
+                        item.write(nomefile);
+                        MIME = getMimeType(nomefile);
+                    } catch (Exception ex) {
+                        EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
+                        nomefile = null;
+                    }
                 }
-
-            } catch (Exception ex1) {
-                ex1.printStackTrace();
-                EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
-                redirect(request, response, "Page_message.jsp?esito=KOUP_IS4");
             }
+
+            if (nomefile != null) {
+
+                if (IDALLEGATO != null) {
+                    request.getSession().setAttribute("ses_idalleg", IDALLEGATO);
+
+                    Allegati original = ep1.getEm().find(Allegati.class, Long.valueOf(IDALLEGATO));
+                    if (original != null) {
+
+                        //CREO COPIA DI ALLEGATO PRECEDENTE "ELIMINATO"
+                        Allegati al1 = new Allegati();
+                        al1.setIstanza(original.getIstanza());
+                        al1.setCodiceallegati(original.getCodiceallegati());
+                        al1.setContent(original.getContent());
+                        al1.setDescrizione(original.getDescrizione());
+                        al1.setStato(ep1.getEm().find(CorsoStato.class, "32"));
+                        al1.setMimetype(original.getMimetype());
+                        al1.setUtentecaricamento(original.getUtentecaricamento());
+                        al1.setDatacaricamento(original.getDatacaricamento());
+
+                        ep1.begin();
+                        ep1.persist(al1);
+
+                        //AGGIORNO ALLEGATO ATTUALE
+                        original.setContent(Base64.encodeBase64String(FileUtils.readFileToByteArray(nomefile)));
+                        original.setDescrizione(DESCRIZIONE);
+                        original.setStato(ep1.getEm().find(CorsoStato.class, "30"));
+                        original.setMimetype(MIME);
+                        original.setUtentecaricamento(utentecaricamento);
+                        original.setDatacaricamento(new Date());
+                        ep1.merge(original);
+                        ep1.commit();
+                        ep1.close();
+                        redirect(request, response, "Page_message.jsp?esito=OK_UPAL");
+                    } else {
+                        redirect(request, response, "Page_message.jsp?esito=KOUP_IS1");
+                    }
+                } else {
+                    redirect(request, response, "Page_message.jsp?esito=KOUP_IS2");
+                }
+            } else {
+                redirect(request, response, "Page_message.jsp?esito=KOUP_IS3");
+            }
+
+        } catch (Exception ex1) {
+            ex1.printStackTrace();
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KOUP_IS4");
+        }
 //        } else {
 //            redirect(request, response, "404.jsp");
 //        }
@@ -2319,6 +2383,12 @@ public class Operations extends HttpServlet {
                     break;
                 case "AUTORIZZAAVVIOCORSO":
                     AUTORIZZAAVVIOCORSO(request, response);
+                    break;
+                case "MODIFICADIRETTORE":
+                    MODIFICADIRETTORE(request, response);
+                    break;
+                case "MODIFICASEDECORSO":
+                    MODIFICASEDECORSO(request, response);
                     break;
                 default:
                     break;

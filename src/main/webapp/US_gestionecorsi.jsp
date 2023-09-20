@@ -117,6 +117,7 @@
                                                             <option value="45">CORSO RIGETTATO</option>  
                                                             <option value="43">CORSO APPROVATO - DA AVVIARE</option>  
                                                             <option value="44">CORSO AVVIATO</option>   
+                                                            <option value="46">MODIFICA SEDE - CORSO IN ATTESA DI AUTORIZZAZIONE</option>   
                                                         </select>
                                                     </div>
                                                 </div>

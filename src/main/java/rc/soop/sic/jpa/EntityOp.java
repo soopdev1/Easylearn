@@ -425,6 +425,17 @@ public class EntityOp {
         }
         return new ArrayList<>();
     }
+    
+    public List<CorsoStato> lista_stati(String tipostato) {
+        try {
+            TypedQuery q = this.em.createNamedQuery("stati.elenco", CorsoStato.class);
+            q.setParameter("tipostato", TipoStato.valueOf(tipostato));
+            return q.getResultList().isEmpty() ? new ArrayList() : (List<CorsoStato>) q.getResultList();
+        } catch (Exception ex0) {
+            trackingAction("SERVICE", estraiEccezione(ex0));
+        }
+        return new ArrayList<>();
+    }
 
     public List<CorsoAvviato_AltroPersonale> list_cavv_altropers(Corsoavviato c1) {
         try {

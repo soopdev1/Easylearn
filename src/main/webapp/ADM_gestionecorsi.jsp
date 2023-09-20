@@ -4,6 +4,7 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.CorsoStato"%>
 <%@page import="rc.soop.sic.jpa.Information"%>
 <%@page import="rc.soop.sic.jpa.Tipologia_Percorso"%>
 <%@page import="rc.soop.sic.Engine"%>
@@ -26,6 +27,8 @@
                 EntityOp eo = new EntityOp();
                 List<Tipologia_Percorso> per1 = Engine.tipo_percorso_attivi(eo);
                 List<SoggettoProponente> solist = eo.list_soggetti();
+                List<CorsoStato> stati = eo.lista_stati("CORSO");
+
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -127,12 +130,9 @@
                                                                 id="statocorso" onchange="return refreshtable();"
                                                                 >
                                                             <option value="">...</option>  
-                                                            <option value="40">CORSO IN AVVIO</option>  
-                                                            <option value="41">CORSO IN ATTESA DI AUTORIZZAZIONE</option>  
-                                                            <option value="42">CORSO RIGETTATO - SOCCORSO ISTRUTTORIO</option>  
-                                                            <option value="45">CORSO RIGETTATO</option>  
-                                                            <option value="43">CORSO APPROVATO - DA AVVIARE</option>  
-                                                            <option value="44">CORSO AVVIATO</option>  
+                                                            <%for (CorsoStato s1 : stati) {%>
+                                                            <option value="<%=s1.getCodicestatocorso()%>"><%=s1.getHtmldescr()%></option>  
+                                                            <%}%>
                                                         </select>
                                                     </div>
                                                 </div>

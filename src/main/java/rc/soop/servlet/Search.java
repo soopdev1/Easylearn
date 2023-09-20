@@ -54,11 +54,7 @@ public class Search extends HttpServlet {
     protected void SELECTDOCENTE(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String q = request.getParameter("q");
-        
-        System.out.println("rc.soop.servlet.Search.SELECTDOCENTE(T) --> "+q);
         List<Docente> result = new EntityOp().list_select_Docenti(q);
-        System.out.println("rc.soop.servlet.Search.SELECTDOCENTE(T) --> "+result.size());
-        
         try (PrintWriter out = response.getWriter()) {
             String inizio = "{ \"items\": [ ";
             String fine = "]}";
@@ -86,20 +82,10 @@ public class Search extends HttpServlet {
         try {
             EntityOp eop = new EntityOp();
             Corsoavviato co1 = eop.getEm().find(Corsoavviato.class, Utils.parseLongR(getRequestValue(request, "IDCORSO")));
-//            co1.getDirettore().getN
-//            List<Docente> result = eop.list_docenti_corso(co1);
-//            for (Docente c1 : result) {
-//                o1.append("<option value='")
-//                        .append(c1.getIddocente()).append("' selected>")
-//                        .append(c1.getCognome())
-//                        .append(" ")
-//                        .append(c1.getNome())
-//                        .append("</option>");
-//            }
+            data = co1.getDirettorecorso();
         } catch (Exception ex) {
             Constant.LOGGER.severe(estraiEccezione(ex));
         }
-
         try (PrintWriter out = response.getWriter()) {
             out.print(data);
         }
@@ -188,7 +174,7 @@ public class Search extends HttpServlet {
             result.forEach(res -> {
                 JsonObject data_value = new JsonObject();
                 data_value.addProperty(RECORDID, at.get());
-                data_value.addProperty("stato", res.getStatocorso().getHtmlicon());
+                data_value.addProperty("stato", res.getStatocorso().getHtmldescr());
                 data_value.addProperty("soggetto", res.getCorsobase().getSoggetto().getRAGIONESOCIALE());
                 data_value.addProperty("id", res.getIdcorsoavviato());
                 String nome = "<b>Tipologia Percorso: " + res.getCorsobase().getIstanza().getTipologiapercorso().getNometipologia() + "</b><br/><u>" + res.getCorsobase().getRepertorio().getDenominazione() + "</u>";
@@ -208,12 +194,13 @@ public class Search extends HttpServlet {
                         + "</form>";
 
                 if (res.getStatocorso().getCodicestatocorso().equals("41")) {
-
                     azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"AUTORIZZA AVVIO CORSO\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
                             + "onclick=\"return approvacorso('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-check-circle\"></i></button>"
                             + "<a href='ADM_rigettacorso.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
                             + " class=\"btn btn-sm btn-bg-light btn-danger fan1\" data-bs-toggle=\"tooltip\" title=\"RIGETTA CORSO\" data-preload='false' "
                             + "\"><i class=\"fa fa-remove\"></i></a>";
+                } else if (res.getStatocorso().getCodicestatocorso().equals("46")) {
+
                 }
 
                 data_value.addProperty("azioni", azioni);

@@ -4,6 +4,7 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.CorsoStato"%>
 <%@page import="rc.soop.sic.Engine"%>
 <%@page import="rc.soop.sic.jpa.Tipologia_Percorso"%>
 <%@page import="rc.soop.sic.jpa.EntityOp"%>
@@ -76,7 +77,10 @@
                                     <hr>
                                     <%}%>
                                     <%
-                                        List<Tipologia_Percorso> per1 = Engine.tipo_percorso_attivi();
+                                        EntityOp eo = new EntityOp();
+                                        List<Tipologia_Percorso> per1 = Engine.tipo_percorso_attivi(eo);
+                                        List<CorsoStato> stati = eo.lista_stati("ISTANZA");
+                                        
                                     %>
                                     <div class="card card-xl-stretch">
                                         <div class="card-header border-0 pt-5">
@@ -109,10 +113,9 @@
                                                             id="statoistanza" onchange="return refreshtable();"
                                                             >
                                                         <option value="">...</option>  
-                                                        <option value="07">ISTANZA DA GESTIRE</option>  
-                                                        <option value="08">ISTANZA APPROVATA</option>  
-                                                        <option value="09">ISTANZA RIGETTATA</option>  
-                                                        <option value="10">ISTANZA RIGETTATA - SOC.ISTR.</option>  
+                                                        <%for(CorsoStato s1 : stati){%>
+                                                        <option value="<%=s1.getCodicestatocorso()%>"><%=s1.getHtmldescr()%></option>  
+                                                        <%}%>
                                                     </select>
                                                 </div>
                                             </div>

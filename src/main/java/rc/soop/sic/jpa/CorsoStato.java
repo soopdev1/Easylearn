@@ -7,13 +7,20 @@ package rc.soop.sic.jpa;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
  *
  * @author Raffaele
  */
+@NamedQueries(value = {
+    @NamedQuery(name = "stati.elenco", query = "SELECT c FROM CorsoStato c WHERE c.tipostato=:tipostato ORDER BY c.ordine")
+})
 @Entity
 @Table(name = "corso_stato")
 public class CorsoStato implements Serializable {
@@ -33,6 +40,10 @@ public class CorsoStato implements Serializable {
     
     @Column(name = "htmldescr")
     private String htmldescr;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipostato")
+    private TipoStato tipostato;
     
     public CorsoStato() {
     }
@@ -77,6 +88,14 @@ public class CorsoStato implements Serializable {
 
     public void setHtmlicon(String htmlicon) {
         this.htmlicon = htmlicon;
+    }
+
+    public TipoStato getTipostato() {
+        return tipostato;
+    }
+
+    public void setTipostato(TipoStato tipostato) {
+        this.tipostato = tipostato;
     }
     
 }
