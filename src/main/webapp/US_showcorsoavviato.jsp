@@ -159,10 +159,8 @@
                                                         <span class="text-danger"><b>ELENCO DOCENTI:</b></span>
                                                         <%if (azionicorso) {%>
                                                         <br>
-                                                        <a class="btn btn-warning btn-sm fan1" href="US_calendariolezioni.jsp"
-                                                           data-fancybox data-type='iframe' 
-                                                           data-bs-toggle="tooltip" title="MODIFICA ELENCO DOCENTI" 
-                                                           data-preload='false' data-width='75%' data-height='75%' id="addcalendariobutton">
+                                                        <a class="btn btn-warning btn-sm fan1" href="US_modificadocenti.jsp" data-fancybox data-type='iframe' 
+                                                           data-bs-toggle="tooltip" title="MODIFICA ELENCO DOCENTI" data-preload='false' data-width='75%' data-height='75%'>
                                                             <i class="fa fa-edit" ></i></a>
                                                             <%}%>
                                                     </label>
@@ -197,10 +195,10 @@
                                                         <span class="text-danger"><b>ELENCO ALLIEVI</b></span>
                                                         <%if (azionicorso) {%>
                                                         <br>
-                                                        <a class="btn btn-warning btn-sm fan1" href="US_calendariolezioni.jsp"
+                                                        <a class="btn btn-warning btn-sm fan1" href="US_modificaallievi.jsp"
                                                            data-fancybox data-type='iframe' 
                                                            data-bs-toggle="tooltip" title="MODIFICA ELENCO ALLIEVI" 
-                                                           data-preload='false' data-width='75%' data-height='75%' id="addcalendariobutton">
+                                                           data-preload='false' data-width='75%' data-height='75%'>
                                                             <i class="fa fa-edit" ></i></a>
                                                             <%}%>
                                                     </label>
@@ -240,10 +238,11 @@
                                                         <span class="text-danger"><b>ELENCO ALTRO PERSONALE</b></span>
                                                         <%if (azionicorso) {%>
                                                         <br>
-                                                        <a class="btn btn-warning btn-sm fan1" href="US_calendariolezioni.jsp"
+                                                        <a class="btn btn-warning btn-sm fan1" href="US_modificaaltropers.jsp"
                                                            data-fancybox data-type='iframe' 
                                                            data-bs-toggle="tooltip" title="MODIFICA ELENCO ALTRO PERSONALE" 
-                                                           data-preload='false' data-width='75%' data-height='75%' id="addcalendariobutton">
+                                                           data-preload='false' data-width='75%' 
+                                                           data-height='75%'">
                                                             <i class="fa fa-edit" ></i></a>
                                                             <%}%>
                                                     </label>

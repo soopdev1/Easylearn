@@ -100,6 +100,79 @@ import rc.soop.sic.jpa.User;
  */
 public class Operations extends HttpServlet {
 
+    protected void CAMBIASTATOALLIEVO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String idallievo = getRequestValue(request, "idallievo");
+        String NUOVOSTATO = getRequestValue(request, "NUOVOSTATO");
+        
+        
+        
+    }
+    
+    protected void MODIFICAPERSONALECORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String IDCORSO = getRequestValue(request, "IDCORSO");
+        String ALTROP = getRequestValue(request, "ALTROP");
+        try {
+            EntityOp ep1 = new EntityOp();
+            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
+            ObjectMapper om = new ObjectMapper();
+            om.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+            List<String> ALTROPJsonList = om.readValue(ALTROP, new TypeReference<List<String>>() {
+            });
+            if (!ALTROPJsonList.isEmpty()) {
+                ep1.begin();
+                for (String a1 : ALTROPJsonList) {
+                    Altropersonale d1 = ep1.getEm().find(Altropersonale.class, parseLongR(a1));
+                    if (d1 != null) {
+                        CorsoAvviato_AltroPersonale cad = new CorsoAvviato_AltroPersonale();
+                        cad.setIdcorsoavviatoaltropersonale(new CorsoAvviato_AltroPersonaleId(d1.getIdaltropersonale(), ca1.getIdcorsoavviato()));
+                        cad.setAltropersonale(d1);
+                        cad.setCorsoavviato(ca1);
+                        ep1.persist(cad);
+                    }
+                }
+                ep1.commit();
+                ep1.close();
+            }
+            redirect(request, response, "Page_message.jsp?esito=OK_MOSD");
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_MOSD3");
+        }
+    }
+
+    protected void MODIFICADOCENTICORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        String IDCORSO = getRequestValue(request, "IDCORSO");
+        String DOCENTI = getRequestValue(request, "DOCENTI");
+        try {
+            EntityOp ep1 = new EntityOp();
+            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
+            ObjectMapper om = new ObjectMapper();
+            om.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+            List<String> DOCENTIJsonList = om.readValue(DOCENTI, new TypeReference<List<String>>() {
+            });
+            if (!DOCENTIJsonList.isEmpty()) {
+                ep1.begin();
+                for (String a1 : DOCENTIJsonList) {
+                    Docente d1 = ep1.getEm().find(Docente.class, parseLongR(a1));
+                    if (d1 != null) {
+                        CorsoAvviato_Docenti cad = new CorsoAvviato_Docenti();
+                        cad.setIdcorsoavviatodocenti(new CorsoAvviato_DocentiId(d1.getIddocente(), ca1.getIdcorsoavviato()));
+                        cad.setDocente(d1);
+                        cad.setCorsoavviato(ca1);
+                        ep1.persist(cad);
+                    }
+                }
+                ep1.commit();
+                ep1.close();
+            }
+            redirect(request, response, "Page_message.jsp?esito=OK_MOSD");
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_MOSD3");
+        }
+    }
+
     protected void MODIFICASEDECORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         try {
@@ -172,6 +245,50 @@ public class Operations extends HttpServlet {
             Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
             if (ca1 != null) {
                 ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "43"));
+                ep1.begin();
+                ep1.merge(ca1);
+                ep1.commit();
+                ep1.close();
+                resp_out.addProperty("result",
+                        true);
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "CORSO NON TROVATO.");
+            }
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+    }
+
+    protected void AUTORIZZACAMBIOSEDE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JsonObject resp_out = new JsonObject();
+        try {
+            String IDCORSO = getRequestValue(request, "IDCORSO");
+            EntityOp ep1 = new EntityOp();
+            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
+            if (ca1 != null) {
+                try {
+                    List<Calendario_Lezioni> lezioni = ep1.calendario_lezioni_corso(ca1);
+                    DateTime dt1 = new DateTime(lezioni.get(0).getDatalezione().getTime());
+                    DateTime dt2 = new DateTime();
+                    if (dt1.isAfter(dt2)) { //DA AVVIARE 
+                        ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "43"));
+                    } else { //AVVIATO
+                        ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "44"));
+                    }
+                } catch (Exception ex2) {
+                    ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "43"));
+                    EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex2));
+                }
                 ep1.begin();
                 ep1.merge(ca1);
                 ep1.commit();
@@ -2384,11 +2501,23 @@ public class Operations extends HttpServlet {
                 case "AUTORIZZAAVVIOCORSO":
                     AUTORIZZAAVVIOCORSO(request, response);
                     break;
+                case "AUTORIZZACAMBIOSEDE":
+                    AUTORIZZACAMBIOSEDE(request, response);
+                    break;
                 case "MODIFICADIRETTORE":
                     MODIFICADIRETTORE(request, response);
                     break;
                 case "MODIFICASEDECORSO":
                     MODIFICASEDECORSO(request, response);
+                    break;
+                case "MODIFICADOCENTICORSO":
+                    MODIFICADOCENTICORSO(request, response);
+                    break;
+                case "MODIFICAPERSONALECORSO":
+                    MODIFICAPERSONALECORSO(request, response);
+                    break;
+                case "CAMBIASTATOALLIEVO":
+                    CAMBIASTATOALLIEVO(request, response);
                     break;
                 default:
                     break;

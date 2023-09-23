@@ -200,7 +200,11 @@ public class Search extends HttpServlet {
                             + " class=\"btn btn-sm btn-bg-light btn-danger fan1\" data-bs-toggle=\"tooltip\" title=\"RIGETTA CORSO\" data-preload='false' "
                             + "\"><i class=\"fa fa-remove\"></i></a>";
                 } else if (res.getStatocorso().getCodicestatocorso().equals("46")) {
-
+                    azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"AUTORIZZA CAMBIO SEDE\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
+                            + "onclick=\"return approvacambiosede('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-check-circle\"></i></button>"
+                            + "<a href='ADM_rigettacorso.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+                            + " class=\"btn btn-sm btn-bg-light btn-danger fan1\" data-bs-toggle=\"tooltip\" title=\"RIGETTA CORSO\" data-preload='false' "
+                            + "\"><i class=\"fa fa-remove\"></i></a>";
                 }
 
                 data_value.addProperty("azioni", azioni);

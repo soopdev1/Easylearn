@@ -32,7 +32,7 @@ $(document).ready(function () {
             }
         },
         columns: [
-            {data: 'stato', orderable: false},
+            {data: 'stato'},
             {data: 'soggetto'},
             {data: 'id'},
             {data: 'nome'},
@@ -75,6 +75,84 @@ function approvacorso(idcorso) {
                         type: 'POST',
                         data: {
                             'type': 'AUTORIZZAAVVIOCORSO',
+                            'IDCORSO': idcorso
+                        },
+                        dataType: 'json',
+                        async: false,
+                        success: function (data) {
+                            //check
+                            if (data.result) {
+                                ok = true;
+                            } else {
+                                messageko = ("ERRORE: " + data.message);
+                            }
+                        },
+                        error: function (request, error) {
+                            messageko = ("ERRORE: " + error);
+                        }
+                    });
+
+                    if (ok) {
+                        $.alert({
+                            title: 'Operazione conclusa con successo!',
+                            content: '',
+                            type: 'success',
+                            typeAnimated: true,
+                            buttons: {
+                                confirm: {
+                                    text: 'OK',
+                                    btnClass: 'btn-success',
+                                    action: function () {
+                                        refreshtable();
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        $.alert({
+                            title: "Errore durante l'operazione!",
+                            content: messageko,
+                            type: 'red',
+                            typeAnimated: true,
+                            theme: 'bootstrap',
+                            columnClass: 'col-md-9',
+                            buttons: {
+                                confirm: {
+                                    text: 'OK',
+                                    btnClass: 'btn-red'
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            ,
+            cancel: {
+                btnClass: 'btn-danger btn-lg',
+                text: "<i class='fa fa-remove'></i> NO" // With spaces and symbols                
+            }
+        }
+    });
+}
+
+function approvacambiosede(idcorso) {
+    var ok = false;
+    var messageko = "ERRORE GENERICO";
+    $.confirm({
+        title: 'Conferma Operazione',
+        content: "Confermi di voler Autorizzare il cambio sede del corso con ID <b>" + idcorso +"</b> ? L'operazione non potrà essere annullata.",
+        theme: 'bootstrap',
+        columnClass: 'col-md-9',
+        buttons: {
+            confirm: {
+                btnClass: 'btn-success btn-lg',
+                text: "<i class='fa fa-check'></i> CONFERMO", // With spaces and symbols
+                action: function () {
+                    $.ajax({
+                        url: 'Operations',
+                        type: 'POST',
+                        data: {
+                            'type': 'AUTORIZZACAMBIOSEDE',
                             'IDCORSO': idcorso
                         },
                         dataType: 'json',

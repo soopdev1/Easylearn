@@ -3,6 +3,10 @@
     Created on : 18-feb-2022, 14.01.46
     Author     : raf
 --%>
+<%@page import="java.nio.charset.Charset"%>
+<%@page import="org.apache.commons.codec.binary.Base64"%>
+<%@page import="rc.soop.sic.jpa.Stati"%>
+<%@page import="java.util.ArrayList"%>
 <%@page import="rc.soop.sic.jpa.Sede"%>
 <%@page import="rc.soop.sic.jpa.User"%>
 <%@page import="rc.soop.sic.jpa.SoggettoProponente"%>
@@ -33,19 +37,20 @@
                 EntityOp eo = new EntityOp();
                 Corsoavviato is1 = eo.getEm().find(Corsoavviato.class, Long.valueOf(idistS));
                 boolean modify = false;
+                List<Allievi> allievi = new ArrayList<>();
                 if (!Utils.isAdmin(session)) {
                     SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
                     if (so.getIdsoggetto().equals(is1.getCorsobase().getSoggetto().getIdsoggetto())
                             && (is1.getStatocorso().getCodicestatocorso().equals("43") || is1.getStatocorso().getCodicestatocorso().equals("44"))) {
                         modify = true;
+                        allievi = eo.getAllieviSoggettoAvvioCorso(so);
                     }
                 }
-
-
+                List<Allievi> allieviok = eo.getAllieviCorsoAvviato(is1);
     %>
     <!--begin::Head-->
     <head><base href="">
-        <title><%=Constant.NAMEAPP%>: Richiesta modifica sede</title>
+        <title><%=Constant.NAMEAPP%>: Modifica allievi corso</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->
@@ -79,50 +84,86 @@
                     <div class="card h-xl-100">
                         <div class="card-header border-0 pt-5">
                             <h3 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bolder fs-3 mb-1">RICHIESTA MODIFICA SEDE ID: <%=is1.getIdcorsoavviato()%> - <%=is1.getCorsobase().getIstanza().getTipologiapercorso().getNometipologia()%> - <u><%=is1.getCorsobase().getRepertorio().getDenominazione()%></u></span>
+                                <span class="card-label fw-bolder fs-3 mb-1">MODIFICA ALLIEVI CORSO ID: <%=is1.getIdcorsoavviato()%> - <%=is1.getCorsobase().getIstanza().getTipologiapercorso().getNometipologia()%> - <u><%=is1.getCorsobase().getRepertorio().getDenominazione()%></u></span>
                             </h3>
                         </div>
                         <div class="card-body py-3">
                             <div class="row col-md-12">
                                 <label class="col-md-4 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>SEDE FORMATIVA ATTUALE:</b></span>
+                                    <span class="text-danger"><b>ALLIEVI ATTUALI:</b></span>
                                 </label>
                                 <label class="col-md-8 col-form-label fw-bold">
-                                    <span><b><%=is1.getCorsobase().getSedescelta().getIndirizzo() + " " + is1.getCorsobase().getSedescelta().getComune() + " " + is1.getCorsobase().getSedescelta().getProvincia()%></b></span>
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Cognome</th>
+                                                <th>Nome</th>
+                                                <th>Codice Fiscale</th>
+                                                <th>Stato</th>
+                                                <th>Azioni</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <%for (Allievi a1 : allieviok) {%>
+                                            <tr>
+                                                <td>
+                                                    <%=a1.getCognome()%>
+                                                </td>
+                                                <td>
+                                                    <%=a1.getNome()%>
+                                                </td>
+                                                <td>
+                                                    <%=a1.getCodicefiscale()%>
+                                                </td>
+                                                <td>
+                                                    <%=Utils.getEtichettastato(a1.getStatoallievo())%>
+                                                </td>
+                                                <td><%
+                                                    if (a1.getStatoallievo().equals(Stati.ATTIVO) || a1.getStatoallievo().equals(Stati.AVVIO)) {%>
+                                                    <button type="button" data-bs-toggle="tooltip" title="MODIFICA STATO ALLIEVO" 
+                                                            data-preload="false" class="btn btn-sm btn-bg-light btn-primary"
+                                                            onclick="return modificastatoallievo('<%=a1.getIdallievi()%>',
+                                                                        '<%=Base64.encodeBase64String((a1.getCognome()+" "+a1.getNome()).getBytes())%>',
+                                                                        '<%=a1.getStatoallievo().name()%>')">
+                                                        <i class="fa fa-edit"></i>
+                                                    </button>
+                                                    <%}%>
+                                                </td>
+                                            </tr>
+                                            <%}%>
+                                        </tbody>
+                                    </table>
                                 </label>
                             </div>
                             <hr>
                             <form action="Operations" method="POST">
-                                <input type="hidden" name="type" value="MODIFICASEDECORSO" />
+                                <input type="hidden" name="type" value="MODIFICADOCENTICORSO" />
                                 <input type="hidden" name="IDCORSO" value="<%=is1.getIdcorsoavviato()%>" />
                                 <div class="row col-md-12">
                                     <label class="col-md-4 col-form-label fw-bold fs-6">
-                                        <span class="text-danger"><b>NUOVA SEDE FORMATIVA:</b></span>
+                                        <span class="text-danger"><b>NUOVI ALLIEVI:</b></span>
                                     </label>
                                     <label class="col-md-8 col-form-label fw-bold">
-                                        <select name="sedescelta" aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
-                                                class="form-select fw-bold" required>
+                                        <select name="ALLIEVI" id="ALLIEVI" aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
+                                                class="form-select form-select-solid form-select-lg fw-bold" required multiple>
                                             <option value="">Scegli...</option>
-                                            <%
-                                                for (Sede s1 : is1.getCorsobase().getSoggetto().getSediformazione()) {
-
-                                                    if (!s1.getIdsede().equals(is1.getCorsobase().getSedescelta().getIdsede())) {
-                                            %>
-                                            <option value="<%=s1.getIdsede()%>"><%=s1.getIndirizzo()%> <%=s1.getCap()%> - <%=s1.getComune()%>, <%=s1.getProvincia()%></option>
-                                            <%}
-                                                }
-                                            %>
+                                            <%for (Allievi al1 : allievi) {%>
+                                            <option value="<%=al1.getIdallievi()%>">
+                                                <%=al1.getCodicefiscale()%> - <%=al1.getCognome()%> <%=al1.getNome()%>
+                                            </option>                                                                
+                                            <%}%>
                                         </select>
                                     </label>
-                                    <span class="help-block">N.B. La richiesta di modifica sede dovrà essere approvata dal Dipartimento competente e lo stato del corso verrà impostato in 'MODIFICA SEDE - CORSO IN ATTESA DI AUTORIZZAZIONE'</span>
+                                    <span class="help-block">NUMERO MASSIMO ALLIEVI: <%=is1.getCorsobase().getNumeroallievi()%>. E' POSSIBILE AGGIUNGERE NUOVI ALLIEVI ENTRO IL 70% DI COMPLETAMENTO DEL CORSO.</span>
                                 </div>
-                                <%if (modify) {%>                                
+                                <input type="hidden" id="allievimax" value="<%=is1.getCorsobase().getNumeroallievi()%>" />
+                                <%if (modify) {%>
                                 <hr>
                                 <p class="mb-0">
                                     <button type="submit" class="btn btn-success btn-circled">
                                         <i class="fa fa-save"></i> SALVA DATI
                                     </button>
-                                </p>                                
+                                </p>
                                 <%}%>
                             </form>
                         </div>
@@ -158,7 +199,8 @@
         <script src="assets/plugins/global/plugins.bundle.js"></script>
         <script src="assets/js/scripts.bundle.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
-
+        <script type="text/javascript" src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
+        <script src="assets/js/US_modificallievi.js"></script>
         <!--end::Page Custom Javascript-->
         <!--end::Javascript-->
     </body>

@@ -40,12 +40,13 @@
                         modify = true;
                     }
                 }
+                List<CorsoAvviato_Docenti> avv_doc = eo.list_cavv_docenti(is1);
 
 
     %>
     <!--begin::Head-->
     <head><base href="">
-        <title><%=Constant.NAMEAPP%>: Richiesta modifica sede</title>
+        <title><%=Constant.NAMEAPP%>: Modifica docenti corso</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->
@@ -79,50 +80,64 @@
                     <div class="card h-xl-100">
                         <div class="card-header border-0 pt-5">
                             <h3 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bolder fs-3 mb-1">RICHIESTA MODIFICA SEDE ID: <%=is1.getIdcorsoavviato()%> - <%=is1.getCorsobase().getIstanza().getTipologiapercorso().getNometipologia()%> - <u><%=is1.getCorsobase().getRepertorio().getDenominazione()%></u></span>
+                                <span class="card-label fw-bolder fs-3 mb-1">MODIFICA DOCENTI CORSO ID: <%=is1.getIdcorsoavviato()%> - <%=is1.getCorsobase().getIstanza().getTipologiapercorso().getNometipologia()%> - <u><%=is1.getCorsobase().getRepertorio().getDenominazione()%></u></span>
                             </h3>
                         </div>
                         <div class="card-body py-3">
                             <div class="row col-md-12">
                                 <label class="col-md-4 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>SEDE FORMATIVA ATTUALE:</b></span>
+                                    <span class="text-danger"><b>DOCENTI ATTUALI:</b></span>
                                 </label>
                                 <label class="col-md-8 col-form-label fw-bold">
-                                    <span><b><%=is1.getCorsobase().getSedescelta().getIndirizzo() + " " + is1.getCorsobase().getSedescelta().getComune() + " " + is1.getCorsobase().getSedescelta().getProvincia()%></b></span>
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Cognome</th>
+                                                <th>Nome</th>
+                                                <th>Codice Fiscale</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <%for (CorsoAvviato_Docenti d1 : avv_doc) {%>
+                                            <tr>
+                                                <td>
+                                                    <%=d1.getDocente().getCognome()%>
+                                                </td>
+                                                <td>
+                                                    <%=d1.getDocente().getNome()%>
+                                                </td>
+                                                <td>
+                                                    <%=d1.getDocente().getCodicefiscale()%>
+                                                </td>
+                                            </tr>
+                                            <%}%>
+                                        </tbody>
+                                    </table>
                                 </label>
                             </div>
                             <hr>
                             <form action="Operations" method="POST">
-                                <input type="hidden" name="type" value="MODIFICASEDECORSO" />
+                                <input type="hidden" name="type" value="MODIFICADOCENTICORSO" />
                                 <input type="hidden" name="IDCORSO" value="<%=is1.getIdcorsoavviato()%>" />
                                 <div class="row col-md-12">
                                     <label class="col-md-4 col-form-label fw-bold fs-6">
-                                        <span class="text-danger"><b>NUOVA SEDE FORMATIVA:</b></span>
+                                        <span class="text-danger"><b>NUOVI DOCENTI:</b></span>
                                     </label>
                                     <label class="col-md-8 col-form-label fw-bold">
-                                        <select name="sedescelta" aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
-                                                class="form-select fw-bold" required>
+                                        <select name="DOCENTI" id="DOCENTI" aria-label="Scegli..."
+                                                data-control="select2" data-placeholder="Scegli..." 
+                                                class="form-select fw-bold" multiple>
                                             <option value="">Scegli...</option>
-                                            <%
-                                                for (Sede s1 : is1.getCorsobase().getSoggetto().getSediformazione()) {
-
-                                                    if (!s1.getIdsede().equals(is1.getCorsobase().getSedescelta().getIdsede())) {
-                                            %>
-                                            <option value="<%=s1.getIdsede()%>"><%=s1.getIndirizzo()%> <%=s1.getCap()%> - <%=s1.getComune()%>, <%=s1.getProvincia()%></option>
-                                            <%}
-                                                }
-                                            %>
                                         </select>
                                     </label>
-                                    <span class="help-block">N.B. La richiesta di modifica sede dovrà essere approvata dal Dipartimento competente e lo stato del corso verrà impostato in 'MODIFICA SEDE - CORSO IN ATTESA DI AUTORIZZAZIONE'</span>
                                 </div>
-                                <%if (modify) {%>                                
+                                <%if (modify) {%>
                                 <hr>
                                 <p class="mb-0">
                                     <button type="submit" class="btn btn-success btn-circled">
                                         <i class="fa fa-save"></i> SALVA DATI
                                     </button>
-                                </p>                                
+                                </p>
                                 <%}%>
                             </form>
                         </div>
@@ -158,7 +173,7 @@
         <script src="assets/plugins/global/plugins.bundle.js"></script>
         <script src="assets/js/scripts.bundle.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
-
+        <script src="assets/js/US_nuovocorso.js"></script>
         <!--end::Page Custom Javascript-->
         <!--end::Javascript-->
     </body>

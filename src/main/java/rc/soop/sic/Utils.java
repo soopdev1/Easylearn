@@ -538,9 +538,9 @@ public class Utils {
             case RITIRATO:
                 return "<i class='fa fa-remove'></i> Ritirato";
             case CHECK:
-                return "<i class='fa fa-warning'></i> In attesa";
+                return "<i class='fa fa-warning'></i> Attivo - In attesa";
             case AVVIO:
-                return "<i class='fa fa-hourglass'></i> In fase di avvio";
+                return "<i class='fa fa-hourglass'></i> Attivo - In fase di avvio";
             default:
                 return "";
         }
