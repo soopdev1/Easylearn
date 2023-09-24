@@ -1097,13 +1097,11 @@ public class Pdf {
                 File fdef = convertPDFA(pdfOut_part1, "DECRETOAPPROVATIVO ISTANZA " + ista1.getCodiceistanza());
                 if (fdef != null) {
                     pdfOut_part1.delete();
-                    System.out.println("tester.T.GENERADECRETOAPPROVATIVO() " + fdef.getPath());
                     return fdef;
                 }
             } catch (Exception ex1) {
                 LOGGER.severe(estraiEccezione(ex1));
             }
-
         } catch (Exception ex0) {
             LOGGER.severe(estraiEccezione(ex0));
         }

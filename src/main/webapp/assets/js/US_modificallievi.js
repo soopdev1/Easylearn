@@ -19,11 +19,11 @@ function modificastatoallievo(idallievo,nomecogn,stato) {
         title: "Modifica stato allievo -  " + atob(nomecogn),
         content: '<form action="" class="formName">' +
                 '<div class="form-group">' +
-                '<label>Stato Attuale: <b>' + stato + '</b></label>' +
+                '<label>Stato Attuale: <b>' + atob(stato) + '</b></label>' +
                 '<select name="NUOVOSTATO" id="NUOVOSTATO" aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..."'+
                 'class="form-select fw-bold NUOVOSTATO" required>'+
                 '<option value="">Scegli...</option>'+
-                '<option value="ATTIVO">ATTIVO</option>'+
+                //'<option value="ATTIVO">ATTIVO</option>'+
                 '<option value="RITIRATO">RITIRATO</option>'+
                 '</select>' +
                 '</div>' +

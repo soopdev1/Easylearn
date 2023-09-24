@@ -101,13 +101,55 @@ import rc.soop.sic.jpa.User;
 public class Operations extends HttpServlet {
 
     protected void CAMBIASTATOALLIEVO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String idallievo = getRequestValue(request, "idallievo");
-        String NUOVOSTATO = getRequestValue(request, "NUOVOSTATO");
-        
-        
-        
+
+        JsonObject resp_out = new JsonObject();
+        try {
+
+            String idallievo = getRequestValue(request, "idallievo");
+            String NUOVOSTATO = getRequestValue(request, "NUOVOSTATO");
+
+            EntityOp ep1 = new EntityOp();
+            Allievi al1 = ep1.getEm().find(Allievi.class, Long.valueOf(idallievo));
+            if (al1 != null) {
+
+                switch (NUOVOSTATO) {
+                    case "RITIRATO": {
+                        al1.setStatoallievo(Stati.RITIRATO);
+                        ep1.begin();
+                        ep1.merge(al1);
+                        ep1.commit();
+                        ep1.close();
+                        resp_out.addProperty("result",
+                                true);
+                        break;
+                    }
+                    default: {
+                        resp_out.addProperty("result",
+                                false);
+                        resp_out.addProperty("message",
+                                "VALORE NON VALIDO.");
+                        break;
+                    }
+                }
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "CORSO NON TROVATO.");
+            }
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+
     }
-    
+
     protected void MODIFICAPERSONALECORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String IDCORSO = getRequestValue(request, "IDCORSO");
         String ALTROP = getRequestValue(request, "ALTROP");
@@ -396,6 +438,51 @@ public class Operations extends HttpServlet {
             ex1.printStackTrace();
             redirect(request, response, "Page_message.jsp?esito=KO_LEZ1");
         }
+    }
+
+    protected void AGGIUNGIALLIEVICORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        try {
+            EntityOp ep1 = new EntityOp();
+
+            String IDCORSO = getRequestValue(request, "IDCORSO");
+            String ALLIEVI = getRequestValue(request, "ALLIEVI");
+
+            Corsoavviato ca = ep1.getEm().find(Corsoavviato.class, parseLongR(IDCORSO));
+
+            ObjectMapper om = new ObjectMapper();
+            om.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+
+            ep1.begin();
+
+            List<String> ALLIEVIJsonList = om.readValue(ALLIEVI, new TypeReference<List<String>>() {
+            });
+
+            List<Calendario_Lezioni> lezioni = ep1.calendario_lezioni_corso(ca);
+            DateTime dt1 = new DateTime(lezioni.get(0).getDatalezione().getTime());
+            DateTime dt2 = new DateTime();
+            boolean daavviare = dt1.isAfter(dt2);
+            for (String a1 : ALLIEVIJsonList) {
+                Allievi al1 = ep1.getEm().find(Allievi.class, parseLongR(a1));
+                if (al1 != null) {
+                    al1.setCorsodiriferimento(ca);
+                    if (daavviare) {
+                        al1.setStatoallievo(Stati.AVVIO);
+                    } else {
+                        al1.setStatoallievo(Stati.ATTIVO);
+                    }
+                    ep1.merge(al1);
+                }
+            }
+            ep1.commit();
+            ep1.close();
+            redirect(request, response, "Page_message.jsp?esito=OK_CL");
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            ex1.printStackTrace();
+            redirect(request, response, "Page_message.jsp?esito=KO_NCIN2");
+        }
+
     }
 
     protected void AVVIANUOVOCORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -2491,6 +2578,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "AVVIANUOVOCORSO":
                     AVVIANUOVOCORSO(request, response);
+                    break;
+                case "AGGIUNGIALLIEVICORSO":
+                    AGGIUNGIALLIEVICORSO(request, response);
                     break;
                 case "INSERISCILEZIONE":
                     INSERISCILEZIONE(request, response);

@@ -28,26 +28,23 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
-                String idistS = Utils.getRequestValue(request, "idcorso");
-                if (idistS.equals("")) {
-                    idistS = (String) session.getAttribute("ses_idcorso");
+                String idlez = Utils.getRequestValue(request, "idlez");
+                if (idlez.equals("")) {
+                    idlez = (String) session.getAttribute("ses_idlez");
                 } else {
-                    session.setAttribute("ses_idcorso", idistS);
+                    session.setAttribute("ses_idlez", idlez);
                 }
                 EntityOp eo = new EntityOp();
-                Corsoavviato is1 = eo.getEm().find(Corsoavviato.class, Long.valueOf(idistS));
+                Calendario_Lezioni cl1 = eo.getEm().find(Calendario_Lezioni.class, Long.valueOf(idlez));
                 boolean modify = false;
-                List<Allievi> allievi = new ArrayList<>();
+                
                 if (!Utils.isAdmin(session)) {
                     SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
-                    if (so.getIdsoggetto().equals(is1.getCorsobase().getSoggetto().getIdsoggetto())
-                            && (is1.getStatocorso().getCodicestatocorso().equals("43") || is1.getStatocorso().getCodicestatocorso().equals("44"))) {
+                    if (so.getIdsoggetto().equals(cl1.getCorsodiriferimento().getCorsobase().getSoggetto().getIdsoggetto())
+                            && cl1.getCorsodiriferimento().getStatocorso().getCodicestatocorso().equals("44")) {
                         modify = true;
-                        allievi = eo.getAllieviSoggettoAvvioCorso(so);
                     }
-                }
-                List<Allievi> allieviok = eo.getAllieviCorsoAvviato(is1);
-    %>
+                }%>
     <!--begin::Head-->
     <head><base href="">
         <title><%=Constant.NAMEAPP%>: Modifica allievi corso</title>

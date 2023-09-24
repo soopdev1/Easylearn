@@ -3,30 +3,22 @@ package rc.soop.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.dmfs.httpessentials.client.HttpRequestExecutor;
-import org.dmfs.httpessentials.exceptions.ProtocolError;
-import org.dmfs.httpessentials.exceptions.ProtocolException;
 import org.dmfs.httpessentials.httpurlconnection.HttpUrlConnectionExecutor;
 import org.dmfs.oauth2.client.BasicOAuth2AuthorizationProvider;
 import org.dmfs.oauth2.client.BasicOAuth2Client;
 import org.dmfs.oauth2.client.BasicOAuth2ClientCredentials;
-import org.dmfs.oauth2.client.OAuth2AccessToken;
 import org.dmfs.oauth2.client.OAuth2AuthorizationProvider;
 import org.dmfs.oauth2.client.OAuth2Client;
 import org.dmfs.oauth2.client.OAuth2ClientCredentials;
 import org.dmfs.oauth2.client.OAuth2InteractiveGrant;
 import org.dmfs.oauth2.client.grants.AuthorizationCodeGrant;
-import org.dmfs.oauth2.client.grants.ImplicitGrant;
 import org.dmfs.oauth2.client.scope.BasicScope;
-import org.dmfs.rfc3986.Uri;
-import org.dmfs.rfc3986.UriEncoded;
 import org.dmfs.rfc3986.encoding.Precoded;
 import org.dmfs.rfc3986.uris.LazyUri;
 import org.dmfs.rfc5545.Duration;
@@ -36,7 +28,6 @@ import static rc.soop.sic.Utils.getRequestValue;
 import static rc.soop.sic.Utils.redirect;
 import rc.soop.sic.jpa.EntityOp;
 import rc.soop.sic.jpa.User;
-
 /**
  *
  * @author raf
@@ -62,7 +53,7 @@ public class LoginOperations extends HttpServlet {
 
     protected void spid(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            HttpRequestExecutor executor = new HttpUrlConnectionExecutor();
+//            HttpRequestExecutor executor = new HttpUrlConnectionExecutor();
             OAuth2AuthorizationProvider provider = new BasicOAuth2AuthorizationProvider(
                     URI.create("https://is-test.regione.sicilia.it/oauth2/authorize"),
                     URI.create("https://is-test.regione.sicilia.it/oauth2/token"),

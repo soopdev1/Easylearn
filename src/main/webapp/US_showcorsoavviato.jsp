@@ -3,6 +3,7 @@
     Created on : 18-feb-2022, 14.01.46
     Author     : raf
 --%>
+<%@page import="org.joda.time.DateTime"%>
 <%@page import="rc.soop.sic.jpa.User"%>
 <%@page import="rc.soop.sic.jpa.SoggettoProponente"%>
 <%@page import="rc.soop.sic.jpa.Calendario_Lezioni"%>
@@ -373,12 +374,18 @@
                                                                                     title="ELIMINA LEZIONE" data-preload='false' 
                                                                                     onclick="return rimuovilezione('<%=c1.getIdcalendariolezioni()%>')">
                                                                                 <i class="fa fa-trash-arrow-up"></i></button>
-                                                                                <%} else if (azionicorso) {%>
-                                                                            <button type="button"class="btn btn-sm btn-warning" data-bs-toggle="tooltip" 
-                                                                                    title="MODIFICA LEZIONE" data-preload='false' 
-                                                                                    onclick="return rimuovilezione('<%=c1.getIdcalendariolezioni()%>')">
-                                                                                <i class="fa fa-edit"></i></button>
-                                                                                <%}%>
+                                                                                <%} else if (azionicorso) {
+                                                                                    if (c1.getDatalezione().after(new DateTime().toDate())) {%>
+                                                                            -
+                                                                            <%} else {%>
+                                                                            <a href="US_gestionepresenzalezione.jsp?idlez=<%=Utils.enc_string(String.valueOf(c1.getIdcalendariolezioni()))%>"
+                                                                               data-fancybox data-type="iframe" data-preload="false" data-width="75%" data-height="75%"
+                                                                               class="btn btn-sm btn-bg-light btn-primary fan1" data-bs-toggle="tooltip" title="INSERISCI/MODIFICA REGISTRO PRESENZE" data-preload='false'>
+                                                                                <i class="fa fa-calendar-alt"></i>
+                                                                            </a>
+                                                                            </a>
+                                                                            <%}
+                                                                                }%>
                                                                         </td>
                                                                     </tr>
                                                                     <%}%>
