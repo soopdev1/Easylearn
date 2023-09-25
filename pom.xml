@@ -138,7 +138,7 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
-            <version>20-ea+3</version>
+            <version>20-ea+4</version>
             <scope>test</scope>
             <type>jar</type>
         </dependency>
@@ -151,7 +151,7 @@
         <dependency>
             <groupId>com.mailjet</groupId>
             <artifactId>mailjet-client</artifactId>
-            <version>5.2.3</version>
+            <version>5.2.4</version>
             <type>jar</type>
         </dependency>
         <dependency>

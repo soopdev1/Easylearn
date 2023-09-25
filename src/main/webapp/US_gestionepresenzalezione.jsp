@@ -28,6 +28,7 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
+                String numlez = Utils.getRequestValue(request, "numlez");
                 String idlez = Utils.getRequestValue(request, "idlez");
                 if (idlez.equals("")) {
                     idlez = (String) session.getAttribute("ses_idlez");
@@ -35,9 +36,11 @@
                     session.setAttribute("ses_idlez", idlez);
                 }
                 EntityOp eo = new EntityOp();
-                Calendario_Lezioni cl1 = eo.getEm().find(Calendario_Lezioni.class, Long.valueOf(idlez));
+                Calendario_Lezioni cl1 = eo.getEm().find(Calendario_Lezioni.class, Long.valueOf(Utils.dec_string(idlez)));
                 boolean modify = false;
-                
+                List<CorsoAvviato_Docenti> avv_doc = eo.list_cavv_docenti(cl1.getCorsodiriferimento());
+                List<Allievi> allievi = eo.getAllieviCorsoAvviato(cl1.getCorsodiriferimento());
+
                 if (!Utils.isAdmin(session)) {
                     SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
                     if (so.getIdsoggetto().equals(cl1.getCorsodiriferimento().getCorsobase().getSoggetto().getIdsoggetto())
@@ -47,7 +50,7 @@
                 }%>
     <!--begin::Head-->
     <head><base href="">
-        <title><%=Constant.NAMEAPP%>: Modifica allievi corso</title>
+        <title><%=Constant.NAMEAPP%>: Modifica presenze lezioni</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->
@@ -81,27 +84,104 @@
                     <div class="card h-xl-100">
                         <div class="card-header border-0 pt-5">
                             <h3 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bolder fs-3 mb-1">MODIFICA ALLIEVI CORSO ID: <%=is1.getIdcorsoavviato()%> - <%=is1.getCorsobase().getIstanza().getTipologiapercorso().getNometipologia()%> - <u><%=is1.getCorsobase().getRepertorio().getDenominazione()%></u></span>
+                                <span class="card-label fw-bolder fs-3 mb-1">PRESENZE LEZIONE NUMERO <u><%=numlez%></u> - CORSO ID: <%=cl1.getCorsodiriferimento().getIdcorsoavviato()%> - 
+                                    <%=cl1.getCorsodiriferimento().getCorsobase().getIstanza().getTipologiapercorso().getNometipologia()%> - <u><%=cl1.getCorsodiriferimento().getCorsobase().getRepertorio().getDenominazione()%></u></span>
                             </h3>
                         </div>
                         <div class="card-body py-3">
                             <div class="row col-md-12">
-                                <label class="col-md-4 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>ALLIEVI ATTUALI:</b></span>
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>DATA EFFETTIVA LEZIONE:</b></span>
                                 </label>
-                                <label class="col-md-8 col-form-label fw-bold">
-                                    <table class="table table-hover">
+                                <div class="col-md-3 col-form-label fw-bold fs-6">
+                                    <input type="date" class="form-control" id="datelez" value="<%=Constant.sdf_PATTERNDATE6.format(cl1.getDatalezione())%>" />
+                                </div>
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>DOCENTE</b></span>
+                                </label>
+                                <div class="col-md-3 col-form-label fs-6">
+                                    <select 
+                                        id="docente"
+                                        name="docente" aria-label="Scegli..." 
+                                        data-control="select2" data-placeholder="Scegli..." 
+                                        class="form-select" required>
+                                        <option value="<%=cl1.getDocente().getIddocente()%>">
+                                            <%=cl1.getDocente().getCognome()%> <%=cl1.getDocente().getNome()%> - <%=cl1.getDocente().getCodicefiscale()%>
+                                        </option>
+                                        <%for (CorsoAvviato_Docenti d1 : avv_doc) {
+                                                if (d1.getDocente().getIddocente().equals(cl1.getDocente().getIddocente())) {
+                                                    continue;
+                                                }
+                                        %>
+                                        <option value="<%=d1.getDocente().getIddocente()%>"><%=d1.getDocente().getCognome()%> <%=d1.getDocente().getNome()%> - <%=d1.getDocente().getCodicefiscale()%></option>
+                                        <%}%>
+                                    </select>
+                                </div>  
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>ORA INIZIO LEZIONE:</b></span>
+                                </label>
+                                <div class="col-md-3 col-form-label fw-bold fs-6">
+                                    <select 
+                                        id="orai"
+                                        name="orai" aria-label="Scegli..." 
+                                        data-control="select2" data-placeholder="Ora Inizio"
+                                        class="form-select" required onchange="return populatedatafine(this);">
+                                        <option value="<%=cl1.getOrainizio()%>" selected><%=cl1.getOrainizio()%></option>
+                                        <option value="08:00">08:00</option>
+                                        <option value="08:30">08:30</option>
+                                        <option value="09:00">09:00</option>
+                                        <option value="09:30">09:30</option>
+                                        <option value="10:00">10:00</option>
+                                        <option value="10:30">10:30</option>
+                                        <option value="11:00">11:00</option>
+                                        <option value="11:30">11:30</option>
+                                        <option value="12:00">12:00</option>
+                                        <option value="12:30">12:30</option>
+                                        <option value="13:00">13:00</option>
+                                        <option value="13:30">13:30</option>
+                                        <option value="14:00">14:00</option>
+                                        <option value="14:30">14:30</option>
+                                        <option value="15:00">15:00</option>
+                                        <option value="15:30">15:30</option>
+                                        <option value="16:00">16:00</option>
+                                        <option value="16:30">16:30</option>
+                                        <option value="17:00">17:00</option>
+                                        <option value="17:30">17:30</option>
+                                        <option value="18:00">18:00</option>
+                                        <option value="18:30">18:30</option>
+                                        <option value="19:00">19:00</option>
+                                        <option value="19:30">19:30</option>
+                                        <option value="20:00">20:00</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>ORA FINE LEZIONE:</b></span>
+                                </label>
+                                <div class="col-md-3 col-form-label fw-bold fs-6">
+                                    <select 
+                                        id="oraf"
+                                        name="oraf" aria-label="Scegli..." 
+                                        data-control="select2" data-placeholder="Ora Fine" 
+                                        class="form-select" required onchange="return checkorariomax();">
+                                        <option value="<%=cl1.getOrafine()%>" selected><%=cl1.getOrafine()%></option>                                        
+                                    </select>
+                                </div>
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>ALLIEVI:</b></span>
+                                </label>    
+                                <div class="col-md-9">
+                                    <table class="table table-hover table-row-bordered">
                                         <thead>
                                             <tr>
                                                 <th>Cognome</th>
                                                 <th>Nome</th>
                                                 <th>Codice Fiscale</th>
-                                                <th>Stato</th>
-                                                <th>Azioni</th>
+                                                <th>Stato Attuale</th>
+                                                <th>Ore Presenza</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <%for (Allievi a1 : allieviok) {%>
+                                            <%for (Allievi a1 : allievi) {%>
                                             <tr>
                                                 <td>
                                                     <%=a1.getCognome()%>
@@ -115,54 +195,30 @@
                                                 <td>
                                                     <%=Utils.getEtichettastato(a1.getStatoallievo())%>
                                                 </td>
-                                                <td><%
-                                                    if (a1.getStatoallievo().equals(Stati.ATTIVO) || a1.getStatoallievo().equals(Stati.AVVIO)) {%>
-                                                    <button type="button" data-bs-toggle="tooltip" title="MODIFICA STATO ALLIEVO" 
-                                                            data-preload="false" class="btn btn-sm btn-bg-light btn-primary"
-                                                            onclick="return modificastatoallievo('<%=a1.getIdallievi()%>',
-                                                                            '<%=Base64.encodeBase64String((a1.getCognome() + " " + a1.getNome()).getBytes())%>',
-                                                                            '<%=Base64.encodeBase64String(Utils.getEtichettastato(a1.getStatoallievo()).getBytes())%>')"
-                                                            >
-                                                        <i class="fa fa-edit"></i>
-                                                    </button>
-                                                    <%}%>
+                                                <td>
+                                                    <select 
+                                                        id="presenza<%=a1.getIdallievi()%>"
+                                                        name="presenza<%=a1.getIdallievi()%>" aria-label="..." 
+                                                        data-control="select2" data-placeholder="..." 
+                                                        class="form-select sel-presenza" required >
+                                                    </select>
                                                 </td>
                                             </tr>
                                             <%}%>
                                         </tbody>
                                     </table>
-                                </label>
+                                </div>    
                             </div>
+
+
+                            <%if (modify) {%>
                             <hr>
-                            <form action="Operations" method="POST">
-                                <input type="hidden" name="type" value="AGGIUNGIALLIEVICORSO" />
-                                <input type="hidden" name="IDCORSO" value="<%=is1.getIdcorsoavviato()%>" />
-                                <div class="row col-md-12">
-                                    <label class="col-md-4 col-form-label fw-bold fs-6">
-                                        <span class="text-danger"><b>NUOVI ALLIEVI:</b></span>
-                                    </label>
-                                    <label class="col-md-8 col-form-label fw-bold">
-                                        <select name="ALLIEVI" id="ALLIEVI" aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
-                                                class="form-select form-select-solid form-select-lg fw-bold" required multiple>
-                                            <option value="">Scegli...</option>
-                                            <%for (Allievi al1 : allievi) {%>
-                                            <option value="<%=al1.getIdallievi()%>">
-                                                <%=al1.getCodicefiscale()%> - <%=al1.getCognome()%> <%=al1.getNome()%>
-                                            </option>                                                                
-                                            <%}%>
-                                        </select>
-                                    </label>
-                                    <span class="help-block">NUMERO MASSIMO ALLIEVI: <%=is1.getCorsobase().getNumeroallievi()%>. E' POSSIBILE AGGIUNGERE NUOVI ALLIEVI ENTRO IL 70% DI COMPLETAMENTO DEL CORSO.</span>
-                                </div>
-                                <input type="hidden" id="allievimax" value="<%=is1.getCorsobase().getNumeroallievi()%>" />
-                                <%if (modify) {%>
-                                <hr>
-                                <p class="mb-0">
-                                    <button type="submit" class="btn btn-success btn-circled">
-                                        <i class="fa fa-save"></i> SALVA DATI
-                                    </button>
-                                </p>
-                                <%}%>
+                            <p class="mb-0">
+                                <button type="submit" class="btn btn-success btn-circled">
+                                    <i class="fa fa-save"></i> SALVA DATI
+                                </button>
+                            </p>
+                            <%}%>
                             </form>
                         </div>
                     </div>
@@ -198,7 +254,7 @@
         <script src="assets/js/scripts.bundle.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
         <script type="text/javascript" src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
-        <script src="assets/js/US_modificallievi.js"></script>
+        <script src="assets/js/US_presenzelezioni.js"></script>
         <!--end::Page Custom Javascript-->
         <!--end::Javascript-->
     </body>

@@ -55,7 +55,6 @@ import static rc.soop.sic.Constant.PATTERNDATE3;
 import rc.soop.sic.jpa.Allievi;
 import rc.soop.sic.jpa.Calendario_Formativo;
 import rc.soop.sic.jpa.Calendario_Lezioni;
-import rc.soop.sic.jpa.CorsoAvviato_Docenti;
 import rc.soop.sic.jpa.EntityOp;
 import rc.soop.sic.jpa.Stati;
 import static rc.soop.sic.jpa.Stati.ABILITATO;

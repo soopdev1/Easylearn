@@ -378,7 +378,7 @@
                                                                                     if (c1.getDatalezione().after(new DateTime().toDate())) {%>
                                                                             -
                                                                             <%} else {%>
-                                                                            <a href="US_gestionepresenzalezione.jsp?idlez=<%=Utils.enc_string(String.valueOf(c1.getIdcalendariolezioni()))%>"
+                                                                            <a href="US_gestionepresenzalezione.jsp?numlez=<%=indice%>&idlez=<%=Utils.enc_string(String.valueOf(c1.getIdcalendariolezioni()))%>"
                                                                                data-fancybox data-type="iframe" data-preload="false" data-width="75%" data-height="75%"
                                                                                class="btn btn-sm btn-bg-light btn-primary fan1" data-bs-toggle="tooltip" title="INSERISCI/MODIFICA REGISTRO PRESENZE" data-preload='false'>
                                                                                 <i class="fa fa-calendar-alt"></i>

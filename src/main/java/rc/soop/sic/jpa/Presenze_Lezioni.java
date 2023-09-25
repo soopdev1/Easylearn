@@ -27,8 +27,8 @@ import javax.persistence.TemporalType;
  * @author Administrator
  */
 @NamedQueries(value = {
-    @NamedQuery(name = "presenzelezioni.corso", query = "SELECT u FROM Calendario_Lezioni u WHERE u.corsodiriferimento=:corsodiriferimento ORDER BY u.datalezione,u.orainizio"),
-    @NamedQuery(name = "presenzelezioni.lezioni", query = "SELECT u FROM Calendario_Lezioni u WHERE u.corsodiriferimento=:corsodiriferimento ORDER BY u.datalezione,u.orainizio")
+    @NamedQuery(name = "presenzelezioni.corso", query = "SELECT u FROM Presenze_Lezioni u WHERE u.corsodiriferimento=:corsodiriferimento ORDER BY u.datarealelezione,u.orainizio"),
+    @NamedQuery(name = "presenzelezioni.lezioni", query = "SELECT u FROM Presenze_Lezioni u WHERE u.calendariolezioni=:calendariolezioni")
 })
 @Entity
 @Table(name = "presenzelezioni")
@@ -62,17 +62,48 @@ public class Presenze_Lezioni implements Serializable {
     @JoinColumn(name = "iddocente")
     private Docente docente;
     
-    @Column(name = "datarealelezione")
+    @Column(name = "datainserimento")
     @Temporal(TemporalType.TIMESTAMP)
     private Date datainserimento;
 
     @Column(name = "utenteinserimento")
     private String utenteinserimento;
     
-    
+        
     public Presenze_Lezioni() {
     }
 
+    public Long getIdpresenzelezioni() {
+        return idpresenzelezioni;
+    }
+
+    public void setIdpresenzelezioni(Long idpresenzelezioni) {
+        this.idpresenzelezioni = idpresenzelezioni;
+    }
+
+    public Calendario_Lezioni getCalendariolezioni() {
+        return calendariolezioni;
+    }
+
+    public void setCalendariolezioni(Calendario_Lezioni calendariolezioni) {
+        this.calendariolezioni = calendariolezioni;
+    }
+
+    public Date getDatarealelezione() {
+        return datarealelezione;
+    }
+
+    public void setDatarealelezione(Date datarealelezione) {
+        this.datarealelezione = datarealelezione;
+    }
+
+    public String getUtenteinserimento() {
+        return utenteinserimento;
+    }
+
+    public void setUtenteinserimento(String utenteinserimento) {
+        this.utenteinserimento = utenteinserimento;
+    }
     
     public Corsoavviato getCorsodiriferimento() {
         return corsodiriferimento;
