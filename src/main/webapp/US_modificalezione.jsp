@@ -41,27 +41,10 @@
                 Calendario_Lezioni cl1 = eo.getEm().find(Calendario_Lezioni.class, Long.valueOf(Utils.dec_string(idlez)));
                 boolean modify = false;
                 List<CorsoAvviato_Docenti> avv_doc = eo.list_cavv_docenti(cl1.getCorsodiriferimento());
-                List<Allievi> allievi = eo.getAllieviCorsoAvviato(cl1.getCorsodiriferimento());
-
-                Presenze_Lezioni pl1 = eo.getPresenzeLezione(cl1);
-
-                List<Presenze_Lezioni_Allievi> pa1 = new ArrayList<>();
-
-                String datainserimento = "DA INSERIRE";
                 String orainizio = cl1.getOrainizio();
                 String orafine = cl1.getOrafine();
                 String dataeffettiva = Constant.sdf_PATTERNDATE6.format(cl1.getDatalezione());
                 Docente doc1 = cl1.getDocente();
-                Long idpresenza = 0L;
-                if (pl1 != null) {
-                    datainserimento = Constant.sdf_PATTERNDATE5.format(pl1.getDatainserimento());
-                    pa1 = eo.getEntiStageSoggetto(pl1);
-                    dataeffettiva = Constant.sdf_PATTERNDATE6.format(pl1.getDatarealelezione());
-                    doc1 = pl1.getDocente();
-                    orainizio = pl1.getOrainizio();
-                    orafine = pl1.getOrafine();
-                idpresenza = pl1.getIdpresenzelezioni();
-                }
 
                 if (!Utils.isAdmin(session)) {
                     SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
@@ -72,7 +55,7 @@
                 }%>
     <!--begin::Head-->
     <head><base href="">
-        <title><%=Constant.NAMEAPP%>: Modifica presenze lezioni</title>
+        <title><%=Constant.NAMEAPP%>: Modifica lezione</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->
@@ -108,18 +91,16 @@
                             <h3 class="card-title align-items-start flex-column">
                                 <span class="card-label fw-bolder fs-3 mb-1">PRESENZE LEZIONE NUMERO <u><%=numlez%></u> - CORSO ID: <%=cl1.getCorsodiriferimento().getIdcorsoavviato()%> - 
                                     <%=cl1.getCorsodiriferimento().getCorsobase().getIstanza().getTipologiapercorso().getNometipologia()%> - <u><%=cl1.getCorsodiriferimento().getCorsobase().getRepertorio().getDenominazione()%></u>
-                                    - Presenze inserire in data: <u><%=datainserimento%></u>
                                 </span>
                             </h3>
                         </div>
                         <div class="card-body py-3">
                             <form action="Operations" method="POST">
-                                <input type="hidden" name="type" value="AGGIUNGIPRESENZELEZIONE"/>
+                                <input type="hidden" name="type" value="MODIFICALEZIONE"/>
                                 <input type="hidden" name="idcalendariolezione" value="<%=cl1.getIdcalendariolezioni()%>"/>
-                                <input type="hidden" name="idpresenza" value="<%=idpresenza%>"/>
                             <div class="row col-md-12">
                                 <label class="col-md-3 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>DATA EFFETTIVA LEZIONE:</b></span>
+                                    <span class="text-danger"><b>DATA LEZIONE:</b></span>
                                 </label>
                                 <div class="col-md-3 col-form-label fw-bold fs-6">
                                     <input type="date" class="form-control" id="datelez" name="datelez" value="<%=dataeffettiva%>" />
@@ -144,7 +125,7 @@
                                         <option value="<%=d1.getDocente().getIddocente()%>"><%=d1.getDocente().getCognome()%> <%=d1.getDocente().getNome()%> - <%=d1.getDocente().getCodicefiscale()%></option>
                                         <%}%>
                                     </select>
-                                </div>  
+                                </div>
                                 <label class="col-md-3 col-form-label fw-bold fs-6">
                                     <span class="text-danger"><b>ORA INIZIO LEZIONE:</b></span>
                                 </label>
@@ -193,62 +174,7 @@
                                         class="form-select" required onchange="return checkorariomax();">
                                         <option value="<%=orafine%>" selected><%=orafine%></option>                                        
                                     </select>
-                                </div>
-                                <label class="col-md-3 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>ALLIEVI:</b></span>
-                                </label>    
-                                <div class="col-md-9">
-                                    <table class="table table-hover table-row-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Cognome</th>
-                                                <th>Nome</th>
-                                                <th>Codice Fiscale</th>
-                                                <th>Stato Attuale</th>
-                                                <th>Ore Presenza</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <%for (Allievi a1 : allievi) {
-                                                    String value1 = "0";
-                                                    Long millis = 0L;
-                                                    boolean presenza = false;
-                                                    for (Presenze_Lezioni_Allievi pla : pa1) {
-                                                        if (pla.getAllievo().getIdallievi().equals(a1.getIdallievi())) {
-                                                            presenza = true;
-                                                            millis = pla.getDurata();
-                                                            value1 = Utils.roundDoubleandFormat(millis / 3600000.00, 1);
-                                                        }
-                                                    }
-
-                                            %>
-                                            <tr>
-                                                <td>
-                                                    <%=a1.getCognome()%>
-                                                </td>
-                                                <td>
-                                                    <%=a1.getNome()%>
-                                                </td>
-                                                <td>
-                                                    <%=a1.getCodicefiscale()%>
-                                                </td>
-                                                <td>
-                                                    <%=Utils.getEtichettastato(a1.getStatoallievo())%>
-                                                </td>
-                                                <td>
-                                                    <select 
-                                                        id="presenza<%=a1.getIdallievi()%>"
-                                                        name="presenza<%=a1.getIdallievi()%>" aria-label="..." 
-                                                        data-control="select2" data-placeholder="..." 
-                                                        class="form-select sel-presenza" required >
-                                                    </select>
-                                                        <input type="hidden" id="start_presenza<%=a1.getIdallievi()%>" value="<%=millis%>" />
-                                                </td>
-                                            </tr>
-                                            <%}%>
-                                        </tbody>
-                                    </table>
-                                </div>    
+                                </div>                                
                             </div>
 
 
@@ -295,7 +221,7 @@
         <script src="assets/js/scripts.bundle.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
         <script type="text/javascript" src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
-        <script src="assets/js/US_presenzelezioni.js"></script>
+        <script src="assets/js/US_modificalezione.js"></script>
         <!--end::Page Custom Javascript-->
         <!--end::Javascript-->
     </body>

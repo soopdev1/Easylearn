@@ -29,8 +29,12 @@ import javax.persistence.TemporalType;
 @NamedQueries(value = {
     @NamedQuery(name = "presenzelezioni.allievo_corso", 
             query = "SELECT u FROM Presenze_Lezioni_Allievi u WHERE u.presenzelezioni.corsodiriferimento=:corsodiriferimento ORDER BY u.presenzelezioni.datarealelezione,u.orainizio"),
+    @NamedQuery(name = "presenzelezioni.giornata", 
+            query = "SELECT u FROM Presenze_Lezioni_Allievi u WHERE u.presenzelezioni=:presenzelezioni ORDER BY u.orainizio,u.allievo.cognome"),
     @NamedQuery(name = "presenzelezioni.allievo", 
             query = "SELECT u FROM Presenze_Lezioni_Allievi u WHERE u.allievo=:allievo ORDER BY u.presenzelezioni.datarealelezione,u.orainizio"),
+    @NamedQuery(name = "presenzelezioni.allievo_giornata", 
+            query = "SELECT u FROM Presenze_Lezioni_Allievi u WHERE u.presenzelezioni=:presenzelezioni AND u.allievo=:allievo"),
 })
 @Entity
 @Table(name = "presenzelezioniallievi")
@@ -45,7 +49,6 @@ public class Presenze_Lezioni_Allievi implements Serializable {
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "idpresenzelezioni")
     private Presenze_Lezioni presenzelezioni;
-
     
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "idallievi")

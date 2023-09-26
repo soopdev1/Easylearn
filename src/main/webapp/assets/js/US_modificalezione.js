@@ -1,6 +1,5 @@
 $(document).ready(function () {
-    setstartdate("data", 0, "min", $('#date_start').val());
-    setstartdate("data", 0, "max", $('#date_end').val());
+    setstartdate("datelez", 1, "min", null);
     populatedatafine(document.getElementById('orai'));
 });
 

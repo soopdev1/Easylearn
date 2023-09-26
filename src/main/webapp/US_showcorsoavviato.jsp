@@ -376,14 +376,18 @@
                                                                                 <i class="fa fa-trash-arrow-up"></i></button>
                                                                                 <%} else if (azionicorso) {
                                                                                     if (c1.getDatalezione().after(new DateTime().toDate())) {%>
-                                                                            -
+                                                                            <a href="US_modificalezione.jsp?numlez=<%=indice%>&idlez=<%=Utils.enc_string(String.valueOf(c1.getIdcalendariolezioni()))%>"
+                                                                               data-fancybox data-type="iframe" data-preload="false" data-width="75%" data-height="75%"
+                                                                               class="btn btn-sm btn-bg-light btn-warning fan1" data-bs-toggle="tooltip" 
+                                                                               title="MODIFICA LEZIONE" data-preload='false'>
+                                                                                <i class="fa fa-edit"></i>
+                                                                            </a>
                                                                             <%} else {%>
                                                                             <a href="US_gestionepresenzalezione.jsp?numlez=<%=indice%>&idlez=<%=Utils.enc_string(String.valueOf(c1.getIdcalendariolezioni()))%>"
                                                                                data-fancybox data-type="iframe" data-preload="false" data-width="75%" data-height="75%"
                                                                                class="btn btn-sm btn-bg-light btn-primary fan1" data-bs-toggle="tooltip" title="INSERISCI/MODIFICA REGISTRO PRESENZE" data-preload='false'>
                                                                                 <i class="fa fa-calendar-alt"></i>
-                                                                            </a>
-                                                                            </a>
+                                                                            </a>                                                                            </a>
                                                                             <%}
                                                                                 }%>
                                                                         </td>

@@ -36,7 +36,6 @@ function checkdatisalvati() {
     var diff = (date2 - date1) / 3600000;
     var labelres = residue;
     var check = diff > residue;
-    alert(tipolez);
     if (tipolez === "FAD") {
         check = diff > residuefad;
         labelres = residuefad;

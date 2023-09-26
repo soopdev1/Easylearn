@@ -31,6 +31,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.mime.MimeTypes;
 import org.joda.time.DateTime;
+import rc.soop.sic.Constant;
 import static rc.soop.sic.Constant.PATTERNDATE3;
 import static rc.soop.sic.Constant.PATTERNDATE4;
 import static rc.soop.sic.Constant.PATTERNDATE5;
@@ -83,6 +84,8 @@ import rc.soop.sic.jpa.Modacquisizione;
 import rc.soop.sic.jpa.Moduli_Docenti;
 import rc.soop.sic.jpa.Moduli_DocentiId;
 import rc.soop.sic.jpa.Path;
+import rc.soop.sic.jpa.Presenze_Lezioni;
+import rc.soop.sic.jpa.Presenze_Lezioni_Allievi;
 import rc.soop.sic.jpa.Repertorio;
 import rc.soop.sic.jpa.Scheda_Attivita;
 import rc.soop.sic.jpa.Sede;
@@ -99,6 +102,115 @@ import rc.soop.sic.jpa.User;
  * @author Raffaele
  */
 public class Operations extends HttpServlet {
+
+    protected void MODIFICALEZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Utils.printRequest(request);
+        String idcalendariolezione = getRequestValue(request, "idcalendariolezione");
+        String docente = getRequestValue(request, "docente");
+        String orai = getRequestValue(request, "orai");
+        String oraf = getRequestValue(request, "oraf");
+        String datelez = getRequestValue(request, "datelez");
+
+        try {
+
+            EntityOp ep1 = new EntityOp();
+            ep1.begin();
+            Calendario_Lezioni cl1 = ep1.getEm().find(Calendario_Lezioni.class, Long.valueOf(idcalendariolezione));
+            Docente d1 = ep1.getEm().find(Docente.class, Long.valueOf(docente));
+            cl1.setDatalezione(Constant.sdf_PATTERNDATE6.parse(datelez));
+            cl1.setDocente(d1);
+            cl1.setOrainizio(orai);
+            cl1.setOrafine(oraf);
+            cl1.setOre(Utils.calcolaore(orai, oraf));
+            cl1.setDatainserimento(new DateTime().toDate());
+            ep1.merge(cl1);
+            ep1.commit();
+            ep1.close();
+            redirect(request, response, "Page_message.jsp?esito=OK_MOSD");
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_LEZ1");
+        }
+
+    }
+
+    protected void AGGIUNGIPRESENZELEZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String idcalendariolezione = getRequestValue(request, "idcalendariolezione");
+        String idpresenza = getRequestValue(request, "idpresenza");
+        String docente = getRequestValue(request, "docente");
+        String orai = getRequestValue(request, "orai");
+        String oraf = getRequestValue(request, "oraf");
+        String datelez = getRequestValue(request, "datelez");
+
+        try {
+
+            EntityOp ep1 = new EntityOp();
+            ep1.begin();
+            Calendario_Lezioni cl1 = ep1.getEm().find(Calendario_Lezioni.class, Long.valueOf(idcalendariolezione));
+            Docente d1 = ep1.getEm().find(Docente.class, Long.valueOf(docente));
+
+            Presenze_Lezioni pl1;
+            if (!idpresenza.equals("0")) {
+                pl1 = ep1.getEm().find(Presenze_Lezioni.class, Long.valueOf(idpresenza));
+                //MERGE
+                pl1.setDatarealelezione(Constant.sdf_PATTERNDATE6.parse(datelez));
+                pl1.setDocente(d1);
+                pl1.setOrainizio(orai);
+                pl1.setOrafine(oraf);
+                pl1.setUtenteinserimento(request.getSession().getAttribute("us_cod").toString());
+                pl1.setDatainserimento(new DateTime().toDate());
+                ep1.merge(pl1);
+            } else {
+                //ADD
+                pl1 = new Presenze_Lezioni();
+                pl1.setDatarealelezione(Constant.sdf_PATTERNDATE6.parse(datelez));
+                pl1.setDocente(d1);
+                pl1.setOrainizio(orai);
+                pl1.setOrafine(oraf);
+                pl1.setUtenteinserimento(request.getSession().getAttribute("us_cod").toString());
+                pl1.setCalendariolezioni(cl1);
+                pl1.setCorsodiriferimento(cl1.getCorsodiriferimento());
+                pl1.setDatainserimento(new DateTime().toDate());
+                ep1.persist(pl1);
+            }
+            ep1.commit();
+            ep1.close();
+
+            EntityOp ep2 = new EntityOp();
+            ep2.begin();
+            List<Allievi> allievi = ep2.getAllieviCorsoAvviato(cl1.getCorsodiriferimento());
+            for (Allievi a1 : allievi) {
+                String presenza = getRequestValue(request, "presenza" + a1.getIdallievi());
+                if (!presenza.equals("")) {
+                    Presenze_Lezioni_Allievi pla = ep2.getPresenzeLezioneAllievo(pl1, a1);
+                    if (pla != null) {
+                        pla.setDatainserimento(new DateTime().toDate());
+                        pla.setDurata(parseLongR(presenza));
+                        pla.setOrainizio(orai);
+                        pla.setOrafine(Utils.getOraFine(orai, pla.getDurata()));
+                        ep2.merge(pla);
+                        //MERGE
+                    } else {
+                        //PERSIST
+                        pla = new Presenze_Lezioni_Allievi();
+                        pla.setDatainserimento(new DateTime().toDate());
+                        pla.setDurata(parseLongR(presenza));
+                        pla.setOrainizio(orai);
+                        pla.setOrafine(Utils.getOraFine(orai, pla.getDurata()));
+                        pla.setAllievo(a1);
+                        pla.setPresenzelezioni(pl1);
+                        ep2.persist(pla);
+                    }
+                }
+            }
+            ep2.commit();
+            ep2.close();
+            redirect(request, response, "Page_message.jsp?esito=OK_MOSD");
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_PRLE1");
+        }
+    }
 
     protected void CAMBIASTATOALLIEVO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -2608,6 +2720,12 @@ public class Operations extends HttpServlet {
                     break;
                 case "CAMBIASTATOALLIEVO":
                     CAMBIASTATOALLIEVO(request, response);
+                    break;
+                case "AGGIUNGIPRESENZELEZIONE":
+                    AGGIUNGIPRESENZELEZIONE(request, response);
+                    break;
+                case "MODIFICALEZIONE":
+                    MODIFICALEZIONE(request, response);
                     break;
                 default:
                     break;

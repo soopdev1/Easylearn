@@ -245,49 +245,16 @@ public class Utils {
 
     public static String enc_string(String plainText) {
         try {
-
             return Base64.getUrlEncoder().encodeToString(plainText.getBytes());
-//            String IV = "AAAAAAAAAAAAAAAA";
-//            String _plaintText_16 = covertto16Byte(plainText);
-//            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-//            SecretKeySpec key = new SecretKeySpec(Engine.getPath("pass.vers.1").getBytes("UTF-8"), "AES");
-//            cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(IV.getBytes("UTF-8")));
-//            return new String(cipher.doFinal(_plaintText_16.getBytes("UTF-8")));
-//
-//            Key aesKey = new SecretKeySpec(Engine.getPath("pass.vers.1").getBytes(), "AES");
-//            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-//            // encrypt the text
-//            cipher.init(Cipher.ENCRYPT_MODE, aesKey);
-//            byte[] encrypted = cipher.doFinal(ing.getBytes());
-//            byte[] encoded = Base64.getEncoder().encode(new String(encrypted).getBytes(StandardCharsets.UTF_8));
-//            return new String(encoded);
         } catch (Exception ex) {
             Constant.LOGGER.severe(estraiEccezione(ex));
         }
         return null;
-
-//        StrongTextEncryptor textEncryptor = new StrongTextEncryptor();
-//        textEncryptor.setPassword(Engine.getPath("pass.vers.1"));
-//        return textEncryptor.encrypt(ing);
     }
 
     public static String dec_string(String ing) {
         try {
-
             return new String(Base64.getUrlDecoder().decode(ing));
-//            String IV = "AAAAAAAAAAAAAAAA";
-//
-//            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-//            SecretKeySpec key = new SecretKeySpec(Engine.getPath("pass.vers.1").getBytes("UTF-8"), "AES");
-//            cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(IV.getBytes("UTF-8")));
-//            return removePadding(new String(cipher.doFinal(ing.getBytes()), "UTF-8"));
-
-//            Key aesKey = new SecretKeySpec(Engine.getPath("pass.vers.1").getBytes(), "AES");
-//            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-//            cipher.init(Cipher.DECRYPT_MODE, aesKey);
-//            byte[] decrypted = cipher.doFinal(ing.getBytes());
-//            byte[] decoded = Base64.getDecoder().decode(new String(decrypted).getBytes(StandardCharsets.UTF_8));
-//            return new String(decoded);
         } catch (Exception ex) {
             Constant.LOGGER.severe(estraiEccezione(ex));
         }
@@ -544,6 +511,7 @@ public class Utils {
                 return "";
         }
     }
+
     public static String getVisualstato(Stati stato) {
         switch (stato) {
             case INATTIVO:
@@ -583,6 +551,16 @@ public class Utils {
                 });
             }
         });
+    }
+
+    public static String getOraFine(String orainizio, Long durata) {
+        try {
+            DateTime dt1 = new DateTime(2023, 1, 1, Utils.parseIntR(orainizio.split(":")[0]), Utils.parseIntR(orainizio.split(":")[1]));
+            return dt1.plus(durata).toString("HH:mm");
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+        }
+        return orainizio;
     }
 
 }

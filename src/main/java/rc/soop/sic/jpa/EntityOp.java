@@ -14,6 +14,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import javax.servlet.http.HttpSession;
+import rc.soop.sic.Constant;
 import static rc.soop.sic.Utils.convmd5;
 import static rc.soop.sic.Utils.estraiEccezione;
 
@@ -52,7 +53,7 @@ public class EntityOp {
         try {
             this.em.getTransaction().commit();
         } catch (Exception ex0) {
-            ex0.printStackTrace();
+            Constant.LOGGER.severe(estraiEccezione(ex0));
         }
     }
 
@@ -209,7 +210,7 @@ public class EntityOp {
         q.setParameter("inattivo", Stati.INATTIVO);
         return (List<Allievi>) q.getResultList();
     }
-    
+
     public List<Allievi> getAllieviSoggettoAvvioCorso(SoggettoProponente s) {
         TypedQuery q = this.em.createNamedQuery("allievi.attivi.new", Allievi.class);
         q.setParameter("soggetto", s);
@@ -221,6 +222,27 @@ public class EntityOp {
         TypedQuery q = this.em.createNamedQuery("allievi.corsoavviato", Allievi.class);
         q.setParameter("corsodiriferimento", ca);
         return (List<Allievi>) q.getResultList();
+    }
+
+    public Presenze_Lezioni getPresenzeLezione(Calendario_Lezioni cl) {
+        TypedQuery q = this.em.createNamedQuery("presenzelezioni.lezioni", Presenze_Lezioni.class);
+        q.setParameter("calendariolezioni", cl);
+        q.setMaxResults(1);
+        return q.getResultList().isEmpty() ? null : (Presenze_Lezioni) q.getSingleResult();
+    }
+
+    public Presenze_Lezioni_Allievi getPresenzeLezioneAllievo(Presenze_Lezioni pl, Allievi a) {
+        TypedQuery q = this.em.createNamedQuery("presenzelezioni.allievo_giornata", Presenze_Lezioni_Allievi.class);
+        q.setParameter("presenzelezioni", pl);
+        q.setParameter("allievo", a);
+        q.setMaxResults(1);
+        return q.getResultList().isEmpty() ? null : (Presenze_Lezioni_Allievi) q.getSingleResult();
+    }
+
+    public List<Presenze_Lezioni_Allievi> getEntiStageSoggetto(Presenze_Lezioni pl) {
+        TypedQuery q = this.em.createNamedQuery("presenzelezioni.giornata", Presenze_Lezioni_Allievi.class);
+        q.setParameter("presenzelezioni", pl);
+        return (List<Presenze_Lezioni_Allievi>) q.getResultList();
     }
 
     public List<EnteStage> getEntiStageSoggetto(SoggettoProponente s) {
@@ -360,6 +382,7 @@ public class EntityOp {
         q.setParameter("istanza", is1);
         return (List<Information>) q.getResultList();
     }
+
     public List<Information> list_info(Corsoavviato ca1) {
         TypedQuery q = this.em.createNamedQuery("info.corsoavviato", Information.class);
         q.setParameter("corsoavviato", ca1);
@@ -425,7 +448,7 @@ public class EntityOp {
         }
         return new ArrayList<>();
     }
-    
+
     public List<CorsoStato> lista_stati(String tipostato) {
         try {
             TypedQuery q = this.em.createNamedQuery("stati.elenco", CorsoStato.class);
@@ -508,10 +531,10 @@ public class EntityOp {
         q.setMaxResults(100);
         q.setParameter("cognome", search.toLowerCase());
         q.setParameter("nome", search.toLowerCase());
-        System.out.println("rc.soop.sic.jpa.EntityOp.list_select_Docenti() "+q.toString());
+        System.out.println("rc.soop.sic.jpa.EntityOp.list_select_Docenti() " + q.toString());
         return q.getResultList().isEmpty() ? new ArrayList() : (List<Docente>) q.getResultList();
     }
-    
+
     public List<Corsoavviato> list_corso_user(SoggettoProponente sp, String tipologiapercorso, String statocorso) {
         HashMap<String, Object> param = new HashMap<>();
 
