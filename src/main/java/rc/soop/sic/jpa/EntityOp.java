@@ -470,6 +470,17 @@ public class EntityOp {
         }
         return new ArrayList<>();
     }
+    
+    public List<TirocinioStage> list_tirocini_allievo(Allievi al1) {
+        try {
+            TypedQuery q = this.em.createNamedQuery("tirociniostage.allievo", CorsoAvviato_AltroPersonale.class);
+            q.setParameter("allievi", al1);
+            return q.getResultList().isEmpty() ? new ArrayList() : (List<TirocinioStage>) q.getResultList();
+        } catch (Exception ex0) {
+            trackingAction("SERVICE", estraiEccezione(ex0));
+        }
+        return new ArrayList<>();
+    }
 
     public List<Docente> list_docenti_moduli(List<Docente> eldoc, List<Calendario_Formativo> calendar) {
         List<Docente> out = new ArrayList<>();

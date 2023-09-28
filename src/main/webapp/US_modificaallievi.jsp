@@ -99,6 +99,7 @@
                                                 <th>Cognome</th>
                                                 <th>Nome</th>
                                                 <th>Codice Fiscale</th>
+                                                <th>Tirocinio/Stage</th>
                                                 <th>Stato</th>
                                                 <th>Azioni</th>
                                             </tr>
@@ -116,9 +117,13 @@
                                                     <%=a1.getCodicefiscale()%>
                                                 </td>
                                                 <td>
+                                                    <%=Utils.getEtichettastato(a1.getStatotirocinio())%>
+                                                </td>
+                                                <td>
                                                     <%=Utils.getEtichettastato(a1.getStatoallievo())%>
                                                 </td>
-                                                <td><%
+                                                <td>
+                                                    <%
                                                     if (a1.getStatoallievo().equals(Stati.ATTIVO) || a1.getStatoallievo().equals(Stati.AVVIO)) {%>
                                                     <button type="button" data-bs-toggle="tooltip" title="MODIFICA STATO ALLIEVO" 
                                                             data-preload="false" class="btn btn-sm btn-bg-light btn-primary"
@@ -128,6 +133,20 @@
                                                             >
                                                         <i class="fa fa-edit"></i>
                                                     </button>
+                                                    <%}%>
+                                                    <%if (a1.getStatotirocinio().equals(Stati.AVVIARE)) {%>
+                                                    <a data-bs-toggle="tooltip" title="AVVIA TIROCINIO/STAGE ALLIEVO" 
+                                                       href="US_tirocinioallievo.jsp?idallievo=<%=Utils.enc_string(String.valueOf(a1.getIdallievi()))%>"
+                                                       data-preload="false" class="btn btn-sm btn-bg-light btn-secondary">
+                                                        <i class="fa fa-forward"></i>
+                                                    </a>
+                                                    <%}%>
+                                                    <%if (a1.getStatotirocinio().equals(Stati.ATTIVO)) {%>
+                                                    <a data-bs-toggle="tooltip" title="VISUALIZZA TIROCINIO/STAGE ALLIEVO" 
+                                                       href="US_tirocinioallievo.jsp?idallievo=<%=Utils.enc_string(String.valueOf(a1.getIdallievi()))%>"
+                                                       data-preload="false" class="btn btn-sm btn-bg-light btn-secondary">
+                                                        <i class="fa fa-file-alt"></i>
+                                                    </a>
                                                     <%}%>
                                                 </td>
                                             </tr>
@@ -155,7 +174,7 @@
                                             <%}%>
                                         </select>
                                     </label>
-                                    <span class="help-block">NUMERO MASSIMO ALLIEVI: <%=is1.getCorsobase().getNumeroallievi()%>. E' POSSIBILE AGGIUNGERE NUOVI ALLIEVI ENTRO IL 70% DI COMPLETAMENTO DEL CORSO.</span>
+                                    <span class="help-block">NUMERO MASSIMO ALLIEVI: <%=is1.getCorsobase().getNumeroallievi()%>. E' POSSIBILE AGGIUNGERE NUOVI ALLIEVI ENTRO IL 30% DI AVANZAMENTO DEL CORSO.</span>
                                 </div>
                                 <input type="hidden" id="allievimax" value="<%=is1.getCorsobase().getNumeroallievi()%>" />
                                 <%if (modify) {%>

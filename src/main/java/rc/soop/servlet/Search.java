@@ -240,7 +240,7 @@ public class Search extends HttpServlet {
             result.forEach(res -> {
                 JsonObject data_value = new JsonObject();
                 data_value.addProperty(RECORDID, at.get());
-                data_value.addProperty("stato", res.getStatocorso().getHtmlicon());
+                data_value.addProperty("stato", res.getStatocorso().getHtmldescr());
                 data_value.addProperty("id", res.getIdcorsoavviato());
                 String nome = "<b>Tipologia Percorso: " + res.getCorsobase().getIstanza().getTipologiapercorso().getNometipologia() + "</b><br/><u>" + res.getCorsobase().getRepertorio().getDenominazione() + "</u>";
                 data_value.addProperty("nome", nome);
@@ -249,6 +249,12 @@ public class Search extends HttpServlet {
                 data_value.addProperty("datainserimento", sdf_PATTERNDATE5.format(res.getDatainserimento()));
                 String azioni = "<form action=\"US_showcorsoavviato.jsp\" method=\"POST\" target=\"_blank\">"
                         + "<input type=\"hidden\" name=\"idcorso\" value=\"" + res.getIdcorsoavviato() + "\"/>";
+                
+                if (res.getStatocorso().getCodicestatocorso().equals("47")) {
+                    azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"RICHIESTA NOMINA COMMISSIONE ESAMI FINALI\" "
+                            + "data-preload='false' class=\"btn btn-sm btn-bg-light btn-warning\" "
+                            + "onclick=\"return richiedicommissione('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-envelope\"></i></button> | ";
+                }
                 if (res.getStatocorso().getCodicestatocorso().equals("40") || res.getStatocorso().getCodicestatocorso().equals("42")) {
                     azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"RICHIEDI AVVIO CORSO\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
                             + "onclick=\"return sendcorso('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-envelope\"></i></button> | ";

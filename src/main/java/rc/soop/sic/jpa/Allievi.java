@@ -97,6 +97,18 @@ public class Allievi implements Serializable {
     @JoinColumn(name = "idcorsoavviato")
     private Corsoavviato corsodiriferimento;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "statotirocinio")
+    private Stati statotirocinio;
+
+    public Stati getStatotirocinio() {
+        return statotirocinio;
+    }
+
+    public void setStatotirocinio(Stati statotirocinio) {
+        this.statotirocinio = statotirocinio;
+    }
+    
     public Corsoavviato getCorsodiriferimento() {
         return corsodiriferimento;
     }

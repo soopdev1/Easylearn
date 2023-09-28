@@ -161,7 +161,7 @@
                                                         <%if (azionicorso) {%>
                                                         <br>
                                                         <a class="btn btn-warning btn-sm fan1" href="US_modificadocenti.jsp" data-fancybox data-type='iframe' 
-                                                           data-bs-toggle="tooltip" title="MODIFICA ELENCO DOCENTI" data-preload='false' data-width='75%' data-height='75%'>
+                                                           data-bs-toggle="tooltip" title="MODIFICA/AGGIUNGI DOCENTI" data-preload='false' data-width='75%' data-height='75%'>
                                                             <i class="fa fa-edit" ></i></a>
                                                             <%}%>
                                                     </label>
@@ -198,7 +198,7 @@
                                                         <br>
                                                         <a class="btn btn-warning btn-sm fan1" href="US_modificaallievi.jsp"
                                                            data-fancybox data-type='iframe' 
-                                                           data-bs-toggle="tooltip" title="MODIFICA ELENCO ALLIEVI" 
+                                                           data-bs-toggle="tooltip" title="MODIFICA/AGGIUNGI ALLIEVI" 
                                                            data-preload='false' data-width='75%' data-height='75%'>
                                                             <i class="fa fa-edit" ></i></a>
                                                             <%}%>
@@ -210,6 +210,7 @@
                                                                     <th>Cognome</th>
                                                                     <th>Nome</th>
                                                                     <th>Codice Fiscale</th>
+                                                                    <th>Tirocinio/Stage</th>
                                                                     <th>Stato</th>
                                                                 </tr>
                                                             </thead>
@@ -224,6 +225,9 @@
                                                                     </td>
                                                                     <td>
                                                                         <%=a1.getCodicefiscale()%>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%=Utils.getEtichettastato(a1.getStatotirocinio())%>
                                                                     </td>
                                                                     <td>
                                                                         <%=Utils.getEtichettastato(a1.getStatoallievo())%>

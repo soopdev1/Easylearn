@@ -496,6 +496,7 @@ public class Utils {
             case INATTIVO:
                 return "<i class='fa fa-lock'></i> Inattivo";
             case ATTIVO:
+            case INCORSO:
                 return "<i class='fa fa-check'></i> Attivo";
             case ABILITATO:
                 return "<i class='fa fa-check'></i> Abilitato";
@@ -507,6 +508,12 @@ public class Utils {
                 return "<i class='fa fa-warning'></i> Attivo - In attesa";
             case AVVIO:
                 return "<i class='fa fa-hourglass'></i> Attivo - In fase di avvio";
+            case AVVIARE:
+                return "<i class='fa fa-hourglass'></i> Da Avviare";
+            case NONPREVISTO:
+                return "<i class='fa fa-lock'></i> Non Previsto";
+            case CONCLUSO:
+                return "<i class='fa fa-check'></i> Concluso";
             default:
                 return "";
         }

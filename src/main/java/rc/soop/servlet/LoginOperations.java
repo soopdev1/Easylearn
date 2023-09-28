@@ -27,6 +27,7 @@ import static rc.soop.sic.Utils.estraiEccezione;
 import static rc.soop.sic.Utils.getRequestValue;
 import static rc.soop.sic.Utils.redirect;
 import rc.soop.sic.jpa.EntityOp;
+import rc.soop.sic.jpa.Path;
 import rc.soop.sic.jpa.User;
 /**
  *
@@ -53,17 +54,22 @@ public class LoginOperations extends HttpServlet {
 
     protected void spid(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
+            
+            
+            EntityOp eo1 = new EntityOp();
+            
 //            HttpRequestExecutor executor = new HttpUrlConnectionExecutor();
             OAuth2AuthorizationProvider provider = new BasicOAuth2AuthorizationProvider(
-                    URI.create("https://is-test.regione.sicilia.it/oauth2/authorize"),
-                    URI.create("https://is-test.regione.sicilia.it/oauth2/token"),
+                    URI.create(eo1.getEm().find(Path.class, "spid.auth").getDescrizione()),
+                    URI.create(eo1.getEm().find(Path.class, "spid.token").getDescrizione()),
                     new Duration(1, 0, 3600));
             OAuth2ClientCredentials credentials = new BasicOAuth2ClientCredentials(
-                    "fq8aefusOqwjKNc5dkchF62ncLwa", "YTnffqNEfhfHqLTPUjfsumMaCAYa");
+                   eo1.getEm().find(Path.class, "spid.clientid").getDescrizione(), 
+                    eo1.getEm().find(Path.class, "spid.clientsecret").getDescrizione());
             OAuth2Client client = new BasicOAuth2Client(
                     provider,
                     credentials,
-                    new LazyUri(new Precoded("https://tu.formati.education/demo/SPIDSERVLET")) /* Redirect URL */);
+                    new LazyUri(new Precoded(eo1.getEm().find(Path.class, "spid.redirect").getDescrizione())) /* Redirect URL */);
             OAuth2InteractiveGrant grant = new AuthorizationCodeGrant(
                     client, new BasicScope("scope"));
             URI authorizationUrl = grant.authorizationUrl();

@@ -202,6 +202,13 @@
                                                     + "<button class='btn btn-danger' onclick='history.back()'><i class='fa fa-backward'></i> Torna Indietro</button>";
                                             break;
                                         }
+                                        case "KO_TSAL1": {
+                                            ty = "alert-danger";
+                                            html = "<i class='fa fa-exclamation-triangle'></i> ERRORE! Impossibile inserire il tirocinio/stage per l'allievo selezionato. Controllare."
+                                                    + " <hr>"
+                                                    + "<button class='btn btn-danger' onclick='history.back()'><i class='fa fa-backward'></i> Torna Indietro</button>";
+                                            break;
+                                        }
                                         case "KO_MOSD1":
                                         case "KO_MOSD2":
                                         case "KO_MOSD3":

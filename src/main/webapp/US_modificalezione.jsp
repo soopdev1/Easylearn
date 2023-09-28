@@ -90,7 +90,8 @@
                         <div class="card-header border-0 pt-5">
                             <h3 class="card-title align-items-start flex-column">
                                 <span class="card-label fw-bolder fs-3 mb-1">PRESENZE LEZIONE NUMERO <u><%=numlez%></u> - CORSO ID: <%=cl1.getCorsodiriferimento().getIdcorsoavviato()%> - 
-                                    <%=cl1.getCorsodiriferimento().getCorsobase().getIstanza().getTipologiapercorso().getNometipologia()%> - <u><%=cl1.getCorsodiriferimento().getCorsobase().getRepertorio().getDenominazione()%></u>
+                                    <%=cl1.getCorsodiriferimento().getCorsobase().getIstanza().getTipologiapercorso().getNometipologia()%> - 
+                                    <u><%=cl1.getCorsodiriferimento().getCorsobase().getRepertorio().getDenominazione()%></u><br/>MODULO: <%=cl1.getCalendarioformativo().getNomemodulo()%>
                                 </span>
                             </h3>
                         </div>

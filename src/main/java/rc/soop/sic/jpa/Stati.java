@@ -15,5 +15,9 @@ public enum Stati {
     AVVIO,
     ATTIVO,
     INATTIVO,
-    RITIRATO
+    RITIRATO,
+    AVVIARE,
+    NONPREVISTO,
+    INCORSO,
+    CONCLUSO
 }

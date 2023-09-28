@@ -3,7 +3,6 @@
     Created on : 18-feb-2022, 14.01.46
     Author     : raf
 --%>
-
 <%@page import="rc.soop.sic.jpa.Allievi"%>
 <%@page import="rc.soop.sic.Constant"%>
 <%@page import="rc.soop.sic.jpa.EntityOp"%>

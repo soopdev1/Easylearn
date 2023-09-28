@@ -95,6 +95,7 @@ import rc.soop.sic.jpa.TemplateDecretoAUT;
 import rc.soop.sic.jpa.TipoCorso;
 import rc.soop.sic.jpa.TipoSede;
 import rc.soop.sic.jpa.Tipologia_Percorso;
+import rc.soop.sic.jpa.TirocinioStage;
 import rc.soop.sic.jpa.User;
 
 /**
@@ -103,8 +104,47 @@ import rc.soop.sic.jpa.User;
  */
 public class Operations extends HttpServlet {
 
+    protected void AVVIATIROCINIOALLIEVO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        
+        String idallievo = getRequestValue(request, "idallievo");
+        String ENTESTAGE = getRequestValue(request, "ENTESTAGE");
+        String ORE = roundDoubleandFormat(fd(formatDoubleforMysql(getRequestValue(request, "ORE"))), 0);
+        
+        String DATAINIZIO = getRequestValue(request, "DATAINIZIO");
+        String DATAFINE = getRequestValue(request, "DATAFINE");
+        
+        try {
+
+            EntityOp ep1 = new EntityOp();
+            ep1.begin();
+            Allievi al1 = ep1.getEm().find(Allievi.class, Long.valueOf(idallievo));
+            EnteStage es1 = ep1.getEm().find(EnteStage.class, Long.valueOf(ENTESTAGE));
+            
+            TirocinioStage ts1 = new TirocinioStage();
+            ts1.setAllievi(al1);
+            ts1.setDatainserimento(new DateTime().toDate());
+            ts1.setDatainizio(Constant.sdf_PATTERNDATE6.parse(DATAINIZIO));
+            ts1.setDatafine(Constant.sdf_PATTERNDATE6.parse(DATAFINE));
+            ts1.setEntestage(es1);
+            ts1.setOrepreviste(parseIntR(ORE));
+            ts1.setUtenteinserimento(request.getSession().getAttribute("us_cod").toString());
+            ep1.persist(ts1);
+            al1.setStatotirocinio(Stati.ATTIVO);
+            ep1.merge(al1);
+            ep1.commit();
+            ep1.close();
+            //NOTIFICA MAIL PEC
+            redirect(request, response, "US_tirocinioallievo.jsp");
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_TSAL1");
+        }
+        
+        
+        
+        
+    }
     protected void MODIFICALEZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Utils.printRequest(request);
         String idcalendariolezione = getRequestValue(request, "idcalendariolezione");
         String docente = getRequestValue(request, "docente");
         String orai = getRequestValue(request, "orai");
@@ -126,6 +166,7 @@ public class Operations extends HttpServlet {
             ep1.merge(cl1);
             ep1.commit();
             ep1.close();
+            //NOTIFICA MAIL PEC
             redirect(request, response, "Page_message.jsp?esito=OK_MOSD");
         } catch (Exception ex1) {
             EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
@@ -655,6 +696,11 @@ public class Operations extends HttpServlet {
                     if (al1 != null) {
                         al1.setCorsodiriferimento(ca);
                         al1.setStatoallievo(Stati.AVVIO);
+                        if(ca.getCorsobase().getStageore()>0){
+                            al1.setStatotirocinio(Stati.AVVIARE);
+                        }else{
+                            al1.setStatotirocinio(Stati.NONPREVISTO);
+                        }
                         ep2.merge(al1);
                     }
                 }
@@ -2726,6 +2772,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "MODIFICALEZIONE":
                     MODIFICALEZIONE(request, response);
+                    break;
+                case "AVVIATIROCINIOALLIEVO":
+                    AVVIATIROCINIOALLIEVO(request, response);
                     break;
                 default:
                     break;

@@ -49,9 +49,7 @@
                 int modulidaassegnare = calendarlez.size() - moduliassegnati;
                 Engine.verificacorsodainviare(co1, calendariocompleto, modulidaassegnare);
                 String costostimato = (co1.getCostostimatoallievo() == 0.0) ? "" : String.format("%.2f", co1.getCostostimatoallievo());
-
                 double oretec = Utils.calcolaPercentuale(String.valueOf(co1.getDurataore()), String.valueOf(60));
-
     %>
     <!--begin::Head-->
     <head><base href="">
