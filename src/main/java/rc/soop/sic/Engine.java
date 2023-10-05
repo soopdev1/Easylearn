@@ -17,6 +17,7 @@ import rc.soop.sic.jpa.Certificazione;
 import rc.soop.sic.jpa.Competenze_Trasversali;
 import rc.soop.sic.jpa.Corso;
 import rc.soop.sic.jpa.CorsoStato;
+import rc.soop.sic.jpa.Corsoavviato;
 import rc.soop.sic.jpa.Docente;
 import rc.soop.sic.jpa.EntityOp;
 import static rc.soop.sic.jpa.EntityOp.trackingAction;
@@ -43,6 +44,7 @@ public class Engine {
         List<Tipologia_Percorso> result = (List<Tipologia_Percorso>) eo.findAll(Tipologia_Percorso.class);
         return result.stream().filter(p1 -> p1.getStatotipologiapercorso().equals(Stati.ATTIVO)).collect(Collectors.toList());
     }
+
     public static List<Tipologia_Percorso> tipo_percorso_attivi() {
         List<Tipologia_Percorso> result = (List<Tipologia_Percorso>) new EntityOp().findAll(Tipologia_Percorso.class);
         return result.stream().filter(p1 -> p1.getStatotipologiapercorso().equals(Stati.ATTIVO)).collect(Collectors.toList());
@@ -84,17 +86,31 @@ public class Engine {
             EntityOp eo = new EntityOp();
 
             List<Istanza> all = eo.getIstanzeSoggetto(so);
-            
+            List<Corsoavviato> ca = eo.getCorsiAvviati_Soggetto(so);
             try {
-                contatori[0] = String.valueOf(all.stream().filter(is1-> is1.getStatocorso().getCodicestatocorso().equals("07")).collect(Collectors.toList()).size());
+                contatori[0] = String.valueOf(all.stream().filter(is1 -> is1.getStatocorso().getCodicestatocorso().equals("07")).collect(Collectors.toList()).size());
             } catch (Exception ex0) {
                 trackingAction(se.getAttribute("us_cod").toString(), estraiEccezione(ex0));
             }
             try {
-                contatori[1] = String.valueOf(all.stream().filter(is1-> is1.getStatocorso().getCodicestatocorso().equals("08")).collect(Collectors.toList()).size());
+                contatori[1] = String.valueOf(all.stream().filter(is1 -> is1.getStatocorso().getCodicestatocorso().equals("08")).collect(Collectors.toList()).size());
             } catch (Exception ex0) {
                 trackingAction(se.getAttribute("us_cod").toString(), estraiEccezione(ex0));
             }
+
+            try {
+                contatori[2] = String.valueOf(ca.stream().filter(is1 -> !is1.getStatocorso().getCodicestatocorso().equals("40")).collect(Collectors.toList()).size());
+            } catch (Exception ex0) {
+                trackingAction(se.getAttribute("us_cod").toString(), estraiEccezione(ex0));
+            }
+
+            try {
+                contatori[3] = String.valueOf(ca.stream().filter(is1 -> (is1.getStatocorso().getCodicestatocorso().equals("44")
+                        || is1.getStatocorso().getCodicestatocorso().equals("46"))).collect(Collectors.toList()).size());
+            } catch (Exception ex0) {
+                trackingAction(se.getAttribute("us_cod").toString(), estraiEccezione(ex0));
+            }
+
         } catch (Exception ex) {
             trackingAction(se.getAttribute("us_cod").toString(), estraiEccezione(ex));
         }

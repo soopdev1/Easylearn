@@ -161,6 +161,11 @@ public class EntityOp {
         q.setParameter("corsobase", corsobase);
         return (List<Corsoavviato>) q.getResultList();
     }
+    public List<Corsoavviato> getCorsiAvviati_Soggetto(SoggettoProponente soggetto) {
+        TypedQuery q = this.em.createNamedQuery("corsoavviato.soggetto", Corsoavviato.class);
+        q.setParameter("soggetto", soggetto);
+        return (List<Corsoavviato>) q.getResultList();
+    }
 
     public List<Corsoavviato> getCorsiAvviati_Admin() {
         TypedQuery q = this.em.createNamedQuery("corsoavviato.stato", Corsoavviato.class);

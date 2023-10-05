@@ -71,7 +71,20 @@ public class Calendario_Lezioni implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date datainserimento;
     
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinColumn(name = "statolezione")
+    private CorsoStato statolezione;
+    
+    
     public Calendario_Lezioni() {
+    }
+
+    public CorsoStato getStatolezione() {
+        return statolezione;
+    }
+
+    public void setStatolezione(CorsoStato statolezione) {
+        this.statolezione = statolezione;
     }
 
     public String getTipolezione() {

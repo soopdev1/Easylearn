@@ -51,25 +51,32 @@
                 String orainizio = cl1.getOrainizio();
                 String orafine = cl1.getOrafine();
                 String dataeffettiva = Constant.sdf_PATTERNDATE6.format(cl1.getDatalezione());
+                String datashow = Constant.sdf_PATTERNDATE4.format(cl1.getDatalezione());
                 Docente doc1 = cl1.getDocente();
                 Long idpresenza = 0L;
                 if (pl1 != null) {
                     datainserimento = Constant.sdf_PATTERNDATE5.format(pl1.getDatainserimento());
                     pa1 = eo.getEntiStageSoggetto(pl1);
                     dataeffettiva = Constant.sdf_PATTERNDATE6.format(pl1.getDatarealelezione());
+                    datashow = Constant.sdf_PATTERNDATE4.format(pl1.getDatarealelezione());
                     doc1 = pl1.getDocente();
                     orainizio = pl1.getOrainizio();
                     orafine = pl1.getOrafine();
-                idpresenza = pl1.getIdpresenzelezioni();
+                    idpresenza = pl1.getIdpresenzelezioni();
                 }
 
                 if (!Utils.isAdmin(session)) {
                     SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
                     if (so.getIdsoggetto().equals(cl1.getCorsodiriferimento().getCorsobase().getSoggetto().getIdsoggetto())
-                            && cl1.getCorsodiriferimento().getStatocorso().getCodicestatocorso().equals("44")) {
+                            && cl1.getCorsodiriferimento().getStatocorso().getCodicestatocorso().equals("44")
+                            && !cl1.getStatolezione().getCodicestatocorso().equals("61")) {
                         modify = true;
                     }
-                }%>
+                }
+
+                String readonly = modify ? "" : "readonly";
+
+    %>
     <!--begin::Head-->
     <head><base href="">
         <title><%=Constant.NAMEAPP%>: Modifica presenze lezioni</title>
@@ -109,7 +116,7 @@
                                 <span class="card-label fw-bolder fs-3 mb-1">PRESENZE LEZIONE NUMERO <u><%=numlez%></u> - CORSO ID: <%=cl1.getCorsodiriferimento().getIdcorsoavviato()%> - 
                                     <%=cl1.getCorsodiriferimento().getCorsobase().getIstanza().getTipologiapercorso().getNometipologia()%> - 
                                     <u><%=cl1.getCorsodiriferimento().getCorsobase().getRepertorio().getDenominazione()%></u><br/>MODULO: <%=cl1.getCalendarioformativo().getNomemodulo()%>
-                                    <br/>Presenze inserire in data: <u><%=datainserimento%></u>
+                                    <br/>Presenze inserite in data: <u><%=datainserimento%></u>
                                 </span>
                             </h3>
                         </div>
@@ -118,117 +125,144 @@
                                 <input type="hidden" name="type" value="AGGIUNGIPRESENZELEZIONE"/>
                                 <input type="hidden" name="idcalendariolezione" value="<%=cl1.getIdcalendariolezioni()%>"/>
                                 <input type="hidden" name="idpresenza" value="<%=idpresenza%>"/>
-                            <div class="row col-md-12">
-                                <label class="col-md-3 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>DATA EFFETTIVA LEZIONE:</b></span>
-                                </label>
-                                <div class="col-md-3 col-form-label fw-bold fs-6">
-                                    <input type="date" class="form-control" id="datelez" name="datelez" value="<%=dataeffettiva%>" />
-                                </div>
-                                <label class="col-md-3 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>DOCENTE</b></span>
-                                </label>
-                                <div class="col-md-3 col-form-label fs-6">
-                                    <select 
-                                        id="docente"
-                                        name="docente" aria-label="Scegli..." 
-                                        data-control="select2" data-placeholder="Scegli..." 
-                                        class="form-select" required>
-                                        <option value="<%=doc1.getIddocente()%>">
-                                            <%=doc1.getCognome()%> <%=doc1.getNome()%> - <%=doc1.getCodicefiscale()%>
-                                        </option>
-                                        <%for (CorsoAvviato_Docenti d1 : avv_doc) {
-                                                if (d1.getDocente().getIddocente().equals(doc1.getIddocente())) {
-                                                    continue;
-                                                }
-                                        %>
-                                        <option value="<%=d1.getDocente().getIddocente()%>"><%=d1.getDocente().getCognome()%> <%=d1.getDocente().getNome()%> - <%=d1.getDocente().getCodicefiscale()%></option>
+                                <div class="row col-md-12">
+                                    <label class="col-md-3 col-form-label fw-bold fs-6">
+                                        <span class="text-danger"><b>DATA EFFETTIVA LEZIONE:</b></span>
+                                    </label>
+                                    <div class="col-md-3 col-form-label fw-bold fs-6">
+                                        <%if (modify) {%>
+                                        <input type="date" class="form-control" id="datelez" name="datelez" value="<%=dataeffettiva%>" <%=readonly%>/>
+                                        <%} else {%>
+                                        <span class="text-dark"><b><%=datashow%></b></span>
+                                        <input type="hidden" id="datelez" name="datelez" value=""/>
                                         <%}%>
-                                    </select>
-                                </div>  
-                                <label class="col-md-3 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>ORA INIZIO LEZIONE:</b></span>
-                                </label>
-                                <div class="col-md-3 col-form-label fw-bold fs-6">
-                                    <select 
-                                        id="orai"
-                                        name="orai" aria-label="Scegli..." 
-                                        data-control="select2" data-placeholder="Ora Inizio"
-                                        class="form-select" required onchange="return populatedatafine(this);">
-                                        <option value="<%=orainizio%>" selected><%=orainizio%></option>
-                                        <option value="08:00">08:00</option>
-                                        <option value="08:30">08:30</option>
-                                        <option value="09:00">09:00</option>
-                                        <option value="09:30">09:30</option>
-                                        <option value="10:00">10:00</option>
-                                        <option value="10:30">10:30</option>
-                                        <option value="11:00">11:00</option>
-                                        <option value="11:30">11:30</option>
-                                        <option value="12:00">12:00</option>
-                                        <option value="12:30">12:30</option>
-                                        <option value="13:00">13:00</option>
-                                        <option value="13:30">13:30</option>
-                                        <option value="14:00">14:00</option>
-                                        <option value="14:30">14:30</option>
-                                        <option value="15:00">15:00</option>
-                                        <option value="15:30">15:30</option>
-                                        <option value="16:00">16:00</option>
-                                        <option value="16:30">16:30</option>
-                                        <option value="17:00">17:00</option>
-                                        <option value="17:30">17:30</option>
-                                        <option value="18:00">18:00</option>
-                                        <option value="18:30">18:30</option>
-                                        <option value="19:00">19:00</option>
-                                        <option value="19:30">19:30</option>
-                                        <option value="20:00">20:00</option>
-                                    </select>
-                                </div>
-                                <label class="col-md-3 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>ORA FINE LEZIONE:</b></span>
-                                </label>
-                                <div class="col-md-3 col-form-label fw-bold fs-6">
-                                    <select 
-                                        id="oraf"
-                                        name="oraf" aria-label="Scegli..." 
-                                        data-control="select2" data-placeholder="Ora Fine" 
-                                        class="form-select" required onchange="return checkorariomax();">
-                                        <option value="<%=orafine%>" selected><%=orafine%></option>                                        
-                                    </select>
-                                </div>
-                                <label class="col-md-3 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>ALLIEVI:</b></span>
-                                </label>    
-                                <div class="col-md-9">
-                                    <table class="table table-hover table-row-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Cognome</th>
-                                                <th>Nome</th>
-                                                <th>Codice Fiscale</th>
-                                                <th>Stato Attuale</th>
-                                                <th>Ore Presenza</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <%for (Allievi a1 : allievi) {
-                                                    String value1 = "0";
-                                                    Long millis = 0L;
-                                                    boolean presenza = false;
-                                                    for (Presenze_Lezioni_Allievi pla : pa1) {
-                                                        if (pla.getAllievo().getIdallievi().equals(a1.getIdallievi())) {
-                                                            presenza = true;
-                                                            millis = pla.getDurata();
-                                                            value1 = Utils.roundDoubleandFormat(millis / 3600000.00, 1);
-                                                        }
-                                                    }
+                                    </div>
+                                    <label class="col-md-3 col-form-label fw-bold fs-6">
+                                        <span class="text-danger"><b>DOCENTE</b></span>
+                                    </label>
+                                    <div class="col-md-3 col-form-label fs-6">
 
+                                        <%if (modify) {%>
+
+
+                                        <select 
+                                            id="docente"
+                                            name="docente" aria-label="Scegli..." 
+                                            data-control="select2" data-placeholder="Scegli..." 
+                                            class="form-select" required>
+                                            <option value="<%=doc1.getIddocente()%>">
+                                                <%=doc1.getCognome()%> <%=doc1.getNome()%> - <%=doc1.getCodicefiscale()%>
+                                            </option>
+                                            <%for (CorsoAvviato_Docenti d1 : avv_doc) {
+                                                    if (d1.getDocente().getIddocente().equals(doc1.getIddocente())) {
+                                                        continue;
+                                                    }
                                             %>
+                                            <option value="<%=d1.getDocente().getIddocente()%>"><%=d1.getDocente().getCognome()%> <%=d1.getDocente().getNome()%> - <%=d1.getDocente().getCodicefiscale()%></option>
+                                            <%}%>
+                                        </select>
+                                        <%} else {%>
+                                        <span class="text-dark"><b><%=doc1.getCognome()%> <%=doc1.getNome()%> - <%=doc1.getCodicefiscale()%></b></span>
+                                        <input type="hidden" class="form-control" id="docente" name="docente" value=""/>
+                                        <%}%>
+                                    </div>  
+                                    <label class="col-md-3 col-form-label fw-bold fs-6">
+                                        <span class="text-danger"><b>ORA INIZIO LEZIONE:</b></span>
+                                    </label>
+                                    <div class="col-md-3 col-form-label fw-bold fs-6">
+                                        <%if (modify) {%>
+                                        <select 
+                                            id="orai"
+                                            name="orai" aria-label="Scegli..." 
+                                            data-control="select2" data-placeholder="Ora Inizio"
+                                            class="form-select" required onchange="return populatedatafine(this);">
+                                            <option value="<%=orainizio%>" selected><%=orainizio%></option>
+                                            <option value="08:00">08:00</option>
+                                            <option value="08:30">08:30</option>
+                                            <option value="09:00">09:00</option>
+                                            <option value="09:30">09:30</option>
+                                            <option value="10:00">10:00</option>
+                                            <option value="10:30">10:30</option>
+                                            <option value="11:00">11:00</option>
+                                            <option value="11:30">11:30</option>
+                                            <option value="12:00">12:00</option>
+                                            <option value="12:30">12:30</option>
+                                            <option value="13:00">13:00</option>
+                                            <option value="13:30">13:30</option>
+                                            <option value="14:00">14:00</option>
+                                            <option value="14:30">14:30</option>
+                                            <option value="15:00">15:00</option>
+                                            <option value="15:30">15:30</option>
+                                            <option value="16:00">16:00</option>
+                                            <option value="16:30">16:30</option>
+                                            <option value="17:00">17:00</option>
+                                            <option value="17:30">17:30</option>
+                                            <option value="18:00">18:00</option>
+                                            <option value="18:30">18:30</option>
+                                            <option value="19:00">19:00</option>
+                                            <option value="19:30">19:30</option>
+                                            <option value="20:00">20:00</option>
+                                        </select>
+                                        <%} else {%>
+                                        <input type="hidden" class="form-control" id="orai" name="orai" value=""/>
+                                        <span class="text-dark"><b><%=orainizio%></b></span>
+                                                <%}%>
+                                    </div>
+                                    <label class="col-md-3 col-form-label fw-bold fs-6">
+                                        <span class="text-danger"><b>ORA FINE LEZIONE:</b></span>
+                                    </label>
+                                    <div class="col-md-3 col-form-label fw-bold fs-6">
+                                        <%if (modify) {%>
+                                        <select 
+                                            id="oraf"
+                                            name="oraf" aria-label="Scegli..." 
+                                            data-control="select2" data-placeholder="Ora Fine" 
+                                            class="form-select" required>
+                                            <option value="<%=orafine%>" selected><%=orafine%></option>                                        
+                                        </select>
+                                        <%} else {%>
+                                        <input type="hidden" class="form-control" id="oraf" name="oraf" value=""/>
+                                        <span class="text-dark"><b><%=orafine%></b></span>
+                                                <%}%>
+                                    </div>
+                                    <label class="col-md-2 col-form-label fw-bold fs-6">
+                                        <span class="text-danger"><b>ALLIEVI:</b></span>
+                                    </label>    
+                                    <div class="col-md-10">
+                                        <table class="table table-hover table-row-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Discente</th>
+                                                    <th>Codice Fiscale</th>
+                                                    <th>Stato Attuale</th>
+                                                    <th>Presenza SI/NO</th>
+                                                    <th>Orario Ingresso/Uscita</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <%for (Allievi a1 : allievi) {
+
+                                                        boolean modifyallievo = false;
+                                                        String allievo_presente = "1";
+                                                        String allievo_orai = "";
+                                                        String allievo_oraf = "";
+
+                                                        for (Presenze_Lezioni_Allievi pla : pa1) {
+                                                            if (pla.getAllievo().getIdallievi().equals(a1.getIdallievi())) {
+                                                                modifyallievo = true;
+                                                                allievo_presente = pla.getDurata() > 0 ? "1" : "0";
+                                                                allievo_orai = pla.getOrainizio();
+                                                                allievo_oraf = pla.getOrafine();
+                                                            }
+                                                        }
+
+                                                %>
+                                            <input type="hidden" name="modify_<%=a1.getIdallievi()%>" value="<%=modifyallievo%>" />
+                                            <input type="hidden" id="startoi_<%=a1.getIdallievi()%>" value="<%=allievo_orai%>" />
+                                            <input type="hidden" id="startof_<%=a1.getIdallievi()%>" value="<%=allievo_oraf%>" />
                                             <tr>
                                                 <td>
-                                                    <%=a1.getCognome()%>
-                                                </td>
-                                                <td>
-                                                    <%=a1.getNome()%>
+                                                    <%=a1.getCognome()%> <%=a1.getNome()%>
                                                 </td>
                                                 <td>
                                                     <%=a1.getCodicefiscale()%>
@@ -237,30 +271,70 @@
                                                     <%=Utils.getEtichettastato(a1.getStatoallievo())%>
                                                 </td>
                                                 <td>
+                                                    <%if (modify) {%>
                                                     <select 
-                                                        id="presenza<%=a1.getIdallievi()%>"
-                                                        name="presenza<%=a1.getIdallievi()%>" aria-label="..." 
+                                                        id="sino_<%=a1.getIdallievi()%>"
+                                                        name="sino_<%=a1.getIdallievi()%>" aria-label="..." 
                                                         data-control="select2" data-placeholder="..." 
-                                                        class="form-select sel-presenza" required >
+                                                        class="form-select" required onchange="return checkorariomax();">
+
+                                                        <%if (allievo_presente.equals("1")) {%>
+                                                        <option value="1" selected>SI</option>
+                                                        <option value="0">NO</option>
+                                                        <%} else {%>
+                                                        <option value="1">SI</option>
+                                                        <option value="0" selected>NO</option>
+                                                        <%}%>
+
+
                                                     </select>
-                                                        <input type="hidden" id="start_presenza<%=a1.getIdallievi()%>" value="<%=millis%>" />
+                                                    <%} else {%>
+                                                    <span class="text-dark"><b><%=allievo_presente.equals("1") ? "SI" : "NO"%></b></span>
+                                                            <%}%>
+                                                </td>
+                                                <td>
+                                                    <div class="row col-md-12">
+                                                        <div class="col-md-6">
+                                                            <%if (modify) {%>
+                                                            <select 
+                                                                id="orai_<%=a1.getIdallievi()%>"
+                                                                name="orai_<%=a1.getIdallievi()%>" aria-label="Scegli..." 
+                                                                data-control="select2" data-placeholder="Ora Inizio"
+                                                                class="form-select sel-presenza" required>
+                                                                <option value="<%=orainizio%>" selected><%=orainizio%></option>
+                                                            </select>
+                                                            <%} else {%>
+                                                            <span class="text-dark"><b><%=orainizio%></b></span>
+                                                                    <%}%>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <%if (modify) {%>
+                                                            <select 
+                                                                id="oraf_<%=a1.getIdallievi()%>"
+                                                                name="oraf_<%=a1.getIdallievi()%>" aria-label="Scegli..." 
+                                                                data-control="select2" data-placeholder="Ora Fine" 
+                                                                class="form-select sel-presenza" required>
+                                                                <option value="<%=orafine%>" selected><%=orafine%></option>                                        
+                                                            </select>
+                                                            <%} else {%>
+                                                            <span class="text-dark"><b><%=orafine%></b></span>
+                                                                    <%}%>
+                                                    </div>
                                                 </td>
                                             </tr>
                                             <%}%>
-                                        </tbody>
-                                    </table>
-                                </div>    
-                            </div>
-
-
-                            <%if (modify) {%>
-                            <hr>
-                            <p class="mb-0">
-                                <button type="submit" class="btn btn-success btn-circled">
-                                    <i class="fa fa-save"></i> SALVA DATI
-                                </button>
-                            </p>
-                            <%}%>
+                                            </tbody>
+                                        </table>
+                                    </div>    
+                                </div>
+                                <%if (modify) {%>
+                                <hr>
+                                <p class="mb-0">
+                                    <button type="submit" class="btn btn-success btn-circled">
+                                        <i class="fa fa-save"></i> SALVA DATI
+                                    </button>
+                                </p>
+                                <%}%>
                             </form>
                         </div>
                     </div>

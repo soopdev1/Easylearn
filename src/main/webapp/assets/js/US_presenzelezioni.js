@@ -1,7 +1,6 @@
 $(document).ready(function () {
-    setstartdate("data", 0, "min", $('#date_start').val());
-    setstartdate("data", 0, "max", $('#date_end').val());
     populatedatafine(document.getElementById('orai'));
+    checkorariomax();
 });
 
 function checkorariomax() {
@@ -9,33 +8,110 @@ function checkorariomax() {
     var oraf = $('#oraf').val();
     $('.sel-presenza').each(function (i, obj) {
         if (obj.id !== "") {
-            $('#' + obj.id).val(null).trigger('change');
+            //$('#' + obj.id).val(null).trigger('change');
             $('#' + obj.id).empty();
         }
     });
     try {
         var date1 = new Date('1/1/2000 ' + orai + ':00');
         var date2 = new Date('1/1/2000 ' + oraf + ':00');
-        var diff = (date2 - date1) / 3600000;
-        //console.log(diff);
-        for (var st = 0; st <= diff; st = st + 0.5) {
-            $('.sel-presenza').each(function (i, obj) {
-                if (obj.id !== "") {
-                    var millis = (st * 3600000);
-                    var st1 = Number(st).toLocaleString("it-IT", {minimumFractionDigits: 1}).replace(/[.,]0$/, "");
-                    var newOption = new Option(st1, millis, false, false);
-                    $('#' + obj.id).append(newOption).trigger('change');
-//                    console.log(i + " --- " + obj.id);
-                }
-//                $('#' + obj.id).append(newOption).trigger('change');
-            });
-        }
+
+
+        //    console.log(date1);
+        //    console.log(date2);
+
 
         $('.sel-presenza').each(function (i, obj) {
-            if (obj.id !== "") {
-                $('#' + obj.id).val($('#start_' + obj.id).val()).trigger('change');
+            var idoggetto = new String(obj.id).trim();
+            if (idoggetto !== "") {
+
+                $('#' + idoggetto).select2("enable", true);
+                $('#' + idoggetto).prop('disabled', false);
+
+                var idallievo = idoggetto.split('_')[1];
+                var sino = $('#sino_' + idallievo).val();
+                var startoi = $('#startoi_' + idallievo).val();
+                var startof = $('#startof_' + idallievo).val();
+
+                if (sino === "0") {
+                    var no1 = new Option("--", "--", false, false);
+                    $('#' + idoggetto).append(no1);
+                    $('#' + idoggetto).select2("enable", false);
+                    $('#' + idoggetto).prop('disabled', true);
+                } else {
+
+
+
+                    if (idoggetto.startsWith("oraf")) {
+                        $('#' + idoggetto).val(null).trigger('change');
+                    }
+                    var selectedind = 1;
+                    for (var i = 8; i < 21; i++) {
+                        var v1 = new Date('1/1/2000 ' + i + ':00:00');
+                        var v2 = new Date('1/1/2000 ' + i + ':30:00');
+
+
+                        var newOption1 = null;
+                        var newOption2 = null;
+
+                        if (v1 >= date1 && v1 <= date2) {
+                            var out1 = i + ":00";
+                            if (i < 10) {
+                                out1 = "0" + i + ":00";
+                            }
+                            newOption1 = out1;
+                            selectedind = out1;
+                        }
+                        if (v2 >= date1 && v2 <= date2) {
+                            var out1 = i + ":30";
+                            if (i < 10) {
+                                out1 = "0" + i + ":30";
+                            }
+                            newOption2 = out1;
+                            selectedind = out1;
+                        }
+
+                        if (newOption1 !== null) {
+//                        if (idoggetto.startsWith("oraf")) {
+//                            var no1 = new Option(newOption1, newOption1, false, false);
+//                            $('#' + idoggetto).append(no1).trigger('change');
+//                        } else {
+                            var no1 = new Option(newOption1, newOption1, false, false);
+                            $('#' + idoggetto).append(no1);
+//                        }
+                        }
+                        if (newOption2 !== null) {
+//                        if (idoggetto.startsWith("oraf")) {
+//                            var no2 = new Option(newOption2, newOption2, false, false);
+//                            $('#' + idoggetto).append(no2).trigger('change');
+//                        } else {
+                            var no2 = new Option(newOption2, newOption2, false, false);
+                            $('#' + idoggetto).append(no2);
+//                        }
+                        }
+                    }
+
+                    if (idoggetto.startsWith("oraf")) {
+                        $('#' + idoggetto).val(selectedind).trigger('change');
+                    }
+
+
+
+
+
+                }
+
+                if (startoi !== "" && idoggetto.startsWith("orai")) {
+                    $('#' + idoggetto).val(startoi).trigger('change');
+                }
+
+                if (startof !== "" && idoggetto.startsWith("oraf")) {
+                    $('#' + idoggetto).val(startof).trigger('change');
+                }
             }
         });
+
+
     } catch (e) {
         console.log(e);
     }
@@ -61,7 +137,6 @@ function setstartdate(id, addday, attr, startdate) {
 }
 
 function checkdatisalvati() {
-
     var tipolez = $('#tipolez').val();
     var orai = $('#orai').val();
     var oraf = $('#oraf').val();
@@ -105,6 +180,7 @@ function checkdatisalvati() {
 }
 
 function populatedatafine(component) {
+
     $('#oraf').val(null).trigger('change');
     var start = component.value;
     if (start !== "") {
@@ -131,6 +207,10 @@ function populatedatafine(component) {
             }
 
         }
+        $('#oraf').on("change", function (e) {
+            checkorariomax();
+        });
+//        checkorariomax();
     }
-    checkorariomax();
+
 }

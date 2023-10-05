@@ -27,15 +27,14 @@ import javax.persistence.TemporalType;
  * @author Administrator
  */
 @NamedQueries(value = {
-    @NamedQuery(name = "presenzelezioni.allievo_corso", 
+    @NamedQuery(name = "presenzelezioni.allievo_corso",
             query = "SELECT u FROM Presenze_Lezioni_Allievi u WHERE u.presenzelezioni.corsodiriferimento=:corsodiriferimento ORDER BY u.presenzelezioni.datarealelezione,u.orainizio"),
-    @NamedQuery(name = "presenzelezioni.giornata", 
+    @NamedQuery(name = "presenzelezioni.giornata",
             query = "SELECT u FROM Presenze_Lezioni_Allievi u WHERE u.presenzelezioni=:presenzelezioni ORDER BY u.orainizio,u.allievo.cognome"),
-    @NamedQuery(name = "presenzelezioni.allievo", 
+    @NamedQuery(name = "presenzelezioni.allievo",
             query = "SELECT u FROM Presenze_Lezioni_Allievi u WHERE u.allievo=:allievo ORDER BY u.presenzelezioni.datarealelezione,u.orainizio"),
-    @NamedQuery(name = "presenzelezioni.allievo_giornata", 
-            query = "SELECT u FROM Presenze_Lezioni_Allievi u WHERE u.presenzelezioni=:presenzelezioni AND u.allievo=:allievo"),
-})
+    @NamedQuery(name = "presenzelezioni.allievo_giornata",
+            query = "SELECT u FROM Presenze_Lezioni_Allievi u WHERE u.presenzelezioni=:presenzelezioni AND u.allievo=:allievo"),})
 @Entity
 @Table(name = "presenzelezioniallievi")
 public class Presenze_Lezioni_Allievi implements Serializable {
@@ -49,11 +48,14 @@ public class Presenze_Lezioni_Allievi implements Serializable {
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "idpresenzelezioni")
     private Presenze_Lezioni presenzelezioni;
-    
+
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "idallievi")
     private Allievi allievo;
-    
+
+    @Column(name = "presente", columnDefinition = "tinyint(1) default 1")
+    private boolean presente;
+
     @Column(name = "orainizio")
     private String orainizio;
 
@@ -68,6 +70,14 @@ public class Presenze_Lezioni_Allievi implements Serializable {
     private Date datainserimento;
 
     public Presenze_Lezioni_Allievi() {
+    }
+
+    public boolean isPresente() {
+        return presente;
+    }
+
+    public void setPresente(boolean presente) {
+        this.presente = presente;
     }
 
     public String getOrainizio() {
@@ -109,7 +119,7 @@ public class Presenze_Lezioni_Allievi implements Serializable {
     public void setDurata(Long durata) {
         this.durata = durata;
     }
-    
+
     public Date getDatainserimento() {
         return datainserimento;
     }

@@ -50,6 +50,8 @@ import org.apache.commons.lang3.StringUtils;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import org.joda.time.DateTime;
 import org.joda.time.Minutes;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
 import static rc.soop.sic.Constant.PATTERNDATE2;
 import static rc.soop.sic.Constant.PATTERNDATE3;
 import rc.soop.sic.jpa.Allievi;
@@ -540,6 +542,18 @@ public class Utils {
         } catch (Exception ex) {
             Constant.LOGGER.severe(estraiEccezione(ex));
             return 0.0;
+        }
+    }
+
+    public static Long calcolaMillis(String orainizio, String orafine) {
+        try {
+            DateTime dt1 = new DateTime(2023, 1, 1, Utils.parseIntR(orainizio.split(":")[0]), Utils.parseIntR(orainizio.split(":")[1]));
+            DateTime dt2 = new DateTime(2023, 1, 1, Utils.parseIntR(orafine.split(":")[0]), Utils.parseIntR(orafine.split(":")[1]));
+            Period p = new Period(dt1, dt2, PeriodType.millis());
+            return Long.valueOf(String.valueOf(p.getValue(0)));
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+            return 0L;
         }
     }
 

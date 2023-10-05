@@ -105,21 +105,21 @@ import rc.soop.sic.jpa.User;
 public class Operations extends HttpServlet {
 
     protected void AVVIATIROCINIOALLIEVO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        
+
         String idallievo = getRequestValue(request, "idallievo");
         String ENTESTAGE = getRequestValue(request, "ENTESTAGE");
         String ORE = roundDoubleandFormat(fd(formatDoubleforMysql(getRequestValue(request, "ORE"))), 0);
-        
+
         String DATAINIZIO = getRequestValue(request, "DATAINIZIO");
         String DATAFINE = getRequestValue(request, "DATAFINE");
-        
+
         try {
 
             EntityOp ep1 = new EntityOp();
             ep1.begin();
             Allievi al1 = ep1.getEm().find(Allievi.class, Long.valueOf(idallievo));
             EnteStage es1 = ep1.getEm().find(EnteStage.class, Long.valueOf(ENTESTAGE));
-            
+
             TirocinioStage ts1 = new TirocinioStage();
             ts1.setAllievi(al1);
             ts1.setDatainserimento(new DateTime().toDate());
@@ -139,11 +139,9 @@ public class Operations extends HttpServlet {
             EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
             redirect(request, response, "Page_message.jsp?esito=KO_TSAL1");
         }
-        
-        
-        
-        
+
     }
+
     protected void MODIFICALEZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String idcalendariolezione = getRequestValue(request, "idcalendariolezione");
         String docente = getRequestValue(request, "docente");
@@ -200,7 +198,9 @@ public class Operations extends HttpServlet {
                 pl1.setOrafine(oraf);
                 pl1.setUtenteinserimento(request.getSession().getAttribute("us_cod").toString());
                 pl1.setDatainserimento(new DateTime().toDate());
+                cl1.setStatolezione(ep1.getEm().find(CorsoStato.class, "60"));
                 ep1.merge(pl1);
+                ep1.merge(cl1);
             } else {
                 //ADD
                 pl1 = new Presenze_Lezioni();
@@ -212,7 +212,9 @@ public class Operations extends HttpServlet {
                 pl1.setCalendariolezioni(cl1);
                 pl1.setCorsodiriferimento(cl1.getCorsodiriferimento());
                 pl1.setDatainserimento(new DateTime().toDate());
+                cl1.setStatolezione(ep1.getEm().find(CorsoStato.class, "60"));
                 ep1.persist(pl1);
+                ep1.merge(cl1);
             }
             ep1.commit();
             ep1.close();
@@ -221,27 +223,35 @@ public class Operations extends HttpServlet {
             ep2.begin();
             List<Allievi> allievi = ep2.getAllieviCorsoAvviato(cl1.getCorsodiriferimento());
             for (Allievi a1 : allievi) {
-                String presenza = getRequestValue(request, "presenza" + a1.getIdallievi());
-                if (!presenza.equals("")) {
-                    Presenze_Lezioni_Allievi pla = ep2.getPresenzeLezioneAllievo(pl1, a1);
-                    if (pla != null) {
-                        pla.setDatainserimento(new DateTime().toDate());
-                        pla.setDurata(parseLongR(presenza));
-                        pla.setOrainizio(orai);
-                        pla.setOrafine(Utils.getOraFine(orai, pla.getDurata()));
-                        ep2.merge(pla);
-                        //MERGE
-                    } else {
-                        //PERSIST
-                        pla = new Presenze_Lezioni_Allievi();
-                        pla.setDatainserimento(new DateTime().toDate());
-                        pla.setDurata(parseLongR(presenza));
-                        pla.setOrainizio(orai);
-                        pla.setOrafine(Utils.getOraFine(orai, pla.getDurata()));
-                        pla.setAllievo(a1);
-                        pla.setPresenzelezioni(pl1);
-                        ep2.persist(pla);
-                    }
+                Long allievo_durata = 0L;
+                boolean allievo_presente = getRequestValue(request, "sino_" + a1.getIdallievi()).equals("1");
+                String allievo_orai = getRequestValue(request, "orai_" + a1.getIdallievi());
+                String allievo_oraf = getRequestValue(request, "oraf_" + a1.getIdallievi());
+                if (!allievo_presente) {
+                    allievo_orai = "00:00";
+                    allievo_oraf = "00:00";
+                } else {
+                    allievo_durata = Utils.calcolaMillis(orai, oraf);
+                }
+                boolean modify = getRequestValue(request, "modify_" + a1.getIdallievi()).equals("true");
+                Presenze_Lezioni_Allievi pla = ep2.getPresenzeLezioneAllievo(pl1, a1);
+                if (pla != null && modify) {
+                    pla.setDatainserimento(new DateTime().toDate());
+                    pla.setDurata(allievo_durata);
+                    pla.setOrainizio(allievo_orai);
+                    pla.setOrafine(allievo_oraf);
+                    ep2.merge(pla);
+                    //MERGE
+                } else {
+                    //PERSIST
+                    pla = new Presenze_Lezioni_Allievi();
+                    pla.setDatainserimento(new DateTime().toDate());
+                    pla.setDurata(allievo_durata);
+                    pla.setOrainizio(allievo_orai);
+                    pla.setOrafine(allievo_oraf);
+                    pla.setAllievo(a1);
+                    pla.setPresenzelezioni(pl1);
+                    ep2.persist(pla);
                 }
             }
             ep2.commit();
@@ -696,9 +706,9 @@ public class Operations extends HttpServlet {
                     if (al1 != null) {
                         al1.setCorsodiriferimento(ca);
                         al1.setStatoallievo(Stati.AVVIO);
-                        if(ca.getCorsobase().getStageore()>0){
+                        if (ca.getCorsobase().getStageore() > 0) {
                             al1.setStatotirocinio(Stati.AVVIARE);
-                        }else{
+                        } else {
                             al1.setStatotirocinio(Stati.NONPREVISTO);
                         }
                         ep2.merge(al1);
@@ -2049,6 +2059,42 @@ public class Operations extends HttpServlet {
 
     }
 
+    protected void CONVALIDALEZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        JsonObject resp_out = new JsonObject();
+
+        try {
+
+            EntityOp ep1 = new EntityOp();
+            Calendario_Lezioni is1 = ep1.getEm().find(Calendario_Lezioni.class, Long.valueOf(getRequestValue(request, "IDLEZIONE")));
+
+            if (is1 != null) {
+                ep1.begin();
+                is1.setStatolezione(ep1.getEm().find(CorsoStato.class, "61"));
+                ep1.merge(is1);
+                ep1.commit();
+                ep1.close();
+                resp_out.addProperty("result",
+                        true);
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "LEZIONE NON TROVATA.");
+            }
+
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+    }
     protected void DELETELEZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         JsonObject resp_out = new JsonObject();
@@ -2655,6 +2701,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "DELETELEZIONE":
                     DELETELEZIONE(request, response);
+                    break;
+                case "CONVALIDALEZIONE":
+                    CONVALIDALEZIONE(request, response);
                     break;
                 case "DELETEDOCUMENT":
                     DELETEDOCUMENT(request, response);

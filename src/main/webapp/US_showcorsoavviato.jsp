@@ -40,9 +40,11 @@
                 Utils.confrontaLezioniCalendario(lezioni, cal_istanza);
 
                 boolean modify = true;
+                boolean view = false;
                 boolean azionicorso = false;
                 if (Utils.isAdmin(session)) {
                     modify = false;
+                    view = true;
                 } else {
                     SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
                     modify = so.getIdsoggetto().equals(is1.getCorsobase().getSoggetto().getIdsoggetto()) && is1.getStatocorso().getCodicestatocorso().equals("40");
@@ -365,7 +367,11 @@
                                                                             String tl = c1.getTipolezione().equals("PRE") ? "(IN PRESENZA)" : "(FAD)";
                                                                             String orenorm = Utils.roundDoubleandFormat(c1.getOre(), 1);
                                                                             oretotl += c1.getOre();
-                                                                            indice++;%>
+                                                                            indice++;
+
+                                                                    %>
+
+
                                                                     <tr>
                                                                         <td class="p-2 w-10px"><%=indice%></td>
                                                                         <td class="p-2 w-50px"><%=Constant.sdf_PATTERNDATE4.format(c1.getDatalezione())%> (<%=c1.getOrainizio()%> - <%=c1.getOrafine()%>)</td>
@@ -373,25 +379,61 @@
                                                                         <td class="p-2 w-50px"><%=c1.getCalendarioformativo().getNomemodulo()%></td>
                                                                         <td class="p-2 w-50px"><%=orenorm%> <%=tl%> 
                                                                         </td>
-                                                                        <td><%if (modify) {%>
+                                                                        <td>
+
+                                                                            <%if (view) {
+                                                                                    if (c1.getStatolezione() != null && c1.getStatolezione().getCodicestatocorso().equals("61")) {%>
+                                                                            <a href="US_gestionepresenzalezione.jsp?numlez=<%=indice%>&idlez=<%=Utils.enc_string(String.valueOf(c1.getIdcalendariolezioni()))%>"
+                                                                               data-fancybox data-type="iframe" data-preload="false" data-width="75%" data-height="75%"
+                                                                               class="btn btn-sm btn-bg-light btn-success fan1" data-bs-toggle="tooltip" 
+                                                                               title="LEZIONE CANVALIDATA - VISUALIZZA REGISTRO PRESENZE" data-preload='false'>
+                                                                                <i class="fa fa-calendar-check"></i>
+                                                                            </a>   
+                                                                            <%}
+                                                                            } else if (modify) {%>
                                                                             <button type="button"class="btn btn-sm btn-danger" data-bs-toggle="tooltip" 
                                                                                     title="ELIMINA LEZIONE" data-preload='false' 
                                                                                     onclick="return rimuovilezione('<%=c1.getIdcalendariolezioni()%>')">
                                                                                 <i class="fa fa-trash-arrow-up"></i></button>
                                                                                 <%} else if (azionicorso) {
-                                                                                    if (c1.getDatalezione().after(new DateTime().toDate())) {%>
+
+                                                                                    if (c1.getDatalezione().after(new DateTime().toDate())) {
+
+
+                                                                                %>
                                                                             <a href="US_modificalezione.jsp?numlez=<%=indice%>&idlez=<%=Utils.enc_string(String.valueOf(c1.getIdcalendariolezioni()))%>"
                                                                                data-fancybox data-type="iframe" data-preload="false" data-width="75%" data-height="75%"
                                                                                class="btn btn-sm btn-bg-light btn-warning fan1" data-bs-toggle="tooltip" 
-                                                                               title="MODIFICA LEZIONE" data-preload='false'>
+                                                                               title="MODIFICA/RIPROGRAMMA LEZIONE" data-preload='false'>
                                                                                 <i class="fa fa-edit"></i>
                                                                             </a>
-                                                                            <%} else {%>
+                                                                            <%} else {
+
+                                                                                if (c1.getStatolezione() == null) {%>
                                                                             <a href="US_gestionepresenzalezione.jsp?numlez=<%=indice%>&idlez=<%=Utils.enc_string(String.valueOf(c1.getIdcalendariolezioni()))%>"
                                                                                data-fancybox data-type="iframe" data-preload="false" data-width="75%" data-height="75%"
-                                                                               class="btn btn-sm btn-bg-light btn-primary fan1" data-bs-toggle="tooltip" title="INSERISCI/MODIFICA REGISTRO PRESENZE" data-preload='false'>
+                                                                               class="btn btn-sm btn-bg-light btn-primary fan1" data-bs-toggle="tooltip" title="INSERISCI REGISTRO PRESENZE" data-preload='false'>
                                                                                 <i class="fa fa-calendar-alt"></i>
-                                                                            </a>                                                                            </a>
+                                                                            </a> 
+                                                                            <%} else if (c1.getStatolezione().getCodicestatocorso().equals("61")) { //CONVALIDATA%> 
+                                                                            <a href="US_gestionepresenzalezione.jsp?numlez=<%=indice%>&idlez=<%=Utils.enc_string(String.valueOf(c1.getIdcalendariolezioni()))%>"
+                                                                               data-fancybox data-type="iframe" data-preload="false" data-width="75%" data-height="75%"
+                                                                               class="btn btn-sm btn-bg-light btn-success fan1" data-bs-toggle="tooltip" 
+                                                                               title="LEZIONE CANVALIDATA - VISUALIZZA REGISTRO PRESENZE" data-preload='false'>
+                                                                                <i class="fa fa-calendar-check"></i>
+                                                                            </a>    
+                                                                            <%} else if (c1.getStatolezione().getCodicestatocorso().equals("60")) {%>
+                                                                            <a href="US_gestionepresenzalezione.jsp?numlez=<%=indice%>&idlez=<%=Utils.enc_string(String.valueOf(c1.getIdcalendariolezioni()))%>"
+                                                                               data-fancybox data-type="iframe" data-preload="false" data-width="75%" data-height="75%"
+                                                                               class="btn btn-sm btn-bg-light btn-secondary fan1" data-bs-toggle="tooltip" title="MODIFICA REGISTRO PRESENZE" data-preload='false'>
+                                                                                <i class="fa fa-calendar-alt"></i>
+                                                                            </a>                                                                       
+                                                                            <button onclick="return convalidalezione('<%=c1.getIdcalendariolezioni()%>')" 
+                                                                                    class="btn btn-sm btn-bg-light btn-success" data-bs-toggle="tooltip" title="CONVALIDA PRESENZE LEZIONE" data-preload='false'>
+                                                                                <i class="fa fa-check"></i>
+                                                                            </button>                                                                       
+                                                                            <%}%>
+                                                                            </a>
                                                                             <%}
                                                                                 }%>
                                                                         </td>
