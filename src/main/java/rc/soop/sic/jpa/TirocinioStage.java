@@ -28,6 +28,7 @@ import javax.persistence.TemporalType;
  */
 @NamedQueries(value = {
     @NamedQuery(name = "tirociniostage.allievo", query = "SELECT u FROM TirocinioStage u WHERE u.allievi=:allievi ORDER BY u.datainizio")
+    
 })
 @Entity
 @Table(name = "tirociniostage")
@@ -46,6 +47,10 @@ public class TirocinioStage implements Serializable {
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "identestage")
     private EnteStage entestage;
+
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinColumn(name = "idsede")
+    private Sede sedestage;
 
     @Column(name = "datainizio")
     @Temporal(TemporalType.DATE)
@@ -68,6 +73,14 @@ public class TirocinioStage implements Serializable {
     public TirocinioStage() {
     }
 
+    public Sede getSedestage() {
+        return sedestage;
+    }
+
+    public void setSedestage(Sede sedestage) {
+        this.sedestage = sedestage;
+    }
+    
     public String getUtenteinserimento() {
         return utenteinserimento;
     }
@@ -131,7 +144,7 @@ public class TirocinioStage implements Serializable {
     public void setOrepreviste(int orepreviste) {
         this.orepreviste = orepreviste;
     }
-    
+
     @Override
     public boolean equals(final Object obj) {
         if (this == obj) {

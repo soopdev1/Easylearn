@@ -51,6 +51,32 @@ public class Search extends HttpServlet {
     private static final String APPJSON = "application/json";
     private static final String CONTENTTYPE = "Content-Type";
 
+    protected void LISTSEDESTAGE(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        StringBuilder o1 = new StringBuilder("");
+        try {
+            EntityOp eop = new EntityOp();            
+            EnteStage es = eop.getEm().find(EnteStage.class, Utils.parseLongR(getRequestValue(request, "IDENTE")));
+            for (Sede c1 : es.getSedistage()) {
+                o1.append("<option value='")
+                        .append(c1.getIdsede()).append("'>")
+                        .append(c1.getIndirizzo())
+                        .append(" ")
+                        .append(c1.getCap())
+                        .append(" ")
+                        .append(c1.getComune())
+                        .append(" ")
+                        .append(c1.getProvincia())
+                        .append("</option>");
+            }
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+        }
+        try (PrintWriter out = response.getWriter()) {
+            out.print(o1);
+        }
+    }
+    
     protected void SELECTDOCENTE(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String q = request.getParameter("q");
@@ -954,6 +980,9 @@ public class Search extends HttpServlet {
                     break;
                 case "SELECTDOCENTE":
                     SELECTDOCENTE(request, response);
+                    break;
+                case "LISTSEDESTAGE":
+                    LISTSEDESTAGE(request, response);
                     break;
                 default: {
                     String p = request.getContextPath();

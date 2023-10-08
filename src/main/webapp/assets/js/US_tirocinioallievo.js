@@ -7,6 +7,25 @@ $(document).ready(function () {
 });
 
 
+function selectsede() {
+    $.ajax({
+        url: "Search",
+        type: "POST",
+        async: false,
+        data: {
+            'type': "LISTSEDESTAGE",
+            'IDENTE': $("#ENTESTAGE").val()
+        },
+        success: function (data) {
+            $("#SEDESTAGE").html('');
+            $("#SEDESTAGE").html(data);
+        },
+        error: function (data) {
+            console.log("ERRORE: " + data);
+        }
+    });
+}
+
 function checkore() {
 
     var maxstage = parseInt($("#maxstage").val());

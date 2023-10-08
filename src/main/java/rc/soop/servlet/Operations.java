@@ -108,6 +108,7 @@ public class Operations extends HttpServlet {
 
         String idallievo = getRequestValue(request, "idallievo");
         String ENTESTAGE = getRequestValue(request, "ENTESTAGE");
+        String SEDESTAGE = getRequestValue(request, "SEDESTAGE");
         String ORE = roundDoubleandFormat(fd(formatDoubleforMysql(getRequestValue(request, "ORE"))), 0);
 
         String DATAINIZIO = getRequestValue(request, "DATAINIZIO");
@@ -119,13 +120,14 @@ public class Operations extends HttpServlet {
             ep1.begin();
             Allievi al1 = ep1.getEm().find(Allievi.class, Long.valueOf(idallievo));
             EnteStage es1 = ep1.getEm().find(EnteStage.class, Long.valueOf(ENTESTAGE));
-
+            Sede se1 = ep1.getEm().find(Sede.class, Long.valueOf(SEDESTAGE));
             TirocinioStage ts1 = new TirocinioStage();
             ts1.setAllievi(al1);
             ts1.setDatainserimento(new DateTime().toDate());
             ts1.setDatainizio(Constant.sdf_PATTERNDATE6.parse(DATAINIZIO));
             ts1.setDatafine(Constant.sdf_PATTERNDATE6.parse(DATAFINE));
             ts1.setEntestage(es1);
+            ts1.setSedestage(se1);
             ts1.setOrepreviste(parseIntR(ORE));
             ts1.setUtenteinserimento(request.getSession().getAttribute("us_cod").toString());
             ep1.persist(ts1);

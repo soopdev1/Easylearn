@@ -39,6 +39,8 @@
                 }
                 List<TirocinioStage> list_tirocini_allievo = eo.list_tirocini_allievo(is1);
 
+                int monteore = is1.getCorsodiriferimento().getCorsobase().getStageore();
+
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -75,7 +77,7 @@
                 <div class="card h-xl-100">
                     <div class="card-header border-0 pt-5">
                         <h3 class="card-title align-items-start flex-column">
-                            <span class="card-label fw-bolder fs-3 mb-1">DETTAGLI TIROCINIO ALLIEVO - ID: <%=is1.getIdallievi()%></span>
+                            <span class="card-label fw-bolder fs-3 mb-1">DETTAGLI TIROCINIO ALLIEVO - <%=is1.getCognome()%> <%=is1.getNome()%></span>
                         </h3>
                     </div>
                     <div class="card-body py-3">
@@ -120,16 +122,24 @@
                                     <thead>
                                         <tr>
                                             <th>Ente Ospitante</th>
+                                            <th>Sede</th>
                                             <th>Data Inizio</th>
                                             <th>Data Fine</th>
                                             <th>Ore Previste</th>
+                                            <th>Calendario Presenze</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <%for (TirocinioStage d1 : list_tirocini_allievo) {%>
+                                        <%for (TirocinioStage d1 : list_tirocini_allievo) {
+
+                                                monteore = monteore - d1.getOrepreviste();
+                                        %>
                                         <tr>
                                             <td>
                                                 <%=d1.getEntestage().getRAGIONESOCIALE()%>
+                                            </td>
+                                            <td>
+                                                <%=d1.getSedestage().getIndirizzo()%> <%=d1.getSedestage().getCap()%> - <%=d1.getSedestage().getComune()%>, <%=d1.getSedestage().getProvincia()%>
                                             </td>
                                             <td>
                                                 <%=Constant.sdf_PATTERNDATE4.format(d1.getDatainizio())%>
@@ -141,13 +151,24 @@
                                                 <%=d1.getOrepreviste()%>
                                                 <input type="hidden" id="orestabilite_<%=d1.getIdtirociniostage()%>" class="orestabilite" value="<%=d1.getOrepreviste()%>" />
                                             </td>
+                                            <td>
+                                                <form action="US_dettaglitirocinioallievo.jsp" method="post">
+                                                    <button type="sumbit" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" 
+                                                            title="VISUALIZZA/MODIFICA PRESENZE" data-preload='false'>
+                                                        <i class="fa fa-calendar-alt"></i>
+                                                    </button>
+                                                    <input type="hidden" name="idtirociniostage" value="<%=d1.getIdtirociniostage()%>" />
+                                                </form>
+                                            </td>
                                         </tr>
                                         <%}%>
                                     </tbody>
                                 </table>
                             </label>
                             <%}%>
-                            <%if (modify) {%>
+
+
+                            <%if (modify && monteore > 0) {%>
                             <hr>
                             <form action="Operations" method="POST" onsubmit="return checkore();">
                                 <input type="hidden" name="type" value="AVVIATIROCINIOALLIEVO" />
@@ -159,47 +180,63 @@
                                         N.B. E' necessario caricare TUTTA la necessaria documentazione nell'apposita sezione della piattaforma. (Gestione Corsi - Gestione Allegati)
                                     </small>
                                 </label>
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>ENTE OSPITANTE</b><br></span>
-                                </label>
-                                <label class="col-md-3 col-form-label fw-bold fs-6">
-                                    <select aria-label="Scegli..." data-control="select2" 
-                                            data-placeholder="Scegli..." 
-                                            class="form-select form-select-solid form-select-lg fw-bold" 
-                                            name="ENTESTAGE"
-                                            id="ENTESTAGE"
-                                            required>
-                                        <option value="">Scegli...</option>                                                                
-                                        <%for (EnteStage es1 : entiaccr) {
-                                        %>
-                                        <option value="<%=es1.getIdentestage()%>">
-                                            <%=es1.getRAGIONESOCIALE()%>
-                                        </option>
-                                        <%}%>
-                                    </select>
-                                </label>
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>ORE DI TIROCINIO/STAGE</b><br></span>
-                                </label>
-                                <label class="col-md-3 col-form-label fw-bold fs-6">
-                                    <input type="text" 
-                                           name="ORE"
-                                           id="ORE"
-                                           class="form-control intvalue" required/>
-                                </label>
+                                <div class="row col-md-12">
+                                    <label class="col-md-2 col-form-label fw-bold fs-6">
+                                        <span class="text-danger"><b>ENTE OSPITANTE</b><br></span>
+                                    </label>
+                                    <div class="col-md-4">
+                                        <select aria-label="Scegli..." data-control="select2" 
+                                                data-placeholder="Scegli..." 
+                                                class="form-select form-select-solid form-select-lg fw-bold" 
+                                                name="ENTESTAGE"
+                                                id="ENTESTAGE"
+                                                required onchange="return selectsede();">
+                                            <option value="">Scegli...</option>                                                                
+                                            <%for (EnteStage es1 : entiaccr) {
+                                            %>
+                                            <option value="<%=es1.getIdentestage()%>">
+                                                <%=es1.getRAGIONESOCIALE()%>
+                                            </option>
+                                            <%}%>
+                                        </select>
+                                    </div>
+                                    <label class="col-md-2 col-form-label fw-bold fs-6">
+                                        <span class="text-danger"><b>SEDE TIROCINIO/STAGE</b><br></span>
+                                    </label>
+                                    <div class="col-md-4">
+                                        <select aria-label="Scegli..." data-control="select2" 
+                                                data-placeholder="Scegli..." 
+                                                class="form-select form-select-solid form-select-lg fw-bold" 
+                                                name="SEDESTAGE"
+                                                id="SEDESTAGE"
+                                                required>
+                                        </select>
+                                    </div>
+                                </div><br/>
+                                <div class="row col-md-12">
+                                    <label class="col-md-2 col-form-label fw-bold fs-6">
+                                        <span class="text-danger"><b>DATA AVVIO</b><br></span>
+                                    </label>
+                                    <div class="col-md-2">
+                                        <input class="form-control" type="date" id="DATAINIZIO" name="DATAINIZIO" required/>
+                                    </div>
+                                    <label class="col-md-2 col-form-label fw-bold fs-6">
+                                        <span class="text-danger"><b>DATA FINE</b><br></span>
+                                    </label>
+                                    <div class="col-md-2">
+                                        <input class="form-control" type="date" id="DATAFINE" name="DATAFINE" required/>
+                                    </div>
+                                    <label class="col-md-2 col-form-label fw-bold fs-6">
+                                        <span class="text-danger"><b>ORE DI TIROCINIO/STAGE</b><br></span>
+                                    </label>
+                                    <div class="col-md-2">
+                                        <input type="text" 
+                                               name="ORE"
+                                               id="ORE"
+                                               class="form-control intvalue" required/>
+                                    </div>
+                                </div>
                                 <div class="row"></div>
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>DATA AVVIO</b><br></span>
-                                </label>
-                                <label class="col-md-3 col-form-label fw-bold fs-6">
-                                    <input class="form-control" type="date" id="DATAINIZIO" name="DATAINIZIO" required/>
-                                </label>
-                                <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-danger"><b>DATA FINE</b><br></span>
-                                </label>
-                                <label class="col-md-3 col-form-label fw-bold fs-6">
-                                    <input class="form-control" type="date" id="DATAFINE" name="DATAFINE" required/>
-                                </label>
                                 <div class="row">
                                     <button type="submit" class="btn btn-sm btn-success col-md-2"><i class="fa fa-save"></i> SALVA DATI</button>
                                 </div> 
