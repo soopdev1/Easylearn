@@ -41,6 +41,8 @@ import rc.soop.sic.Engine;
 import rc.soop.sic.Pdf;
 import rc.soop.sic.SendMail;
 import rc.soop.sic.Utils;
+import static rc.soop.sic.Utils.calcolaMillis;
+import static rc.soop.sic.Utils.calcolaore;
 import static rc.soop.sic.Utils.datemysqltoita;
 import static rc.soop.sic.Utils.estraiEccezione;
 import static rc.soop.sic.Utils.fd;
@@ -86,6 +88,7 @@ import rc.soop.sic.jpa.Moduli_DocentiId;
 import rc.soop.sic.jpa.Path;
 import rc.soop.sic.jpa.Presenze_Lezioni;
 import rc.soop.sic.jpa.Presenze_Lezioni_Allievi;
+import rc.soop.sic.jpa.Presenze_Tirocinio_Allievi;
 import rc.soop.sic.jpa.Repertorio;
 import rc.soop.sic.jpa.Scheda_Attivita;
 import rc.soop.sic.jpa.Sede;
@@ -103,6 +106,43 @@ import rc.soop.sic.jpa.User;
  * @author Raffaele
  */
 public class Operations extends HttpServlet {
+
+    protected void INSERISCIPRESENZATIROCINIO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        String idtirociniostage = getRequestValue(request, "idtirociniostage");
+        String datetiroc = getRequestValue(request, "datetiroc");
+        String orai = getRequestValue(request, "orai");
+        String oraf = getRequestValue(request, "oraf");
+
+        try {
+
+            EntityOp ep1 = new EntityOp();
+            ep1.begin();
+            
+            TirocinioStage al1 = ep1.getEm().find(TirocinioStage.class, Long.valueOf(idtirociniostage));
+            
+            Presenze_Tirocinio_Allievi pta = new Presenze_Tirocinio_Allievi();
+            
+            pta.setAllievi(al1.getAllievi());
+            pta.setDatapresenza(Constant.sdf_PATTERNDATE6.parse(datetiroc));
+            pta.setDatainserimento(new DateTime().toDate());
+            pta.setTirociniostage(al1);
+            pta.setOre(calcolaore(orai, oraf));
+            pta.setOrainizio(orai);
+            pta.setOrafine(oraf);
+            pta.setUtenteinserimento(request.getSession().getAttribute("us_cod").toString());
+            pta.setStatolezione(ep1.getEm().find(CorsoStato.class, "60"));
+            ep1.persist(pta);
+            ep1.commit();
+            ep1.close();
+            
+            redirect(request, response, "US_dettaglitirocinioallievo.jsp?idtirociniostage="+idtirociniostage);
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_TSAL1");
+        }
+        
+    }
 
     protected void AVVIATIROCINIOALLIEVO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -161,7 +201,7 @@ public class Operations extends HttpServlet {
             cl1.setDocente(d1);
             cl1.setOrainizio(orai);
             cl1.setOrafine(oraf);
-            cl1.setOre(Utils.calcolaore(orai, oraf));
+            cl1.setOre(calcolaore(orai, oraf));
             cl1.setDatainserimento(new DateTime().toDate());
             ep1.merge(cl1);
             ep1.commit();
@@ -233,7 +273,7 @@ public class Operations extends HttpServlet {
                     allievo_orai = "00:00";
                     allievo_oraf = "00:00";
                 } else {
-                    allievo_durata = Utils.calcolaMillis(orai, oraf);
+                    allievo_durata = calcolaMillis(orai, oraf);
                 }
                 boolean modify = getRequestValue(request, "modify_" + a1.getIdallievi()).equals("true");
                 Presenze_Lezioni_Allievi pla = ep2.getPresenzeLezioneAllievo(pl1, a1);
@@ -591,7 +631,7 @@ public class Operations extends HttpServlet {
             cl1.setDatalezione(data);
             cl1.setOrainizio(orai);
             cl1.setOrafine(oraf);
-            cl1.setOre(Utils.calcolaore(orai, oraf));
+            cl1.setOre(calcolaore(orai, oraf));
             cl1.setTipolezione(tipolezione);
             ep1.begin();
             ep1.persist(cl1);
@@ -2097,6 +2137,7 @@ public class Operations extends HttpServlet {
             out.print(resp_out.toString());
         }
     }
+
     protected void DELETELEZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         JsonObject resp_out = new JsonObject();
@@ -2826,6 +2867,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "AVVIATIROCINIOALLIEVO":
                     AVVIATIROCINIOALLIEVO(request, response);
+                    break;
+                case "INSERISCIPRESENZATIROCINIO":
+                    INSERISCIPRESENZATIROCINIO(request, response);
                     break;
                 default:
                     break;

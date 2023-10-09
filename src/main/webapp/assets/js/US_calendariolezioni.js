@@ -68,6 +68,7 @@ function checkdatisalvati() {
 
 function populatedatafine(component) {
     $('#oraf').val(null).trigger('change');
+    $('#oraf').empty();
     var start = component.value;
     if (start !== "") {
         for (var i = 8; i < 21; i++) {

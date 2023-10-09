@@ -4,6 +4,7 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.Presenze_Tirocinio_Allievi"%>
 <%@page import="rc.soop.sic.jpa.TirocinioStage"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="rc.soop.sic.jpa.User"%>
@@ -28,8 +29,16 @@
                 boolean modify = false;
                 if (!Utils.isAdmin(request.getSession())) {
                     SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
-                    modify = true;
+                    if (so.getIdsoggetto().equals(ts1.getEntestage().getSoggetto().getIdsoggetto())) {
+                        modify = true;
+                    }
                 }
+
+                List<Presenze_Tirocinio_Allievi> lpr = eo.list_presenzetirocinio_allievo(ts1);
+
+                int presenzeinserite = Utils.countOreTirocinio(lpr, "60");
+                int presenzeconvalid = Utils.countOreTirocinio(lpr, "61");
+            
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -112,8 +121,17 @@
                             </label>
                         </div>
                         <hr>
-                        <label class="col-form-label fw-bold fs-6 text-primary">AGGIUNGI PRESENZA TIROCINIO:</label>
-                        <form action="Operations" method="POST">
+
+                        <form action="Operations" method="POST" id="forminsert">
+                            <%if (modify) {%>
+
+                            <label class="col-form-label fw-bold fs-6 text-primary">AGGIUNGI PRESENZA TIROCINIO:</label> 
+                            <button class="btn btn-success btn-sm" data-preload='false' type="sumbit"
+                                    data-bs-toggle="tooltip" title="SALVA ED INSERISCI PRESENZA" 
+                                    >
+                                <i class="fa fa-save"></i></button>
+                                <%}%>
+
                             <input type="hidden" name="type" value="INSERISCIPRESENZATIROCINIO"/>
                             <input type="hidden" name="idtirociniostage" value="<%=idtirociniostage%>"/>
 
@@ -122,7 +140,7 @@
                                     <span class=" text-primary"><b>DATA LEZIONE:</b></span>
                                 </label>
                                 <div class="col-md-2 col-form-label fw-bold fs-6">
-                                    <input type="date" class="form-control" id="datetiroc" name="datetiroc"/>
+                                    <input type="date" class="form-control" id="datetiroc" name="datetiroc" required />
                                 </div>
                                 <label class="col-md-2 col-form-label fw-bold fs-6">
                                     <span class=" text-primary"><b>ORA INIZIO:</b></span>
@@ -175,7 +193,7 @@
                         </form>
 
                         <hr>
-                        <label class="col-form-label fw-bold fs-6">PRESENZE INSERITE:</label>
+                        <label class="col-form-label fw-bold fs-6">PRESENZE INSERITE: <%=lpr.size()%> - ORE INSERITE: </label>
                         <table class="table table-hover">
                             <thead>
                                 <tr>

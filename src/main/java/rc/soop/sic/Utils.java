@@ -58,6 +58,7 @@ import rc.soop.sic.jpa.Allievi;
 import rc.soop.sic.jpa.Calendario_Formativo;
 import rc.soop.sic.jpa.Calendario_Lezioni;
 import rc.soop.sic.jpa.EntityOp;
+import rc.soop.sic.jpa.Presenze_Tirocinio_Allievi;
 import rc.soop.sic.jpa.Stati;
 import static rc.soop.sic.jpa.Stati.ABILITATO;
 import static rc.soop.sic.jpa.Stati.ATTIVO;
@@ -582,6 +583,15 @@ public class Utils {
             Constant.LOGGER.severe(estraiEccezione(ex));
         }
         return orainizio;
+    }
+
+    public static int countOreTirocinio(List<Presenze_Tirocinio_Allievi> listapresenze, String codicestato) {
+        try {
+            return listapresenze.stream().filter(l1 -> l1.getStatolezione().getCodicestatocorso().equals(codicestato)).collect(Collectors.toList()).size();
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+        }
+        return 0;
     }
 
 }

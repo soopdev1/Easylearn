@@ -478,9 +478,20 @@ public class EntityOp {
     
     public List<TirocinioStage> list_tirocini_allievo(Allievi al1) {
         try {
-            TypedQuery q = this.em.createNamedQuery("tirociniostage.allievo", CorsoAvviato_AltroPersonale.class);
+            TypedQuery q = this.em.createNamedQuery("tirociniostage.allievo", TirocinioStage.class);
             q.setParameter("allievi", al1);
             return q.getResultList().isEmpty() ? new ArrayList() : (List<TirocinioStage>) q.getResultList();
+        } catch (Exception ex0) {
+            trackingAction("SERVICE", estraiEccezione(ex0));
+        }
+        return new ArrayList<>();
+    }
+    
+    public List<Presenze_Tirocinio_Allievi> list_presenzetirocinio_allievo(TirocinioStage tirociniostage) {
+        try {
+            TypedQuery q = this.em.createNamedQuery("presenzetirocinioallievi.tirociniostage", Presenze_Tirocinio_Allievi.class);
+            q.setParameter("tirociniostage", tirociniostage);
+            return q.getResultList().isEmpty() ? new ArrayList() : (List<Presenze_Tirocinio_Allievi>) q.getResultList();
         } catch (Exception ex0) {
             trackingAction("SERVICE", estraiEccezione(ex0));
         }
