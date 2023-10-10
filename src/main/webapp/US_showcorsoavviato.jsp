@@ -396,10 +396,7 @@
                                                                                     onclick="return rimuovilezione('<%=c1.getIdcalendariolezioni()%>')">
                                                                                 <i class="fa fa-trash-arrow-up"></i></button>
                                                                                 <%} else if (azionicorso) {
-
                                                                                     if (c1.getDatalezione().after(new DateTime().toDate())) {
-
-
                                                                                 %>
                                                                             <a href="US_modificalezione.jsp?numlez=<%=indice%>&idlez=<%=Utils.enc_string(String.valueOf(c1.getIdcalendariolezioni()))%>"
                                                                                data-fancybox data-type="iframe" data-preload="false" data-width="75%" data-height="75%"

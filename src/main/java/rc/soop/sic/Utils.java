@@ -4,6 +4,7 @@
  */
 package rc.soop.sic;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.IOException;
@@ -585,13 +586,19 @@ public class Utils {
         return orainizio;
     }
 
-    public static int countOreTirocinio(List<Presenze_Tirocinio_Allievi> listapresenze, String codicestato) {
+    public static String countOreTirocinio(List<Presenze_Tirocinio_Allievi> listapresenze, String codicestato) {
         try {
-            return listapresenze.stream().filter(l1 -> l1.getStatolezione().getCodicestatocorso().equals(codicestato)).collect(Collectors.toList()).size();
+            
+            AtomicDouble ad = new AtomicDouble(0.0);
+            List<Presenze_Tirocinio_Allievi> lista =  listapresenze.stream().filter(l1 -> l1.getStatolezione().getCodicestatocorso().equals(codicestato)).collect(Collectors.toList());
+            lista.forEach(l1->{
+                ad.addAndGet(l1.getOre());
+            });
+            return roundDoubleandFormat(ad.get(), 1);
         } catch (Exception ex) {
             Constant.LOGGER.severe(estraiEccezione(ex));
         }
-        return 0;
+        return "0";
     }
 
 }

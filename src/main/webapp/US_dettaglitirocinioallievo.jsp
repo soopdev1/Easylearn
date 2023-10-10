@@ -36,9 +36,9 @@
 
                 List<Presenze_Tirocinio_Allievi> lpr = eo.list_presenzetirocinio_allievo(ts1);
 
-                int presenzeinserite = Utils.countOreTirocinio(lpr, "60");
-                int presenzeconvalid = Utils.countOreTirocinio(lpr, "61");
-            
+                String presenzeinserite = Utils.countOreTirocinio(lpr, "60");
+                String presenzeconvalid = Utils.countOreTirocinio(lpr, "61");
+
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -193,16 +193,47 @@
                         </form>
 
                         <hr>
-                        <label class="col-form-label fw-bold fs-6">PRESENZE INSERITE: <%=lpr.size()%> - ORE INSERITE: </label>
+                        <label class="col-form-label fw-bold fs-6">PRESENZE INSERITE: <%=lpr.size()%> - ORE INSERITE (DA CONVALIDARE): <%=presenzeinserite%> - ORE CONVALIDATE: <%=presenzeconvalid%></label>
                         <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th class="p-2 w-10px">#</th>
                                     <th class="p-2 w-50px">Data</th>
                                     <th class="p-2 w-50px">Orario</th>
-                                    <th class="p-2 w-10px">Azioni</th>
+                                    <th class="p-2 w-50px">Ora</th>
+                                    <th class="p-2 w-50px">Stato</th>
+                                    <th class="p-2 w-50px">Azioni</th>
                                 </tr>
                             </thead>
+                            <tbody>
+
+                                <%
+                                    int i = 1;
+                                    for (Presenze_Tirocinio_Allievi pta1 : lpr) {%>
+                                <tr>
+                                    <td class="p-2 w-10px"><%=i%></td>
+                                    <td class="p-2 w-50px"><%=Constant.sdf_PATTERNDATE4.format(pta1.getDatapresenza())%></td>
+                                    <td class="p-2 w-50px"><%=pta1.getOrainizio()%> - <%=pta1.getOrafine()%></td>                                    
+                                    <td class="p-2 w-50px"><%=Utils.roundDoubleandFormat(pta1.getOre(), 1)%></td>
+                                    <td class="p-2 w-50px"><%=pta1.getStatolezione().getHtmldescr()%></td>
+                                    <td class="p-2 w-50px">
+                                        <%if (modify && pta1.getStatolezione().getCodicestatocorso().equals("60")) {%>
+                                        <button onclick="return convalidapresenzatirocinio('<%=pta1.getIdpresenzetirocinioallievi()%>')" 
+                                                class="btn btn-sm btn-bg-light btn-success" data-bs-toggle="tooltip" 
+                                                title="CONVALIDA PRESENZA TIROCINIO" data-preload='false'>
+                                            <i class="fa fa-check"></i>
+                                        </button>
+                                        <button type="button"class="btn btn-sm btn-danger" data-bs-toggle="tooltip" 
+                                                title="ELIMINA PRESENZA TIROCINIO" data-preload='false' 
+                                                onclick="return rimuovipresenzatirocinio('<%=pta1.getIdpresenzetirocinioallievi()%>')">
+                                            <i class="fa fa-trash-arrow-up"></i>
+                                        </button>
+
+                                        <%}%>
+                                    </td>
+                                </tr>
+                                <%}%>
+                            </tbody>
                         </table>
                     </div>
                 </div>

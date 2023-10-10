@@ -2101,6 +2101,39 @@ public class Operations extends HttpServlet {
 
     }
 
+    protected void CONVALIDAPRESENZATIROCINIO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JsonObject resp_out = new JsonObject();
+        try {
+            EntityOp ep1 = new EntityOp();
+            Presenze_Tirocinio_Allievi is1 = ep1.getEm().find(Presenze_Tirocinio_Allievi.class, Long.valueOf(getRequestValue(request, "IDPRESENZA")));
+            if (is1 != null) {
+                ep1.begin();
+                is1.setStatolezione(ep1.getEm().find(CorsoStato.class, "61"));
+                ep1.merge(is1);
+                ep1.commit();
+                ep1.close();
+                resp_out.addProperty("result",
+                        true);
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "PRESENZA TIROCINIO NON TROVATA.");
+            }
+
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+    }
+    
     protected void CONVALIDALEZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         JsonObject resp_out = new JsonObject();
@@ -2138,6 +2171,41 @@ public class Operations extends HttpServlet {
         }
     }
 
+    protected void DELETEPRESENZATIROCINIO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JsonObject resp_out = new JsonObject();
+
+        try {
+
+            EntityOp ep1 = new EntityOp();
+            Presenze_Tirocinio_Allievi is1 = ep1.getEm().find(Presenze_Tirocinio_Allievi.class,
+                    Long.valueOf(getRequestValue(request, "IDPRESENZA")));
+            if (is1 != null) {
+                ep1.begin();
+                ep1.remove(is1);
+                ep1.commit();
+                ep1.close();
+                resp_out.addProperty("result",
+                        true);
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "PRESENZA TIROCINIO NON TROVATA.");
+            }
+
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+    }
+    
     protected void DELETELEZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         JsonObject resp_out = new JsonObject();
@@ -2745,8 +2813,14 @@ public class Operations extends HttpServlet {
                 case "DELETELEZIONE":
                     DELETELEZIONE(request, response);
                     break;
+                case "DELETEPRESENZATIROCINIO":
+                    DELETEPRESENZATIROCINIO(request, response);
+                    break;
                 case "CONVALIDALEZIONE":
                     CONVALIDALEZIONE(request, response);
+                    break;
+                case "CONVALIDAPRESENZATIROCINIO":
+                    CONVALIDAPRESENZATIROCINIO(request, response);
                     break;
                 case "DELETEDOCUMENT":
                     DELETEDOCUMENT(request, response);

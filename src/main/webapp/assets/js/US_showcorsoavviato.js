@@ -253,6 +253,7 @@ function rimuovilezione(idlezionecal) {
         title: 'Conferma Operazione',
         content: "Confermi di voler eliminare la lezione selezionata? L'operazione non potrà essere annullata.",
         theme: 'bootstrap',
+        columnClass: 'col-md-9',
         buttons: {
             confirm: {
                 btnClass: 'btn-success',
