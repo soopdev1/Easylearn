@@ -1,5 +1,6 @@
 package rc.soop.servlet;
 
+import com.google.common.base.Splitter;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.io.IOException;
@@ -25,6 +26,7 @@ import static rc.soop.sic.Utils.redirect;
 import rc.soop.sic.jpa.Allievi;
 import rc.soop.sic.jpa.Altropersonale;
 import rc.soop.sic.jpa.Corso;
+import rc.soop.sic.jpa.CorsoAvviato_Docenti;
 import rc.soop.sic.jpa.Corsoavviato;
 import rc.soop.sic.jpa.Docente;
 import rc.soop.sic.jpa.EnteStage;
@@ -55,7 +57,7 @@ public class Search extends HttpServlet {
             throws ServletException, IOException {
         StringBuilder o1 = new StringBuilder("");
         try {
-            EntityOp eop = new EntityOp();            
+            EntityOp eop = new EntityOp();
             EnteStage es = eop.getEm().find(EnteStage.class, Utils.parseLongR(getRequestValue(request, "IDENTE")));
             for (Sede c1 : es.getSedistage()) {
                 o1.append("<option value='")
@@ -76,7 +78,7 @@ public class Search extends HttpServlet {
             out.print(o1);
         }
     }
-    
+
     protected void SELECTDOCENTE(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String q = request.getParameter("q");
@@ -128,6 +130,41 @@ public class Search extends HttpServlet {
             for (Docente c1 : result) {
                 o1.append("<option value='")
                         .append(c1.getIddocente()).append("' selected>")
+                        .append(c1.getCognome())
+                        .append(" ")
+                        .append(c1.getNome())
+                        .append("</option>");
+            }
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+        }
+
+        try (PrintWriter out = response.getWriter()) {
+            out.print(o1);
+        }
+    }
+
+    protected void LISTDOCENTICORSOPERCOMMISSIONE(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        StringBuilder o1 = new StringBuilder("");
+        try {
+            EntityOp eop = new EntityOp();
+
+            List<String> SELECTED = Splitter.on(",").splitToList(getRequestValue(request, "SELECTED"));
+
+            Corsoavviato co1 = eop.getEm().find(Corsoavviato.class, Utils.parseLongR(getRequestValue(request, "IDCORSO")));
+            List<CorsoAvviato_Docenti> result = eop.list_cavv_docenti(co1);
+
+            for (CorsoAvviato_Docenti cd1 : result) {
+
+                Docente c1 = cd1.getDocente();
+
+                if (SELECTED.contains(String.valueOf(c1.getIddocente()))) {
+                    continue;
+                }
+
+                o1.append("<option value='")
+                        .append(c1.getIddocente()).append("'>")
                         .append(c1.getCognome())
                         .append(" ")
                         .append(c1.getNome())
@@ -275,12 +312,13 @@ public class Search extends HttpServlet {
                 data_value.addProperty("datainserimento", sdf_PATTERNDATE5.format(res.getDatainserimento()));
                 String azioni = "<form action=\"US_showcorsoavviato.jsp\" method=\"POST\" target=\"_blank\">"
                         + "<input type=\"hidden\" name=\"idcorso\" value=\"" + res.getIdcorsoavviato() + "\"/>";
-                
+
                 if (res.getStatocorso().getCodicestatocorso().equals("47")) {
-                    azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"RICHIESTA NOMINA COMMISSIONE ESAMI FINALI\" "
-                            + "data-preload='false' class=\"btn btn-sm btn-bg-light btn-warning\" "
-                            + "onclick=\"return richiedicommissione('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-envelope\"></i></button> | ";
+                    azioni += "<a href=\"US_richiedicommissione.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "\" data-fancybox data-type='iframe' "
+                            + "data-bs-toggle=\"tooltip\" title=\"RICHIESTA NOMINA COMMISSIONE ESAMI FINAL\" data-preload='false' data-width='100%' data-height='100%' "
+                            + "class=\"btn btn-sm btn-bg-light btn-warning fan1\"><i class=\"fa fa-envelope\"></i></a> | ";
                 }
+
                 if (res.getStatocorso().getCodicestatocorso().equals("40") || res.getStatocorso().getCodicestatocorso().equals("42")) {
                     azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"RICHIEDI AVVIO CORSO\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
                             + "onclick=\"return sendcorso('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-envelope\"></i></button> | ";
@@ -974,6 +1012,9 @@ public class Search extends HttpServlet {
                     break;
                 case "LISTDOCENTICORSO":
                     LISTDOCENTICORSO(request, response);
+                    break;
+                case "LISTDOCENTICORSOPERCOMMISSIONE":
+                    LISTDOCENTICORSOPERCOMMISSIONE(request, response);
                     break;
                 case "GETDIRETTORE":
                     GETDIRETTORE(request, response);

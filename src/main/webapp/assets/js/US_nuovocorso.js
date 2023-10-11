@@ -51,7 +51,7 @@ $(document).ready(function () {
                     }
                 }
 
-                $('#ALLIEVI').select2({maximumSelectionSize: na});
+                $('#ALLIEVI').select2({maximumSelectionLength: na});
                 $("#checkend").val(md);
                 setstartdate("DATAFINE", 15, "min", null);
                 //setstartdate("DATAFINE", 15 + md, "max", null);
