@@ -65,6 +65,7 @@ import rc.soop.sic.jpa.Altropersonale;
 import rc.soop.sic.jpa.Attrezzature;
 import rc.soop.sic.jpa.Calendario_Formativo;
 import rc.soop.sic.jpa.Calendario_Lezioni;
+import rc.soop.sic.jpa.CommissioneEsame;
 import rc.soop.sic.jpa.Competenze;
 import rc.soop.sic.jpa.Competenze_Trasversali;
 import rc.soop.sic.jpa.Conoscenze;
@@ -107,6 +108,47 @@ import rc.soop.sic.jpa.User;
  */
 public class Operations extends HttpServlet {
 
+    protected void RICHIEDINOMINACOMMISSIONE(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        try {
+            String IDCORSO = getRequestValue(request, "IDCORSO");
+            String esperto = getRequestValue(request, "esperto");
+            ObjectMapper om = new ObjectMapper();
+            om.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+            List<String> JSON_commissione = om.readValue(getRequestValue(request, "commissione"), 
+                    new TypeReference<List<String>>() {
+            });
+            List<String> JSON_sostituti = om.readValue(getRequestValue(request, "sostituti"), 
+                    new TypeReference<List<String>>() {
+            });          
+            EntityOp ep1 = new EntityOp();
+            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
+            if (ca1 != null && !JSON_commissione.isEmpty() && !JSON_sostituti.isEmpty()) {
+                CommissioneEsame ce = new CommissioneEsame();
+                ce.setCorsodiriferimento(ca1);
+                ce.setDatainserimento(new DateTime().toDate());
+                ce.setEspertosettore(esperto);
+                ce.setTitolare1(ep1.getEm().find(Docente.class, Long.valueOf(JSON_commissione.get(0))));
+                ce.setTitolare2(ep1.getEm().find(Docente.class, Long.valueOf(JSON_commissione.get(1))));
+                ce.setSostituto1(ep1.getEm().find(Docente.class, Long.valueOf(JSON_sostituti.get(0))));
+                ce.setSostituto2(ep1.getEm().find(Docente.class, Long.valueOf(JSON_sostituti.get(1))));
+                ce.setUtenteinserimento(request.getSession().getAttribute("us_cod").toString());
+                ce.setStatocommissione(Stati.RICHIESTA);
+                ep1.begin();
+                ep1.persist(ce);
+                ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "48"));                
+                ep1.commit();
+                ep1.close();                
+                redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");                
+            } else {
+                redirect(request, response, "Page_message.jsp?esito=KO_MOSD1");
+            }
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_MOSD2");
+        }
+    }
+
     protected void INSERISCIPRESENZATIROCINIO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         String idtirociniostage = getRequestValue(request, "idtirociniostage");
@@ -118,11 +160,11 @@ public class Operations extends HttpServlet {
 
             EntityOp ep1 = new EntityOp();
             ep1.begin();
-            
+
             TirocinioStage al1 = ep1.getEm().find(TirocinioStage.class, Long.valueOf(idtirociniostage));
-            
+
             Presenze_Tirocinio_Allievi pta = new Presenze_Tirocinio_Allievi();
-            
+
             pta.setAllievi(al1.getAllievi());
             pta.setDatapresenza(Constant.sdf_PATTERNDATE6.parse(datetiroc));
             pta.setDatainserimento(new DateTime().toDate());
@@ -135,13 +177,13 @@ public class Operations extends HttpServlet {
             ep1.persist(pta);
             ep1.commit();
             ep1.close();
-            
-            redirect(request, response, "US_dettaglitirocinioallievo.jsp?idtirociniostage="+idtirociniostage);
+
+            redirect(request, response, "US_dettaglitirocinioallievo.jsp?idtirociniostage=" + idtirociniostage);
         } catch (Exception ex1) {
             EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
             redirect(request, response, "Page_message.jsp?esito=KO_TSAL1");
         }
-        
+
     }
 
     protected void AVVIATIROCINIOALLIEVO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -2133,7 +2175,7 @@ public class Operations extends HttpServlet {
             out.print(resp_out.toString());
         }
     }
-    
+
     protected void CONVALIDALEZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         JsonObject resp_out = new JsonObject();
@@ -2205,7 +2247,7 @@ public class Operations extends HttpServlet {
             out.print(resp_out.toString());
         }
     }
-    
+
     protected void DELETELEZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         JsonObject resp_out = new JsonObject();
@@ -2944,6 +2986,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "INSERISCIPRESENZATIROCINIO":
                     INSERISCIPRESENZATIROCINIO(request, response);
+                    break;
+                case "RICHIEDINOMINACOMMISSIONE":
+                    RICHIEDINOMINACOMMISSIONE(request, response);
                     break;
                 default:
                     break;

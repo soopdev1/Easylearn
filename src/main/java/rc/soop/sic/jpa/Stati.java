@@ -19,5 +19,8 @@ public enum Stati {
     AVVIARE,
     NONPREVISTO,
     INCORSO,
-    CONCLUSO
+    CONCLUSO,
+    RICHIESTA, //COMMISSIONE
+    APPROVATA,
+    RESPINTA
 }

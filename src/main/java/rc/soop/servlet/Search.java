@@ -32,6 +32,7 @@ import rc.soop.sic.jpa.Docente;
 import rc.soop.sic.jpa.EnteStage;
 import rc.soop.sic.jpa.EntityOp;
 import rc.soop.sic.jpa.Istanza;
+import rc.soop.sic.jpa.PresidenteCommissione;
 import rc.soop.sic.jpa.Sede;
 import rc.soop.sic.jpa.SoggettoProponente;
 import rc.soop.sic.jpa.Stati;
@@ -688,6 +689,38 @@ public class Search extends HttpServlet {
         }
     }
 
+    protected void list_presidenti(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try (PrintWriter out = response.getWriter()) {
+            JsonObject jMembers = new JsonObject();
+            JsonArray data = new JsonArray();
+
+            List<PresidenteCommissione> result = new EntityOp().findAll(PresidenteCommissione.class);
+
+            jMembers.addProperty(ITOTALRECORDS, result.size());
+            jMembers.addProperty(ITOTALDISPLAY, result.size());
+            jMembers.addProperty(SECHO, 0);
+            jMembers.addProperty(SCOLUMS, "");
+            AtomicInteger at = new AtomicInteger(1);
+            result.forEach(res -> {
+                JsonObject data_value = new JsonObject();
+                data_value.addProperty(RECORDID, at.get());
+                data_value.addProperty("cognome", res.getCognome());
+                data_value.addProperty("nome", res.getNome());
+                data_value.addProperty("qualifica", res.getQualifica());
+                data_value.addProperty("dipartimento", res.getDipartimento());
+                data_value.addProperty("area", res.getAreaservizio());
+                data_value.addProperty("stato", res.getStatopresidente().name());
+                data_value.addProperty("azioni", "<i class='fa fa-hourglass'></i>");
+                data.add(data_value);
+                at.addAndGet(1);
+            });
+            jMembers.add(AADATA, data);
+            response.setContentType(APPJSON);
+            response.setHeader(CONTENTTYPE, APPJSON);
+            out.print(jMembers.toString());
+        }
+    }
     protected void list_docenti(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try (PrintWriter out = response.getWriter()) {
@@ -979,6 +1012,9 @@ public class Search extends HttpServlet {
             switch (type) {
                 case "list_docenti":
                     list_docenti(request, response);
+                    break;
+                case "list_presidenti":
+                    list_presidenti(request, response);
                     break;
                 case "list_altropersonale":
                     list_altropersonale(request, response);

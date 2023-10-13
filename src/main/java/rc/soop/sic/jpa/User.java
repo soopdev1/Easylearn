@@ -30,8 +30,7 @@ import static org.apache.commons.lang3.builder.ToStringStyle.JSON_STYLE;
     @NamedQuery(name = "user.UsernamePwd", query = "SELECT u FROM User u WHERE u.username=:username AND u.password=:password"),
     @NamedQuery(name = "user.byUsername", query = "SELECT u FROM User u WHERE u.username=:username"),
     @NamedQuery(name = "user.byEmail", query = "SELECT u FROM User u WHERE u.email=:email"),
-    @NamedQuery(name = "user.bySA", query = "SELECT u FROM User u WHERE u.soggetto=:sa"),
-    @NamedQuery(name = "user.updateTipo", query = "UPDATE User u SET u.tipo=:tipo WHERE u.soggetto=:soggetto")
+    @NamedQuery(name = "user.bySA", query = "SELECT u FROM User u WHERE u.soggetto=:sa")
 })
 @Entity
 @Table(name = "user")
@@ -58,6 +57,10 @@ public class User implements Serializable {
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "idsoggetto")
     private SoggettoProponente soggetto;
+    
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "idpresidente")
+    private PresidenteCommissione presidente;
 
     public static String formatUser(String ing) {
         try {
@@ -104,6 +107,14 @@ public class User implements Serializable {
         this.email = email;
         this.tipo = tipo;
         this.creationdate = creationdate;
+    }
+
+    public PresidenteCommissione getPresidente() {
+        return presidente;
+    }
+
+    public void setPresidente(PresidenteCommissione presidente) {
+        this.presidente = presidente;
     }
 
     public Long getId() {
@@ -183,10 +194,7 @@ public class User implements Serializable {
             return false;
         }
         User other = (User) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
+        return !((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id)));
     }
 
     @Override
