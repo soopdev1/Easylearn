@@ -1,53 +1,62 @@
 var table;
 
 $(document).ready(function () {
-    table = $('#tab_dt1').DataTable({
-        dom: '<Bif<t>lp>',
-        buttons: [
-            {
-                extend: 'excelHtml5',
-                className: 'btn btn-sm btn-primary',
-                text: '<i class="fa fa-file-excel"></i>',
-                titleAttr: 'Esporta in Excel',
-                exportOptions: {
-                    columns: [0, 1, 2, 3, 4, 5] //Your Column value those you want
+    try {
+
+
+        table = $('#tab_dt1').DataTable({
+            dom: '<Bif<t>lp>',
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    className: 'btn btn-sm btn-primary',
+                    text: '<i class="fa fa-file-excel"></i>',
+                    titleAttr: 'Esporta in Excel',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5] //Your Column value those you want
+                    }
                 }
+            ],
+            lengthMenu: [[50, 100, -1], [50, 100, "Tutto"]],
+            order: [[0, 'asc']],
+            language: {
+                url: 'assets/plugins/DataTables/it-IT.json'
+            },
+            responsive: true,
+            processing: true,
+            ajax: {
+                url: 'Search',
+                type: 'POST',
+                data: {'type': 'list_presidenti'}
+            },
+            columns: [
+                {data: 'cognome'},
+                {data: 'nome'},
+                {data: 'qualifica'},
+                {data: 'dipartimento'},
+                {data: 'area'},
+                {data: 'stato'},
+                {data: 'azioni', orderable: false}
+            ]
+        });
+        Fancybox.bind(".fan1", {
+            groupAll: false, // Group all items
+            hideScrollbar: false,
+            on: {
+                closing: (fancybox) => {
+                    refreshtable();
+                }
+            },
+            fullscreen: {
+                autoStart: true
             }
-        ],
-        lengthMenu: [[50, 100, -1], [50, 100, "Tutto"]],
-        order: [[0, 'asc']],
-        language: {
-            url: 'assets/plugins/DataTables/it-IT.json'
-        },
-        responsive: true,
-        processing: true,
-        ajax: {
-            url: 'Search',
-            type: 'POST',
-            data: {'type': 'list_presidenti'}
-        },
-        columns: [
-            {data: 'cognome'},
-            {data: 'nome'},
-            {data: 'qualifica'},
-            {data: 'dipartimento'},
-            {data: 'area'},
-            {data: 'stato'},
-            {data: 'azioni', orderable: false}
-        ]
-    });
-    Fancybox.bind(".fan1", {
-        groupAll: false, // Group all items
-        hideScrollbar: false,
-        on: {
-            closing: (fancybox) => {
-                refreshtable();
-            }
-        },
-        fullscreen: {
-            autoStart: true
-        }
-    });
+        });
+    } catch (e) {
+
+    }
+
+    Inputmask("email").mask(".mailvalue");
+
 
 });
 

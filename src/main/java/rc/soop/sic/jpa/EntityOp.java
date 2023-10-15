@@ -161,6 +161,7 @@ public class EntityOp {
         q.setParameter("corsobase", corsobase);
         return (List<Corsoavviato>) q.getResultList();
     }
+
     public List<Corsoavviato> getCorsiAvviati_Soggetto(SoggettoProponente soggetto) {
         TypedQuery q = this.em.createNamedQuery("corsoavviato.soggetto", Corsoavviato.class);
         q.setParameter("soggetto", soggetto);
@@ -475,7 +476,7 @@ public class EntityOp {
         }
         return new ArrayList<>();
     }
-    
+
     public List<TirocinioStage> list_tirocini_allievo(Allievi al1) {
         try {
             TypedQuery q = this.em.createNamedQuery("tirociniostage.allievo", TirocinioStage.class);
@@ -486,7 +487,7 @@ public class EntityOp {
         }
         return new ArrayList<>();
     }
-    
+
     public List<Presenze_Tirocinio_Allievi> list_presenzetirocinio_allievo(TirocinioStage tirociniostage) {
         try {
             TypedQuery q = this.em.createNamedQuery("presenzetirocinioallievi.tirociniostage", Presenze_Tirocinio_Allievi.class);
@@ -496,6 +497,28 @@ public class EntityOp {
             trackingAction("SERVICE", estraiEccezione(ex0));
         }
         return new ArrayList<>();
+    }
+    public List<PresidenteCommissione> list_presidenti_attivi() {
+        try {
+            TypedQuery q = this.em.createNamedQuery("presidentecommissione.stato", PresidenteCommissione.class);
+            q.setParameter("statopresidente", Stati.ATTIVO);
+            return q.getResultList().isEmpty() ? new ArrayList() : (List<PresidenteCommissione>) q.getResultList();
+        } catch (Exception ex0) {
+            trackingAction("SERVICE", estraiEccezione(ex0));
+        }
+        return new ArrayList<>();
+    }
+
+    public CommissioneEsame getCommissioneEsameCorso(Corsoavviato corsodiriferimento) {
+        try {
+            TypedQuery q = this.em.createNamedQuery("commissione.corso", TirocinioStage.class);
+            q.setParameter("corsodiriferimento", corsodiriferimento);
+            q.setMaxResults(1);
+            return q.getResultList().isEmpty() ? null : (CommissioneEsame) q.getSingleResult();
+        } catch (Exception ex0) {
+            trackingAction("SERVICE", estraiEccezione(ex0));
+        }
+        return null;
     }
 
     public List<Docente> list_docenti_moduli(List<Docente> eldoc, List<Calendario_Formativo> calendar) {

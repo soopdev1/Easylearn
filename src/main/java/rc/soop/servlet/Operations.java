@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
+import static org.apache.commons.codec.digest.DigestUtils.md5Hex;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -43,6 +45,8 @@ import rc.soop.sic.SendMail;
 import rc.soop.sic.Utils;
 import static rc.soop.sic.Utils.calcolaMillis;
 import static rc.soop.sic.Utils.calcolaore;
+import static rc.soop.sic.Utils.createPassword;
+import static rc.soop.sic.Utils.createUsername;
 import static rc.soop.sic.Utils.datemysqltoita;
 import static rc.soop.sic.Utils.estraiEccezione;
 import static rc.soop.sic.Utils.fd;
@@ -90,6 +94,7 @@ import rc.soop.sic.jpa.Path;
 import rc.soop.sic.jpa.Presenze_Lezioni;
 import rc.soop.sic.jpa.Presenze_Lezioni_Allievi;
 import rc.soop.sic.jpa.Presenze_Tirocinio_Allievi;
+import rc.soop.sic.jpa.PresidenteCommissione;
 import rc.soop.sic.jpa.Repertorio;
 import rc.soop.sic.jpa.Scheda_Attivita;
 import rc.soop.sic.jpa.Sede;
@@ -108,19 +113,107 @@ import rc.soop.sic.jpa.User;
  */
 public class Operations extends HttpServlet {
 
-    protected void RICHIEDINOMINACOMMISSIONE(HttpServletRequest request, HttpServletResponse response) 
+    protected void NOMINAPRESIDENTECOMMISSIONE(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            String IDCORSOVALUE = getRequestValue(request, "IDCORSOVALUE");
+            String PRESIDENTE = getRequestValue(request, "PRESIDENTE");
+            String NUMPROTNOMINA = getRequestValue(request, "NUMPROTNOMINA");
+            String DATAPROTNOMINA = getRequestValue(request, "DATAPROTNOMINA");
+
+            EntityOp ep1 = new EntityOp();
+            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSOVALUE));
+            PresidenteCommissione pr1 = ep1.getEm().find(PresidenteCommissione.class, Long.valueOf(PRESIDENTE));
+            if (ca1 != null && pr1 !=null) {
+                ca1.setPresidentecommissione(pr1);
+                ca1.setProtnomina(NUMPROTNOMINA);
+                ca1.setDataprotnomina(sdf_PATTERNDATE6.parse(DATAPROTNOMINA));
+                ca1.setPdfnomina(null); //da sistemare
+                ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "51"));
+                ep1.begin();
+                ep1.merge(ca1);
+                ep1.commit();
+                ep1.close();
+                redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
+            } else {
+                redirect(request, response, "Page_message.jsp?esito=KO_MOSD1");
+            }
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_MOSD2");
+        }
+        
+    }
+    
+    protected void RIGETTACOMMISSIONE(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            String IDCOMM = getRequestValue(request, "IDCOMM");
+
+            EntityOp ep1 = new EntityOp();
+            CommissioneEsame ca1 = ep1.getEm().find(CommissioneEsame.class, Long.valueOf(IDCOMM));
+            if (ca1 != null) {
+                ca1.setStatocommissione(Stati.APPROVATA);
+                ca1.setUtenteinserimento(request.getSession().getAttribute("us_cod").toString());
+                Corsoavviato ca = ca1.getCorsodiriferimento();
+                ca.setStatocorso(ep1.getEm().find(CorsoStato.class, "49"));
+                ep1.begin();
+                ep1.merge(ca1);
+                ep1.merge(ca);
+                ep1.commit();
+                ep1.close();
+                redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
+            } else {
+                redirect(request, response, "Page_message.jsp?esito=KO_MOSD1");
+            }
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_MOSD2");
+        }
+    }
+
+    protected void APPROVACOMMISSIONE(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        try {
+            String IDCOMM = getRequestValue(request, "IDCOMM");
+
+            EntityOp ep1 = new EntityOp();
+            CommissioneEsame ca1 = ep1.getEm().find(CommissioneEsame.class, Long.valueOf(IDCOMM));
+            if (ca1 != null) {
+                ca1.setStatocommissione(Stati.APPROVATA);
+                ca1.setUtenteinserimento(request.getSession().getAttribute("us_cod").toString());
+                Corsoavviato ca = ca1.getCorsodiriferimento();
+                ca.setStatocorso(ep1.getEm().find(CorsoStato.class, "49"));
+                ep1.begin();
+                ep1.merge(ca1);
+                ep1.merge(ca);
+                ep1.commit();
+                ep1.close();
+                redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
+            } else {
+                redirect(request, response, "Page_message.jsp?esito=KO_MOSD1");
+            }
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_MOSD2");
+        }
+
+    }
+
+    protected void RICHIEDINOMINACOMMISSIONE(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
             String IDCORSO = getRequestValue(request, "IDCORSO");
             String esperto = getRequestValue(request, "esperto");
             ObjectMapper om = new ObjectMapper();
             om.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-            List<String> JSON_commissione = om.readValue(getRequestValue(request, "commissione"), 
+            List<String> JSON_commissione = om.readValue(getRequestValue(request, "commissione"),
                     new TypeReference<List<String>>() {
             });
-            List<String> JSON_sostituti = om.readValue(getRequestValue(request, "sostituti"), 
+            List<String> JSON_sostituti = om.readValue(getRequestValue(request, "sostituti"),
                     new TypeReference<List<String>>() {
-            });          
+            });
             EntityOp ep1 = new EntityOp();
             Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
             if (ca1 != null && !JSON_commissione.isEmpty() && !JSON_sostituti.isEmpty()) {
@@ -136,10 +229,10 @@ public class Operations extends HttpServlet {
                 ce.setStatocommissione(Stati.RICHIESTA);
                 ep1.begin();
                 ep1.persist(ce);
-                ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "48"));                
+                ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "48"));
                 ep1.commit();
-                ep1.close();                
-                redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");                
+                ep1.close();
+                redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
             } else {
                 redirect(request, response, "Page_message.jsp?esito=KO_MOSD1");
             }
@@ -206,8 +299,8 @@ public class Operations extends HttpServlet {
             TirocinioStage ts1 = new TirocinioStage();
             ts1.setAllievi(al1);
             ts1.setDatainserimento(new DateTime().toDate());
-            ts1.setDatainizio(Constant.sdf_PATTERNDATE6.parse(DATAINIZIO));
-            ts1.setDatafine(Constant.sdf_PATTERNDATE6.parse(DATAFINE));
+            ts1.setDatainizio(sdf_PATTERNDATE6.parse(DATAINIZIO));
+            ts1.setDatafine(sdf_PATTERNDATE6.parse(DATAFINE));
             ts1.setEntestage(es1);
             ts1.setSedestage(se1);
             ts1.setOrepreviste(parseIntR(ORE));
@@ -534,6 +627,38 @@ public class Operations extends HttpServlet {
             Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
             if (ca1 != null) {
                 ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "43"));
+                ep1.begin();
+                ep1.merge(ca1);
+                ep1.commit();
+                ep1.close();
+                resp_out.addProperty("result",
+                        true);
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "CORSO NON TROVATO.");
+            }
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+    }
+
+    protected void IMPOSTADESIGNAZIONE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JsonObject resp_out = new JsonObject();
+        try {
+            String IDCORSO = getRequestValue(request, "IDCORSO");
+            EntityOp ep1 = new EntityOp();
+            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
+            if (ca1 != null) {
+                ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "50"));
                 ep1.begin();
                 ep1.merge(ca1);
                 ep1.commit();
@@ -1003,6 +1128,64 @@ public class Operations extends HttpServlet {
         } catch (Exception ex1) {
             EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
             redirect(request, response, "Page_message.jsp?esito=KO_NEN2");
+        }
+
+    }
+
+    protected void ADDPRESIDENTE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        try {
+            if (isAdmin(request.getSession())) {
+                String COGNOME = normalizeUTF8(getRequestValue(request, "COGNOME"));
+                String NOME = normalizeUTF8(getRequestValue(request, "NOME"));
+                String QUALIFICA = normalizeUTF8(getRequestValue(request, "QUALIFICA"));
+                String DIPARTIMENTO = normalizeUTF8(getRequestValue(request, "DIPARTIMENTO"));
+                String AREA = normalizeUTF8(getRequestValue(request, "AREA"));
+                String EMAIL = normalizeUTF8(getRequestValue(request, "EMAIL"));
+
+                PresidenteCommissione pc = new PresidenteCommissione();
+                pc.setCognome(COGNOME);
+                pc.setNome(NOME);
+                pc.setQualifica(QUALIFICA);
+                pc.setDipartimento(DIPARTIMENTO);
+                pc.setAreaservizio(AREA);
+                pc.setMail(EMAIL);
+                pc.setDatainserimento(new DateTime().toDate());
+                pc.setStatopresidente(Stati.ATTIVO);
+
+                EntityOp ep1 = new EntityOp();
+                ep1.begin();
+                ep1.persist(pc);
+                ep1.commit();
+                ep1.close();
+
+                String username = createUsername(NOME, COGNOME);
+                String psw_plain = createPassword();
+
+                User uspres = new User();
+                uspres.setUsername(username);
+                uspres.setPassword(md5Hex(psw_plain));
+                uspres.setEmail(EMAIL);
+                uspres.setCreationdate(new DateTime().toDate());
+                uspres.setPresidente(pc);
+                uspres.setStato(1);
+                uspres.setTipo(3);
+
+                EntityOp ep2 = new EntityOp();
+                ep2.begin();
+                ep2.persist(uspres);
+                ep2.commit();
+                ep2.close();
+
+                //sendmail
+                redirect(request, response, "Page_message.jsp?esito=OK_MOSD");
+
+            } else {
+                redirect(request, response, "Page_message.jsp?esito=KO_INPR1");
+            }
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_INPR2");
         }
 
     }
@@ -2927,6 +3110,9 @@ public class Operations extends HttpServlet {
                 case "ADDALLIEVO":
                     ADDALLIEVO(request, response);
                     break;
+                case "ADDPRESIDENTE":
+                    ADDPRESIDENTE(request, response);
+                    break;
                 case "ADDENTEOSPITANTE":
                     ADDENTEOSPITANTE(request, response);
                     break;
@@ -2960,6 +3146,9 @@ public class Operations extends HttpServlet {
                 case "AUTORIZZACAMBIOSEDE":
                     AUTORIZZACAMBIOSEDE(request, response);
                     break;
+                case "IMPOSTADESIGNAZIONE":
+                    IMPOSTADESIGNAZIONE(request, response);
+                    break;
                 case "MODIFICADIRETTORE":
                     MODIFICADIRETTORE(request, response);
                     break;
@@ -2989,6 +3178,15 @@ public class Operations extends HttpServlet {
                     break;
                 case "RICHIEDINOMINACOMMISSIONE":
                     RICHIEDINOMINACOMMISSIONE(request, response);
+                    break;
+                case "APPROVACOMMISSIONE":
+                    APPROVACOMMISSIONE(request, response);
+                    break;
+                case "RIGETTACOMMISSIONE":
+                    RIGETTACOMMISSIONE(request, response);
+                    break;
+                case "NOMINAPRESIDENTECOMMISSIONE":
+                    NOMINAPRESIDENTECOMMISSIONE(request, response);
                     break;
                 default:
                     break;

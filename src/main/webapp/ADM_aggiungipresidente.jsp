@@ -18,20 +18,12 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
-                String idistS = Utils.getRequestValue(request, "idente");
-                if (idistS.equals("")) {
-                    idistS = (String) session.getAttribute("ses_idente");
-                } else {
-                    session.setAttribute("ses_idente", idistS);
-                }
-                EntityOp eo = new EntityOp();
-                List<IstatProv> prov = eo.findAll(IstatProv.class);
-                Long idist = Long.valueOf(Utils.dec_string(idistS));
-                EnteStage is1 = eo.getEm().find(EnteStage.class, idist);
+                
+            
     %>
     <!--begin::Head-->
     <head><base href="">
-        <title><%=Constant.NAMEAPP%>: Aggiungi sede tirocinio/stage</title>
+        <title><%=Constant.NAMEAPP%>: Aggiungi anagrafica presidente</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->
@@ -61,60 +53,77 @@
         <div class="row">
             <!--begin::Col-->
             <form method="POST" action="Operations">
-                <input type="hidden" name="type" value="ADDSEDESTAGETIROCINIOENTE"/>
-                <input type="hidden" name="idente" value="<%=is1.getIdentestage()%>"/>
-                <h1 class="text-center fs-4">Ente Ospitante Stage/Tirocinio: <%=is1.getRAGIONESOCIALE()%></h1>                                    
+                <input type="hidden" name="type" value="ADDPRESIDENTE"/>
                 <div class="col-xl-12">
                     <div class="card h-xl-100">
                         <div class="card-header border-0 pt-5">
 
                             <h3 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bolder fs-3 mb-1">NUOVA SEDE TIROCINIO/STAGE</span>
+                                <span class="card-label fw-bolder fs-3 mb-1">ANAGRAFICA PRESIDENTE DI COMMISSIONE</span>
                             </h3>
                             <button class="btn btn-lg btn-success"><i class="fa fa-save"></i> SALVA DATI</button>
                         </div>
                         <div class="card-body py-3">
                             <div class="row col-md-12">
                                 <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-dark"><b>SEDE FORMATIVA - INDIRIZZO</b></span>
+                                    <span class="text-dark"><b>COGNOME</b></span>
                                 </label>
                                 <div class="col-md-4 col-form-label fs-6">
                                     <input type="text" 
-                                           name="SF_INDIRIZZO"
-                                           id="SF_INDIRIZZO"
-                                           class="form-control" required maxlength="150" />
+                                           name="COGNOME"
+                                           id="COGNOME"
+                                           class="form-control" required maxlength="50" onkeyup="return checkNoSpecialChar(this)"/>
                                 </div>
                                 <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-dark"><b>SEDE FORMATIVA - CAP</b></span>
+                                    <span class="text-dark"><b>NOME</b></span>
                                 </label>
                                 <div class="col-md-4 col-form-label fs-6">
                                     <input type="text" 
-                                           name="SF_CAP"
-                                           id="SF_CAP"
-                                           class="form-control capvalue" required maxlength="5" />
+                                           name="NOME"
+                                           id="NOME"
+                                           class="form-control capvalue" required maxlength="50" onkeyup="return checkNoSpecialChar(this)"/>
                                 </div>
                                 <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-dark"><b>SEDE FORMATIVA - COMUNE</b></span>
+                                    <span class="text-dark"><b>QUALIFICA</b></span>
                                 </label>
                                 <div class="col-md-4 col-form-label fs-6">
                                     <input type="text" 
-                                           name="SF_COMUNE"
-                                           id="SF_COMUNE"
-                                           class="form-control" required maxlength="150" />
+                                           name="QUALIFICA"
+                                           id="QUALIFICA"
+                                           class="form-control" required maxlength="150" onkeyup="return checkNoSpecialChar(this)"/>
                                 </div>
                                 <label class="col-md-2 col-form-label fw-bold fs-6">
-                                    <span class="text-dark"><b>SEDE FORMATIVA - PROVINCIA</b></span>
+                                    <span class="text-dark"><b>DIPARTIMENTO</b></span>
                                 </label>
                                 <div class="col-md-4 col-form-label fs-6">
-                                    <select aria-label="Scegli..." data-control="select2" data-placeholder="Scegli..." 
-                                            class="form-select " name="SF_PROVINCIA" required>
-                                        <option value="">Scegli...</option>
-                                        <%for (IstatProv pr1 : prov) {%>
-                                        <option value="<%=pr1.getIdistatprov()%>"><%=pr1.getIdistatprov()%> - <%=pr1.getNome()%></option>
-                                        <%}%>
-                                    </select>
+                                    <input type="text" 
+                                           name="DIPARTIMENTO"
+                                           id="DIPARTIMENTO"
+                                           class="form-control" required maxlength="150" onkeyup="return checkNoSpecialChar(this)"/>
                                 </div>
+                                <label class="col-md-2 col-form-label fw-bold fs-6">
+                                    <span class="text-dark"><b>AREA</b></span>
+                                </label>
+                                <div class="col-md-4 col-form-label fs-6">
+                                    <input type="text" 
+                                           name="AREA"
+                                           id="AREA"
+                                           class="form-control" required maxlength="150" onkeyup="return checkNoSpecialChar(this)"/>
+                                </div>
+                                <label class="col-md-2 col-form-label fw-bold fs-6">
+                                    <span class="text-dark"><b>INDIRIZZO EMAIL</b></span>
+                                </label>
+                                <div class="col-md-4 col-form-label fs-6">
+                                    <input type="text" 
+                                           name="EMAIL"
+                                           id="EMAIL"
+                                           class="form-control mailvalue" required maxlength="100"/>
+                                </div>
+                                
                             </div>
+                            <span class="help-block">
+                                N.B. dopo aver salvato l'anagrafica verrà creata l'utenza di accesso e le credenziali saranno inviate all'indirizzo email inserite.
+                            </span>
                         </div>
                     </div>
                     <!--end::Tables Widget 3-->
@@ -154,7 +163,7 @@
         <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
         <script src="assets/js/common.js"></script>
         <script src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
-        <script src="assets/js/US_aggiungiente.js"></script>
+        <script src="assets/js/ADM_presidenti.js"></script>
 
         <!--end::Page Custom Javascript-->
         <!--end::Javascript-->

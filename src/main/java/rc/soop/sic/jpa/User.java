@@ -36,10 +36,12 @@ import static org.apache.commons.lang3.builder.ToStringStyle.JSON_STYLE;
 @Table(name = "user")
 public class User implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
+    
     @Column(name = "username")
     private String username;
     @Column(name = "password")
@@ -57,7 +59,7 @@ public class User implements Serializable {
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "idsoggetto")
     private SoggettoProponente soggetto;
-    
+
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "idpresidente")
     private PresidenteCommissione presidente;
@@ -98,15 +100,6 @@ public class User implements Serializable {
     }
 
     public User() {
-    }
-
-    public User(Long id, String username, String password, String email, int tipo, Date creationdate) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.tipo = tipo;
-        this.creationdate = creationdate;
     }
 
     public PresidenteCommissione getPresidente() {

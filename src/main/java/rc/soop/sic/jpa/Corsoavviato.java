@@ -52,27 +52,71 @@ public class Corsoavviato implements Serializable {
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "direttore")
     private Altropersonale direttore;
-    
+
     @Column(name = "direttorecorso")
     private String direttorecorso;
-    
+
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "stato")
     private CorsoStato statocorso;
-    
+
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "idcorso")
     private Corso corsobase;
 
-    @Column(name = "presidentecommissione")
-    private String presidentecommissione;
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinColumn(name = "presidentecommissione")
+    private PresidenteCommissione presidentecommissione;
 
-    @Column(name = "membricommissione")
-    private String membricommissione;
+    @Column(name = "protnomina")
+    private String protnomina;
+    @Column(name = "dataprotnomina")
+    @Temporal(TemporalType.DATE)
+    private Date dataprotnomina;
+    @Column(name = "utentenomina")
+    private String utentenomina;
+    @Column(name = "pdfnomina", columnDefinition = "LONGTEXT")
+    private String pdfnomina;
+    
+    
 
     @Column(name = "datainserimento")
     @Temporal(TemporalType.TIMESTAMP)
     private Date datainserimento;
+
+    public String getPdfnomina() {
+        return pdfnomina;
+    }
+
+    public void setPdfnomina(String pdfnomina) {
+        this.pdfnomina = pdfnomina;
+    }
+
+    
+    
+    public String getUtentenomina() {
+        return utentenomina;
+    }
+
+    public void setUtentenomina(String utentenomina) {
+        this.utentenomina = utentenomina;
+    }
+
+    public String getProtnomina() {
+        return protnomina;
+    }
+
+    public void setProtnomina(String protnomina) {
+        this.protnomina = protnomina;
+    }
+
+    public Date getDataprotnomina() {
+        return dataprotnomina;
+    }
+
+    public void setDataprotnomina(Date dataprotnomina) {
+        this.dataprotnomina = dataprotnomina;
+    }
 
     public Date getDatainserimento() {
         return datainserimento;
@@ -81,7 +125,7 @@ public class Corsoavviato implements Serializable {
     public void setDatainserimento(Date datainserimento) {
         this.datainserimento = datainserimento;
     }
-    
+
     public Altropersonale getDirettore() {
         return direttore;
     }
@@ -113,7 +157,7 @@ public class Corsoavviato implements Serializable {
     public void setCorsobase(Corso corsobase) {
         this.corsobase = corsobase;
     }
-    
+
     public Date getDatafine() {
         return datafine;
     }
@@ -125,7 +169,7 @@ public class Corsoavviato implements Serializable {
     public void setDirettorecorso(String direttorecorso) {
         this.direttorecorso = direttorecorso;
     }
-    
+
     public void setDatafine(Date datafine) {
         this.datafine = datafine;
     }
@@ -138,20 +182,12 @@ public class Corsoavviato implements Serializable {
         this.statocorso = statocorso;
     }
 
-    public String getPresidentecommissione() {
+    public PresidenteCommissione getPresidentecommissione() {
         return presidentecommissione;
     }
 
-    public void setPresidentecommissione(String presidentecommissione) {
+    public void setPresidentecommissione(PresidenteCommissione presidentecommissione) {
         this.presidentecommissione = presidentecommissione;
-    }
-
-    public String getMembricommissione() {
-        return membricommissione;
-    }
-
-    public void setMembricommissione(String membricommissione) {
-        this.membricommissione = membricommissione;
     }
 
 }

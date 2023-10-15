@@ -81,7 +81,7 @@
                                                 <div class="card-title align-items-start flex-column">
                                                     <a data-fancybox data-type='iframe' 
                                                        class="btn btn-primary fan1" 
-                                                       href="US_aggiungiallievo.jsp"><i class="fa fa-plus"></i> AGGIUNGI ANAGRAFICA PRESIDENTE</a>
+                                                       href="ADM_aggiungipresidente.jsp"><i class="fa fa-plus"></i> AGGIUNGI ANAGRAFICA PRESIDENTE</a>
                                                 </div>
                                             </div>
                                             <!--end::Header-->

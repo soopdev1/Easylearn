@@ -13,6 +13,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -21,6 +23,9 @@ import javax.persistence.TemporalType;
  *
  * @author Administrator
  */
+@NamedQueries(value = {
+    @NamedQuery(name = "presidentecommissione.stato", query = "SELECT c FROM PresidenteCommissione c WHERE c.statopresidente=:statopresidente"),
+})
 @Entity
 @Table(name = "presidentecommissione")
 public class PresidenteCommissione implements Serializable {
@@ -63,12 +68,24 @@ public class PresidenteCommissione implements Serializable {
     @Column(name = "datarevoca")
     @Temporal(TemporalType.DATE)
     private Date datarevoca;
+    
+    @Column(name = "datainserimento")
+    @Temporal(TemporalType.DATE)
+    private Date datainserimento;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "statopresidente")
     private Stati statopresidente;
 
     public PresidenteCommissione() {
+    }
+
+    public Date getDatainserimento() {
+        return datainserimento;
+    }
+
+    public void setDatainserimento(Date datainserimento) {
+        this.datainserimento = datainserimento;
     }
 
     public String getAttonomina() {

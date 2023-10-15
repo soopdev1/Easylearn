@@ -29,7 +29,8 @@
                 List<Corso> c1 = eo.getCorsiIstanza(is1);
     %>
     <!--begin::Head-->
-    <head><base href="">
+    <head>
+        <base href="">
         <title><%=Constant.NAMEAPP%>: Approva Istanza</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />

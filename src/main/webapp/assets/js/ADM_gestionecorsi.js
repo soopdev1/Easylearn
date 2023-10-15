@@ -1,6 +1,6 @@
 var table;
 
-$(document).ready(function () {    
+$(document).ready(function () {
     table = $('#tab_dt1').DataTable({
         dom: '<Bif<t>lp>',
         buttons: [
@@ -11,6 +11,17 @@ $(document).ready(function () {
                 titleAttr: 'Esporta in Excel',
                 exportOptions: {
                     columns: [8, 1, 2, 3, 4, 5, 6] //Your Column value those you want
+                }
+            },
+            {
+                extend: 'pdfHtml5',
+                className: 'btn btn-sm btn-danger',
+                text: '<i class="fa fa-file-pdf"></i>',
+                titleAttr: 'Esporta in PDF',
+                orientation: 'landscape',
+                pageSize: 'A4',
+                exportOptions: {
+                    columns: [8, 1, 2, 3, 4, 5, 6, 9] //Your Column value those you want
                 }
             }
         ],
@@ -40,7 +51,8 @@ $(document).ready(function () {
             {data: 'datafine', type: "date-eu"},
             {data: 'datainserimento', type: "date-euro"},
             {data: 'azioni', orderable: false},
-            {data: 'statovisual', visible: false}
+            {data: 'statovisual', visible: false},
+            {data: 'presidente', visible: false}
         ]
     });
     Fancybox.bind(".fan1", {
@@ -62,7 +74,7 @@ function approvacorso(idcorso) {
     var messageko = "ERRORE GENERICO";
     $.confirm({
         title: 'Conferma Operazione',
-        content: "Confermi di voler Autorizzare l'avvio del corso con ID <b>" + idcorso +"</b> ? L'operazione non potrà essere annullata.",
+        content: "Confermi di voler Autorizzare l'avvio del corso con ID <b>" + idcorso + "</b> ? L'operazione non potrà essere annullata.",
         theme: 'bootstrap',
         columnClass: 'col-md-9',
         buttons: {
@@ -140,7 +152,7 @@ function approvacambiosede(idcorso) {
     var messageko = "ERRORE GENERICO";
     $.confirm({
         title: 'Conferma Operazione',
-        content: "Confermi di voler Autorizzare il cambio sede del corso con ID <b>" + idcorso +"</b> ? L'operazione non potrà essere annullata.",
+        content: "Confermi di voler Autorizzare il cambio sede del corso con ID <b>" + idcorso + "</b> ? L'operazione non potrà essere annullata.",
         theme: 'bootstrap',
         columnClass: 'col-md-9',
         buttons: {
@@ -153,6 +165,83 @@ function approvacambiosede(idcorso) {
                         type: 'POST',
                         data: {
                             'type': 'AUTORIZZACAMBIOSEDE',
+                            'IDCORSO': idcorso
+                        },
+                        dataType: 'json',
+                        async: false,
+                        success: function (data) {
+                            //check
+                            if (data.result) {
+                                ok = true;
+                            } else {
+                                messageko = ("ERRORE: " + data.message);
+                            }
+                        },
+                        error: function (request, error) {
+                            messageko = ("ERRORE: " + error);
+                        }
+                    });
+
+                    if (ok) {
+                        $.alert({
+                            title: 'Operazione conclusa con successo!',
+                            content: '',
+                            type: 'success',
+                            typeAnimated: true,
+                            buttons: {
+                                confirm: {
+                                    text: 'OK',
+                                    btnClass: 'btn-success',
+                                    action: function () {
+                                        refreshtable();
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        $.alert({
+                            title: "Errore durante l'operazione!",
+                            content: messageko,
+                            type: 'red',
+                            typeAnimated: true,
+                            theme: 'bootstrap',
+                            columnClass: 'col-md-9',
+                            buttons: {
+                                confirm: {
+                                    text: 'OK',
+                                    btnClass: 'btn-red'
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            ,
+            cancel: {
+                btnClass: 'btn-danger btn-lg',
+                text: "<i class='fa fa-remove'></i> NO" // With spaces and symbols                
+            }
+        }
+    });
+}
+function impostadesignazione(idcorso) {
+    var ok = false;
+    var messageko = "ERRORE GENERICO";
+    $.confirm({
+        title: 'Conferma Operazione',
+        content: "Confermi di voler predisporre il corso con ID <b>" + idcorso + "</b> nello stato 'IN DESIGNAZIONE PRESIDENTE'? L'operazione non potrà essere annullata.",
+        theme: 'bootstrap',
+        columnClass: 'col-md-9',
+        buttons: {
+            confirm: {
+                btnClass: 'btn-success btn-lg',
+                text: "<i class='fa fa-check'></i> CONFERMO", // With spaces and symbols
+                action: function () {
+                    $.ajax({
+                        url: 'Operations',
+                        type: 'POST',
+                        data: {
+                            'type': 'IMPOSTADESIGNAZIONE',
                             'IDCORSO': idcorso
                         },
                         dataType: 'json',

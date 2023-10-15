@@ -28,6 +28,7 @@ import java.util.Base64;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -45,6 +46,7 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import static org.apache.commons.fileupload.servlet.ServletFileUpload.isMultipartContent;
+import org.apache.commons.lang3.RandomStringUtils;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import org.apache.commons.lang3.StringUtils;
@@ -588,10 +590,10 @@ public class Utils {
 
     public static String countOreTirocinio(List<Presenze_Tirocinio_Allievi> listapresenze, String codicestato) {
         try {
-            
+
             AtomicDouble ad = new AtomicDouble(0.0);
-            List<Presenze_Tirocinio_Allievi> lista =  listapresenze.stream().filter(l1 -> l1.getStatolezione().getCodicestatocorso().equals(codicestato)).collect(Collectors.toList());
-            lista.forEach(l1->{
+            List<Presenze_Tirocinio_Allievi> lista = listapresenze.stream().filter(l1 -> l1.getStatolezione().getCodicestatocorso().equals(codicestato)).collect(Collectors.toList());
+            lista.forEach(l1 -> {
                 ad.addAndGet(l1.getOre());
             });
             return roundDoubleandFormat(ad.get(), 1);
@@ -599,6 +601,42 @@ public class Utils {
             Constant.LOGGER.severe(estraiEccezione(ex));
         }
         return "0";
+    }
+
+    public static String createUsername(String nome, String cognome) {
+        nome = StringUtils.stripAccents(nome).replaceAll("[^a-zA-Z0-9]", "");
+        cognome = StringUtils.stripAccents(cognome).replaceAll("[^a-zA-Z0-9]", "");
+        String result;
+        if (nome.length() > 1) {
+            result = StringUtils.capitalize(nome.substring(0, 1));
+        } else {
+            result = RandomStringUtils.randomAlphabetic(1).toUpperCase();
+        }
+        result += StringUtils.substring(cognome, 0, 5);
+        while (result.length() < 6) {
+            result += RandomStringUtils.randomAlphabetic(1).toLowerCase();
+        }
+        result += RandomStringUtils.randomNumeric(4);
+        return result;
+    }
+
+    public static String createPassword() {
+        int length = 10;
+        String capitalCaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String lowerCaseLetters = "abcdefghijklmnopqrstuvwxyz";
+        String specialCharacters = "!@#$";
+        String numbers = "1234567890";
+        String combinedChars = capitalCaseLetters + lowerCaseLetters + specialCharacters + numbers;
+        Random random = new Random();
+        char[] password = new char[length];
+        password[0] = lowerCaseLetters.charAt(random.nextInt(lowerCaseLetters.length()));
+        password[1] = capitalCaseLetters.charAt(random.nextInt(capitalCaseLetters.length()));
+        password[2] = specialCharacters.charAt(random.nextInt(specialCharacters.length()));
+        password[3] = numbers.charAt(random.nextInt(numbers.length()));
+        for (int i = 4; i < length; i++) {
+            password[i] = combinedChars.charAt(random.nextInt(combinedChars.length()));
+        }
+        return new String(password);
     }
 
 }

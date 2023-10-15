@@ -153,6 +153,7 @@
                                                                 <th class="p-2 w-50px">Data Inserimento</th>
                                                                 <th class="p-2 min-w-120px">Azioni</th>
                                                                 <th class="p-2 w-50px" style="display: none;">Stato</th>
+                                                                <th class="p-2 w-50px" style="display: none;">Presidente Commissione</th>
                                                             </tr>
                                                         </thead>
                                                         <!--end::Table head-->

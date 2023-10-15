@@ -25,6 +25,7 @@ import static rc.soop.sic.Utils.isAdmin;
 import static rc.soop.sic.Utils.redirect;
 import rc.soop.sic.jpa.Allievi;
 import rc.soop.sic.jpa.Altropersonale;
+import rc.soop.sic.jpa.CommissioneEsame;
 import rc.soop.sic.jpa.Corso;
 import rc.soop.sic.jpa.CorsoAvviato_Docenti;
 import rc.soop.sic.jpa.Corsoavviato;
@@ -257,22 +258,47 @@ public class Search extends HttpServlet {
                         + "<input type=\"hidden\" name=\"idcorso\" value=\"" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "\"/>"
                         + "</form>";
 
-                if (res.getStatocorso().getCodicestatocorso().equals("41")) {
-                    azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"AUTORIZZA AVVIO CORSO\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
-                            + "onclick=\"return approvacorso('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-check-circle\"></i></button>"
-                            + "<a href='ADM_rigettacorso.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
-                            + " class=\"btn btn-sm btn-bg-light btn-danger fan1\" data-bs-toggle=\"tooltip\" title=\"RIGETTA CORSO\" data-preload='false' "
-                            + "\"><i class=\"fa fa-remove\"></i></a>";
-                } else if (res.getStatocorso().getCodicestatocorso().equals("46")) {
-                    azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"AUTORIZZA CAMBIO SEDE\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
-                            + "onclick=\"return approvacambiosede('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-check-circle\"></i></button>"
-                            + "<a href='ADM_rigettacorso.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
-                            + " class=\"btn btn-sm btn-bg-light btn-danger fan1\" data-bs-toggle=\"tooltip\" title=\"RIGETTA CORSO\" data-preload='false' "
-                            + "\"><i class=\"fa fa-remove\"></i></a>";
+                switch (res.getStatocorso().getCodicestatocorso()) {
+                    case "41": {
+                        azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"AUTORIZZA AVVIO CORSO\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
+                                + "onclick=\"return approvacorso('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-check-circle\"></i></button>"
+                                + "<a href='ADM_rigettacorso.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+                                + " class=\"btn btn-sm btn-bg-light btn-danger fan1\" data-bs-toggle=\"tooltip\" title=\"RIGETTA CORSO\" data-preload='false' "
+                                + "\"><i class=\"fa fa-remove\"></i></a>";
+                    }
+                    case "46": {
+                        azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"AUTORIZZA CAMBIO SEDE\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
+                                + "onclick=\"return approvacambiosede('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-check-circle\"></i></button>"
+                                + "<a href='ADM_rigettacorso.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+                                + " class=\"btn btn-sm btn-bg-light btn-danger fan1\" data-bs-toggle=\"tooltip\" title=\"RIGETTA CORSO\" data-preload='false' "
+                                + "\"><i class=\"fa fa-remove\"></i></a>";
+                    }
+                    case "48": {
+                        azioni += "<a href='ADM_verificacommissione.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato()))
+                                + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+                                + " class=\"btn btn-sm btn-bg-light btn-warning fan1\" data-bs-toggle=\"tooltip\" title=\"VERIFICA COMMISSIONE ESAMI\" data-preload='false' "
+                                + "\"><i class=\"fa fa-edit\"></i></a>";
+                    }
+                    case "49": {
+                        azioni
+                                += "<a href='ADM_verificacommissione.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato()))
+                                + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+                                + " class=\"btn btn-sm btn-bg-light btn-primary fan1\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA COMMISSIONE ESAMI\" data-preload='false' "
+                                + "\"><i class=\"fa fa-users\"></i></a>"
+                                + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"IMPOSTA STATO 'IN DESIGNAZIONE PRESIDENTE'\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
+                                + "onclick=\"return impostadesignazione('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-check-circle\"></i></button>";
+                    }
+                    case "50": {
+                        azioni += "<a href='ADM_designapresidente.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato()))
+                                + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+                                + " class=\"btn btn-sm btn-bg-light btn-success fan1\" data-bs-toggle=\"tooltip\" title=\"DESIGNA PRESIDENTE\" data-preload='false' "
+                                + "\"><i class=\"fa fa-user-alt\"></i></a>";
+                    }
                 }
-
                 data_value.addProperty("azioni", azioni);
                 data_value.addProperty("statovisual", res.getStatocorso().getNome());
+                data_value.addProperty("presidente", res.getPresidentecommissione() == null ? "NON PRESENTE" : (res.getPresidentecommissione().getCognome()
+                        + " " + res.getPresidentecommissione().getNome()));
                 data.add(data_value);
                 at.addAndGet(1);
             });
@@ -721,6 +747,7 @@ public class Search extends HttpServlet {
             out.print(jMembers.toString());
         }
     }
+
     protected void list_docenti(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try (PrintWriter out = response.getWriter()) {

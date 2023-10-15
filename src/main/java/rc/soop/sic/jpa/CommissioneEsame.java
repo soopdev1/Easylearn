@@ -29,6 +29,7 @@ import javax.persistence.TemporalType;
  * @author Administrator
  */
 @NamedQueries(value = {
+    @NamedQuery(name = "commissione.corso", query = "SELECT u FROM CommissioneEsame u WHERE u.corsodiriferimento=:corsodiriferimento ORDER BY u.datainserimento DESC"),
 })
 @Entity
 @Table(name = "commissione")
