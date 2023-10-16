@@ -12,17 +12,6 @@ $(document).ready(function () {
                 exportOptions: {
                     columns: [8, 1, 2, 3, 4, 5, 6] //Your Column value those you want
                 }
-            },
-            {
-                extend: 'pdfHtml5',
-                className: 'btn btn-sm btn-danger',
-                text: '<i class="fa fa-file-pdf"></i>',
-                titleAttr: 'Esporta in PDF',
-                orientation: 'landscape',
-                pageSize: 'A4',
-                exportOptions: {
-                    columns: [8, 1, 2, 3, 4, 5, 6, 9,10,11] //Your Column value those you want
-                }
             }
         ],
         lengthMenu: [[10, 50, 100, -1], [10, 50, 100, "Tutto"]],
@@ -36,7 +25,7 @@ $(document).ready(function () {
             url: 'Search',
             type: 'POST',
             data: function (d) {
-                d.type = 'list_corso_admin';
+                d.type = 'list_corso_pres';
                 d.soggetto = $('#soggetto').val();
                 d.statocorso = $('#statocorso').val();
                 d.tipopercorso = $('#tipopercorso').val();

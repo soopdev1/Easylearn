@@ -116,13 +116,13 @@ public class Operations extends HttpServlet {
     protected void NOMINAPRESIDENTECOMMISSIONE(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            String IDCORSOVALUE = getRequestValue(request, "IDCORSOVALUE");
+            String IDCORSO = getRequestValue(request, "IDCORSO");
             String PRESIDENTE = getRequestValue(request, "PRESIDENTE");
             String NUMPROTNOMINA = getRequestValue(request, "NUMPROTNOMINA");
             String DATAPROTNOMINA = getRequestValue(request, "DATAPROTNOMINA");
 
             EntityOp ep1 = new EntityOp();
-            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSOVALUE));
+            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
             PresidenteCommissione pr1 = ep1.getEm().find(PresidenteCommissione.class, Long.valueOf(PRESIDENTE));
             if (ca1 != null && pr1 !=null) {
                 ca1.setPresidentecommissione(pr1);

@@ -3,6 +3,7 @@
     Created on : 18-feb-2022, 14.01.46
     Author     : raf
 --%>
+<%@page import="rc.soop.sic.jpa.PresidenteCommissione"%>
 <%@page import="rc.soop.sic.jpa.Stati"%>
 <%@page import="rc.soop.sic.jpa.CommissioneEsame"%>
 <%@page import="rc.soop.sic.jpa.Sede"%>
@@ -40,11 +41,12 @@
                     modify = true;
                 }
 
+               
 
     %>
     <!--begin::Head-->
     <head><base href="">
-        <title><%=Constant.NAMEAPP%>: Richiesta nomina commissione d'esame</title>
+        <title><%=Constant.NAMEAPP%>: Commissione d'esame</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->
@@ -54,7 +56,6 @@
         <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
         <link rel="stylesheet" href="assets/plugins/jquery-confirm.3.3.2.min.css">
-        <link href="assets/plugins/select2/select2_v4.1.0.min.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/plus.css" rel="stylesheet" type="text/css" />
 
@@ -79,7 +80,7 @@
                     <div class="card h-xl-100">
                         <div class="card-header border-0 pt-5">
                             <h3 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bolder fs-3 mb-1">RICHIESTA NOMINA COMMISSIONE - CORSO ID: <%=is1.getIdcorsoavviato()%> - <%=is1.getCorsobase().getIstanza().getTipologiapercorso().getNometipologia()%> - <u><%=is1.getCorsobase().getRepertorio().getDenominazione()%></u></span>
+                                <span class="card-label fw-bolder fs-3 mb-1">NOMINA COMMISSIONE - CORSO ID: <%=is1.getIdcorsoavviato()%> - <%=is1.getCorsobase().getIstanza().getTipologiapercorso().getNometipologia()%> - <u><%=is1.getCorsobase().getRepertorio().getDenominazione()%></u></span>
                             </h3>
                         </div>
                         <div class="card-body py-3">

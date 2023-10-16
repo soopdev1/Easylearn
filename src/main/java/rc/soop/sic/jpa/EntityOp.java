@@ -498,6 +498,7 @@ public class EntityOp {
         }
         return new ArrayList<>();
     }
+
     public List<PresidenteCommissione> list_presidenti_attivi() {
         try {
             TypedQuery q = this.em.createNamedQuery("presidentecommissione.stato", PresidenteCommissione.class);
@@ -589,6 +590,40 @@ public class EntityOp {
         HashMap<String, Object> param = new HashMap<>();
 
         String sql = "SELECT c FROM Corsoavviato c ";
+
+        if (sp != null) {
+            sql += !sql.toUpperCase().contains("WHERE") ? "WHERE " : " AND ";
+            sql += "c.corsobase.soggetto=:soggetto ";
+            param.put("soggetto", sp);
+        }
+        if (!tipologiapercorso.equals("")) {
+            sql += !sql.toUpperCase().contains("WHERE") ? "WHERE " : " AND ";
+            sql += "c.corsobase.istanza.tipologiapercorso.idtipopercorso = :tipologiapercorso";
+            param.put("tipologiapercorso", Long.valueOf(tipologiapercorso));
+        }
+        if (!statocorso.equals("")) {
+            sql += !sql.toUpperCase().contains("WHERE") ? "WHERE " : " AND ";
+            sql += "c.statocorso.codicestatocorso = :statocorso";
+            param.put("statocorso", statocorso);
+        }
+
+        sql += " ORDER BY c.idcorsoavviato DESC";
+
+        TypedQuery<Corsoavviato> q = this.em.createQuery(sql, Corsoavviato.class);
+        if (param.isEmpty()) {
+            q.setMaxResults(500);
+        }
+        param.entrySet().forEach(m -> {
+            q.setParameter(m.getKey(), m.getValue());
+        });
+        return q.getResultList().isEmpty() ? new ArrayList() : (List<Corsoavviato>) q.getResultList();
+    }
+
+    public List<Corsoavviato> list_corso_pres(SoggettoProponente sp, String tipologiapercorso, String statocorso, PresidenteCommissione presidentecommissione) {
+        HashMap<String, Object> param = new HashMap<>();
+
+        String sql = "SELECT c FROM Corsoavviato c WHERE c.presidentecommissione=:presidentecommissione ";
+        param.put("presidentecommissione", presidentecommissione);
 
         if (sp != null) {
             sql += !sql.toUpperCase().contains("WHERE") ? "WHERE " : " AND ";

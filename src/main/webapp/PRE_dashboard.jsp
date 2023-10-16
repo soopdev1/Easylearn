@@ -4,6 +4,10 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.Engine"%>
+<%@page import="rc.soop.sic.jpa.CorsoStato"%>
+<%@page import="rc.soop.sic.jpa.SoggettoProponente"%>
+<%@page import="rc.soop.sic.jpa.Tipologia_Percorso"%>
 <%@page import="java.util.stream.Collectors"%>
 <%@page import="rc.soop.sic.jpa.Corsoavviato"%>
 <%@page import="java.util.List"%>
@@ -18,8 +22,11 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
-                List<Corsoavviato> corsi = EntityOp.getCorsiAvviati_pres();
-                
+                EntityOp eo = new EntityOp();
+                List<Tipologia_Percorso> per1 = Engine.tipo_percorso_attivi(eo);
+                List<SoggettoProponente> solist = eo.list_soggetti();
+                List<CorsoStato> stati = eo.lista_stati("CORSO");
+
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -30,13 +37,13 @@
         <link rel="stylesheet" href="assets/css/gfont.css" />
         <!--end::Fonts-->
         <!--begin::Page Vendor Stylesheets(used by this page)-->
-        <link href="assets/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet" type="text/css" />
-        <link href="assets/plugins/DataTables/datatables.min.css" rel="stylesheet" type="text/css" />
-        <!--end::Page Vendor Stylesheets-->
-        <!--begin::Global Stylesheets Bundle(used by all pages)-->
         <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
+        <link href="assets/plugins/DataTables/datatables.min.css" rel="stylesheet" type="text/css" />
+        <link href="assets/plugins/select2/select2_v4.1.0.min.css" rel="stylesheet" type="text/css" />
+        <link href="assets/plugins/jquery-confirm.3.3.2.min.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+        <link href="assets/css/plus.css" rel="stylesheet" type="text/css" />
         <!--end::Global Stylesheets Bundle-->
     </head>
     <!--end::Head-->
@@ -66,78 +73,99 @@
                                 <!--begin::Row-->
                                 <div class="row g-10">
                                     <!--begin::Col-->
-                                    <div class="row g-5 g-lg-10">
-                                        <!--begin::Col-->                   
-
-                                        <div class="card-header border-0 pt-5">
-                                            <h3 class="card-title align-items-start flex-column">
-                                                <span class="card-label fw-bolder fs-3 mb-1">CORSI AUTOFINANZIATI</span>
-                                                <span class="text-muted mt-1 fw-bold fs-7">Elenco dei corsi autofinanziati</span>
-                                            </h3>
-                                        </div>
+                                    <div class="col-xl-12">
+                                        <!--begin::Tables Widget 3-->
                                         <div class="card h-xl-100">
-
-
-                                            <%if (!corsi.isEmpty()) {%>
-                                            <table class="table table-bordered table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col"><b>ID</b></th>
-                                                        <th scope="col"><b>Protocollo Istanza</b></th>
-                                                        <th scope="col"><b>Data avvio</b></th>
-                                                        <th scope="col"><b>Data fine</b></th>
-                                                        <th scope="col"><b>Stato</b></th>
-                                                        <th scope="col"><b>Azioni</b></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-
-                                                    <%for (Corsoavviato co1 : corsi) {
-
-                                                            String stato = co1.getStatocorso().getCodice().equals("20")
-                                                                    ? "<span class='badge badge-warning'>AVVIATO</span>"
-                                                                    : "<span class='badge badge-success'>CONCLUSO</span>";
-                                                    %>
-                                                    <tr>
-                                                        <th scope="row"><%=co1.getIdcorso()%></th>
-                                                        <td><%=co1.getIstanza().getProtocollosoggetto()%> <%=co1.getIstanza().getProtocollosoggettodata()%></td>                                                       
-                                                        <td><%=Constant.sdf_PATTERNDATE4.format(co1.getDatainizio())%></td>
-                                                        <td><%=Constant.sdf_PATTERNDATE4.format(co1.getDatafine())%></td>
-                                                        <td><%=stato%></td>
-                                                        <td>
-                                                            <a href="#" class="btn btn-sm btn-bg-light btn-primary" data-bs-toggle="tooltip" title="ELENCO DOCUMENTI CORSO" >
-                                                            <i class="fa fa-list-check"></i></a>
-                                                            
-                                                            <a href="#" data-fancybox data-type='iframe' 
-                                                               data-bs-toggle="tooltip" title="REDAZIONE VERBALE CHIUSURA ESAMI" 
-                                                               data-preload='false' data-width='75%' data-height='75%' 
-                                                               class="btn btn-sm btn-bg-light btn-danger fan1">
-                                                                <i class="fa fa-pencil"></i></a>
-
-                                                            <a href="#" data-fancybox data-type='iframe' 
-                                                               data-bs-toggle="tooltip" title="GENERA ATTESTATI DI PARTECIPAZIONE" 
-                                                               data-preload='false' data-width='75%' data-height='75%' 
-                                                               class="btn btn-sm btn-bg-light btn-dark fan1">
-                                                                <i class="fa fa-print"></i></a>
-
-                                                            <a href="#" data-fancybox data-type='iframe' 
-                                                               data-bs-toggle="tooltip" title="CARICA ATTESTATI FIRMATI " 
-                                                               data-preload='false' data-width='100%' data-height='100%' 
-                                                               class="btn btn-sm btn-bg-light btn-warning fan1">
-                                                                <i class="fa fa-upload"></i></a>
-
-                                                            <a href="#" class="btn btn-sm btn-bg-light btn-success" data-bs-toggle="tooltip" title="VALIDAZIONE EMOLUMENTI" >
-                                                                <i class="fa fa-forward"></i></a>
-                                                        </td>
-                                                    </tr>  
-                                                    <% }%>
-                                                </tbody>
-                                            </table>
-                                            <%}%>
+                                            <!--begin::Header-->
+                                            <div class="card-header border-0 pt-5">
+                                                <h3 class="card-title align-items-start flex-column">
+                                                    <span class="card-label fw-bolder fs-3 mb-1">Corsi di formazione professionale</span>
+                                                </h3>
+                                            </div>
+                                            <!--end::Header-->
+                                            <!--begin::Body
+                                            <hr>-->
+                                            <div class="card-body py-3">
+                                                <div class="col-md-12 row">
+                                                    <div class="col-md-4">
+                                                        <label>Soggetto Proponente</label>
+                                                        <select aria-label="Scegli..." 
+                                                                data-placeholder="..." 
+                                                                class="form-select form-select-solid form-select-lg fw-bold" 
+                                                                name="soggetto"
+                                                                id="soggetto" onchange="return refreshtable();"
+                                                                >
+                                                            <option value="">...</option>  
+                                                            <%for (SoggettoProponente t1 : solist) {%>
+                                                            <option value="<%=t1.getIdsoggetto()%>"><%=t1.getRAGIONESOCIALE().toUpperCase()%></option>  
+                                                            <%}%>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label>Tipo Percorso</label>
+                                                        <select aria-label="Scegli..." 
+                                                                data-placeholder="..." 
+                                                                class="form-select form-select-solid form-select-lg fw-bold" 
+                                                                name="tipopercorso"
+                                                                id="tipopercorso" onchange="return refreshtable();"
+                                                                >
+                                                            <option value="">...</option>  
+                                                            <%for (Tipologia_Percorso t1 : per1) {%>
+                                                            <option value="<%=t1.getIdtipopercorso()%>"><%=t1.getNometipologia().toUpperCase()%></option>  
+                                                            <%}%>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label>Stato Corso</label>
+                                                        <select aria-label="Scegli..." 
+                                                                data-placeholder="..." 
+                                                                class="form-select form-select-solid form-select-lg fw-bold" 
+                                                                name="statocorso"
+                                                                id="statocorso" onchange="return refreshtable();"
+                                                                >
+                                                            <option value="">...</option>  
+                                                            <%for (CorsoStato s1 : stati) {%>
+                                                            <option value="<%=s1.getCodicestatocorso()%>"><%=s1.getHtmldescr()%></option>  
+                                                            <%}%>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                <!--begin::Table container-->
+                                                <div class="table-responsive ">
+                                                    <!--begin::Table-->
+                                                    <table class="table align-middle gy-3 table-bordered table-hover" id="tab_dt1" style="border-bottom: 2px;">
+                                                        <!--begin::Table head-->
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="p-2 w-50px">Stato</th>
+                                                                <th class="p-2 min-w-120px">Soggetto Proponente</th>
+                                                                <th class="p-2 w-50px">ID</th>
+                                                                <th class="p-2 min-w-120px">Nome</th>
+                                                                <th class="p-2 w-50px">Data Inizio</th>
+                                                                <th class="p-2 w-50px">Data Fine</th>
+                                                                <th class="p-2 w-50px">Data Inserimento</th>
+                                                                <th class="p-2 min-w-120px">Azioni</th>
+                                                                <th class="p-2 w-50px" style="display: none;">Stato</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <!--end::Table head-->
+                                                        <!--begin::Table body-->
+                                                        <tbody>                                                                
+                                                        </tbody>
+                                                        <!--end::Table body-->
+                                                    </table>
+                                                    <!--end::Table-->
+                                                </div>
+                                                <!--end::Table container-->
+                                            </div>
+                                            <!--begin::Body-->
                                         </div>
-                                        <!--end::Col-->
+                                        <!--end::Tables Widget 3-->
                                     </div>
-                                    <!--end::Row-->
+                                    <!--end::Col-->
+                                    <!--begin::Col-->
+                                    <!--end::Col-->
                                 </div>
                                 <!--end::Post-->
                                 <!--begin::Footer-->
@@ -188,16 +216,23 @@
             <!--end::Global Javascript Bundle-->
             <!--begin::Page Vendors Javascript(used by this page)-->
             <script src="assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
+            <script src="assets/plugins/DataTables/jquery-3.5.1.js"></script>
+            <script src="assets/plugins/DataTables/jquery.dataTables.min.js"></script>
             <script src="assets/plugins/DataTables/datatables.min.js"></script>
+            <script src="assets/plugins/DataTables/date-eu.js"></script>
+            <script src="assets/plugins/DataTables/date-euro.js"></script>
             <!--end::Page Vendors Javascript-->
             <!--begin::Page Custom Javascript(used by this page)-->
             <script src="assets/js/widgets.bundle.js"></script>
             <script src="assets/js/custom/widgets.js"></script>
-            <script src="assets/js/custom/apps/chat/chat.js"></script>
-            <script src="assets/js/custom/utilities/modals/create-app.js"></script>
-            <script src="assets/js/custom/utilities/modals/create-campaign.js"></script>
-            <script src="assets/js/custom/utilities/modals/users-search.js"></script>
             <script src="assets/fontawesome-6.0.0/js/all.js"></script>
+            <link rel="stylesheet" href="assets/plugins/fancybox.v4.0.31.css"/>
+            <script type="text/javascript" src="assets/plugins/fancybox.v4.0.31.js"></script>
+            <script type="text/javascript" src="assets/plugins/select2/select2_v4.1.0.min.js"></script>
+            <script type="text/javascript" src="assets/plugins/select2/i18n/it.js"></script>
+            <script type="text/javascript" src="assets/js/common.js"></script>
+            <script type="text/javascript" src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
+            <script type="text/javascript" src="assets/js/PRE_gestionecorsi.js"></script>
 
             <!--end::Page Custom Javascript-->
             <!--end::Javascript-->

@@ -16,13 +16,16 @@
         case "1": {%>
 <jsp:include page="menuADM1.jsp" />
 <%
-    break;
+        break;
     }
     case "2": {%>
 <jsp:include page="menuUS1.jsp" /> 
 <%
-    break;
-        }
+        break;
+    }
+    case "3": {%>
+    <jsp:include page="menuPRE1.jsp" /> 
+<%}
         default:
             break;
     }

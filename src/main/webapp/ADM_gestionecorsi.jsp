@@ -86,7 +86,6 @@
                                                 <h3 class="card-title align-items-start flex-column">
                                                     <span class="card-label fw-bolder fs-3 mb-1">Corsi di formazione professionale</span>
                                                 </h3>
-
                                             </div>
                                             <!--end::Header-->
                                             <!--begin::Body
@@ -154,6 +153,8 @@
                                                                 <th class="p-2 min-w-120px">Azioni</th>
                                                                 <th class="p-2 w-50px" style="display: none;">Stato</th>
                                                                 <th class="p-2 w-50px" style="display: none;">Presidente Commissione</th>
+                                                                <th class="p-2 w-50px" style="display: none;">Numero Protocollo Nomina Presidente Commissione</th>
+                                                                <th class="p-2 w-50px" style="display: none;">Data Protocollo Nomina Presidente Commissione</th>
                                                             </tr>
                                                         </thead>
                                                         <!--end::Table head-->

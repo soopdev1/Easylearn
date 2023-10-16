@@ -43,6 +43,11 @@
 
                 List<PresidenteCommissione> presidenti = eo.list_presidenti_attivi();
 
+                PresidenteCommissione pc = is1.getPresidentecommissione();
+                boolean newpresident = true;
+                if (pc != null) {
+                    newpresident = false;
+                }
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -110,7 +115,33 @@
                                     <%=com.getEspertosettore()%>
                                 </div>
                             </div>
-                            <%if (modify) {%>
+
+                            <%if (!newpresident) {%>
+                            <hr>
+                            <div class="row col-md-12">
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger">PRESIDENTE COMMISSIONE:</span>
+                                </label>
+                                <div class="col-md-9">
+                                    <span class="text-black"><b><%=pc.getCognome()%> <%=pc.getNome()%></b></span>
+                                </div>
+                            </div><br/>
+                            <div class="row col-md-12">
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger">NUMERO PROTOCOLLO NOMINA:</span>
+                                </label>
+                                <div class="col-md-3">
+                                    <span class="text-black"><b><%=is1.getProtnomina()%></b></span>
+                                </div>
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger">DATA PROTOCOLLO NOMINA:</span>
+                                </label>
+                                <div class="col-md-3">
+                                    <span class="text-black"><b><%=Constant.sdf_PATTERNDATE5.format(is1.getDataprotnomina())%></b></span>
+                                </div>
+                            </div>
+
+                            <%} else if (modify) {%>
                             <hr>
 
                             <form action="Operations" method="POST">
