@@ -364,24 +364,28 @@ public class Search extends HttpServlet {
                         + "<button type=\"submit\"class=\"btn btn-sm btn-primary\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA DETTAGLI CORSO\"data-preload='false'><i class=\"fa fa-file-text\"></i></button>"
                         + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"GESTIONE ALLEGATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\""
                         + "onclick=\"return document.getElementById('gestall_" + res.getIdcorsoavviato() + "').submit();\"><i class=\"fa fa-file-clipboard\"></i></button>";
-                        
 
                 switch (res.getStatocorso().getCodicestatocorso()) {
                     case "51": {
-                        azioni+= "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"GESTIONE ESAMI FINALI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\""
-                        + "onclick=\"return document.getElementById('gestesami_" + res.getIdcorsoavviato() + "').submit();\"><i class=\"fa fa-edit\"></i></button>";
+                        azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"GESTIONE ESAMI FINALI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\""
+                                + "onclick=\"return document.getElementById('gestesami_" + res.getIdcorsoavviato() + "').submit();\"><i class=\"fa fa-edit\"></i></button>";
+                    }
+                    case "52": {
+                        azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"SCARICA PDF VERBALE\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-danger\""
+                                + "onclick=\"return document.getElementById('gestesami_" + res.getIdcorsoavviato() + "').submit();\"><i class=\"fa fa-file-pdf\"></i></button>"
+                                + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"SCARICA ATTESTATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-warning\""
+                                + "onclick=\"return document.getElementById('gestesami_" + res.getIdcorsoavviato() + "').submit();\"><i class=\"fa fa-file-archive\"></i></button>";
                     }
                 }
-                
-                azioni+= "</form>"
+
+                azioni += "</form>"
                         + "<form action=\"US_allegaticorso.jsp\" method=\"POST\" target=\"_blank\" id=\"gestall_" + res.getIdcorsoavviato() + "\">"
                         + "<input type=\"hidden\" name=\"idcorso\" value=\"" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "\"/>"
                         + "</form>"
                         + "<form action=\"PRE_gestioneesami.jsp\" method=\"POST\" target=\"_blank\" id=\"gestesami_" + res.getIdcorsoavviato() + "\">"
                         + "<input type=\"hidden\" name=\"idcorso\" value=\"" + String.valueOf(res.getIdcorsoavviato()) + "\"/>"
                         + "</form>";
-                
-                
+
                 data_value.addProperty("azioni", azioni);
                 data_value.addProperty("statovisual", res.getStatocorso().getNome());
                 data_value.addProperty("presidente", res.getPresidentecommissione() == null ? "NON PRESENTE" : (res.getPresidentecommissione().getCognome()

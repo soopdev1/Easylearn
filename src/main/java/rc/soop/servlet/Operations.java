@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.digest.DigestUtils;
 import static org.apache.commons.codec.digest.DigestUtils.md5Hex;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -113,6 +112,49 @@ import rc.soop.sic.jpa.User;
  */
 public class Operations extends HttpServlet {
 
+    protected void ESAMIFINALI(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        Utils.printRequest(request);
+
+        try {
+
+            String IDCORSO = getRequestValue(request, "IDCORSO");
+
+            EntityOp ep1 = new EntityOp();
+            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
+            if (ca1 != null) {
+
+                String VERBPROT = getRequestValue(request, "VERBPROT");
+                String VERBDATA = getRequestValue(request, "VERBDATA");//SQL
+                String DATAESAME = getRequestValue(request, "DATAESAME"); //SQL
+                int ORESVOLTE = parseIntR(getRequestValue(request, "ORESVOLTE"));
+                List<Allievi> allievi = ep1.getAllieviCorsoAvviato(ca1);
+
+                for (Allievi a1 : allievi) {
+                    int ALLIEVOOREPRESENZA = parseIntR(getRequestValue(request, "OREPRES_" + a1.getIdallievi()));
+                    String ALLIEVOGIUDIZIO = getRequestValue(request, "GIUDIZIO_" + a1.getIdallievi());
+                    int ALLIEVOVOTO = parseIntR(getRequestValue(request, "VOTO_" + a1.getIdallievi()));
+                    String ALLIEVOESITO = getRequestValue(request, "ESITO_" + a1.getIdallievi());
+                    if (!ALLIEVOESITO.equals("")) {
+                        //SAVE
+                    }
+                }
+                ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "52"));
+                ep1.begin();
+                ep1.merge(ca1);
+                ep1.commit();
+                ep1.close();
+                redirect(request, response, "PRE_dashboard.jsp");
+            } else {
+                redirect(request, response, "Page_message.jsp?esito=KO_MOSD1");
+            }
+
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_MOSD2");
+        }
+    }
+
     protected void NOMINAPRESIDENTECOMMISSIONE(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
@@ -124,7 +166,7 @@ public class Operations extends HttpServlet {
             EntityOp ep1 = new EntityOp();
             Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
             PresidenteCommissione pr1 = ep1.getEm().find(PresidenteCommissione.class, Long.valueOf(PRESIDENTE));
-            if (ca1 != null && pr1 !=null) {
+            if (ca1 != null && pr1 != null) {
                 ca1.setPresidentecommissione(pr1);
                 ca1.setProtnomina(NUMPROTNOMINA);
                 ca1.setDataprotnomina(sdf_PATTERNDATE6.parse(DATAPROTNOMINA));
@@ -142,9 +184,9 @@ public class Operations extends HttpServlet {
             EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
             redirect(request, response, "Page_message.jsp?esito=KO_MOSD2");
         }
-        
+
     }
-    
+
     protected void RIGETTACOMMISSIONE(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
@@ -3188,8 +3230,14 @@ public class Operations extends HttpServlet {
                 case "NOMINAPRESIDENTECOMMISSIONE":
                     NOMINAPRESIDENTECOMMISSIONE(request, response);
                     break;
-                default:
+                case "ESAMIFINALI":
+                    ESAMIFINALI(request, response);
                     break;
+                default: {
+                    String p = request.getContextPath();
+                    request.getSession().invalidate();
+                    redirect(request, response, p);
+                }
             }
         } catch (Exception ex) {
             EntityOp.trackingAction("SERVICE", estraiEccezione(ex));

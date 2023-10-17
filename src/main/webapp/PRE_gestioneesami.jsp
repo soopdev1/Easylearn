@@ -101,6 +101,10 @@
                                 <!--begin::Row-->
                                 <div class="row">
                                     <div class="col-xl-12">
+                                        
+                                        <form action="Operations" method="POST">
+                                            <input type="hidden" name="type" value="ESAMIFINALI"/>
+                                            <input type="hidden" name="IDCORSO" value="<%=is1.getIdcorsoavviato()%>"/>
                                         <div class="card h-xl-100">
                                             <div class="card-header border-0 pt-5">
                                                 <h3 class="card-title align-items-start flex-column">
@@ -373,11 +377,11 @@
                                                 </div>
                                                 <hr>
                                                 <div class="row col-md-12">
-                                                    <button type="button" class="btn btn-success btn-lg"> <i class="fa fa-save"></i> SALVA DATI E GENERA DOCUMENTI</button>
+                                                    <button type="submit" class="btn btn-success btn-lg"><i class="fa fa-save"></i> SALVA DATI E GENERA DOCUMENTI</button>
                                                 </div>
                                             </div>
                                         </div>
-                                        <!--end::Tables Widget 3-->
+                                        </form>
                                     </div>
                                 </div>
                                 <!--end::Row-->
