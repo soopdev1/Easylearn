@@ -3,6 +3,7 @@
     Created on : 12 ago 2023, 14:18:44
     Author     : raf
 --%>
+<%@page import="rc.soop.sic.jpa.PresidenteCommissione"%>
 <%@page import="rc.soop.sic.jpa.SoggettoProponente"%>
 <%@page import="rc.soop.sic.jpa.Corsoavviato"%>
 <%@page import="rc.soop.sic.jpa.EnteStage"%>
@@ -66,13 +67,22 @@
         List<Allegati> la = eo.list_allegati(null, null, is1, null, null, null);
         List<Information> info1 = eo.list_info(is1);
         boolean showinfo = !info1.isEmpty();
-
-        boolean modify = true;
+        String usernameUtente = "---";
+        boolean caricanuovo = true;
         if (Utils.isAdmin(session)) {
-            modify = false;
+            caricanuovo = false;
         } else {
             SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
-            modify = so.getIdsoggetto().equals(is1.getCorsobase().getSoggetto().getIdsoggetto());
+            if (so == null) {
+                PresidenteCommissione pc1 = ((User) session.getAttribute("us_memory")).getPresidente();
+                if (pc1 != null) {
+                    usernameUtente = ((User) session.getAttribute("us_memory")).getUsername();
+                    caricanuovo = true;
+                }
+            } else {
+                caricanuovo = so.getIdsoggetto().equals(is1.getCorsobase().getSoggetto().getIdsoggetto());
+                usernameUtente = ((User) session.getAttribute("us_memory")).getUsername();
+            }
 
         }
     %>
@@ -160,7 +170,7 @@
                                         <%}%>
                                         <%}%>
                                         <%}%>
-                                        <%if (modify) {%>
+                                        <%if (caricanuovo) {%>
                                         <!--begin::Header-->
                                         <form action="Operations?type=UPLDOCCORSO" method="post"  enctype="multipart/form-data">
                                             <input type="hidden" name="idcorsoavviato" value="<%=is1.getIdcorsoavviato()%>"/>
@@ -243,7 +253,7 @@
                                                                             data-preload='false'
                                                                             ><i class="fa fa-file-alt"></i>
                                                                     </button>
-                                                                    <%if (modify) {%>
+                                                                    <%if (usernameUtente.trim().equalsIgnoreCase(d2.getUtentecaricamento().trim())) {%>
                                                                     | 
                                                                     <button type="button"class="btn btn-sm btn-bg-light btn-danger"
                                                                             data-bs-toggle="tooltip" title="ELIMINA DOCUMENTO" 
@@ -261,7 +271,7 @@
                                                                         <i class="fa fa-arrow-right-arrow-left"></i>
                                                                     </a>
                                                                     <%}
-                                                                    }%>
+                                                                        }%>
                                                                 </form>
                                                             </td>      
                                                         </tr>
