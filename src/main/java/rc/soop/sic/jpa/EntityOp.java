@@ -169,10 +169,10 @@ public class EntityOp {
     }
 
     public List<Corsoavviato> getCorsiAvviati_Admin() {
-        TypedQuery q = this.em.createNamedQuery("corsoavviato.stato", Corsoavviato.class);
-        CorsoStato c1 = new CorsoStato();
-        c1.setCodicestatocorso("20");
-        q.setParameter("stato", c1);
+        TypedQuery q = this.em.createNamedQuery("corsoavviato.contatoreok", Corsoavviato.class);
+        
+        List<CorsoStato> csLIST = lista_stati("CORSO").stream().filter(c1->c1.isOk()).collect(Collectors.toList());
+        q.setParameter("statusok", csLIST);
         return (List<Corsoavviato>) q.getResultList();
     }
 

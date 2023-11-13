@@ -69,7 +69,7 @@
                     SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
                     if (so.getIdsoggetto().equals(cl1.getCorsodiriferimento().getCorsobase().getSoggetto().getIdsoggetto())
                             && cl1.getCorsodiriferimento().getStatocorso().getCodicestatocorso().equals("44")
-                            && !cl1.getStatolezione().getCodicestatocorso().equals("61")) {
+                            && (cl1.getStatolezione() == null || !cl1.getStatolezione().getCodicestatocorso().equals("61"))) {
                         modify = true;
                     }
                 }
@@ -319,7 +319,7 @@
                                                             <%} else {%>
                                                             <span class="text-dark"><b><%=orafine%></b></span>
                                                                     <%}%>
-                                                    </div>
+                                                        </div>
                                                 </td>
                                             </tr>
                                             <%}%>

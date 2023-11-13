@@ -41,7 +41,6 @@
                     modify = true;
                 }
 
-               
 
     %>
     <!--begin::Head-->
@@ -116,19 +115,51 @@
                             </div>
                             <%if (modify) {%>
                             <hr>
-                            <div class="row col-md-6 btn-group">
-                                <button type="button" class="btn btn-success btn-sm col-md-6" onclick="return document.getElementById('formapprova').submit();"> <i class="fa fa-save"></i> CONFERMA COMMISSIONE</button>
-                                <button type="button" class="btn btn-danger btn-sm col-md-6" 
-                                        onclick="return document.getElementById('formrigetta').submit();"> <i class="fa fa-remove"></i> RIGETTA <%=com.getIdcommissione()%></button>
+                            <div class="row col-md-12">
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>PROT. RICHIESTA:</b></span>
+                                </label>
+                                <div class="col-md-3">
+                                    <input type="text" name="NUMPROTRICH" id="NUMPROTRICH" 
+                                           class="form-control" 
+                                           required/>
+                                </div>
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>DATA PROT. RICHIESTA:</b></span>
+                                </label>
+                                <div class="col-md-3">
+                                    <input type="date" name="DATAPROTRICH" id="DATAPROTRICH" 
+                                           class="form-control" 
+                                           required/>
+                                </div>
                             </div>
-                            <form action="Operations" method="POST" id="formapprova">
-                                <input type="hidden" name="type" value="APPROVACOMMISSIONE" />
-                                <input type="hidden" name="IDCOMM" value="<%=com.getIdcommissione()%>" />
-                            </form>
-                            <form action="Operations" method="POST" id="formrigetta">
-                                <input type="hidden" name="type" value="RIGETTACOMMISSIONE" />
-                                <input type="hidden" name="IDCOMM" value="<%=com.getIdcommissione()%>" />
-                            </form>
+                            <hr>
+                            <div class="row col-md-6 btn-group">
+                                <button type="button" class="btn btn-success btn-sm col-md-6" 
+                                        onclick="return gestiscicommissione('<%=com.getIdcommissione()%>', 'APPROVACOMMISSIONE', 'approvare');"> 
+                                    <i class="fa fa-save"></i> APPROVA COMMISSIONE</button>
+                                <button type="button" class="btn btn-danger btn-sm col-md-6" 
+                                        onclick="return gestiscicommissione('<%=com.getIdcommissione()%>', 'RIGETTACOMMISSIONE', 'rigettare (attivando il soccorso istruttorio)');">
+                                    <i class="fa fa-remove"></i> RIGETTA COMMISSIONE</button>
+                            </div>
+                            <input type="hidden" name="type" value="" />
+                            <input type="hidden" name="type" value="" />
+                            <%} else if (com.getNumprotrichiesta() != null) {%>
+                            <hr>
+                            <div class="row col-md-12">
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>PROT. RICHIESTA:</b></span>
+                                </label>
+                                <div class="col-md-3">
+                                    <%=com.getNumprotrichiesta()%>
+                                </div>
+                                <label class="col-md-3 col-form-label fw-bold fs-6">
+                                    <span class="text-danger"><b>DATA PROT. RICHIESTA:</b></span>
+                                </label>
+                                <div class="col-md-3">
+                                    <%=Constant.sdf_PATTERNDATE4.format(com.getDataprotrichiesta())%>
+                                </div>
+                            </div>
                             <%}%>
                             </form>
                         </div>
@@ -164,6 +195,10 @@
         <script src="assets/plugins/global/plugins.bundle.js"></script>
         <script src="assets/js/scripts.bundle.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
+
+        <script src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
+
+        <script src="assets/js/ADM_verificacommissione.js"></script>
         <!--end::Page Custom Javascript-->
         <!--end::Javascript-->
     </body>

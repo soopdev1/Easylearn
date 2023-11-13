@@ -11,7 +11,7 @@ import static rc.soop.sic.Utils.createLog;
  */
 public class Constant {
 
-    public static final String NAMEAPP = "EasyLearn";
+    public static final String NAMEAPP = "WeForm";
     public static final String VERSIONAPP = "Version 1.0 RC";
     public static final String PATTERNDATE1 = "yyyyMMdd";
     public static final String PATTERNDATE2 = "HHmmssSSS";

@@ -4,6 +4,7 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.PresidenteCommissione"%>
 <%@page import="rc.soop.sic.jpa.Presenze_Tirocinio_Allievi"%>
 <%@page import="rc.soop.sic.jpa.TirocinioStage"%>
 <%@page import="java.util.ArrayList"%>
@@ -28,9 +29,14 @@
                 Allievi is1 = ts1.getAllievi();
                 boolean modify = false;
                 if (!Utils.isAdmin(request.getSession())) {
-                    SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
-                    if (so.getIdsoggetto().equals(ts1.getEntestage().getSoggetto().getIdsoggetto())) {
-                        modify = true;
+                    PresidenteCommissione pc = ((User) session.getAttribute("us_memory")).getPresidente();
+                    if (pc != null) {
+                        modify = false;
+                    } else {
+                        SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
+                        if (so.getIdsoggetto().equals(ts1.getEntestage().getSoggetto().getIdsoggetto())) {
+                            modify = true;
+                        }
                     }
                 }
 
@@ -120,17 +126,17 @@
                                 <span><b><%=ts1.getOrepreviste()%></b></span>
                             </label>
                         </div>
+                        <%if (modify) {%>
                         <hr>
-
                         <form action="Operations" method="POST" id="forminsert">
-                            <%if (modify) {%>
+
 
                             <label class="col-form-label fw-bold fs-6 text-primary">AGGIUNGI PRESENZA TIROCINIO:</label> 
                             <button class="btn btn-success btn-sm" data-preload='false' type="sumbit"
                                     data-bs-toggle="tooltip" title="SALVA ED INSERISCI PRESENZA" 
                                     >
                                 <i class="fa fa-save"></i></button>
-                                <%}%>
+
 
                             <input type="hidden" name="type" value="INSERISCIPRESENZATIROCINIO"/>
                             <input type="hidden" name="idtirociniostage" value="<%=idtirociniostage%>"/>
@@ -191,7 +197,7 @@
                                 </div>                                
                             </div>
                         </form>
-
+                        <%}%>
                         <hr>
                         <label class="col-form-label fw-bold fs-6">PRESENZE INSERITE: <%=lpr.size()%> - ORE INSERITE (DA CONVALIDARE): <%=presenzeinserite%> - ORE CONVALIDATE: <%=presenzeconvalid%></label>
                         <table class="table table-hover">

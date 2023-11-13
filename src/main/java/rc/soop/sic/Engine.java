@@ -128,8 +128,8 @@ public class Engine {
             List<Istanza> dagestire = eo.getIstanzedaGestire();
             List<Istanza> gestite = eo.getIstanzeGestite();
 
-            contatori[0] = String.valueOf(dagestire.size());
             try {
+                contatori[0] = String.valueOf(dagestire.size());
                 contatori[1] = String.valueOf(
                         gestite.stream().filter(i1 -> i1.getStatocorso().getCodicestatocorso().equals("08"))
                                 .collect(Collectors.toList()).size());
@@ -137,6 +137,12 @@ public class Engine {
                 trackingAction(se.getAttribute("us_cod").toString(), estraiEccezione(ex1));
             }
 
+            try {
+                List<Corsoavviato> ca = eo.getCorsiAvviati_Admin();
+                contatori[2] = String.valueOf(ca.size());
+            } catch (Exception ex1) {
+                trackingAction(se.getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            }
             //corsi avviati
         } catch (Exception ex) {
             trackingAction(se.getAttribute("us_cod").toString(), estraiEccezione(ex));

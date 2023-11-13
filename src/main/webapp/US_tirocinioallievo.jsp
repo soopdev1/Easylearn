@@ -4,6 +4,7 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.PresidenteCommissione"%>
 <%@page import="rc.soop.sic.jpa.TirocinioStage"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="rc.soop.sic.jpa.User"%>
@@ -33,9 +34,16 @@
                 List<EnteStage> entiaccr = new ArrayList<>();
                 boolean modify = false;
                 if (!Utils.isAdmin(request.getSession())) {
-                    SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
-                    entiaccr = new EntityOp().getEntiStageSoggetto(so);
-                    modify = true;
+
+                    PresidenteCommissione pc = ((User) session.getAttribute("us_memory")).getPresidente();
+                    if (pc != null) {
+                        modify = false;
+                    } else {
+
+                        SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
+                        entiaccr = new EntityOp().getEntiStageSoggetto(so);
+                        modify = true;
+                    }
                 }
                 List<TirocinioStage> list_tirocini_allievo = eo.list_tirocini_allievo(is1);
 
@@ -160,6 +168,7 @@
                                                     <input type="hidden" name="idtirociniostage" value="<%=d1.getIdtirociniostage()%>" />
                                                 </form>
                                             </td>
+
                                         </tr>
                                         <%}%>
                                     </tbody>

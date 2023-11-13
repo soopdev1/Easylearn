@@ -73,7 +73,30 @@ public class CommissioneEsame implements Serializable {
     @Column(name = "statocommissione")
     private Stati statocommissione;
         
+    @Column(name = "numprotrichiesta")
+    private String numprotrichiesta;
+    
+    @Column(name = "dataprotrichiesta")
+    @Temporal(TemporalType.DATE)
+    private Date dataprotrichiesta;
+    
     public CommissioneEsame() {
+    }
+
+    public String getNumprotrichiesta() {
+        return numprotrichiesta;
+    }
+
+    public void setNumprotrichiesta(String numprotrichiesta) {
+        this.numprotrichiesta = numprotrichiesta;
+    }
+
+    public Date getDataprotrichiesta() {
+        return dataprotrichiesta;
+    }
+
+    public void setDataprotrichiesta(Date dataprotrichiesta) {
+        this.dataprotrichiesta = dataprotrichiesta;
     }
 
     public String getUtenteinserimento() {

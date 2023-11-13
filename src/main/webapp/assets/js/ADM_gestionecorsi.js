@@ -10,18 +10,16 @@ $(document).ready(function () {
                 text: '<i class="fa fa-file-excel"></i>',
                 titleAttr: 'Esporta in Excel',
                 exportOptions: {
-                    columns: [8, 1, 2, 3, 4, 5, 6] //Your Column value those you want
+                    columns: [7, 1, 2, 3, 4, 5] //Your Column value those you want
                 }
             },
             {
-                extend: 'pdfHtml5',
+                extend: 'excelHtml5',
                 className: 'btn btn-sm btn-danger',
-                text: '<i class="fa fa-file-pdf"></i>',
-                titleAttr: 'Esporta in PDF',
-                orientation: 'landscape',
-                pageSize: 'A4',
+                text: '<i class="fa fa-file-excel"></i> IN DESIGNAZIONE',
+                titleAttr: 'Esporta in Excel',
                 exportOptions: {
-                    columns: [8, 1, 2, 3, 4, 5, 6, 9,10,11] //Your Column value those you want
+                    columns: [7, 1, 2, 3, 4, 5, 8, 9, 10, 11] //Your Column value those you want
                 }
             }
         ],
@@ -49,12 +47,12 @@ $(document).ready(function () {
             {data: 'nome'},
             {data: 'datainizio', type: "date-eu"},
             {data: 'datafine', type: "date-eu"},
-            {data: 'datainserimento', type: "date-euro"},
             {data: 'azioni', orderable: false},
             {data: 'statovisual', visible: false},
-            {data: 'presidente', visible: false},
-            {data: 'protnomina', visible: false},
-            {data: 'dataprotnomina', visible: false}
+            {data: 'sede', visible: false},
+            {data: 'commissione', visible: false},
+            {data: 'protrichiestacommissione', visible: false},
+            {data: 'presidente', visible: false}
         ]
     });
     Fancybox.bind(".fan1", {

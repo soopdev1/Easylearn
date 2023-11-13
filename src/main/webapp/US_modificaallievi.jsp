@@ -3,6 +3,7 @@
     Created on : 18-feb-2022, 14.01.46
     Author     : raf
 --%>
+<%@page import="rc.soop.sic.jpa.PresidenteCommissione"%>
 <%@page import="java.nio.charset.Charset"%>
 <%@page import="org.apache.commons.codec.binary.Base64"%>
 <%@page import="rc.soop.sic.jpa.Stati"%>
@@ -39,11 +40,16 @@
                 boolean modify = false;
                 List<Allievi> allievi = new ArrayList<>();
                 if (!Utils.isAdmin(session)) {
-                    SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
-                    if (so.getIdsoggetto().equals(is1.getCorsobase().getSoggetto().getIdsoggetto())
-                            && (is1.getStatocorso().getCodicestatocorso().equals("43") || is1.getStatocorso().getCodicestatocorso().equals("44"))) {
-                        modify = true;
-                        allievi = eo.getAllieviSoggettoAvvioCorso(so);
+                    PresidenteCommissione pc = ((User) session.getAttribute("us_memory")).getPresidente();
+                    if (pc != null) {
+                        modify = false;
+                    } else {
+                        SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
+                        if (so.getIdsoggetto().equals(is1.getCorsobase().getSoggetto().getIdsoggetto())
+                                && (is1.getStatocorso().getCodicestatocorso().equals("43") || is1.getStatocorso().getCodicestatocorso().equals("44"))) {
+                            modify = true;
+                            allievi = eo.getAllieviSoggettoAvvioCorso(so);
+                        }
                     }
                 }
                 List<Allievi> allieviok = eo.getAllieviCorsoAvviato(is1);
@@ -124,7 +130,7 @@
                                                 </td>
                                                 <td>
                                                     <%
-                                                    if (a1.getStatoallievo().equals(Stati.ATTIVO) || a1.getStatoallievo().equals(Stati.AVVIO)) {%>
+                                                        if (modify && (a1.getStatoallievo().equals(Stati.ATTIVO) || a1.getStatoallievo().equals(Stati.AVVIO))) {%>
                                                     <button type="button" data-bs-toggle="tooltip" title="MODIFICA STATO ALLIEVO" 
                                                             data-preload="false" class="btn btn-sm btn-bg-light btn-primary"
                                                             onclick="return modificastatoallievo('<%=a1.getIdallievi()%>',
@@ -134,7 +140,7 @@
                                                         <i class="fa fa-edit"></i>
                                                     </button>
                                                     <%}%>
-                                                    <%if (a1.getStatotirocinio().equals(Stati.AVVIARE)) {%>
+                                                    <%if (modify && a1.getStatotirocinio().equals(Stati.AVVIARE)) {%>
                                                     <a data-bs-toggle="tooltip" title="AVVIA TIROCINIO/STAGE ALLIEVO" 
                                                        href="US_tirocinioallievo.jsp?idallievo=<%=Utils.enc_string(String.valueOf(a1.getIdallievi()))%>"
                                                        data-preload="false" class="btn btn-sm btn-bg-light btn-secondary">
@@ -155,6 +161,7 @@
                                     </table>
                                 </label>
                             </div>
+                            <%if (modify) {%>        
                             <hr>
                             <form action="Operations" method="POST">
                                 <input type="hidden" name="type" value="AGGIUNGIALLIEVICORSO" />
@@ -186,6 +193,7 @@
                                 </p>
                                 <%}%>
                             </form>
+                            <%}%>
                         </div>
                     </div>
                     <!--end::Tables Widget 3-->

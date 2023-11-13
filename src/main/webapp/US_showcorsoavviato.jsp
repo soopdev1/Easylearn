@@ -3,6 +3,7 @@
     Created on : 18-feb-2022, 14.01.46
     Author     : raf
 --%>
+<%@page import="rc.soop.sic.jpa.PresidenteCommissione"%>
 <%@page import="org.joda.time.DateTime"%>
 <%@page import="rc.soop.sic.jpa.User"%>
 <%@page import="rc.soop.sic.jpa.SoggettoProponente"%>
@@ -46,11 +47,17 @@
                     modify = false;
                     view = true;
                 } else {
-                    SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
-                    modify = so.getIdsoggetto().equals(is1.getCorsobase().getSoggetto().getIdsoggetto()) && is1.getStatocorso().getCodicestatocorso().equals("40");
-                    if (so.getIdsoggetto().equals(is1.getCorsobase().getSoggetto().getIdsoggetto())
-                            && (is1.getStatocorso().getCodicestatocorso().equals("43") || is1.getStatocorso().getCodicestatocorso().equals("44"))) {
-                        azionicorso = true;
+                    PresidenteCommissione pc = ((User) session.getAttribute("us_memory")).getPresidente();
+                    if (pc != null) {
+                        modify = false;
+                        view = true;
+                    } else {
+                        SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
+                        modify = so.getIdsoggetto().equals(is1.getCorsobase().getSoggetto().getIdsoggetto()) && is1.getStatocorso().getCodicestatocorso().equals("40");
+                        if (so.getIdsoggetto().equals(is1.getCorsobase().getSoggetto().getIdsoggetto())
+                                && (is1.getStatocorso().getCodicestatocorso().equals("43") || is1.getStatocorso().getCodicestatocorso().equals("44"))) {
+                            azionicorso = true;
+                        }
                     }
                 }
 
@@ -203,6 +210,13 @@
                                                            data-bs-toggle="tooltip" title="MODIFICA/AGGIUNGI ALLIEVI" 
                                                            data-preload='false' data-width='75%' data-height='75%'>
                                                             <i class="fa fa-edit" ></i></a>
+                                                            <%} else if (view) {%>
+                                                        <br>
+                                                        <a class="btn btn-success btn-sm fan1" href="US_modificaallievi.jsp"
+                                                           data-fancybox data-type='iframe' 
+                                                           data-bs-toggle="tooltip" title="VISUALIZZA DETTAGLI ALLIEVI" 
+                                                           data-preload='false' data-width='75%' data-height='75%'>
+                                                            <i class="fa fa-users" ></i></a>   
                                                             <%}%>
                                                     </label>
                                                     <label class="col-md-10 col-form-label">

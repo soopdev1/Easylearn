@@ -30,7 +30,7 @@
                     </span>
                     <div class="menu-sub menu-sub-accordion menu-active-bg">
                         <div class="menu-item">
-                            <a class="menu-link active" href="ADM_dashboard.jsp">
+                            <a class="menu-link active" href="PRE_dashboard.jsp">
                                 <span class="menu-bullet">
                                     <span class="bullet bullet-dot"></span>
                                 </span>

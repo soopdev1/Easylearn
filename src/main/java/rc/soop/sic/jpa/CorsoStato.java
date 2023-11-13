@@ -24,30 +24,41 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "corso_stato")
 public class CorsoStato implements Serializable {
-    
+
     @Id
     @Column(name = "codicestatocorso")
     private String codicestatocorso;
-    
+
     @Column(name = "nome")
     private String nome;
-    
+
     @Column(name = "ordine")
     private int ordine;
 
     @Column(name = "htmlicon")
     private String htmlicon;
-    
+
     @Column(name = "htmldescr")
     private String htmldescr;
-    
+
+    @Column(name = "ok", columnDefinition = "tinyint(1) default 1")
+    private boolean ok;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "tipostato")
     private TipoStato tipostato;
-    
+
     public CorsoStato() {
     }
 
+    public boolean isOk() {
+        return ok;
+    }
+
+    public void setOk(boolean ok) {
+        this.ok = ok;
+    }
+    
     public String getHtmldescr() {
         return htmldescr;
     }
@@ -63,8 +74,6 @@ public class CorsoStato implements Serializable {
     public void setCodicestatocorso(String codicestatocorso) {
         this.codicestatocorso = codicestatocorso;
     }
-
-    
 
     public String getNome() {
         return nome;
@@ -97,5 +106,5 @@ public class CorsoStato implements Serializable {
     public void setTipostato(TipoStato tipostato) {
         this.tipostato = tipostato;
     }
-    
+
 }

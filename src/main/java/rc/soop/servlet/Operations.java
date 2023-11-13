@@ -112,6 +112,68 @@ import rc.soop.sic.jpa.User;
  */
 public class Operations extends HttpServlet {
 
+    protected void PDFVERBALE(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String idcorso = Utils.dec_string(getRequestValue(request, "idcorso"));
+
+        EntityOp ep1 = new EntityOp();
+
+        try {
+            String contentb64 = ep1.getEm().find(Path.class, "pdf.test.verbale").getDescrizione();
+            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(idcorso));
+            if (ca1 != null) {
+
+                String mimeType = "application/pdf";
+                response.setContentType(mimeType);
+                String headerKey = "Content-Disposition";
+                String headerValue = format("attach; filename=\"%s\"",
+                        Utils.generaId(50)
+                        + MimeTypes.getDefaultMimeTypes().forName(mimeType).getExtension());
+                response.setHeader(headerKey, headerValue);
+                response.setContentLength(-1);
+                try (OutputStream outStream = response.getOutputStream()) {
+                    outStream.write(Base64.decodeBase64(contentb64));
+                }
+            } else {
+                redirect(request, response, "404.jsp");
+            }
+        } catch (Exception ex1) {
+            ex1.printStackTrace();
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "404.jsp");
+        }
+    }
+
+    protected void ATTESTATI(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String idcorso = Utils.dec_string(getRequestValue(request, "idcorso"));
+        EntityOp ep1 = new EntityOp();
+
+        try {
+            String contentb64 = ep1.getEm().find(Path.class, "pdf.test.attestati").getDescrizione();
+            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(idcorso));
+            if (ca1 != null) {
+                String mimeType = "application/zip";
+                response.setContentType(mimeType);
+                String headerKey = "Content-Disposition";
+                String headerValue = format("attach; filename=\"%s\"",
+                        Utils.generaId(50)
+                        + MimeTypes.getDefaultMimeTypes().forName(mimeType).getExtension());
+                response.setHeader(headerKey, headerValue);
+                response.setContentLength(-1);
+                try (OutputStream outStream = response.getOutputStream()) {
+                    outStream.write(Base64.decodeBase64(contentb64));
+                }
+            } else {
+                redirect(request, response, "500.jsp");
+            }
+        } catch (Exception ex1) {
+            ex1.printStackTrace();
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "404.jsp");
+        }
+    }
+
     protected void ESAMIFINALI(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Utils.printRequest(request);
@@ -189,14 +251,17 @@ public class Operations extends HttpServlet {
 
     protected void RIGETTACOMMISSIONE(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        JsonObject resp_out = new JsonObject();
         try {
             String IDCOMM = getRequestValue(request, "IDCOMM");
 
             EntityOp ep1 = new EntityOp();
             CommissioneEsame ca1 = ep1.getEm().find(CommissioneEsame.class, Long.valueOf(IDCOMM));
             if (ca1 != null) {
-                ca1.setStatocommissione(Stati.APPROVATA);
+                ca1.setStatocommissione(Stati.RESPINTA);
                 ca1.setUtenteinserimento(request.getSession().getAttribute("us_cod").toString());
+                ca1.setNumprotrichiesta(getRequestValue(request, "NUMPROTRICH"));
+                ca1.setDataprotrichiesta(sdf_PATTERNDATE6.parse(getRequestValue(request, "DATAPROTRICH")));
                 Corsoavviato ca = ca1.getCorsodiriferimento();
                 ca.setStatocorso(ep1.getEm().find(CorsoStato.class, "49"));
                 ep1.begin();
@@ -204,20 +269,32 @@ public class Operations extends HttpServlet {
                 ep1.merge(ca);
                 ep1.commit();
                 ep1.close();
-                redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
+                resp_out.addProperty("result",
+                        true);
             } else {
-                redirect(request, response, "Page_message.jsp?esito=KO_MOSD1");
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "COMMISSIONE NON TROVATA.");
             }
         } catch (Exception ex1) {
             EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
-            redirect(request, response, "Page_message.jsp?esito=KO_MOSD2");
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    estraiEccezione(ex1));
         }
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+
     }
 
     protected void APPROVACOMMISSIONE(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        JsonObject resp_out = new JsonObject();
         try {
+
             String IDCOMM = getRequestValue(request, "IDCOMM");
 
             EntityOp ep1 = new EntityOp();
@@ -225,6 +302,8 @@ public class Operations extends HttpServlet {
             if (ca1 != null) {
                 ca1.setStatocommissione(Stati.APPROVATA);
                 ca1.setUtenteinserimento(request.getSession().getAttribute("us_cod").toString());
+                ca1.setNumprotrichiesta(getRequestValue(request, "NUMPROTRICH"));
+                ca1.setDataprotrichiesta(sdf_PATTERNDATE6.parse(getRequestValue(request, "DATAPROTRICH")));
                 Corsoavviato ca = ca1.getCorsodiriferimento();
                 ca.setStatocorso(ep1.getEm().find(CorsoStato.class, "49"));
                 ep1.begin();
@@ -232,13 +311,24 @@ public class Operations extends HttpServlet {
                 ep1.merge(ca);
                 ep1.commit();
                 ep1.close();
-                redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
+                resp_out.addProperty("result",
+                        true);
             } else {
-                redirect(request, response, "Page_message.jsp?esito=KO_MOSD1");
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "COMMISSIONE NON TROVATA.");
             }
         } catch (Exception ex1) {
             EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
-            redirect(request, response, "Page_message.jsp?esito=KO_MOSD2");
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    estraiEccezione(ex1));
+        }
+        
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
         }
 
     }
@@ -301,7 +391,7 @@ public class Operations extends HttpServlet {
             Presenze_Tirocinio_Allievi pta = new Presenze_Tirocinio_Allievi();
 
             pta.setAllievi(al1.getAllievi());
-            pta.setDatapresenza(Constant.sdf_PATTERNDATE6.parse(datetiroc));
+            pta.setDatapresenza(sdf_PATTERNDATE6.parse(datetiroc));
             pta.setDatainserimento(new DateTime().toDate());
             pta.setTirociniostage(al1);
             pta.setOre(calcolaore(orai, oraf));
@@ -2974,13 +3064,6 @@ public class Operations extends HttpServlet {
             EntityOp e = new EntityOp();
 
             e.begin();
-
-//            if (is != null) {
-//                is.setQuantitarichiesta(is.getQuantitarichiesta() + parseIntR(getRequestValue(request, "quantitarichiesta")));
-//                is.setProtocollosoggetto(getRequestValue(request, "protnum"));
-//                is.setProtocollosoggettodata(new DateTime().toString(PATTERNDATE4));
-//                e.merge(is);
-//            } else {
             Istanza is;
             try {
                 is = e.getEm().find(Istanza.class, Long.valueOf(getRequestValue(request, "istanzabase")));
@@ -2998,6 +3081,7 @@ public class Operations extends HttpServlet {
                 is.setQuantitarichiesta(parseIntR(getRequestValue(request, "quantitarichiesta")));
                 is.setTipologiapercorso(e.getEm().find(Tipologia_Percorso.class, Long.valueOf(getRequestValue(request, "scelta"))));
                 e.persist(is);
+
             }
 
             Corso c = new Corso();
@@ -3232,6 +3316,12 @@ public class Operations extends HttpServlet {
                     break;
                 case "ESAMIFINALI":
                     ESAMIFINALI(request, response);
+                    break;
+                case "PDFVERBALE":
+                    PDFVERBALE(request, response);
+                    break;
+                case "ATTESTATI":
+                    ATTESTATI(request, response);
                     break;
                 default: {
                     String p = request.getContextPath();

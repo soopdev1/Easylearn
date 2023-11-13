@@ -149,12 +149,12 @@
                                                                 <th class="p-2 min-w-120px">Nome</th>
                                                                 <th class="p-2 w-50px">Data Inizio</th>
                                                                 <th class="p-2 w-50px">Data Fine</th>
-                                                                <th class="p-2 w-50px">Data Inserimento</th>
                                                                 <th class="p-2 min-w-120px">Azioni</th>
                                                                 <th class="p-2 w-50px" style="display: none;">Stato</th>
+                                                                <th class="p-2 w-50px" style="display: none;">Sede</th>
+                                                                <th class="p-2 w-50px" style="display: none;">Commissione</th>
+                                                                <th class="p-2 w-50px" style="display: none;">Protocollo Richiesta</th>
                                                                 <th class="p-2 w-50px" style="display: none;">Presidente Commissione</th>
-                                                                <th class="p-2 w-50px" style="display: none;">Numero Protocollo Nomina Presidente Commissione</th>
-                                                                <th class="p-2 w-50px" style="display: none;">Data Protocollo Nomina Presidente Commissione</th>
                                                             </tr>
                                                         </thead>
                                                         <!--end::Table head-->

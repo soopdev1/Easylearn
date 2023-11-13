@@ -25,6 +25,7 @@ import static rc.soop.sic.Utils.isAdmin;
 import static rc.soop.sic.Utils.redirect;
 import rc.soop.sic.jpa.Allievi;
 import rc.soop.sic.jpa.Altropersonale;
+import rc.soop.sic.jpa.CommissioneEsame;
 import rc.soop.sic.jpa.Corso;
 import rc.soop.sic.jpa.CorsoAvviato_Docenti;
 import rc.soop.sic.jpa.Corsoavviato;
@@ -264,6 +265,7 @@ public class Search extends HttpServlet {
                                 + "<a href='ADM_rigettacorso.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
                                 + " class=\"btn btn-sm btn-bg-light btn-danger fan1\" data-bs-toggle=\"tooltip\" title=\"RIGETTA CORSO\" data-preload='false' "
                                 + "\"><i class=\"fa fa-remove\"></i></a>";
+                        break;
                     }
                     case "46": {
                         azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"AUTORIZZA CAMBIO SEDE\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
@@ -271,12 +273,14 @@ public class Search extends HttpServlet {
                                 + "<a href='ADM_rigettacorso.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
                                 + " class=\"btn btn-sm btn-bg-light btn-danger fan1\" data-bs-toggle=\"tooltip\" title=\"RIGETTA CORSO\" data-preload='false' "
                                 + "\"><i class=\"fa fa-remove\"></i></a>";
+                        break;
                     }
                     case "48": {
                         azioni += "<a href='ADM_verificacommissione.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato()))
                                 + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
                                 + " class=\"btn btn-sm btn-bg-light btn-warning fan1\" data-bs-toggle=\"tooltip\" title=\"VERIFICA COMMISSIONE ESAMI\" data-preload='false' "
                                 + "\"><i class=\"fa fa-edit\"></i></a>";
+                        break;
                     }
                     case "49": {
                         azioni
@@ -286,12 +290,14 @@ public class Search extends HttpServlet {
                                 + "\"><i class=\"fa fa-users\"></i></a>"
                                 + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"IMPOSTA STATO 'IN DESIGNAZIONE PRESIDENTE'\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
                                 + "onclick=\"return impostadesignazione('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-check-circle\"></i></button>";
+                        break;
                     }
                     case "50": {
                         azioni += "<a href='ADM_designapresidente.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato()))
                                 + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
                                 + " class=\"btn btn-sm btn-bg-light btn-success fan1\" data-bs-toggle=\"tooltip\" title=\"DESIGNA PRESIDENTE\" data-preload='false' "
                                 + "\"><i class=\"fa fa-user-alt\"></i></a>";
+                        break;
                     }
                     case "51": {
                         azioni
@@ -299,15 +305,36 @@ public class Search extends HttpServlet {
                                 + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
                                 + " class=\"btn btn-sm btn-bg-light btn-primary fan1\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA COMMISSIONE E PRESIDENTE\" data-preload='false' "
                                 + "\"><i class=\"fa fa-users\"></i></a>";
+                        break;
                     }
                 }
                 data_value.addProperty("azioni", azioni);
                 data_value.addProperty("statovisual", res.getStatocorso().getNome());
-                data_value.addProperty("presidente", res.getPresidentecommissione() == null ? "NON PRESENTE" : (res.getPresidentecommissione().getCognome()
+                data_value.addProperty("sede", res.getCorsobase().getSedescelta().getIndirizzo() + " - "+res.getCorsobase().getSedescelta().getComune());
+
+                CommissioneEsame com = ep.getCommissioneEsameCorso(res);
+
+                if (com == null) {
+                    data_value.addProperty("commissione", "");
+                    data_value.addProperty("protrichiestacommissione", "");
+                } else {
+                    data_value.addProperty("commissione",
+                            com.getTitolare1().getCognome() + " " + com.getTitolare1().getNome() + ", " + com.getTitolare2().getCognome() + " " + com.getTitolare2().getNome() + " - "
+                            + com.getSostituto1().getCognome() + " " + com.getSostituto1().getNome() + ", " + com.getSostituto2().getCognome() + " " + com.getSostituto2().getNome()
+                    );
+                    
+                    if (com.getNumprotrichiesta() != null) {
+                        data_value.addProperty("protrichiestacommissione", "PROT. " + com.getNumprotrichiesta() + " del " + sdf_PATTERNDATE4.format(com.getDataprotrichiesta()));
+                    } else {
+                        data_value.addProperty("protrichiestacommissione", "");
+                    }
+                }
+
+                data_value.addProperty("presidente", res.getPresidentecommissione() == null ? "" : (res.getPresidentecommissione().getCognome()
                         + " " + res.getPresidentecommissione().getNome()));
 
-                data_value.addProperty("protnomina", res.getProtnomina() == null ? "NON PRESENTE" : res.getProtnomina());
-                data_value.addProperty("dataprotnomina", res.getDataprotnomina() == null ? "NON PRESENTE" : sdf_PATTERNDATE4.format(res.getDataprotnomina()));
+//                data_value.addProperty("protnomina", res.getProtnomina() == null ? "" : res.getProtnomina());
+//                data_value.addProperty("dataprotnomina", res.getDataprotnomina() == null ? "" : sdf_PATTERNDATE4.format(res.getDataprotnomina()));
 
                 data.add(data_value);
                 at.addAndGet(1);
@@ -369,16 +396,26 @@ public class Search extends HttpServlet {
                     case "51": {
                         azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"GESTIONE ESAMI FINALI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\""
                                 + "onclick=\"return document.getElementById('gestesami_" + res.getIdcorsoavviato() + "').submit();\"><i class=\"fa fa-edit\"></i></button>";
+                        break;
                     }
                     case "52": {
                         azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"SCARICA PDF VERBALE\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-danger\""
-                                + "onclick=\"return document.getElementById('gestesami_" + res.getIdcorsoavviato() + "').submit();\"><i class=\"fa fa-file-pdf\"></i></button>"
+                                + "onclick=\"return document.getElementById('pdfverbale_" + res.getIdcorsoavviato() + "').submit();\"><i class=\"fa fa-file-pdf\"></i></button>"
                                 + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"SCARICA ATTESTATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-warning\""
-                                + "onclick=\"return document.getElementById('gestesami_" + res.getIdcorsoavviato() + "').submit();\"><i class=\"fa fa-file-archive\"></i></button>";
+                                + "onclick=\"return document.getElementById('attestati_" + res.getIdcorsoavviato() + "').submit();\"><i class=\"fa fa-file-archive\"></i></button>";
+                        break;
                     }
                 }
 
                 azioni += "</form>"
+                        + "<form action=\"Operations\" method=\"POST\" target=\"_blank\" id=\"pdfverbale_" + res.getIdcorsoavviato() + "\">"
+                        + "<input type=\"hidden\" name=\"type\" value=\"PDFVERBALE\"/>"
+                        + "<input type=\"hidden\" name=\"idcorso\" value=\"" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "\"/>"
+                        + "</form>"
+                        + "<form action=\"Operations\" method=\"POST\" target=\"_blank\" id=\"attestati_" + res.getIdcorsoavviato() + "\">"
+                        + "<input type=\"hidden\" name=\"type\" value=\"ATTESTATI\"/>"
+                        + "<input type=\"hidden\" name=\"idcorso\" value=\"" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "\"/>"
+                        + "</form>"
                         + "<form action=\"US_allegaticorso.jsp\" method=\"POST\" target=\"_blank\" id=\"gestall_" + res.getIdcorsoavviato() + "\">"
                         + "<input type=\"hidden\" name=\"idcorso\" value=\"" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "\"/>"
                         + "</form>"

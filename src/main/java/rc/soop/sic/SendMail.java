@@ -4,6 +4,7 @@
  */
 package rc.soop.sic;
 
+import com.mailjet.client.Base64;
 import com.mailjet.client.ClientOptions;
 import static com.mailjet.client.ClientOptions.builder;
 import com.mailjet.client.MailjetClient;
@@ -19,36 +20,29 @@ import static com.mailjet.client.resource.Emailv31.Message.SUBJECT;
 import static com.mailjet.client.resource.Emailv31.Message.TO;
 import static com.mailjet.client.resource.Emailv31.resource;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import static java.nio.file.Files.probeContentType;
-import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
-import javax.mail.Address;
 import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.event.TransportEvent;
-import javax.mail.event.TransportListener;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import static org.apache.commons.codec.binary.Base64.encodeBase64;
-import static org.apache.commons.io.IOUtils.toByteArray;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import static rc.soop.sic.Constant.LOGGER;
+import static rc.soop.sic.Constant.NAMEAPP;
 import static rc.soop.sic.Constant.RB;
-import static rc.soop.sic.Constant.sdf_PATTERNDATE5;
 import static rc.soop.sic.Utils.datemysqltoita;
 import static rc.soop.sic.Utils.estraiEccezione;
 import rc.soop.sic.jpa.EmailTemplate;
@@ -147,7 +141,7 @@ public class SendMail {
         try {
             EmailTemplate et = eo.getEm().find(EmailTemplate.class, 1L);
 
-            String name = "EasyLearn Notification Mail";
+            String name = NAMEAPP + " Notification Mail";
 
             String to[] = {eo.getEm().find(Path.class, "dest.nuovaistanza").getDescrizione()};
 
@@ -224,16 +218,11 @@ public class SendMail {
 
             if (file != null) {
                 try {
-                    filename = file.getName();
-                    content_type = probeContentType(file.toPath());
-                    try (InputStream i = new FileInputStream(file)) {
-                        b64 = new String(encodeBase64(toByteArray(i)));
-                    }
                     mail.put(ATTACHMENTS, new JSONArray()
                             .put(new JSONObject()
-                                    .put("ContentType", content_type)
-                                    .put("Filename", filename)
-                                    .put("Base64Content", b64)));
+                                    .put("ContentType", probeContentType(file.toPath()))
+                                    .put("Filename", file.getName())
+                                    .put("Base64Content", Base64.encode(FileUtils.readFileToByteArray(file)))));
                 } catch (Exception ex1) {
                     LOGGER.severe(estraiEccezione(ex1));
                 }

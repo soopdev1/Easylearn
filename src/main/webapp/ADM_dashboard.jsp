@@ -15,16 +15,6 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
-                Istanza i1 = (Istanza) session.getAttribute("is_memory");
-                int corsi_attuali = 0;
-                boolean istanzaok = false;
-                if (i1 != null) {
-                    istanzaok = i1.getStatocorso().getCodicestatocorso().equals("02");
-                    corsi_attuali = i1.getQuantitarichiesta();
-                } else {
-                    i1 = new Istanza();
-                }
-
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -131,7 +121,7 @@
                                                 </span>
                                                 <!--end::Svg Icon-->
                                                 <div class="d-flex flex-column">
-                                                    <div class="text-primary fw-bolder fs-1 mb-0 mt-5"><%=contatori[3]%></div>
+                                                    <div class="text-primary fw-bolder fs-1 mb-0 mt-5"><%=contatori[2]%></div>
                                                     <div class="text-muted fw-bold fs-6">Corsi attualmente attivi</div>
                                                 </div>
                                             </div>

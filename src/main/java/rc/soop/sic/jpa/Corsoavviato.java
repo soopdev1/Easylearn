@@ -28,7 +28,9 @@ import javax.persistence.TemporalType;
 @NamedQueries(value = {
     @NamedQuery(name = "corsoavviato.stato", query = "SELECT c FROM Corsoavviato c WHERE c.statocorso=:stato"),
     @NamedQuery(name = "corsoavviato.corsobase", query = "SELECT c FROM Corsoavviato c WHERE c.corsobase=:corsobase"),
-    @NamedQuery(name = "corsoavviato.soggetto", query = "SELECT c FROM Corsoavviato c WHERE c.corsobase.soggetto=:soggetto")
+    @NamedQuery(name = "corsoavviato.soggetto", query = "SELECT c FROM Corsoavviato c WHERE c.corsobase.soggetto=:soggetto"),
+    @NamedQuery(name = "corsoavviato.contatoreok", query = "SELECT c FROM Corsoavviato c WHERE c.statocorso IN :statusok")
+    
 })
 @Entity
 @Table(name = "corsoavviato")
