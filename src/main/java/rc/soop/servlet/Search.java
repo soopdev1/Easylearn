@@ -288,17 +288,23 @@ public class Search extends HttpServlet {
                                 + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
                                 + " class=\"btn btn-sm btn-bg-light btn-primary fan1\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA COMMISSIONE ESAMI\" data-preload='false' "
                                 + "\"><i class=\"fa fa-users\"></i></a>"
-                                + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"IMPOSTA STATO 'IN DESIGNAZIONE PRESIDENTE'\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
-                                + "onclick=\"return impostadesignazione('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-check-circle\"></i></button>";
-                        break;
-                    }
-                    case "50": {
-                        azioni += "<a href='ADM_designapresidente.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato()))
+                                
+                                +"<a href='ADM_designapresidente.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato()))
                                 + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
                                 + " class=\"btn btn-sm btn-bg-light btn-success fan1\" data-bs-toggle=\"tooltip\" title=\"DESIGNA PRESIDENTE\" data-preload='false' "
                                 + "\"><i class=\"fa fa-user-alt\"></i></a>";
+                                
+//                                + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"IMPOSTA STATO 'IN DESIGNAZIONE PRESIDENTE'\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
+//                                + "onclick=\"return impostadesignazione('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-check-circle\"></i></button>";
                         break;
                     }
+//                    case "50": {
+//                        azioni += "<a href='ADM_designapresidente.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato()))
+//                                + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+//                                + " class=\"btn btn-sm btn-bg-light btn-success fan1\" data-bs-toggle=\"tooltip\" title=\"DESIGNA PRESIDENTE\" data-preload='false' "
+//                                + "\"><i class=\"fa fa-user-alt\"></i></a>";
+//                        break;
+//                    }
                     case "51": {
                         azioni
                                 += "<a href='ADM_designapresidente.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato()))

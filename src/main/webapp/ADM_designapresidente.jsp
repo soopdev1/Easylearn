@@ -128,16 +128,16 @@
                             </div><br/>
                             <div class="row col-md-12">
                                 <label class="col-md-3 col-form-label fw-bold fs-6">
-                                    <span class="text-danger">NUMERO PROTOCOLLO NOMINA:</span>
+                                    <span class="text-danger">NUMERO PROTOCOLLO GABINETTO:</span>
                                 </label>
                                 <div class="col-md-3">
-                                    <span class="text-black"><b><%=is1.getProtnomina()%></b></span>
+                                    <span class="text-black"><b><%=is1.getProtgab()%></b></span>
                                 </div>
                                 <label class="col-md-3 col-form-label fw-bold fs-6">
-                                    <span class="text-danger">DATA PROTOCOLLO NOMINA:</span>
+                                    <span class="text-danger">DATA PROTOCOLLO GABINETTO:</span>
                                 </label>
                                 <div class="col-md-3">
-                                    <span class="text-black"><b><%=Constant.sdf_PATTERNDATE5.format(is1.getDataprotnomina())%></b></span>
+                                    <span class="text-black"><b><%=Constant.sdf_PATTERNDATE4.format(is1.getDataprotgab())%></b></span>
                                 </div>
                             </div>
 
@@ -164,21 +164,21 @@
                                 </div><br/>
                                 <div class="row col-md-12">
                                     <label class="col-md-3 col-form-label fw-bold fs-6">
-                                        <span class="text-danger">NUMERO PROTOCOLLO NOMINA:</span>
+                                        <span class="text-danger">NUMERO PROTOCOLLO GABINETTO:</span>
                                     </label>
                                     <div class="col-md-3">
                                         <input type="text" class="form-control form-control-lg" 
-                                               name="NUMPROTNOMINA"
-                                               id="NUMPROTNOMINA" required
+                                               name="NUMPROTGAB"
+                                               id="NUMPROTGAB" required
                                                />
                                     </div>
                                     <label class="col-md-3 col-form-label fw-bold fs-6">
-                                        <span class="text-danger">DATA PROTOCOLLO NOMINA:</span>
+                                        <span class="text-danger">DATA PROTOCOLLO GABINETTO:</span>
                                     </label>
                                     <div class="col-md-3">
                                         <input type="date" class="form-control form-control-lg" 
-                                               name="DATAPROTNOMINA"
-                                               id="DATAPROTNOMINA" required
+                                               name="DATAPROTGAB"
+                                               id="DATAPROTGAB" required
                                                />
                                     </div>
                                 </div>

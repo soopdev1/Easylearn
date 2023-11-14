@@ -85,10 +85,14 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.Store;
+import static rc.soop.sic.Constant.sdf_PATTERNDATE4;
 import static rc.soop.sic.Utils.datemysqltoita;
 import static rc.soop.sic.Utils.estraiEccezione;
 import static rc.soop.sic.Utils.roundDoubleandFormat;
 import rc.soop.sic.jpa.Calendario_Formativo;
+import rc.soop.sic.jpa.CommissioneEsame;
+import rc.soop.sic.jpa.Corsoavviato;
+import rc.soop.sic.jpa.PresidenteCommissione;
 import rc.soop.sic.jpa.TipoCorso;
 
 /**
@@ -675,6 +679,71 @@ public class Pdf {
     private static final String FUNZNOME = "Giulio Giuliani";
     private static final String DIRCARICA = "IL DIRIGENTE DEL SERVIZIO";
     private static final String DIRNOME = "Maria Josè Verde";
+
+    public static File GENERANOMINAPRES(EntityOp ep, Corsoavviato ca, CommissioneEsame ce) {
+        try {
+
+            Path pathtemp = ep.getEm().find(Path.class, "path.temp");
+            Path template = ep.getEm().find(Path.class, "pdf.nomina.v1");
+
+            DateTime datael = new DateTime();
+
+            createDir(pathtemp.getDescrizione());
+
+            File pdfOut = new File(pathtemp.getDescrizione() + "NOTA_NOMINA_PRES_" + ca.getIdcorsoavviato() + "_" + ce.getIdcommissione()
+                    + "_" + datael.toString(PATTERNDATE3) + ".D1.pdf");
+
+            try (InputStream is = new ByteArrayInputStream(Base64.decodeBase64(template.getDescrizione())); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
+
+                PdfAcroForm form = getAcroForm(pdfDoc, true);
+                form.setGenerateAppearance(true);
+                Map<String, PdfFormField> fields = form.getAllFormFields();
+
+                setFieldsValue(form, fields, "protdata", sdf_PATTERNDATE4.format(ca.getDataprotnomina()));
+                setFieldsValue(form, fields, "protnum", ca.getProtnomina());
+
+                setFieldsValue(form, fields, "idcorso", ca.getCorsobase().getIdentificativocorso());
+                setFieldsValue(form, fields, "corso", ca.getCorsobase().getRepertorio().getDenominazione());
+                setFieldsValue(form, fields, "ragionesociale", ca.getCorsobase().getSoggetto().getRAGIONESOCIALE());
+
+                setFieldsValue(form, fields, "sede", ca.getCorsobase().getSedescelta().getIndirizzo() + " - " + ca.getCorsobase().getSedescelta().getComune());
+
+                PresidenteCommissione pc = ca.getPresidentecommissione();
+
+                setFieldsValue(form, fields, "presidente_nome", pc.getCognome() + " " + pc.getNome());
+                setFieldsValue(form, fields, "presidente_qualifica", pc.getQualifica());
+                setFieldsValue(form, fields, "presidente_telefono", pc.getTelefono());
+                setFieldsValue(form, fields, "presidente_mail", pc.getMail());
+
+                setFieldsValue(form, fields, "indirizzo", ca.getCorsobase().getSoggetto().getSedelegale().getIndirizzo() + " - " + ca.getCorsobase().getSoggetto().getSedelegale().getComune());
+                setFieldsValue(form, fields, "telefono", ca.getCorsobase().getSoggetto().getTELEFONO());
+                setFieldsValue(form, fields, "mail", ca.getCorsobase().getSoggetto().getEMAIL());
+                setFieldsValue(form, fields, "pec", ca.getCorsobase().getSoggetto().getPEC());
+
+                setFieldsValue(form, fields, "commissione1", ce.getTitolare1().getCognome() + " " + ce.getTitolare1().getNome());
+                setFieldsValue(form, fields, "commissione2", ce.getTitolare2().getCognome() + " " + ce.getTitolare2().getNome());
+                setFieldsValue(form, fields, "suppl_commissione1", ce.getSostituto1().getCognome() + " " + ce.getSostituto1().getNome());
+                setFieldsValue(form, fields, "suppl_commissione2", ce.getSostituto2().getCognome() + " " + ce.getSostituto2().getNome());
+
+                setFieldsValue(form, fields, "protgabdata", sdf_PATTERNDATE4.format(ca.getDataprotgab()));
+                setFieldsValue(form, fields, "protgab", ca.getProtgab());
+                setFieldsValue(form, fields, "protgabanno", ca.getProtgab()+"/"+new DateTime(ca.getDataprotgab()).year().toString());
+                
+                setFieldsValue(form, fields, "dataprotrichiesta", sdf_PATTERNDATE4.format(ce.getDataprotrichiesta()));
+                setFieldsValue(form, fields, "protrichiesta", ce.getNumprotrichiesta());
+                
+                setFieldsValue(form, fields, "funz1carica", FUNZCARICA);
+                setFieldsValue(form, fields, "funz1nome", FUNZNOME);
+                setFieldsValue(form, fields, "dir1carica", DIRCARICA);
+                setFieldsValue(form, fields, "dir1nome", DIRNOME);
+                
+            }
+
+        } catch (Exception ex0) {
+            LOGGER.severe(estraiEccezione(ex0));
+        }
+        return null;
+    }
 
     public static File GENERADECRETODDSFTO(EntityOp ep, Istanza ista1) {
         try {

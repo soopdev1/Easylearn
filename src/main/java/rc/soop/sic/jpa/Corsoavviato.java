@@ -70,6 +70,13 @@ public class Corsoavviato implements Serializable {
     @JoinColumn(name = "presidentecommissione")
     private PresidenteCommissione presidentecommissione;
 
+    @Column(name = "protgab")
+    private String protgab;
+    @Column(name = "dataprotgab")
+    @Temporal(TemporalType.DATE)
+    private Date dataprotgab;
+    
+    
     @Column(name = "protnomina")
     private String protnomina;
     @Column(name = "dataprotnomina")
@@ -94,8 +101,22 @@ public class Corsoavviato implements Serializable {
         this.pdfnomina = pdfnomina;
     }
 
-    
-    
+    public String getProtgab() {
+        return protgab;
+    }
+
+    public void setProtgab(String protgab) {
+        this.protgab = protgab;
+    }
+
+    public Date getDataprotgab() {
+        return dataprotgab;
+    }
+
+    public void setDataprotgab(Date dataprotgab) {
+        this.dataprotgab = dataprotgab;
+    }
+
     public String getUtentenomina() {
         return utentenomina;
     }

@@ -222,16 +222,16 @@ public class Operations extends HttpServlet {
         try {
             String IDCORSO = getRequestValue(request, "IDCORSO");
             String PRESIDENTE = getRequestValue(request, "PRESIDENTE");
-            String NUMPROTNOMINA = getRequestValue(request, "NUMPROTNOMINA");
-            String DATAPROTNOMINA = getRequestValue(request, "DATAPROTNOMINA");
+            String NUMPROTGAB = getRequestValue(request, "NUMPROTGAB");
+            String DATAPROTGAB = getRequestValue(request, "DATAPROTGAB");
 
             EntityOp ep1 = new EntityOp();
             Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
             PresidenteCommissione pr1 = ep1.getEm().find(PresidenteCommissione.class, Long.valueOf(PRESIDENTE));
             if (ca1 != null && pr1 != null) {
                 ca1.setPresidentecommissione(pr1);
-                ca1.setProtnomina(NUMPROTNOMINA);
-                ca1.setDataprotnomina(sdf_PATTERNDATE6.parse(DATAPROTNOMINA));
+                ca1.setProtgab(NUMPROTGAB);
+                ca1.setDataprotgab(sdf_PATTERNDATE6.parse(DATAPROTGAB));
                 ca1.setPdfnomina(null); //da sistemare
                 ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "51"));
                 ep1.begin();
