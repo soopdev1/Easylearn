@@ -3,6 +3,9 @@
     Created on : 18-feb-2022, 14.01.46
     Author     : raf
 --%>
+<%@page import="rc.soop.sic.jpa.CommissioneEsameSostituzione"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="rc.soop.sic.jpa.CommissioneEsame"%>
 <%@page import="rc.soop.sic.jpa.Sede"%>
 <%@page import="rc.soop.sic.jpa.User"%>
 <%@page import="rc.soop.sic.jpa.SoggettoProponente"%>
@@ -24,29 +27,40 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
-                String idistS = Utils.getRequestValue(request, "idcorso");
-                if (idistS.equals("")) {
-                    idistS = (String) session.getAttribute("ses_idcorso");
+                String idcommS = Utils.getRequestValue(request, "idcomm");
+                if (idcommS.equals("")) {
+                    idcommS = (String) session.getAttribute("ses_idcomm");
                 } else {
-                    session.setAttribute("ses_idcorso", idistS);
+                    session.setAttribute("ses_idcomm", idcommS);
                 }
+                String iddocenteS = Utils.getRequestValue(request, "iddocente");
+                if (iddocenteS.equals("")) {
+                    iddocenteS = (String) session.getAttribute("ses_iddocente");
+                } else {
+                    session.setAttribute("ses_iddocente", iddocenteS);
+                }
+
                 EntityOp eo = new EntityOp();
-                Corsoavviato is1 = eo.getEm().find(Corsoavviato.class, Long.valueOf(Utils.dec_string(idistS)));
-                List<CorsoAvviato_Docenti> docenti = eo.list_cavv_docenti(is1);
-                boolean modify = false;
-                if (!Utils.isAdmin(session)) {
-                    SoggettoProponente so = ((User) session.getAttribute("us_memory")).getSoggetto();
-                    if (so.getIdsoggetto().equals(is1.getCorsobase().getSoggetto().getIdsoggetto())
-                            && (is1.getStatocorso().getCodicestatocorso().equals("47"))) {
-                        modify = true;
+
+                CommissioneEsame ce = eo.getEm().find(CommissioneEsame.class, Long.valueOf(Utils.dec_string(idcommS)));
+                List<CommissioneEsameSostituzione> sost = eo.list_sostituzioni_comm(ce);
+                Docente comp1 = eo.getEm().find(Docente.class, Long.valueOf(Utils.dec_string(iddocenteS)));
+
+                Corsoavviato is1 = ce.getCorsodiriferimento();
+                boolean sost1_giapres = false;
+                boolean sost2_giapres = false;
+
+                for (CommissioneEsameSostituzione ces1 : sost) {
+                    if (ces1.getSostituto().getIddocente().equals(ce.getSostituto1().getIddocente())) {
+                        sost1_giapres = true;
+                    } else if (ces1.getSostituto().getIddocente().equals(ce.getSostituto2().getIddocente())) {
+                        sost2_giapres = true;
                     }
                 }
-
-
     %>
     <!--begin::Head-->
     <head><base href="">
-        <title><%=Constant.NAMEAPP%>: Richiesta nomina commissione d'esame</title>
+        <title><%=Constant.NAMEAPP%>: Sostituzione commissione d'esame</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
         <!--begin::Fonts-->
@@ -56,6 +70,7 @@
         <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/fontawesome-6.0.0/css/all.css" rel="stylesheet" type="text/css" />
         <link rel="stylesheet" href="assets/plugins/jquery-confirm.3.3.2.min.css">
+        <link href="assets/plugins/select2/select2_v4.1.0.min.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/plus.css" rel="stylesheet" type="text/css" />
 
@@ -80,65 +95,62 @@
                     <div class="card h-xl-100">
                         <div class="card-header border-0 pt-5">
                             <h3 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bolder fs-3 mb-1">RICHIESTA NOMINA COMMISSIONE - CORSO ID: <%=is1.getIdcorsoavviato()%> - <%=is1.getCorsobase().getIstanza().getTipologiapercorso().getNometipologia()%> - <u><%=is1.getCorsobase().getRepertorio().getDenominazione()%></u></span>
+                                <span class="card-label fw-bolder fs-3 mb-1">SOSTITUZIONE COMMISSIONE - CORSO ID: <%=is1.getIdcorsoavviato()%> - <%=is1.getCorsobase().getIstanza().getTipologiapercorso().getNometipologia()%> - <u><%=is1.getCorsobase().getRepertorio().getDenominazione()%></u></span>
                             </h3>
                         </div>
                         <div class="card-body py-3">
-                            <form action="Operations" method="POST" onsubmit="return checkdatisalvati();">
-                                <input type="hidden" name="type" value="RICHIEDINOMINACOMMISSIONE" />
-                                <input type="hidden" ID="IDCORSOVALUE" name="IDCORSO" value="<%=is1.getIdcorsoavviato()%>" />
+                            <form action="Operations" method="POST">
+                                <input type="hidden" name="type" value="SOSTITUISCICOMMISSIONE" />
+                                <input type="hidden" ID="IDCORSO" name="IDCORSO" value="<%=is1.getIdcorsoavviato()%>" />
+                                <input type="hidden" ID="IDCOMM" name="IDCOMM" value="<%=ce.getIdcommissione()%>" />
+                                <input type="hidden" ID="IDCOMPORIGINALE" name="IDCOMPORIGINALE" value="<%=comp1.getIddocente()%>" />
                                 <div class="row col-md-12">
-                                    <label class="col-md-4 col-form-label fw-bold fs-6">
-                                        <span class="text-danger"><b>NOMINATIVI COMMISSIONE (2):</b></span>
+                                    <label class="col-md-3 col-form-label fw-bold fs-6">
+                                        <span><b>SOSTITUISCI <u class="text-danger"><%=comp1.getCognome()%> <%=comp1.getNome()%></u> CON:</b></span>
                                     </label>
-                                    <div class="col-md-8 col-form-label fw-bold fs-6">
+                                    <div class="col-md-6">
                                         <select aria-label="Scegli..." 
                                                 data-placeholder="..." 
-                                                class="form-select" 
-                                                name="commissione"
-                                                id="commissione" onchange="return popolaeverificadocenti('<%=is1.getIdcorsoavviato()%>');" multiple required
+                                                class="form-select form-select-lg form-select-transparent" 
+                                                name="SOSTITUTO"
+                                                id="SOSTITUTO" 
+                                                required
                                                 >
-                                            <option value="">...</option>  
-                                            <%for (CorsoAvviato_Docenti d1 : docenti) {%>
-                                            <option value="<%=d1.getDocente().getIddocente()%>"><%=d1.getDocente().getCognome()%> <%=d1.getDocente().getNome()%></option>  
+                                            <option value="">...</option>
+                                            <%if (!sost1_giapres) {%>
+                                            <option value="<%=ce.getSostituto1().getIddocente()%>"><%=ce.getSostituto1().getCognome()%> <%=ce.getSostituto1().getNome()%></option>  
+                                            <%}%>
+                                            <%if (!sost2_giapres) {%>
+                                            <option value="<%=ce.getSostituto2().getIddocente()%>"><%=ce.getSostituto2().getCognome()%> <%=ce.getSostituto2().getNome()%></option>  
                                             <%}%>
                                         </select>
                                     </div>
                                 </div>
-                                <hr>
+                                <br/>
                                 <div class="row col-md-12">
-                                    <label class="col-md-4 col-form-label fw-bold fs-6">
-                                        <span class="text-danger"><b>NOMINATIVI SOSTITUTI (2):</b></span>
+                                    <label class="col-md-3 col-form-label fw-bold fs-6">
+                                        <span class="text-danger">NUMERO NOTA:</span>
                                     </label>
-                                    <div class="col-md-8">
-                                        <select aria-label="Scegli..." 
-                                                data-placeholder="..." 
-                                                class="form-select" 
-                                                name="sostituti"
-                                                id="sostituti" multiple required
-                                                >
-                                            <option value="">...</option>
-                                        </select>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control form-control-lg" 
+                                               name="NOTASOSTITUZIONE"
+                                               id="NOTASOSTITUZIONE" required
+                                               />
                                     </div>
-                                </div>
-                                <hr>
-                                <div class="row col-md-12">
-                                    <label class="col-md-4 col-form-label fw-bold fs-6">
-                                        <span class="text-danger"><b>ESPERTO DI SETTORE:</b></span>
+                                    <label class="col-md-3 col-form-label fw-bold fs-6">
+                                        <span class="text-danger">DATA NOTA:</span>
                                     </label>
-                                    <div class="col-md-8">
-                                        <input class="form-control form-control-lg" 
-                                               name="esperto"
-                                               id="esperto" 
+                                    <div class="col-md-3">
+                                        <input type="date" class="form-control form-control-lg" 
+                                               name="DATANOTASOSTITUZIONE"
+                                               id="DATANOTASOSTITUZIONE" required
                                                />
                                     </div>
                                 </div>
-                                <%if (modify) {%>
-                                <hr>
+                                <br/>
                                 <div class="row col-md-3">
                                     <button type="submit" class="btn btn-success btn-sm"> <i class="fa fa-save" ></i> SALVA DATI</button>
                                 </div>
-                                <%}%>
                             </form>
                         </div>
                     </div>
@@ -173,7 +185,10 @@
         <script src="assets/plugins/global/plugins.bundle.js"></script>
         <script src="assets/js/scripts.bundle.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
+        <script type="text/javascript" src="assets/plugins/select2/select2_v4.1.0.min.js"></script>
+        <script type="text/javascript" src="assets/plugins/select2/i18n/it.js"></script>
         <script type="text/javascript" src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
+        <script type="text/javascript" src="assets/js/US_richiedicommissione.js"></script>
 
         <!--end::Page Custom Javascript-->
         <!--end::Javascript-->

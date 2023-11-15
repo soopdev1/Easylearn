@@ -38,4 +38,33 @@ $(document).ready(function () {
     $('.form-select').select2({
         language: "it"
     });
+    Fancybox.bind(".fan1", {
+        groupAll: false, // Group all items
+        hideScrollbar: false,
+        on: {
+            closing: (fancybox) => {
+                window.location.reload();
+            }
+        },
+        fullscreen: {
+            autoStart: true
+        }
+    });
+
+    try {
+        tinymce.init({
+            mode : "exact",
+            selector: 'textarea',
+            toolbar: 'undo redo | bold italic underline',
+            menubar: false,
+            branding: false,
+            statusbar: false,
+            height: 200,
+            max_height: 200
+        });
+    } catch (e) {
+
+    }
+
+
 });

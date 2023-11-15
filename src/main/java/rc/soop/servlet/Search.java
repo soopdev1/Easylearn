@@ -288,12 +288,11 @@ public class Search extends HttpServlet {
                                 + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
                                 + " class=\"btn btn-sm btn-bg-light btn-primary fan1\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA COMMISSIONE ESAMI\" data-preload='false' "
                                 + "\"><i class=\"fa fa-users\"></i></a>"
-                                
-                                +"<a href='ADM_designapresidente.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato()))
+                                + "<a href='ADM_designapresidente.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato()))
                                 + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
                                 + " class=\"btn btn-sm btn-bg-light btn-success fan1\" data-bs-toggle=\"tooltip\" title=\"DESIGNA PRESIDENTE\" data-preload='false' "
                                 + "\"><i class=\"fa fa-user-alt\"></i></a>";
-                                
+
 //                                + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"IMPOSTA STATO 'IN DESIGNAZIONE PRESIDENTE'\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
 //                                + "onclick=\"return impostadesignazione('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-check-circle\"></i></button>";
                         break;
@@ -310,13 +309,25 @@ public class Search extends HttpServlet {
                                 += "<a href='ADM_designapresidente.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato()))
                                 + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
                                 + " class=\"btn btn-sm btn-bg-light btn-primary fan1\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA COMMISSIONE E PRESIDENTE\" data-preload='false' "
-                                + "\"><i class=\"fa fa-users\"></i></a>";
+                                + "\"><i class=\"fa fa-users\"></i></a>"
+                                + "<a href='ADM_notanomina.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato()))
+                                + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+                                + " class=\"btn btn-sm btn-bg-light btn-dark fan1\" data-bs-toggle=\"tooltip\" title=\"NOTA NOMINA\" data-preload='false' "
+                                + "\"><i class=\"fa fa-file-alt\"></i></a>";
+                        break;
+                    }
+                    case "52": {
+                        azioni += "<a href='ADM_notanomina.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato()))
+                                + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+                                + " class=\"btn btn-sm btn-bg-light btn-dark fan1\" data-bs-toggle=\"tooltip\" title=\"NOTA NOMINA\" data-preload='false' "
+                                + "\"><i class=\"fa fa-file-alt\"></i></a>";
                         break;
                     }
                 }
+
                 data_value.addProperty("azioni", azioni);
                 data_value.addProperty("statovisual", res.getStatocorso().getNome());
-                data_value.addProperty("sede", res.getCorsobase().getSedescelta().getIndirizzo() + " - "+res.getCorsobase().getSedescelta().getComune());
+                data_value.addProperty("sede", res.getCorsobase().getSedescelta().getIndirizzo() + " - " + res.getCorsobase().getSedescelta().getComune());
 
                 CommissioneEsame com = ep.getCommissioneEsameCorso(res);
 
@@ -328,7 +339,7 @@ public class Search extends HttpServlet {
                             com.getTitolare1().getCognome() + " " + com.getTitolare1().getNome() + ", " + com.getTitolare2().getCognome() + " " + com.getTitolare2().getNome() + " - "
                             + com.getSostituto1().getCognome() + " " + com.getSostituto1().getNome() + ", " + com.getSostituto2().getCognome() + " " + com.getSostituto2().getNome()
                     );
-                    
+
                     if (com.getNumprotrichiesta() != null) {
                         data_value.addProperty("protrichiestacommissione", "PROT. " + com.getNumprotrichiesta() + " del " + sdf_PATTERNDATE4.format(com.getDataprotrichiesta()));
                     } else {
@@ -341,7 +352,6 @@ public class Search extends HttpServlet {
 
 //                data_value.addProperty("protnomina", res.getProtnomina() == null ? "" : res.getProtnomina());
 //                data_value.addProperty("dataprotnomina", res.getDataprotnomina() == null ? "" : sdf_PATTERNDATE4.format(res.getDataprotnomina()));
-
                 data.add(data_value);
                 at.addAndGet(1);
             });
@@ -478,15 +488,30 @@ public class Search extends HttpServlet {
                 String azioni = "<form action=\"US_showcorsoavviato.jsp\" method=\"POST\" target=\"_blank\">"
                         + "<input type=\"hidden\" name=\"idcorso\" value=\"" + res.getIdcorsoavviato() + "\"/>";
 
-                if (res.getStatocorso().getCodicestatocorso().equals("47")) {
-                    azioni += "<a href=\"US_richiedicommissione.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "\" data-fancybox data-type='iframe' "
-                            + "data-bs-toggle=\"tooltip\" title=\"RICHIESTA NOMINA COMMISSIONE ESAMI FINAL\" data-preload='false' data-width='100%' data-height='100%' "
-                            + "class=\"btn btn-sm btn-bg-light btn-warning fan1\"><i class=\"fa fa-envelope\"></i></a> | ";
-                }
-
-                if (res.getStatocorso().getCodicestatocorso().equals("40") || res.getStatocorso().getCodicestatocorso().equals("42")) {
-                    azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"RICHIEDI AVVIO CORSO\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
-                            + "onclick=\"return sendcorso('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-envelope\"></i></button> | ";
+                switch (res.getStatocorso().getCodicestatocorso()) {
+                    case "47": {
+                        azioni += "<a href=\"US_richiedicommissione.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "\" data-fancybox data-type='iframe' "
+                                + "data-bs-toggle=\"tooltip\" title=\"RICHIESTA NOMINA COMMISSIONE ESAMI FINAL\" data-preload='false' data-width='100%' data-height='100%' "
+                                + "class=\"btn btn-sm btn-bg-light btn-warning fan1\"><i class=\"fa fa-envelope\"></i></a> | ";
+                        break;
+                    }
+                    case "40":
+                    case "42": {
+                        azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"RICHIEDI AVVIO CORSO\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
+                                + "onclick=\"return sendcorso('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-envelope\"></i></button> | ";
+                        break;
+                    }
+                    case "52": {
+                        azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"GESTIONE ESAMI FINALI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\""
+                                + "onclick=\"return document.getElementById('gestesami_" + res.getIdcorsoavviato() + "').submit();\"><i class=\"fa fa-edit\"></i></button> | ";
+//                        azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"SCARICA PDF VERBALE\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-danger\""
+//                                + "onclick=\"return document.getElementById('pdfverbale_" + res.getIdcorsoavviato() + "').submit();\"><i class=\"fa fa-file-pdf\"></i></button>"
+//                                + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"SCARICA ATTESTATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-warning\""
+//                                + "onclick=\"return document.getElementById('attestati_" + res.getIdcorsoavviato() + "').submit();\"><i class=\"fa fa-file-archive\"></i></button>";
+                        break;
+                    }
+                    default:
+                        break;
                 }
                 azioni += "<button type=\"submit\"class=\"btn btn-sm btn-primary\" data-bs-toggle=\"tooltip\" title=\"VISUALIZZA DETTAGLI CORSO\"data-preload='false'><i class=\"fa fa-file-text\"></i></button> | "
                         + "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"GESTIONE ALLEGATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\""
@@ -494,6 +519,9 @@ public class Search extends HttpServlet {
                         + "</form>"
                         + "<form action=\"US_allegaticorso.jsp\" method=\"POST\" target=\"_blank\" id=\"gestall_" + res.getIdcorsoavviato() + "\">"
                         + "<input type=\"hidden\" name=\"idcorso\" value=\"" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "\"/>"
+                        + "</form>"
+                        + "<form action=\"US_gestioneesami.jsp\" method=\"POST\" id=\"gestesami_" + res.getIdcorsoavviato() + "\">"
+                        + "<input type=\"hidden\" name=\"idcorso\" value=\"" + String.valueOf(res.getIdcorsoavviato()) + "\"/>"
                         + "</form>";
 
                 data_value.addProperty("azioni", azioni);

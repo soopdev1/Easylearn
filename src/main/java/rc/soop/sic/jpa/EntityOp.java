@@ -170,8 +170,8 @@ public class EntityOp {
 
     public List<Corsoavviato> getCorsiAvviati_Admin() {
         TypedQuery q = this.em.createNamedQuery("corsoavviato.contatoreok", Corsoavviato.class);
-        
-        List<CorsoStato> csLIST = lista_stati("CORSO").stream().filter(c1->c1.isOk()).collect(Collectors.toList());
+
+        List<CorsoStato> csLIST = lista_stati("CORSO").stream().filter(c1 -> c1.isOk()).collect(Collectors.toList());
         q.setParameter("statusok", csLIST);
         return (List<Corsoavviato>) q.getResultList();
     }
@@ -493,6 +493,17 @@ public class EntityOp {
             TypedQuery q = this.em.createNamedQuery("presenzetirocinioallievi.tirociniostage", Presenze_Tirocinio_Allievi.class);
             q.setParameter("tirociniostage", tirociniostage);
             return q.getResultList().isEmpty() ? new ArrayList() : (List<Presenze_Tirocinio_Allievi>) q.getResultList();
+        } catch (Exception ex0) {
+            trackingAction("SERVICE", estraiEccezione(ex0));
+        }
+        return new ArrayList<>();
+    }
+
+    public List<CommissioneEsameSostituzione> list_sostituzioni_comm(CommissioneEsame commissione) {
+        try {
+            TypedQuery<CommissioneEsameSostituzione> q = this.em.createNamedQuery("commissionesostituzione.commissione", CommissioneEsameSostituzione.class);
+            q.setParameter("commissione", commissione);
+            return q.getResultList();
         } catch (Exception ex0) {
             trackingAction("SERVICE", estraiEccezione(ex0));
         }

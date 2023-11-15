@@ -80,6 +80,10 @@ public class CommissioneEsame implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date dataprotrichiesta;
     
+    
+    
+    
+    
     public CommissioneEsame() {
     }
 
@@ -207,7 +211,7 @@ public class CommissioneEsame implements Serializable {
 
         return new StringBuilder()
                 .append("{")
-                .append("\"").append("idcalendariolezioni").append("\"").append(":").append("\"").append(this.idcommissione).append("\"").append(",")
+                .append("\"").append("idcommissione").append("\"").append(":").append("\"").append(this.idcommissione).append("\"").append(",")
                 .append("}")
                 .toString();
     }

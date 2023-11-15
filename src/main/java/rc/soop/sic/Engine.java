@@ -14,6 +14,7 @@ import static rc.soop.sic.Utils.estraiEccezione;
 import static rc.soop.sic.Utils.fd;
 import rc.soop.sic.jpa.Calendario_Formativo;
 import rc.soop.sic.jpa.Certificazione;
+import rc.soop.sic.jpa.CommissioneEsameSostituzione;
 import rc.soop.sic.jpa.Competenze_Trasversali;
 import rc.soop.sic.jpa.Corso;
 import rc.soop.sic.jpa.CorsoStato;
@@ -248,11 +249,30 @@ public class Engine {
     }
 
     public static boolean checkexist_CT(List<Calendario_Formativo> calendar, Competenze_Trasversali ct) {
-        return calendar.stream().anyMatch(c3 -> c3.getCompetenzetrasversali().equals(ct));
+        try {
+            return calendar.stream().anyMatch(c3 -> c3.getCompetenzetrasversali().equals(ct));
+        } catch (Exception ex) {
+            trackingAction("service", estraiEccezione(ex));
+            return false;
+        }
     }
 
     public static Calendario_Formativo getexist_CT(List<Calendario_Formativo> calendar, Competenze_Trasversali ct) {
-        return calendar.stream().filter(c3 -> c3.getCompetenzetrasversali().equals(ct)).findAny().get();
+        try {
+            return calendar.stream().filter(c3 -> c3.getCompetenzetrasversali().equals(ct)).findAny().get();
+        } catch (Exception ex) {
+            trackingAction("service", estraiEccezione(ex));
+            return null;
+        }
+    }
+
+    public static CommissioneEsameSostituzione isSostituito(List<CommissioneEsameSostituzione> sost, Docente d1) {
+        try {
+            return sost.stream().filter(s1 -> s1.getOriginale().getIddocente().equals(d1.getIddocente())).findAny().orElse(null);
+        } catch (Exception ex) {
+            trackingAction("service", estraiEccezione(ex));
+            return null;
+        }
     }
 
 }

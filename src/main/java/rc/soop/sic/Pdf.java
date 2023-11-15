@@ -93,6 +93,7 @@ import rc.soop.sic.jpa.Calendario_Formativo;
 import rc.soop.sic.jpa.CommissioneEsame;
 import rc.soop.sic.jpa.Corsoavviato;
 import rc.soop.sic.jpa.PresidenteCommissione;
+import rc.soop.sic.jpa.TemplateDecretoAUT;
 import rc.soop.sic.jpa.TipoCorso;
 
 /**
@@ -668,24 +669,25 @@ public class Pdf {
         return null;
     }
 
-    private static final String NOMESERVIZIO = "Servizio 3 Sistema di Accreditamento della Formazione Professionale e Certificazione delle Competenze";
-
-    private static final String VISTO1 = "il D.D.G. n. 1154 del 22 settembre 2022 con il quale il Dirigente Generale del Dipartimento della "
-            + "Formazione Professionale ha conferito, alla Dott.ssa Maria Josè Verde, l’incarico di Dirigente "
-            + "responsabile del Servizio 3 “Sistema di Accreditamento della Formazione Professionale e "
-            + "Certificazione delle Competenze” con decorrenza 20 giugno 2022;";
-
-    private static final String FUNZCARICA = "Il Funzionario Direttivo";
-    private static final String FUNZNOME = "Giulio Giuliani";
-    private static final String DIRCARICA = "IL DIRIGENTE DEL SERVIZIO";
-    private static final String DIRNOME = "Maria Josè Verde";
-
-    public static File GENERANOMINAPRES(EntityOp ep, Corsoavviato ca, CommissioneEsame ce) {
+//    private static final String NOMESERVIZIO = "Servizio 3 Sistema di Accreditamento della Formazione Professionale e Certificazione delle Competenze";
+//
+//    private static final String VISTO1 = "il D.D.G. n. 1154 del 22 settembre 2022 con il quale il Dirigente Generale del Dipartimento della "
+//            + "Formazione Professionale ha conferito, alla Dott.ssa Maria Josè Verde, l’incarico di Dirigente "
+//            + "responsabile del Servizio 3 “Sistema di Accreditamento della Formazione Professionale e "
+//            + "Certificazione delle Competenze” con decorrenza 20 giugno 2022;";
+//
+//    private static final String FUNZCARICA = "Il Funzionario Direttivo";
+//    private static final String FUNZNOME = "Giulio Giuliani";
+//    private static final String DIRCARICA = "IL DIRIGENTE DEL SERVIZIO";
+//    private static final String DIRNOME = "Maria Josè Verde";
+    public static File GENERANOMINAPRES(EntityOp ep, Corsoavviato ca) {
         try {
 
             Path pathtemp = ep.getEm().find(Path.class, "path.temp");
             Path template = ep.getEm().find(Path.class, "pdf.nomina.v1");
-
+            TemplateDecretoAUT templ1 = ep.getContentTemplateDescretoAUT();
+            
+            CommissioneEsame ce = ep.getCommissioneEsameCorso(ca);
             DateTime datael = new DateTime();
 
             createDir(pathtemp.getDescrizione());
@@ -727,17 +729,24 @@ public class Pdf {
 
                 setFieldsValue(form, fields, "protgabdata", sdf_PATTERNDATE4.format(ca.getDataprotgab()));
                 setFieldsValue(form, fields, "protgab", ca.getProtgab());
-                setFieldsValue(form, fields, "protgabanno", ca.getProtgab()+"/"+new DateTime(ca.getDataprotgab()).year().toString());
-                
+                setFieldsValue(form, fields, "protgabanno", ca.getProtgab() + "/" + new DateTime(ca.getDataprotgab()).year().toString());
+
                 setFieldsValue(form, fields, "dataprotrichiesta", sdf_PATTERNDATE4.format(ce.getDataprotrichiesta()));
                 setFieldsValue(form, fields, "protrichiesta", ce.getNumprotrichiesta());
-                
-                setFieldsValue(form, fields, "funz1carica", FUNZCARICA);
-                setFieldsValue(form, fields, "funz1nome", FUNZNOME);
-                setFieldsValue(form, fields, "dir1carica", DIRCARICA);
-                setFieldsValue(form, fields, "dir1nome", DIRNOME);
-                
+
+                setFieldsValue(form, fields, "funz1carica", templ1.getFUNZCARICA());
+                setFieldsValue(form, fields, "funz1nome", templ1.getFUNZNOME());
+                setFieldsValue(form, fields, "dir1carica", templ1.getDIRIGCARICA());
+                setFieldsValue(form, fields, "dir1nome", templ1.getDIRIGNOME());
+
+                fields.forEach((t, u) -> {
+                    form.partialFormFlattening(t);
+                });
+                form.flattenFields();
             }
+
+            System.out.println("tester.T.GENERADECRETOAPPROVATIVO() " + pdfOut.getPath());
+            return pdfOut;
 
         } catch (Exception ex0) {
             LOGGER.severe(estraiEccezione(ex0));
@@ -747,6 +756,9 @@ public class Pdf {
 
     public static File GENERADECRETODDSFTO(EntityOp ep, Istanza ista1) {
         try {
+
+            TemplateDecretoAUT templ1 = ep.getContentTemplateDescretoAUT();
+
             String DDS = ista1.getDecreto().split("§")[0];
             String DDSDATA = datemysqltoita(ista1.getDecreto().split("§")[1]);
             Path pathtemp = ep.getEm().find(Path.class, "path.temp");
@@ -846,7 +858,7 @@ public class Pdf {
                             + ", ad attuare i sottostanti percorsi formativi finanziati, di seguito elencati:";
                 }
 
-                setFieldsValue(form, fields, "NOMESERVIZIO", NOMESERVIZIO);
+                setFieldsValue(form, fields, "NOMESERVIZIO", templ1.getNOMESERVIZIO());
                 setFieldsValue(form, fields, "DESCRIZIONE", ogg);
                 setFieldsValue(form, fields, "DDS", DDS);
                 setFieldsValue(form, fields, "DDSDATA", DDSDATA);
@@ -854,7 +866,7 @@ public class Pdf {
                 setFieldsValue(form, fields, "pag2", "PAGINA 2 DI 7");
                 setFieldsValue(form, fields, "pag3", "PAGINA 3 DI 7");
                 setFieldsValue(form, fields, "pag4", "PAGINA 4 DI 7");
-                setFieldsValue(form, fields, "VISTO1", VISTO1);
+                setFieldsValue(form, fields, "VISTO1", templ1.getVISTO1());
                 setFieldsValue(form, fields, "ART1", ART1);
 
                 fields.forEach((t, u) -> {
@@ -872,7 +884,7 @@ public class Pdf {
                 form.setGenerateAppearance(true);
                 Map<String, PdfFormField> fields = form.getAllFormFields();
 
-                setFieldsValue(form, fields, "NOMESERVIZIO", NOMESERVIZIO);
+                setFieldsValue(form, fields, "NOMESERVIZIO", templ1.getNOMESERVIZIO());
                 setFieldsValue(form, fields, "RAGIONESOCIALE", ista1.getSoggetto().getRAGIONESOCIALE());
                 setFieldsValue(form, fields, "PARTITAIVA", ista1.getSoggetto().getPARTITAIVA());
                 setFieldsValue(form, fields, "CIR", ista1.getSoggetto().getCIR());
@@ -883,11 +895,11 @@ public class Pdf {
                 setFieldsValue(form, fields, "pagB", "PAGINA 7 DI 7");
 
                 setFieldsValue(form, fields, "DATA", ista1.getDatagestione().split(" ")[0]);
-                setFieldsValue(form, fields, "funz1carica", FUNZCARICA);
-                setFieldsValue(form, fields, "funz1nome", FUNZNOME);
+                setFieldsValue(form, fields, "funz1carica", templ1.getFUNZCARICA());
+                setFieldsValue(form, fields, "funz1nome", templ1.getFUNZNOME());
                 setFieldsValue(form, fields, "funz1fto", "F.TO");
-                setFieldsValue(form, fields, "dir1carica", DIRCARICA);
-                setFieldsValue(form, fields, "dir1nome", DIRNOME);
+                setFieldsValue(form, fields, "dir1carica", templ1.getDIRIGCARICA());
+                setFieldsValue(form, fields, "dir1nome", templ1.getDIRIGNOME());
                 setFieldsValue(form, fields, "dir1fto", "F.TO");
 
                 fields.forEach((t, u) -> {
@@ -943,6 +955,7 @@ public class Pdf {
             Path template_parte1 = ep.getEm().find(Path.class, "pdf.decreto.ok.p1");
             Path template_parte2 = ep.getEm().find(Path.class, "pdf.decreto.ok.p2");
             Path template_parte_corso = ep.getEm().find(Path.class, "pdf.decreto.ok.corso1");
+            TemplateDecretoAUT templ1 = new EntityOp().getContentTemplateDescretoAUT();
 
             DateTime datael = new DateTime();
 
@@ -1036,7 +1049,7 @@ public class Pdf {
                             + ", ad attuare i sottostanti percorsi formativi finanziati, di seguito elencati:";
                 }
 
-                setFieldsValue(form, fields, "NOMESERVIZIO", NOMESERVIZIO);
+                setFieldsValue(form, fields, "NOMESERVIZIO", templ1.getNOMESERVIZIO());
                 setFieldsValue(form, fields, "DESCRIZIONE", ogg);
                 setFieldsValue(form, fields, "DDS", "");
                 setFieldsValue(form, fields, "DDDSDATA", "");
@@ -1044,7 +1057,7 @@ public class Pdf {
                 setFieldsValue(form, fields, "pag2", "PAGINA 2 DI 7");
                 setFieldsValue(form, fields, "pag3", "PAGINA 3 DI 7");
                 setFieldsValue(form, fields, "pag4", "PAGINA 4 DI 7");
-                setFieldsValue(form, fields, "VISTO1", VISTO1);
+                setFieldsValue(form, fields, "VISTO1", templ1.getVISTO1());
                 setFieldsValue(form, fields, "ART1", ART1);
 
                 fields.forEach((t, u) -> {
@@ -1062,7 +1075,7 @@ public class Pdf {
                 form.setGenerateAppearance(true);
                 Map<String, PdfFormField> fields = form.getAllFormFields();
 
-                setFieldsValue(form, fields, "NOMESERVIZIO", NOMESERVIZIO);
+                setFieldsValue(form, fields, "NOMESERVIZIO", templ1.getNOMESERVIZIO());
                 setFieldsValue(form, fields, "RAGIONESOCIALE", ista1.getSoggetto().getRAGIONESOCIALE());
                 setFieldsValue(form, fields, "PARTITAIVA", ista1.getSoggetto().getPARTITAIVA());
                 setFieldsValue(form, fields, "CIR", ista1.getSoggetto().getCIR());
@@ -1073,11 +1086,11 @@ public class Pdf {
                 setFieldsValue(form, fields, "pagB", "PAGINA 7 DI 7");
 
                 setFieldsValue(form, fields, "DATA", ista1.getDatagestione().split(" ")[0]);
-                setFieldsValue(form, fields, "funz1carica", FUNZCARICA);
-                setFieldsValue(form, fields, "funz1nome", FUNZNOME);
+                setFieldsValue(form, fields, "funz1carica", templ1.getFUNZCARICA());
+                setFieldsValue(form, fields, "funz1nome", templ1.getFUNZNOME());
                 setFieldsValue(form, fields, "funz1fto", "_____________________________");
-                setFieldsValue(form, fields, "dir1carica", DIRCARICA);
-                setFieldsValue(form, fields, "dir1nome", DIRNOME);
+                setFieldsValue(form, fields, "dir1carica", templ1.getDIRIGCARICA());
+                setFieldsValue(form, fields, "dir1nome", templ1.getDIRIGNOME());
                 setFieldsValue(form, fields, "dir1fto", "_____________________________");
 
                 fields.forEach((t, u) -> {

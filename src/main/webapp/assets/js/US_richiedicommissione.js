@@ -10,6 +10,11 @@ $(document).ready(function () {
             language: "it",
             maximumSelectionLength: 2
         });
+        $('#SOSTITUTO').select2({
+            allowClear: true,
+            language: "it",
+            maximumSelectionLength: 2
+        });
     } catch (e) {
     }
 });
@@ -18,9 +23,9 @@ function checkdatisalvati() {
 
     var nominativicommissione = ($('#commissione').val() + "");
     var nominativisostituti = ($('#sostituti').val() + "");
-   // alert(nominativicommissione.split(",").length);
-   // alert(nominativisostituti.split(",").length);
-   // return false;
+    // alert(nominativicommissione.split(",").length);
+    // alert(nominativisostituti.split(",").length);
+    // return false;
     if (nominativicommissione.split(",").length !== 2) {
         $.alert({
             title: "NOMINATIVI COMMISSIONE NON COMPLETI.",

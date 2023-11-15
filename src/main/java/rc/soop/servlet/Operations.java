@@ -33,6 +33,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.mime.MimeTypes;
 import org.joda.time.DateTime;
 import rc.soop.sic.Constant;
+import static rc.soop.sic.Constant.EXTPDF;
+import static rc.soop.sic.Constant.MIMEPDF;
 import static rc.soop.sic.Constant.PATTERNDATE3;
 import static rc.soop.sic.Constant.PATTERNDATE4;
 import static rc.soop.sic.Constant.PATTERNDATE5;
@@ -69,6 +71,7 @@ import rc.soop.sic.jpa.Attrezzature;
 import rc.soop.sic.jpa.Calendario_Formativo;
 import rc.soop.sic.jpa.Calendario_Lezioni;
 import rc.soop.sic.jpa.CommissioneEsame;
+import rc.soop.sic.jpa.CommissioneEsameSostituzione;
 import rc.soop.sic.jpa.Competenze;
 import rc.soop.sic.jpa.Competenze_Trasversali;
 import rc.soop.sic.jpa.Conoscenze;
@@ -217,6 +220,40 @@ public class Operations extends HttpServlet {
         }
     }
 
+    protected void GENERANOTANOMINA(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            String IDCORSO = getRequestValue(request, "IDCORSO");
+
+            String NUMPROTNOMINA = getRequestValue(request, "NUMPROTNOMINA");
+            String DATAPROTNOMINA = getRequestValue(request, "DATAPROTNOMINA");
+
+            EntityOp ep1 = new EntityOp();
+            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
+            if (ca1 != null) {
+                ca1.setProtnomina(NUMPROTNOMINA);
+                ca1.setDataprotnomina(sdf_PATTERNDATE6.parse(DATAPROTNOMINA));
+                ca1.setUtentenomina(request.getSession().getAttribute("us_cod").toString());
+                try {
+                    ca1.setPdfnomina(Base64.encodeBase64String(FileUtils.readFileToByteArray(Pdf.GENERANOMINAPRES(ep1, ca1))));
+                } catch (Exception ex2) {
+                    EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex2));
+                }
+                ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "52"));
+                ep1.begin();
+                ep1.merge(ca1);
+                ep1.commit();
+                ep1.close();
+                redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
+            } else {
+                redirect(request, response, "Page_message.jsp?esito=KO_MOSD1");
+            }
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_MOSD2");
+        }
+    }
+
     protected void NOMINAPRESIDENTECOMMISSIONE(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
@@ -232,7 +269,6 @@ public class Operations extends HttpServlet {
                 ca1.setPresidentecommissione(pr1);
                 ca1.setProtgab(NUMPROTGAB);
                 ca1.setDataprotgab(sdf_PATTERNDATE6.parse(DATAPROTGAB));
-                ca1.setPdfnomina(null); //da sistemare
                 ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "51"));
                 ep1.begin();
                 ep1.merge(ca1);
@@ -326,11 +362,49 @@ public class Operations extends HttpServlet {
             resp_out.addProperty("message",
                     estraiEccezione(ex1));
         }
-        
+
         try (PrintWriter out = response.getWriter()) {
             out.print(resp_out.toString());
         }
 
+    }
+
+    protected void SOSTITUISCICOMMISSIONE(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            String IDCOMM = getRequestValue(request, "IDCOMM");
+            String IDCOMPORIGINALE = getRequestValue(request, "IDCOMPORIGINALE");
+            String SOSTITUTO = getRequestValue(request, "SOSTITUTO");
+            String NOTASOSTITUZIONE = getRequestValue(request, "NOTASOSTITUZIONE");
+            String DATANOTASOSTITUZIONE = getRequestValue(request, "DATANOTASOSTITUZIONE");
+
+            EntityOp ep1 = new EntityOp();
+            CommissioneEsame ce1 = ep1.getEm().find(CommissioneEsame.class, Long.valueOf(IDCOMM));
+            Docente orig1 = ep1.getEm().find(Docente.class, Long.valueOf(IDCOMPORIGINALE));
+            Docente sost1 = ep1.getEm().find(Docente.class, Long.valueOf(SOSTITUTO));
+
+            if (ce1 != null && orig1 != null && sost1 !=null) {
+                
+                CommissioneEsameSostituzione ces = new CommissioneEsameSostituzione();
+                ces.setCommissione(ce1);
+                ces.setOriginale(orig1);
+                ces.setSostituto(sost1);
+                ces.setDatainserimento(new DateTime().toDate());
+                ces.setNotasostituzione(NOTASOSTITUZIONE);
+                ces.setDatanotasostituzione(sdf_PATTERNDATE6.parse(DATANOTASOSTITUZIONE));
+                ep1.begin();
+                ep1.persist(ces);
+                ep1.commit();
+                ep1.close();
+                redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
+            } else {
+                redirect(request, response, "Page_message.jsp?esito=KO_SOCO1");
+            }
+
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_SOCO2");
+        }
     }
 
     protected void RICHIEDINOMINACOMMISSIONE(HttpServletRequest request, HttpServletResponse response)
@@ -2247,16 +2321,35 @@ public class Operations extends HttpServlet {
 
     }
 
-    protected void VISUALDOC(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+    protected void VISUALNOTANOMINA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
+            Long IDCORSOAVVIATO = Long.valueOf(getRequestValue(request, "IDCORSOAVVIATO"));
+            EntityOp eo = new EntityOp();
+            Corsoavviato a1 = eo.getEm().find(Corsoavviato.class, IDCORSOAVVIATO);
+            if (a1 != null && a1.getPdfnomina() != null) {
+                response.setContentType(MIMEPDF);
+                String headerKey = "Content-Disposition";
+                String headerValue = format("attach; filename=\"%s\"",
+                        Utils.generaId(50)
+                        + EXTPDF);
+                response.setHeader(headerKey, headerValue);
+                response.setContentLength(-1);
+                try (OutputStream outStream = response.getOutputStream()) {
+                    outStream.write(Base64.decodeBase64(a1.getPdfnomina()));
+                }
+            }
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "404.jsp");
+        }
+    }
 
+    protected void VISUALDOC(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
             Long iddoc = Long.valueOf(getRequestValue(request, "iddocument"));
             EntityOp eo = new EntityOp();
-
             Allegati a1 = eo.getEm().find(Allegati.class, iddoc);
             if (a1 != null) {
-
                 response.setContentType(a1.getMimetype());
                 String headerKey = "Content-Disposition";
                 String headerValue = format("attach; filename=\"%s\"",
@@ -2267,11 +2360,10 @@ public class Operations extends HttpServlet {
                 try (OutputStream outStream = response.getOutputStream()) {
                     outStream.write(Base64.decodeBase64(a1.getContent()));
                 }
-
             }
-
         } catch (Exception ex1) {
-
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "404.jsp");
         }
     }
 
@@ -3191,6 +3283,9 @@ public class Operations extends HttpServlet {
                 case "VISUALDOC":
                     VISUALDOC(request, response);
                     break;
+                case "VISUALNOTANOMINA":
+                    VISUALNOTANOMINA(request, response);
+                    break;
                 case "APPROVAISTANZA":
                     APPROVAISTANZA(request, response);
                     break;
@@ -3313,6 +3408,12 @@ public class Operations extends HttpServlet {
                     break;
                 case "NOMINAPRESIDENTECOMMISSIONE":
                     NOMINAPRESIDENTECOMMISSIONE(request, response);
+                    break;
+                case "GENERANOTANOMINA":
+                    GENERANOTANOMINA(request, response);
+                    break;
+                case "SOSTITUISCICOMMISSIONE":
+                    SOSTITUISCICOMMISSIONE(request, response);
                     break;
                 case "ESAMIFINALI":
                     ESAMIFINALI(request, response);
