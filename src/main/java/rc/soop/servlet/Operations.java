@@ -66,6 +66,7 @@ import static rc.soop.sic.Utils.roundDoubleandFormat;
 import rc.soop.sic.jpa.Abilita;
 import rc.soop.sic.jpa.Allegati;
 import rc.soop.sic.jpa.Allievi;
+import rc.soop.sic.jpa.AllieviEsterni;
 import rc.soop.sic.jpa.Altropersonale;
 import rc.soop.sic.jpa.Attrezzature;
 import rc.soop.sic.jpa.Calendario_Formativo;
@@ -179,7 +180,7 @@ public class Operations extends HttpServlet {
 
     protected void ESAMIFINALI(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Utils.printRequest(request);
+//        Utils.printRequest(request);
 
         try {
 
@@ -189,31 +190,74 @@ public class Operations extends HttpServlet {
             Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
             if (ca1 != null) {
 
-                String VERBPROT = getRequestValue(request, "VERBPROT");
-                String VERBDATA = getRequestValue(request, "VERBDATA");//SQL
-                String DATAESAME = getRequestValue(request, "DATAESAME"); //SQL
-                int ORESVOLTE = parseIntR(getRequestValue(request, "ORESVOLTE"));
+                //EsameFinale
                 List<Allievi> allievi = ep1.getAllieviCorsoAvviato(ca1);
+                List<AllieviEsterni> allieviesterni = ep1.getAllieviEsterniCorsoAvviato(ca1);
+
+                String VERBPROT = getRequestValue(request, "VERBPROT");
+                String VERBDATA = getRequestValue(request, "VERBDATA");
+                String NOMESOTTOSCR = getRequestValue(request, "NOMESOTTOSCR");
+                String RUOLOSOTTOSCR = getRequestValue(request, "RUOLOSOTTOSCR");
+               
+                String DATAESAME = getRequestValue(request, "DATAESAME");
+                String DATAVERIFICA = getRequestValue(request, "DATAVERIFICA");
+                boolean verificaintermedia = !DATAVERIFICA.equals("");
+
+                String PUNTOA = getRequestValue(request, "PUNTOA");
+                String PUNTOB = getRequestValue(request, "PUNTOB");
+                String PUNTOE = getRequestValue(request, "PUNTOE");
+                String PUNTOF = getRequestValue(request, "PUNTOF");
+                String PUNTOG = getRequestValue(request, "PUNTOG");
+                String PUNTOH = getRequestValue(request, "PUNTOH");
+
+                String ORAESTRAZIONE = getRequestValue(request, "ORAESTRAZIONE");
+                String UTENTEESTRAZIONE = getRequestValue(request, "UTENTEESTRAZIONE");
+
+                String PRIMAPROVA = getRequestValue(request, "PRIMAPROVA");
+                String SECONDAPROVA = getRequestValue(request, "SECONDAPROVA");
 
                 for (Allievi a1 : allievi) {
-                    int ALLIEVOOREPRESENZA = parseIntR(getRequestValue(request, "OREPRES_" + a1.getIdallievi()));
-                    String ALLIEVOGIUDIZIO = getRequestValue(request, "GIUDIZIO_" + a1.getIdallievi());
-                    int ALLIEVOVOTO = parseIntR(getRequestValue(request, "VOTO_" + a1.getIdallievi()));
-                    String ALLIEVOESITO = getRequestValue(request, "ESITO_" + a1.getIdallievi());
-                    if (!ALLIEVOESITO.equals("")) {
-                        //SAVE
-                    }
+
+                    String AMMESSO = getRequestValue(request, "AMMESSO_" + a1.getIdallievi());
+                    String AMMESSOFORZATO = getRequestValue(request, "AMMESSOFORZATO_" + a1.getIdallievi());
+                    String PRESENTE = getRequestValue(request, "PRESENTE_" + a1.getIdallievi());
+                    String VOTOAMM = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOAMM_" + a1.getIdallievi()));
+                    String VOTOMEDIA = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOMEDIA_" + a1.getIdallievi()));
+                    String VOTOPSC = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOPSC_" + a1.getIdallievi()));
+                    String VOTOCOLL = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOCOLL_" + a1.getIdallievi()));
+                    String VOTOPPR = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOPPR_" + a1.getIdallievi()));
+                    String VOTOFINALE = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOFINALE_" + a1.getIdallievi()));
+                    String ESITO = Utils.formatDoubleforMysql(getRequestValue(request, "ESITO_" + a1.getIdallievi()));
+
                 }
-                ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "52"));
+
+                for (AllieviEsterni a1 : allieviesterni) {
+                    String AMMESSO = getRequestValue(request, "AMMESSO_ES" + a1.getIdallievi());
+                    String AMMESSOFORZATO = getRequestValue(request, "AMMESSOFORZATO_ES" + a1.getIdallievi());
+                    String PRESENTE = getRequestValue(request, "PRESENTE_ES" + a1.getIdallievi());
+                    String VOTOAMM = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOAMM_ES" + a1.getIdallievi()));
+                    String VOTOMEDIA = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOMEDIA_ES" + a1.getIdallievi()));
+                    String VOTOPSC = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOPSC_ES" + a1.getIdallievi()));
+                    String VOTOCOLL = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOCOLL_ES" + a1.getIdallievi()));
+                    String VOTOPPR = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOPPR_ES" + a1.getIdallievi()));
+                    String VOTOFINALE = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOFINALE_ES" + a1.getIdallievi()));
+                    String ESITO = Utils.formatDoubleforMysql(getRequestValue(request, "ESITO_ES" + a1.getIdallievi()));
+                    
+                }
+                
+                
+                
+                //SALVATAGGIO
+                
+                ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "53"));
                 ep1.begin();
                 ep1.merge(ca1);
                 ep1.commit();
                 ep1.close();
-                redirect(request, response, "PRE_dashboard.jsp");
+                redirect(request, response, "US_gestionecorsi.jsp");
             } else {
                 redirect(request, response, "Page_message.jsp?esito=KO_MOSD1");
             }
-
         } catch (Exception ex1) {
             EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
             redirect(request, response, "Page_message.jsp?esito=KO_MOSD2");
@@ -383,8 +427,8 @@ public class Operations extends HttpServlet {
             Docente orig1 = ep1.getEm().find(Docente.class, Long.valueOf(IDCOMPORIGINALE));
             Docente sost1 = ep1.getEm().find(Docente.class, Long.valueOf(SOSTITUTO));
 
-            if (ce1 != null && orig1 != null && sost1 !=null) {
-                
+            if (ce1 != null && orig1 != null && sost1 != null) {
+
                 CommissioneEsameSostituzione ces = new CommissioneEsameSostituzione();
                 ces.setCommissione(ce1);
                 ces.setOriginale(orig1);
@@ -1394,6 +1438,59 @@ public class Operations extends HttpServlet {
             redirect(request, response, "Page_message.jsp?esito=KO_INPR2");
         }
 
+    }
+
+    protected void ADDALLIEVOESTERNO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            SoggettoProponente so = ((User) request.getSession().getAttribute("us_memory")).getSoggetto();
+
+            String COGNOME = normalizeUTF8(getRequestValue(request, "COGNOME"));
+            String IDCORSO = getRequestValue(request, "IDCORSO");
+            String NOME = normalizeUTF8(getRequestValue(request, "NOME"));
+            String CODICEFISCALE = normalizeUTF8(getRequestValue(request, "CODICEFISCALE"));
+            String TELEFONO = StringUtils.replace(getRequestValue(request, "TELEFONO"), "_", "");
+            String EMAIL = normalizeUTF8(getRequestValue(request, "EMAIL"));
+            String DOCID = normalizeUTF8(getRequestValue(request, "DOCID"));
+            String TITSTUDIO = normalizeUTF8(getRequestValue(request, "TITSTUDIO"));
+            boolean CATPROT = getRequestValue(request, "CATPROT").equals("on");
+
+            AllieviEsterni al1 = new AllieviEsterni();
+            al1.setCognome(COGNOME);
+            al1.setNome(NOME);
+            al1.setCodicefiscale(CODICEFISCALE);
+            al1.setTelefono(TELEFONO);
+            al1.setEmail(EMAIL);
+            al1.setNumdocid(DOCID);
+            al1.setDatadocid(sdf_PATTERNDATE6.parse(getRequestValue(request, "DATEDOCID")));
+            al1.setSoggetto(so);
+            al1.setTitolostudio(TITSTUDIO);
+            al1.setCatprot(CATPROT);
+            al1.setStatoallievo(Stati.CHECK);
+            al1.setDatainserimento(new DateTime().toDate());
+
+            Utils.ricavaDatidaCF_EST(al1);
+
+            EntityOp ep1 = new EntityOp();
+
+            Corsoavviato is1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
+
+            al1.setCorsodiriferimento(is1);
+
+            if (ep1.esisteAllievoCF(CODICEFISCALE)) {
+                redirect(request, response, "Page_message.jsp?esito=KO_NAL2");
+            } else {
+                ep1.begin();
+                ep1.persist(al1);
+                ep1.commit();
+                ep1.close();
+                redirect(request, response, "Page_message.jsp?esito=OK_UPAL");
+            }
+
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KO_NAL1");
+
+        }
     }
 
     protected void ADDALLIEVO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -3330,6 +3427,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "ADDALLIEVO":
                     ADDALLIEVO(request, response);
+                    break;
+                case "ADDALLIEVOESTERNO":
+                    ADDALLIEVOESTERNO(request, response);
                     break;
                 case "ADDPRESIDENTE":
                     ADDPRESIDENTE(request, response);

@@ -14,7 +14,15 @@
         int verifysession = Utils.checkSession(session, request);
         switch (verifysession) {
             case 1: {
-                EntityOp eo = new EntityOp();
+                String idistS = Utils.getRequestValue(request, "idcorso");
+                if (idistS.equals("")) {
+                    idistS = (String) session.getAttribute("ses_idcorso");
+                } else {
+                    idistS = Utils.dec_string(Utils.getRequestValue(request, "idcorso"));
+                }
+            
+                session.setAttribute("ses_idcorso", idistS);
+
     %>
     <!--begin::Head-->
     <head><base href="">
@@ -48,7 +56,8 @@
         <div class="row">
             <!--begin::Col-->
             <form method="POST" action="Operations" onsubmit="return controllasalvataggio();">
-                <input type="hidden" name="type" value="ADDALLIEVO"/>
+                <input type="hidden" name="type" value="ADDALLIEVOESTERNO"/>
+                <input type="hidden" name="IDCORSO" value="<%=idistS%>"/>
                 <div class="col-xl-12">
                     <div class="card h-xl-100">
                         <div class="card-header border-0 pt-5">

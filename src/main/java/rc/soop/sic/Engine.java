@@ -12,7 +12,9 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpSession;
 import static rc.soop.sic.Utils.estraiEccezione;
 import static rc.soop.sic.Utils.fd;
+import rc.soop.sic.jpa.Allievi;
 import rc.soop.sic.jpa.Calendario_Formativo;
+import rc.soop.sic.jpa.Calendario_Lezioni;
 import rc.soop.sic.jpa.Certificazione;
 import rc.soop.sic.jpa.CommissioneEsameSostituzione;
 import rc.soop.sic.jpa.Competenze_Trasversali;
@@ -28,11 +30,15 @@ import rc.soop.sic.jpa.Livello_Certificazione;
 import rc.soop.sic.jpa.Modacquisizione;
 import rc.soop.sic.jpa.Moduli_Docenti;
 import rc.soop.sic.jpa.Path;
+import rc.soop.sic.jpa.Presenze_Lezioni;
+import rc.soop.sic.jpa.Presenze_Lezioni_Allievi;
+import rc.soop.sic.jpa.Presenze_Tirocinio_Allievi;
 import rc.soop.sic.jpa.Repertorio;
 import rc.soop.sic.jpa.Scheda_Attivita;
 import rc.soop.sic.jpa.SoggettoProponente;
 import rc.soop.sic.jpa.Stati;
 import rc.soop.sic.jpa.Tipologia_Percorso;
+import rc.soop.sic.jpa.TirocinioStage;
 import rc.soop.sic.jpa.User;
 
 /**
@@ -275,4 +281,43 @@ public class Engine {
         }
     }
 
+    public static double getOretotalipresenza(EntityOp eo, Allievi a1) {
+        try {
+            List<Calendario_Lezioni> lezioni = eo.calendario_lezioni_corso(a1.getCorsodiriferimento());
+            long duratamillis = 0L;
+            for (Calendario_Lezioni c1 : lezioni) {
+                if (c1.getStatolezione() != null && c1.getStatolezione().getCodicestatocorso().equals("61")) { //SOLO CONVALIDATE
+                    List<Presenze_Lezioni_Allievi> pa1 = eo.getpresenzelezioniGiornata(eo.getPresenzeLezione(c1));
+                    for (Presenze_Lezioni_Allievi pla : pa1) {
+                        if (pla.getAllievo().getIdallievi().equals(a1.getIdallievi())) {
+                            duratamillis += pla.getDurata();
+                        }
+                    }
+                }
+            }
+//            return Long.valueOf(duratamillis/3600000L).doubleValue();
+        } catch (Exception ex) {
+            trackingAction("service", estraiEccezione(ex));
+        }
+        return 40.00;
+    }
+
+    public static double getOretotalitirocinio(EntityOp eo, Allievi a1) {
+        try {
+            double total = 0.0;
+            List<TirocinioStage> list_tirocini_allievo = eo.list_tirocini_allievo(a1);
+
+            for (TirocinioStage ts1 : list_tirocini_allievo) {
+                List<Presenze_Tirocinio_Allievi> lpr = eo.list_presenzetirocinio_allievo(ts1);
+
+                String presenzeconvalid = Utils.countOreTirocinio(lpr, "61");
+                total += fd(presenzeconvalid);
+            }
+//            return total;
+        } catch (Exception ex) {
+            trackingAction("service", estraiEccezione(ex));
+        }
+            return 100.00;
+
+    }
 }

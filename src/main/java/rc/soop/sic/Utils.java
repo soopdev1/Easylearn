@@ -58,6 +58,7 @@ import org.joda.time.PeriodType;
 import static rc.soop.sic.Constant.PATTERNDATE2;
 import static rc.soop.sic.Constant.PATTERNDATE3;
 import rc.soop.sic.jpa.Allievi;
+import rc.soop.sic.jpa.AllieviEsterni;
 import rc.soop.sic.jpa.Calendario_Formativo;
 import rc.soop.sic.jpa.Calendario_Lezioni;
 import rc.soop.sic.jpa.EntityOp;
@@ -468,33 +469,69 @@ public class Utils {
         return null;
     }
 
-    public static void ricavaDatidaCF(Allievi al1) {
-        String val = validateCF(al1.getCodicefiscale());
-        if (val == null) {
-            String anno = StringUtils.substring(al1.getCodicefiscale(), 6, 8);
-            String comune = StringUtils.substring(al1.getCodicefiscale(), 11, 15);
+    private static void ricavaDatidaCF(Allievi al1, AllieviEsterni al2) {
+        if (al1 != null) {
+            String val = validateCF(al1.getCodicefiscale());
+            if (val == null) {
+                String anno = StringUtils.substring(al1.getCodicefiscale(), 6, 8);
+                String comune = StringUtils.substring(al1.getCodicefiscale(), 11, 15);
 
-            if (parseIntR(anno) < 10) {
-                anno = "20" + anno;
+                if (parseIntR(anno) < 10) {
+                    anno = "20" + anno;
+                } else {
+                    anno = "19" + anno;
+                }
+                String mese = StringUtils.substring(al1.getCodicefiscale(), 8, 9);
+                String giorno = StringUtils.substring(al1.getCodicefiscale(), 9, 11);
+                String sesso;
+                if (parseIntR(giorno) < 32) {
+                    sesso = "M";
+                } else {
+                    sesso = "F";
+                    giorno = String.valueOf(parseIntR(giorno) - 40);
+                }
+                DateTime nascita = new DateTime(parseIntR(anno), parseIntR(ricavaMese(mese)), parseIntR(giorno), 0, 0);
+                al1.setDatanascita(nascita.toDate());
+                al1.setLuogonascita(new EntityOp().getComuneCF(comune).getNome());
+                al1.setSesso(sesso);
             } else {
-                anno = "19" + anno;
+                Constant.LOGGER.log(Level.SEVERE, "ERRORE CF: {0}", val);
             }
-            String mese = StringUtils.substring(al1.getCodicefiscale(), 8, 9);
-            String giorno = StringUtils.substring(al1.getCodicefiscale(), 9, 11);
-            String sesso;
-            if (parseIntR(giorno) < 32) {
-                sesso = "M";
+        } else if (al2 != null) {
+            String val = validateCF(al2.getCodicefiscale());
+            if (val == null) {
+                String anno = StringUtils.substring(al2.getCodicefiscale(), 6, 8);
+                String comune = StringUtils.substring(al2.getCodicefiscale(), 11, 15);
+
+                if (parseIntR(anno) < 10) {
+                    anno = "20" + anno;
+                } else {
+                    anno = "19" + anno;
+                }
+                String mese = StringUtils.substring(al2.getCodicefiscale(), 8, 9);
+                String giorno = StringUtils.substring(al2.getCodicefiscale(), 9, 11);
+                String sesso;
+                if (parseIntR(giorno) < 32) {
+                    sesso = "M";
+                } else {
+                    sesso = "F";
+                    giorno = String.valueOf(parseIntR(giorno) - 40);
+                }
+                DateTime nascita = new DateTime(parseIntR(anno), parseIntR(ricavaMese(mese)), parseIntR(giorno), 0, 0);
+                al2.setDatanascita(nascita.toDate());
+                al2.setLuogonascita(new EntityOp().getComuneCF(comune).getNome());
+                al2.setSesso(sesso);
             } else {
-                sesso = "F";
-                giorno = String.valueOf(parseIntR(giorno) - 40);
+                Constant.LOGGER.log(Level.SEVERE, "ERRORE CF: {0}", val);
             }
-            DateTime nascita = new DateTime(parseIntR(anno), parseIntR(ricavaMese(mese)), parseIntR(giorno), 0, 0);
-            al1.setDatanascita(nascita.toDate());
-            al1.setLuogonascita(new EntityOp().getComuneCF(comune).getNome());
-            al1.setSesso(sesso);
-        } else {
-            Constant.LOGGER.log(Level.SEVERE, "ERRORE CF: {0}", val);
         }
+    }
+
+    public static void ricavaDatidaCF(Allievi al1) {
+        ricavaDatidaCF(al1, null);
+    }
+    public static void ricavaDatidaCF_EST(AllieviEsterni al2) {
+        ricavaDatidaCF(null, al2);
     }
 
     public static String getEtichettastato(Stati stato) {

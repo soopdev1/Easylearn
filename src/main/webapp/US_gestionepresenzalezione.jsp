@@ -56,7 +56,7 @@
                 Long idpresenza = 0L;
                 if (pl1 != null) {
                     datainserimento = Constant.sdf_PATTERNDATE5.format(pl1.getDatainserimento());
-                    pa1 = eo.getEntiStageSoggetto(pl1);
+                    pa1 = eo.getpresenzelezioniGiornata(pl1);
                     dataeffettiva = Constant.sdf_PATTERNDATE6.format(pl1.getDatarealelezione());
                     datashow = Constant.sdf_PATTERNDATE4.format(pl1.getDatarealelezione());
                     doc1 = pl1.getDocente();
@@ -303,9 +303,11 @@
                                                                 class="form-select sel-presenza" required>
                                                                 <option value="<%=orainizio%>" selected><%=orainizio%></option>
                                                             </select>
-                                                            <%} else {%>
+                                                            <%} else if(allievo_presente.equals("1")){%>
                                                             <span class="text-dark"><b><%=orainizio%></b></span>
-                                                                    <%}%>
+                                                                    <%}else{%>
+                                                            <span class="text-dark"></span>
+                                                            <%}%>
                                                         </div>
                                                         <div class="col-md-6">
                                                             <%if (modify) {%>
@@ -316,9 +318,11 @@
                                                                 class="form-select sel-presenza" required>
                                                                 <option value="<%=orafine%>" selected><%=orafine%></option>                                        
                                                             </select>
-                                                            <%} else {%>
+                                                            <%} else if(allievo_presente.equals("1")){%>
                                                             <span class="text-dark"><b><%=orafine%></b></span>
-                                                                    <%}%>
+                                                                    <%}else{%>
+                                                            <span class="text-dark"></span>
+                                                            <%}%>
                                                         </div>
                                                 </td>
                                             </tr>

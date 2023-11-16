@@ -218,16 +218,22 @@ public class EntityOp {
     }
 
     public List<Allievi> getAllieviSoggettoAvvioCorso(SoggettoProponente s) {
-        TypedQuery q = this.em.createNamedQuery("allievi.attivi.new", Allievi.class);
+        TypedQuery<Allievi> q = this.em.createNamedQuery("allievi.attivi.new", Allievi.class);
         q.setParameter("soggetto", s);
         q.setParameter("check", Stati.CHECK);
-        return (List<Allievi>) q.getResultList();
+        return q.getResultList();
     }
 
     public List<Allievi> getAllieviCorsoAvviato(Corsoavviato ca) {
-        TypedQuery q = this.em.createNamedQuery("allievi.corsoavviato", Allievi.class);
+        TypedQuery<Allievi> q = this.em.createNamedQuery("allievi.corsoavviato", Allievi.class);
         q.setParameter("corsodiriferimento", ca);
-        return (List<Allievi>) q.getResultList();
+        return q.getResultList();
+    }
+    
+    public List<AllieviEsterni> getAllieviEsterniCorsoAvviato(Corsoavviato ca) {
+        TypedQuery<AllieviEsterni> q = this.em.createNamedQuery("allieviest.corsoavviato", AllieviEsterni.class);
+        q.setParameter("corsodiriferimento", ca);
+        return q.getResultList();
     }
 
     public Presenze_Lezioni getPresenzeLezione(Calendario_Lezioni cl) {
@@ -245,7 +251,7 @@ public class EntityOp {
         return q.getResultList().isEmpty() ? null : (Presenze_Lezioni_Allievi) q.getSingleResult();
     }
 
-    public List<Presenze_Lezioni_Allievi> getEntiStageSoggetto(Presenze_Lezioni pl) {
+    public List<Presenze_Lezioni_Allievi> getpresenzelezioniGiornata(Presenze_Lezioni pl) {
         TypedQuery q = this.em.createNamedQuery("presenzelezioni.giornata", Presenze_Lezioni_Allievi.class);
         q.setParameter("presenzelezioni", pl);
         return (List<Presenze_Lezioni_Allievi>) q.getResultList();

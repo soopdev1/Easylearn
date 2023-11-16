@@ -510,6 +510,16 @@ public class Search extends HttpServlet {
 //                                + "onclick=\"return document.getElementById('attestati_" + res.getIdcorsoavviato() + "').submit();\"><i class=\"fa fa-file-archive\"></i></button>";
                         break;
                     }
+                    case "53": {
+                        azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"SCARICA PDF VERBALE\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-danger\""
+                                + "onclick=\"return document.getElementById('pdfverbale_" + res.getIdcorsoavviato() + "').submit();\"><i class=\"fa fa-file-pdf\"></i></button>"
+                                + "<a href=\"US_.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "\" data-fancybox data-type='iframe' "
+                                + "data-bs-toggle=\"tooltip\" title=\"RICHIESTA NOMINA COMMISSIONE ESAMI FINAL\" data-preload='false' data-width='100%' data-height='100%' "
+                                + "class=\"btn btn-sm btn-bg-light btn-warning fan1\"><i class=\"fa fa-envelope\"></i></a> | ";
+//+ "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"SCARICA ATTESTATI\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-warning\""
+                        //+ "onclick=\"return document.getElementById('attestati_" + res.getIdcorsoavviato() + "').submit();\"><i class=\"fa fa-file-archive\"></i></button> | ";
+                        break;
+                    }
                     default:
                         break;
                 }
@@ -522,6 +532,10 @@ public class Search extends HttpServlet {
                         + "</form>"
                         + "<form action=\"US_gestioneesami.jsp\" method=\"POST\" id=\"gestesami_" + res.getIdcorsoavviato() + "\">"
                         + "<input type=\"hidden\" name=\"idcorso\" value=\"" + String.valueOf(res.getIdcorsoavviato()) + "\"/>"
+                        + "</form>"
+                        + "<form action=\"Operations\" method=\"POST\" target=\"_blank\" id=\"pdfverbale_" + res.getIdcorsoavviato() + "\">"
+                        + "<input type=\"hidden\" name=\"type\" value=\"PDFVERBALE\"/>"
+                        + "<input type=\"hidden\" name=\"idcorso\" value=\"" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "\"/>"
                         + "</form>";
 
                 data_value.addProperty("azioni", azioni);
