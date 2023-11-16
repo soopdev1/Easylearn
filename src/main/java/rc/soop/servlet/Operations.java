@@ -199,6 +199,7 @@ public class Operations extends HttpServlet {
                 String NOMESOTTOSCR = getRequestValue(request, "NOMESOTTOSCR");
                 String RUOLOSOTTOSCR = getRequestValue(request, "RUOLOSOTTOSCR");
                
+                String DATACHIUSURAVERBALE = getRequestValue(request, "DATACHIUSURAVERBALE");
                 String DATAESAME = getRequestValue(request, "DATAESAME");
                 String DATAVERIFICA = getRequestValue(request, "DATAVERIFICA");
                 boolean verificaintermedia = !DATAVERIFICA.equals("");
