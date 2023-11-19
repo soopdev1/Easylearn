@@ -134,7 +134,7 @@ function calcolaValutazioneFinale(endrow) {
             $('#VOTOPSC_' + endrow).val("0");
             $('#VOTOCOLL_' + endrow).val("0");
             $('#VOTOPPR_' + endrow).val("0");
-            $('#VOTOFINALE_' + endrow).val(res);
+            $('#VOTOFINALE_' + endrow).val("0");
             $("#ESITO_" + endrow).val("ASSENTE").trigger('change');
 
 

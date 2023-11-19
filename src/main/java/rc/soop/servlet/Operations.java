@@ -2,10 +2,13 @@ package rc.soop.servlet;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.AtomicDouble;
 import com.google.gson.JsonObject;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -17,6 +20,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -34,12 +39,15 @@ import org.apache.tika.mime.MimeTypes;
 import org.joda.time.DateTime;
 import rc.soop.sic.Constant;
 import static rc.soop.sic.Constant.EXTPDF;
+import static rc.soop.sic.Constant.EXTZIP;
 import static rc.soop.sic.Constant.MIMEPDF;
+import static rc.soop.sic.Constant.MIMEZIP;
 import static rc.soop.sic.Constant.PATTERNDATE3;
 import static rc.soop.sic.Constant.PATTERNDATE4;
 import static rc.soop.sic.Constant.PATTERNDATE5;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE5;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE6;
+import static rc.soop.sic.Constant.sdf_PATTERNDATE7;
 import rc.soop.sic.Engine;
 import rc.soop.sic.Pdf;
 import rc.soop.sic.SendMail;
@@ -61,6 +69,7 @@ import static rc.soop.sic.Utils.normalize;
 import static rc.soop.sic.Utils.normalizeUTF8;
 import static rc.soop.sic.Utils.parseIntR;
 import static rc.soop.sic.Utils.parseLongR;
+import static rc.soop.sic.Utils.prettystring;
 import static rc.soop.sic.Utils.redirect;
 import static rc.soop.sic.Utils.roundDoubleandFormat;
 import rc.soop.sic.jpa.Abilita;
@@ -68,9 +77,11 @@ import rc.soop.sic.jpa.Allegati;
 import rc.soop.sic.jpa.Allievi;
 import rc.soop.sic.jpa.AllieviEsterni;
 import rc.soop.sic.jpa.Altropersonale;
+import rc.soop.sic.jpa.AttestatiQualifica;
 import rc.soop.sic.jpa.Attrezzature;
 import rc.soop.sic.jpa.Calendario_Formativo;
 import rc.soop.sic.jpa.Calendario_Lezioni;
+import rc.soop.sic.jpa.CertificatiCompetenze;
 import rc.soop.sic.jpa.CommissioneEsame;
 import rc.soop.sic.jpa.CommissioneEsameSostituzione;
 import rc.soop.sic.jpa.Competenze;
@@ -86,6 +97,9 @@ import rc.soop.sic.jpa.Corsoavviato;
 import rc.soop.sic.jpa.Docente;
 import rc.soop.sic.jpa.EnteStage;
 import rc.soop.sic.jpa.EntityOp;
+import rc.soop.sic.jpa.EntityServices;
+import rc.soop.sic.jpa.Esamefinale;
+import rc.soop.sic.jpa.EsamefinaleDetails;
 import rc.soop.sic.jpa.IncrementalCorso;
 import rc.soop.sic.jpa.Information;
 import rc.soop.sic.jpa.Istanza;
@@ -116,6 +130,132 @@ import rc.soop.sic.jpa.User;
  */
 public class Operations extends HttpServlet {
 
+    protected void ATTESTATI(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        String idcorso = Utils.dec_string(getRequestValue(request, "idcorso"));
+
+        EntityOp ep1 = new EntityOp();
+
+        try {
+            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(idcorso));
+            if (ca1 != null) {
+                List<AttestatiQualifica> lista = ep1.list_attestati(ca1);
+                Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
+                String zipname = "AT_"+Utils.generaId(50)
+                        + EXTZIP;
+
+                File zip = new File(pathtemp.getDescrizione() + zipname);
+
+                List<String> srcFiles = new ArrayList<>();
+
+                for (AttestatiQualifica cc : lista) {
+                    try {
+                        File f1 = new File(pathtemp.getDescrizione() + cc.getFilename());
+                        FileUtils.writeByteArrayToFile(f1, Base64.decodeBase64(cc.getContent()));
+                        srcFiles.add(f1.getPath());
+                    } catch (Exception ex0) {
+                        EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex0));
+                    }
+                }
+
+                try (FileOutputStream fos = new FileOutputStream(zip); ZipOutputStream zipOut = new ZipOutputStream(fos)) {
+                    for (String srcFile : srcFiles) {
+                        File fileToZip = new File(srcFile);
+                        try (FileInputStream fis = new FileInputStream(fileToZip)) {
+                            ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
+                            zipOut.putNextEntry(zipEntry);
+                            byte[] bytes = new byte[4096];
+                            int length;
+                            while ((length = fis.read(bytes)) >= 0) {
+                                zipOut.write(bytes, 0, length);
+                            }
+                        }
+                    }
+
+                }
+
+                response.setContentType(MIMEZIP);
+                String headerKey = "Content-Disposition";
+                String headerValue = format("attach; filename=\"%s\"",
+                        zipname);
+                response.setHeader(headerKey, headerValue);
+                response.setContentLength(-1);
+                try (OutputStream outStream = response.getOutputStream()) {
+                    outStream.write(FileUtils.readFileToByteArray(zip));
+                }
+            } else {
+                redirect(request, response, "404.jsp");
+            }
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "404.jsp");
+        }
+    }
+    
+    protected void CERTIFICATI(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String idcorso = Utils.dec_string(getRequestValue(request, "idcorso"));
+
+        EntityOp ep1 = new EntityOp();
+
+        try {
+            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(idcorso));
+            if (ca1 != null) {
+                List<CertificatiCompetenze> lista = ep1.list_certificati(ca1);
+                Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
+                String zipname = "CE_"+Utils.generaId(50)
+                        + EXTZIP;
+
+                File zip = new File(pathtemp.getDescrizione() + zipname);
+
+                List<String> srcFiles = new ArrayList<>();
+
+                for (CertificatiCompetenze cc : lista) {
+                    try {
+                        File f1 = new File(pathtemp.getDescrizione() + cc.getFilename());
+                        FileUtils.writeByteArrayToFile(f1, Base64.decodeBase64(cc.getContent()));
+                        srcFiles.add(f1.getPath());
+                    } catch (Exception ex0) {
+                        EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex0));
+                    }
+                }
+
+                try (FileOutputStream fos = new FileOutputStream(zip); ZipOutputStream zipOut = new ZipOutputStream(fos)) {
+                    for (String srcFile : srcFiles) {
+                        File fileToZip = new File(srcFile);
+                        try (FileInputStream fis = new FileInputStream(fileToZip)) {
+                            ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
+                            zipOut.putNextEntry(zipEntry);
+                            byte[] bytes = new byte[4096];
+                            int length;
+                            while ((length = fis.read(bytes)) >= 0) {
+                                zipOut.write(bytes, 0, length);
+                            }
+                        }
+                    }
+
+                }
+
+                response.setContentType(MIMEZIP);
+                String headerKey = "Content-Disposition";
+                String headerValue = format("attach; filename=\"%s\"",
+                        zipname);
+                response.setHeader(headerKey, headerValue);
+                response.setContentLength(-1);
+                try (OutputStream outStream = response.getOutputStream()) {
+                    outStream.write(FileUtils.readFileToByteArray(zip));
+                }
+            } else {
+                redirect(request, response, "404.jsp");
+            }
+        } catch (Exception ex1) {
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "404.jsp");
+        }
+    }
+
     protected void PDFVERBALE(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String idcorso = Utils.dec_string(getRequestValue(request, "idcorso"));
@@ -123,60 +263,55 @@ public class Operations extends HttpServlet {
         EntityOp ep1 = new EntityOp();
 
         try {
-            String contentb64 = ep1.getEm().find(Path.class, "pdf.test.verbale").getDescrizione();
+
             Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(idcorso));
             if (ca1 != null) {
 
-                String mimeType = "application/pdf";
-                response.setContentType(mimeType);
+                File p1 = Pdf.GENERAPRELIMINAREVERBALE(ep1, ca1);
+                File p2 = Pdf.GENERAVERBALE(ep1, ca1);
+
+                File zip = new File(p1.getPath() + ".zip");
+
+                List<String> srcFiles = new ArrayList<>();
+                srcFiles.add(p1.getPath());
+                srcFiles.add(p2.getPath());
+
+                try (FileOutputStream fos = new FileOutputStream(zip); ZipOutputStream zipOut = new ZipOutputStream(fos)) {
+                    for (String srcFile : srcFiles) {
+                        File fileToZip = new File(srcFile);
+                        try (FileInputStream fis = new FileInputStream(fileToZip)) {
+                            ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
+                            zipOut.putNextEntry(zipEntry);
+                            byte[] bytes = new byte[4096];
+                            int length;
+                            while ((length = fis.read(bytes)) >= 0) {
+                                zipOut.write(bytes, 0, length);
+                            }
+                        }
+                    }
+
+                }
+
+                response.setContentType(MIMEZIP);
                 String headerKey = "Content-Disposition";
                 String headerValue = format("attach; filename=\"%s\"",
                         Utils.generaId(50)
-                        + MimeTypes.getDefaultMimeTypes().forName(mimeType).getExtension());
+                        + EXTZIP);
                 response.setHeader(headerKey, headerValue);
                 response.setContentLength(-1);
                 try (OutputStream outStream = response.getOutputStream()) {
-                    outStream.write(Base64.decodeBase64(contentb64));
+                    outStream.write(FileUtils.readFileToByteArray(zip));
                 }
             } else {
                 redirect(request, response, "404.jsp");
             }
         } catch (Exception ex1) {
-            ex1.printStackTrace();
             EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
             redirect(request, response, "404.jsp");
         }
     }
 
-    protected void ATTESTATI(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String idcorso = Utils.dec_string(getRequestValue(request, "idcorso"));
-        EntityOp ep1 = new EntityOp();
-
-        try {
-            String contentb64 = ep1.getEm().find(Path.class, "pdf.test.attestati").getDescrizione();
-            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(idcorso));
-            if (ca1 != null) {
-                String mimeType = "application/zip";
-                response.setContentType(mimeType);
-                String headerKey = "Content-Disposition";
-                String headerValue = format("attach; filename=\"%s\"",
-                        Utils.generaId(50)
-                        + MimeTypes.getDefaultMimeTypes().forName(mimeType).getExtension());
-                response.setHeader(headerKey, headerValue);
-                response.setContentLength(-1);
-                try (OutputStream outStream = response.getOutputStream()) {
-                    outStream.write(Base64.decodeBase64(contentb64));
-                }
-            } else {
-                redirect(request, response, "500.jsp");
-            }
-        } catch (Exception ex1) {
-            ex1.printStackTrace();
-            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
-            redirect(request, response, "404.jsp");
-        }
-    }
+    
 
     protected void ESAMIFINALI(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -189,16 +324,17 @@ public class Operations extends HttpServlet {
             EntityOp ep1 = new EntityOp();
             Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
             if (ca1 != null) {
-
-                //EsameFinale
                 List<Allievi> allievi = ep1.getAllieviCorsoAvviato(ca1);
                 List<AllieviEsterni> allieviesterni = ep1.getAllieviEsterniCorsoAvviato(ca1);
+                CommissioneEsame com = ep1.getCommissioneEsameCorso(ca1);
+                List<CommissioneEsameSostituzione> sost = ep1.list_sostituzioni_comm(com);
 
+                //EsameFinale
                 String VERBPROT = getRequestValue(request, "VERBPROT");
                 String VERBDATA = getRequestValue(request, "VERBDATA");
                 String NOMESOTTOSCR = getRequestValue(request, "NOMESOTTOSCR");
                 String RUOLOSOTTOSCR = getRequestValue(request, "RUOLOSOTTOSCR");
-               
+
                 String DATACHIUSURAVERBALE = getRequestValue(request, "DATACHIUSURAVERBALE");
                 String DATAESAME = getRequestValue(request, "DATAESAME");
                 String DATAVERIFICA = getRequestValue(request, "DATAVERIFICA");
@@ -217,41 +353,208 @@ public class Operations extends HttpServlet {
                 String PRIMAPROVA = getRequestValue(request, "PRIMAPROVA");
                 String SECONDAPROVA = getRequestValue(request, "SECONDAPROVA");
 
+                int AMMESSI = 0;
+                int ASSENTI = 0;
+                int ESAMINATI = 0;
+                int IDONEI = 0;
+                int NONIDONEI = 0;
+                int INTERNI = 0;
+                int ESTERNI = 0;
+                int INTERNIOK = 0;
+                int ESTERNIOK = 0;
+
+                int UNDERM = 0;
+                int UNDERF = 0;
+                int OVERM = 0;
+                int OVERF = 0;
+
+                List<EsamefinaleDetails> DETTAGLIINTERNI = new ArrayList<>();
                 for (Allievi a1 : allievi) {
+
+                    Long IDALLIEVI = a1.getIdallievi();
+                    int ETA = Engine.calcolaEta(new DateTime(a1.getDatanascita().getTime()));
 
                     String AMMESSO = getRequestValue(request, "AMMESSO_" + a1.getIdallievi());
                     String AMMESSOFORZATO = getRequestValue(request, "AMMESSOFORZATO_" + a1.getIdallievi());
+
+                    if (AMMESSO.equals("SI")) {
+                        AMMESSI++;
+                    } else {
+                        if (AMMESSOFORZATO.equals("SI")) {
+                            AMMESSI++;
+                        }
+                    }
+
                     String PRESENTE = getRequestValue(request, "PRESENTE_" + a1.getIdallievi());
+
+                    if (PRESENTE.equals("NO")) {
+                        ASSENTI++;
+                    } else {
+                        ESAMINATI++;
+                        INTERNI++;
+                        if (a1.getSesso().equals("M")) {
+                            if (ETA <= 28) {
+                                UNDERM++;
+                            } else {
+                                OVERM++;
+                            }
+                        } else {
+                            if (ETA <= 28) {
+                                UNDERF++;
+                            } else {
+                                OVERF++;
+                            }
+                        }
+                    }
+
                     String VOTOAMM = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOAMM_" + a1.getIdallievi()));
                     String VOTOMEDIA = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOMEDIA_" + a1.getIdallievi()));
                     String VOTOPSC = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOPSC_" + a1.getIdallievi()));
                     String VOTOCOLL = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOCOLL_" + a1.getIdallievi()));
                     String VOTOPPR = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOPPR_" + a1.getIdallievi()));
                     String VOTOFINALE = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOFINALE_" + a1.getIdallievi()));
-                    String ESITO = Utils.formatDoubleforMysql(getRequestValue(request, "ESITO_" + a1.getIdallievi()));
+                    String ESITO = getRequestValue(request, "ESITO_" + a1.getIdallievi());
 
+                    if (ESITO.contains("NON IDONEO")) {
+                        NONIDONEI++;
+                    } else if (ESITO.contains("IDONEO")) {
+                        IDONEI++;
+                        INTERNIOK++;
+                    }
+
+                    EsamefinaleDetails efd = new EsamefinaleDetails(IDALLIEVI, true,
+                            a1.getSesso(), AMMESSO, AMMESSOFORZATO, PRESENTE, VOTOAMM, VOTOMEDIA, VOTOPSC, VOTOCOLL, VOTOPPR, VOTOFINALE, ESITO,
+                            ETA);
+
+                    DETTAGLIINTERNI.add(efd);
                 }
 
+                List<EsamefinaleDetails> DETTAGLIESTERNI = new ArrayList<>();
                 for (AllieviEsterni a1 : allieviesterni) {
+                    Long IDALLIEVI = a1.getIdallievi();
+                    int ETA = Engine.calcolaEta(new DateTime(a1.getDatanascita().getTime()));
+
                     String AMMESSO = getRequestValue(request, "AMMESSO_ES" + a1.getIdallievi());
                     String AMMESSOFORZATO = getRequestValue(request, "AMMESSOFORZATO_ES" + a1.getIdallievi());
+                    if (AMMESSO.equals("SI")) {
+                        AMMESSI++;
+                    } else {
+                        if (AMMESSOFORZATO.equals("SI")) {
+                            AMMESSI++;
+                        }
+                    }
                     String PRESENTE = getRequestValue(request, "PRESENTE_ES" + a1.getIdallievi());
+
+                    if (PRESENTE.equals("NO")) {
+                        ASSENTI++;
+                    } else {
+                        ESAMINATI++;
+                        ESTERNI++;
+                        if (a1.getSesso().equals("M")) {
+                            if (ETA <= 28) {
+                                UNDERM++;
+                            } else {
+                                OVERM++;
+                            }
+                        } else {
+                            if (ETA <= 28) {
+                                UNDERF++;
+                            } else {
+                                OVERF++;
+                            }
+                        }
+                    }
+
                     String VOTOAMM = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOAMM_ES" + a1.getIdallievi()));
                     String VOTOMEDIA = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOMEDIA_ES" + a1.getIdallievi()));
                     String VOTOPSC = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOPSC_ES" + a1.getIdallievi()));
                     String VOTOCOLL = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOCOLL_ES" + a1.getIdallievi()));
                     String VOTOPPR = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOPPR_ES" + a1.getIdallievi()));
                     String VOTOFINALE = Utils.formatDoubleforMysql(getRequestValue(request, "VOTOFINALE_ES" + a1.getIdallievi()));
-                    String ESITO = Utils.formatDoubleforMysql(getRequestValue(request, "ESITO_ES" + a1.getIdallievi()));
-                    
+                    String ESITO = getRequestValue(request, "ESITO_ES" + a1.getIdallievi());
+
+                    if (ESITO.contains("NON IDONEO")) {
+                        NONIDONEI++;
+                    } else if (ESITO.contains("IDONEO")) {
+                        IDONEI++;
+                        ESTERNIOK++;
+                    }
+
+                    EsamefinaleDetails efd = new EsamefinaleDetails(IDALLIEVI, false,
+                            a1.getSesso(), AMMESSO, AMMESSOFORZATO, PRESENTE, VOTOAMM, VOTOMEDIA, VOTOPSC, VOTOCOLL, VOTOPPR, VOTOFINALE, ESITO,
+                            ETA);
+
+                    DETTAGLIESTERNI.add(efd);
                 }
-                
-                
-                
+
+                Docente dt1 = com.getTitolare1();
+                Docente dt2 = com.getTitolare2();
+
+                CommissioneEsameSostituzione cs1 = Engine.isSostituito(sost, dt1);
+                CommissioneEsameSostituzione cs2 = Engine.isSostituito(sost, dt2);
+
                 //SALVATAGGIO
-                
+                Esamefinale ef = new Esamefinale();
+                ef.setCorsodiriferimento(ca1);
+                ef.setCommissioneesame(com);
+                ef.setDatainserimento(new DateTime().toDate());
+                ef.setDataoraesame(sdf_PATTERNDATE7.parse(DATAESAME));
+                ef.setDatachiusuraverbale(sdf_PATTERNDATE7.parse(DATACHIUSURAVERBALE));
+                if (cs1 == null) {
+                    ef.setCommissionenome1(dt1);
+                } else {
+                    ef.setCommissionenome1(cs1.getSostituto());
+                }
+                if (cs2 == null) {
+                    ef.setCommissionenome2(dt2);
+                } else {
+                    ef.setCommissionenome2(cs2.getSostituto());
+                }
+                ef.setDataverbale(sdf_PATTERNDATE6.parse(VERBDATA));
+
+                if (verificaintermedia) {
+                    ef.setDataverificaintermedia(sdf_PATTERNDATE6.parse(DATAVERIFICA));
+                }
+
+                ef.setNomesottoscrittore(NOMESOTTOSCR);
+                ef.setOraestrazione(ORAESTRAZIONE);
+                ef.setPresidentecommissione(ca1.getPresidentecommissione());
+                ef.setPrimaprova(PRIMAPROVA);
+                ef.setProtocolloverbale(VERBPROT);
+                ef.setPuntoa(PUNTOA);
+                ef.setPuntob(PUNTOB);
+                ef.setPuntoe(PUNTOE);
+                ef.setPuntof(PUNTOF);
+                ef.setPuntog(PUNTOG);
+                ef.setPuntoh(PUNTOH);
+                ef.setRuolosottoscrittore(RUOLOSOTTOSCR);
+                ef.setSecondaprova(SECONDAPROVA);
+                ef.setSostituzione1(cs1);
+                ef.setSostituzione2(cs2);
+                ef.setUtenteestrazione(UTENTEESTRAZIONE);
+                ef.setVerificaintermedia(verificaintermedia);
+
+                //ALLIEVI
+                ef.setDettagliallieviinterni(DETTAGLIINTERNI.toString());
+                ef.setDettagliallieviesterni(DETTAGLIESTERNI.toString());
+                ef.setIscritti(allievi.size());
+                ef.setAmmessi(AMMESSI);
+                ef.setAssenti(ASSENTI);
+                ef.setEsaminati(ESAMINATI);
+                ef.setIdonei(IDONEI);
+                ef.setNonidonei(NONIDONEI);
+                ef.setInterni(INTERNI);
+                ef.setEsterni(ESTERNI);
+                ef.setInterniOK(INTERNIOK);
+                ef.setEsterniOK(ESTERNIOK);
+                ef.setUnderM(UNDERM);
+                ef.setUnderF(UNDERF);
+                ef.setOverM(OVERM);
+                ef.setOverF(OVERF);
+
                 ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "53"));
                 ep1.begin();
+                ep1.persist(ef);
                 ep1.merge(ca1);
                 ep1.commit();
                 ep1.close();
@@ -976,6 +1279,183 @@ public class Operations extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             out.print(resp_out.toString());
         }
+    }
+
+    protected void ARCHIVIACORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JsonObject resp_out = new JsonObject();
+        try {
+            String IDCORSO = getRequestValue(request, "IDCORSO");
+            EntityOp ep1 = new EntityOp();
+            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
+            if (ca1 != null) {
+                ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "55"));
+                ep1.begin();
+                ep1.merge(ca1);
+                ep1.commit();
+                ep1.close();
+                resp_out.addProperty("result",
+                        true);
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "CORSO NON TROVATO.");
+            }
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+    }
+    
+    protected void GENERACERTIFICATI(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JsonObject resp_out = new JsonObject();
+        try {
+            String IDCORSO = getRequestValue(request, "IDCORSO");
+            EntityOp ep1 = new EntityOp();
+            Corsoavviato ca1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(IDCORSO));
+            if (ca1 != null) {
+
+                //GENERA CERTIFICATI E ATTESTATI
+                Esamefinale ef1 = ep1.getEsameFinaleCorso(ca1);
+                List<Allievi> allievi = ep1.getAllieviCorsoAvviato(ca1);
+                List<AllieviEsterni> allieviesterni = ep1.getAllieviEsterniCorsoAvviato(ca1);
+                ObjectMapper om = new ObjectMapper();
+                om.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
+
+                List<EsamefinaleDetails> da_int = om.readValue(
+                        "[" + StringUtils.replace(ef1.getDettagliallieviinterni(), "}{", "},{") + "]",
+                        new TypeReference<List<EsamefinaleDetails>>() {
+                });
+
+                List<EsamefinaleDetails> da_est = om.readValue(
+                        "[" + StringUtils.replace(ef1.getDettagliallieviesterni(), "}{", "},{") + "]",
+                        new TypeReference<List<EsamefinaleDetails>>() {
+                });
+
+                for (EsamefinaleDetails esterni : da_est) {
+
+                    if (esterni.getESITO().startsWith("IDONEO")) {
+                        AllieviEsterni adet = allieviesterni.stream().filter(a11 -> a11.getIdallievi().equals(esterni.getIDALLIEVI())).findAny().orElse(null);
+                        if (adet != null) {
+                            CertificatiCompetenze cc = new CertificatiCompetenze();
+                            cc.setAllievoesterno(adet);
+                            cc.setCorsodiriferimento(ca1);
+                            cc.setDatagenerazione(new DateTime().toDate());
+                            cc.setEsame(ef1);
+                            cc.setFilename("CERTIFICATOCOMPETENZE_" + prettystring(adet.getCognome() + adet.getNome()) + "_CORSO_"
+                                    + ca1.getIdcorsoavviato() + "_" + generateIdentifier(7) + EXTPDF);
+                            
+                            AttestatiQualifica aq = new AttestatiQualifica();
+                            cc.setAllievoesterno(adet);
+                            aq.setCorsodiriferimento(ca1);
+                            aq.setDatagenerazione(new DateTime().toDate());
+                            aq.setEsame(ef1);
+                            aq.setFilename("ATTESTATOQUALIFICA_" + prettystring(adet.getCognome() + adet.getNome()) + "_CORSO_"
+                                    + ca1.getIdcorsoavviato() + "_" + generateIdentifier(7) + EXTPDF);
+                            
+                            EntityOp ep2 = new EntityOp();
+                            ep2.begin();
+                            ep2.persist(cc);
+                            ep2.persist(aq);
+                            ep2.commit();
+                            ep2.close();
+                            
+                            String content = Pdf.GENERACERTIFICATO(ep1, ca1, null, adet, ef1, esterni, cc);
+                            cc.setContent(content);
+                            String contentat = Pdf.GENERAATTESTATO(ep1, ca1, null, adet, ef1, esterni, aq);
+                            aq.setContent(contentat);
+                            
+                            EntityOp ep3 = new EntityOp();
+                            ep3.begin();
+                            ep3.merge(cc);
+                            ep3.merge(aq);
+                            ep3.commit();
+                            ep3.close();
+                        } else {
+                            System.out.println(esterni.getIDALLIEVI() + " GENERACERTIFICATI(KO) NON TROVATO");
+                        }
+                    } else {
+                        System.out.println(esterni.getIDALLIEVI() + " GENERACERTIFICATI(KO) " + esterni.getESITO());
+                    }
+                }
+
+                for (EsamefinaleDetails interni : da_int) {
+
+                    if (interni.getESITO().startsWith("IDONEO")) {
+
+                        Allievi adet = allievi.stream().filter(a11 -> a11.getIdallievi().equals(interni.getIDALLIEVI())).findAny().orElse(null);
+
+                        if (adet != null) {
+                            CertificatiCompetenze cc = new CertificatiCompetenze();
+                            cc.setAllievointerno(adet);
+                            cc.setCorsodiriferimento(ca1);
+                            cc.setDatagenerazione(new DateTime().toDate());
+                            cc.setEsame(ef1);
+                            cc.setFilename("CERTIFICATOCOMPETENZE_" + prettystring(adet.getCognome() + adet.getNome()) + "_CORSO_"
+                                    + ca1.getIdcorsoavviato() + "_" + generateIdentifier(7) + EXTPDF);
+                            
+                            AttestatiQualifica aq = new AttestatiQualifica();
+                            cc.setAllievointerno(adet);
+                            aq.setCorsodiriferimento(ca1);
+                            aq.setDatagenerazione(new DateTime().toDate());
+                            aq.setEsame(ef1);
+                            aq.setFilename("ATTESTATOQUALIFICA_" + prettystring(adet.getCognome() + adet.getNome()) + "_CORSO_"
+                                    + ca1.getIdcorsoavviato() + "_" + generateIdentifier(7) + EXTPDF);
+                            
+                            EntityOp ep2 = new EntityOp();
+                            ep2.begin();
+                            ep2.persist(cc);
+                            ep2.persist(aq);
+                            ep2.commit();
+                            ep2.close();
+                            String content = Pdf.GENERACERTIFICATO(ep1, ca1, adet, null, ef1, interni, cc);
+                            cc.setContent(content);
+                            String contentat = Pdf.GENERAATTESTATO(ep1, ca1, adet, null, ef1, interni, aq);
+                            aq.setContent(contentat);
+                            EntityOp ep3 = new EntityOp();
+                            ep3.begin();
+                            ep3.merge(cc);
+                            ep3.merge(aq);
+                            ep3.commit();
+                            ep3.close();
+                        } else {
+                            System.out.println(interni.getIDALLIEVI() + " GENERACERTIFICATI(KO) NON TROVATO");
+                        }
+                    } else {
+                        System.out.println(interni.getIDALLIEVI() + " GENERACERTIFICATI(KO) " + interni.getESITO());
+                    }
+                }
+
+                ca1.setStatocorso(ep1.getEm().find(CorsoStato.class, "54"));
+                ep1.begin();
+                ep1.merge(ca1);
+                ep1.commit();
+                ep1.close();
+                resp_out.addProperty("result",
+                        true);
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "CORSO NON TROVATO.");
+            }
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+
     }
 
     protected void RICHIEDIAVVIOCORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -3522,8 +4002,17 @@ public class Operations extends HttpServlet {
                 case "PDFVERBALE":
                     PDFVERBALE(request, response);
                     break;
+                case "CERTIFICATI":
+                    CERTIFICATI(request, response);
+                    break;
+                case "GENERACERTIFICATI":
+                    GENERACERTIFICATI(request, response);
+                    break;
                 case "ATTESTATI":
                     ATTESTATI(request, response);
+                    break;
+                case "ARCHIVIACORSO":
+                    ARCHIVIACORSO(request, response);
                     break;
                 default: {
                     String p = request.getContextPath();

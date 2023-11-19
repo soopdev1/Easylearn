@@ -229,7 +229,7 @@ public class EntityOp {
         q.setParameter("corsodiriferimento", ca);
         return q.getResultList();
     }
-    
+
     public List<AllieviEsterni> getAllieviEsterniCorsoAvviato(Corsoavviato ca) {
         TypedQuery<AllieviEsterni> q = this.em.createNamedQuery("allieviest.corsoavviato", AllieviEsterni.class);
         q.setParameter("corsodiriferimento", ca);
@@ -527,12 +527,46 @@ public class EntityOp {
         return new ArrayList<>();
     }
 
+    public List<CertificatiCompetenze> list_certificati(Corsoavviato corsodiriferimento) {
+        try {
+            TypedQuery<CertificatiCompetenze> q = this.em.createNamedQuery("certificaticompetenze.corsoavviato", CertificatiCompetenze.class);
+            q.setParameter("corsodiriferimento", corsodiriferimento);
+            return q.getResultList();
+        } catch (Exception ex0) {
+            trackingAction("SERVICE", estraiEccezione(ex0));
+        }
+        return new ArrayList<>();
+    }
+
+    public List<AttestatiQualifica> list_attestati(Corsoavviato corsodiriferimento) {
+        try {
+            TypedQuery<AttestatiQualifica> q = this.em.createNamedQuery("attestatiqualifica.corsoavviato", AttestatiQualifica.class);
+            q.setParameter("corsodiriferimento", corsodiriferimento);
+            return q.getResultList();
+        } catch (Exception ex0) {
+            trackingAction("SERVICE", estraiEccezione(ex0));
+        }
+        return new ArrayList<>();
+    }
+
     public CommissioneEsame getCommissioneEsameCorso(Corsoavviato corsodiriferimento) {
         try {
             TypedQuery q = this.em.createNamedQuery("commissione.corso", TirocinioStage.class);
             q.setParameter("corsodiriferimento", corsodiriferimento);
             q.setMaxResults(1);
             return q.getResultList().isEmpty() ? null : (CommissioneEsame) q.getSingleResult();
+        } catch (Exception ex0) {
+            trackingAction("SERVICE", estraiEccezione(ex0));
+        }
+        return null;
+    }
+
+    public Esamefinale getEsameFinaleCorso(Corsoavviato corsodiriferimento) {
+        try {
+            TypedQuery<Esamefinale> q = this.em.createNamedQuery("esamefinale.corsoavviato", Esamefinale.class);
+            q.setParameter("corsodiriferimento", corsodiriferimento);
+            q.setMaxResults(1);
+            return q.getResultList().isEmpty() ? null : q.getSingleResult();
         } catch (Exception ex0) {
             trackingAction("SERVICE", estraiEccezione(ex0));
         }

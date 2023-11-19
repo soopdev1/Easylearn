@@ -675,5 +675,24 @@ public class Utils {
         }
         return new String(password);
     }
+    
+    public static String prettystring(String ing) {
+        if (ing != null) {
+            ing = ing.replaceAll("\\\\", "");
+            ing = ing.replaceAll("\n", "");
+            ing = ing.replaceAll("\r", "");
+            ing = ing.replaceAll("\t", "");
+            ing = ing.replaceAll("'", "");
+            ing = ing.replaceAll("“", "");
+            ing = ing.replaceAll("‘", "");
+            ing = ing.replaceAll("”", "");
+            ing = ing.replaceAll("\"", "");
+            ing = ing.replaceAll(" ", "_");
+            return ing.replaceAll("\"", "").trim();
+        } else {
+            return "";
+        }
+    }
+    
 
 }

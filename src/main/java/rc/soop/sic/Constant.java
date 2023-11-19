@@ -19,11 +19,17 @@ public class Constant {
     public static final String PATTERNDATE4 = "dd/MM/yyyy";
     public static final String PATTERNDATE5 = "dd/MM/yyyy HH:mm:ss";
     public static final String PATTERNDATE6 = "yyyy-MM-dd";
+    public static final String PATTERNDATE7 = "yyyy-MM-dd'T'HH:mm";
+    public static final String PATTERNDATE8 = "HH:mm";
     public static SimpleDateFormat sdf_PATTERNDATE4 = new SimpleDateFormat(PATTERNDATE4);
     public static SimpleDateFormat sdf_PATTERNDATE5 = new SimpleDateFormat(PATTERNDATE5);
     public static SimpleDateFormat sdf_PATTERNDATE6 = new SimpleDateFormat(PATTERNDATE6);
+    public static SimpleDateFormat sdf_PATTERNDATE7 = new SimpleDateFormat(PATTERNDATE7);
+    public static SimpleDateFormat sdf_PATTERNDATE8 = new SimpleDateFormat(PATTERNDATE8);
     public static final String MIMEPDF = "application/pdf";
     public static final String EXTPDF = ".pdf";
+    public static final String MIMEZIP = "application/zip";
+    public static final String EXTZIP = ".zip";
 
     public static final ResourceBundle RB = ResourceBundle.getBundle("parameter.conf");
     public static final Logger LOGGER = createLog(NAMEAPP, RB.getString("path.log"), PATTERNDATE1);

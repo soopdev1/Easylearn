@@ -16,6 +16,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -24,6 +26,10 @@ import javax.persistence.TemporalType;
  *
  * @author Administrator
  */
+@NamedQueries(value = {
+    @NamedQuery(name = "esamefinale.corsoavviato",
+            query = "SELECT u FROM Esamefinale u WHERE u.corsodiriferimento=:corsodiriferimento ORDER BY u.datainserimento DESC")
+})
 @Entity
 @Table(name = "esamefinale")
 public class Esamefinale implements Serializable {
@@ -45,6 +51,10 @@ public class Esamefinale implements Serializable {
     @Column(name = "dataoraesame")
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataoraesame;
+    
+    @Column(name = "datachiusuraverbale")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date datachiusuraverbale;
 
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "idpresidente")
@@ -140,13 +150,52 @@ public class Esamefinale implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date dataverbale;
     
-    @Column(name = "nomesosttoscrittore")
+    @Column(name = "nomesottoscrittore")
     private String nomesottoscrittore;
     
-    @Column(name = "ruolososttoscrittore")
-    private String ruolososttoscrittore;
+    @Column(name = "ruolosottoscrittore")
+    private String ruolosottoscrittore;
+    
+    
+    @Column(name = "dettagliallieviinterni", columnDefinition = "LONGTEXT")
+    private String dettagliallieviinterni;
+    
+    @Column(name = "dettagliallieviesterni", columnDefinition = "LONGTEXT")
+    private String dettagliallieviesterni;
     
     public Esamefinale() {
+    }
+
+    public Date getDatachiusuraverbale() {
+        return datachiusuraverbale;
+    }
+
+    public void setDatachiusuraverbale(Date datachiusuraverbale) {
+        this.datachiusuraverbale = datachiusuraverbale;
+    }
+    
+    public String getRuolosottoscrittore() {
+        return ruolosottoscrittore;
+    }
+
+    public void setRuolosottoscrittore(String ruolosottoscrittore) {
+        this.ruolosottoscrittore = ruolosottoscrittore;
+    }
+
+    public String getDettagliallieviinterni() {
+        return dettagliallieviinterni;
+    }
+
+    public void setDettagliallieviinterni(String dettagliallieviinterni) {
+        this.dettagliallieviinterni = dettagliallieviinterni;
+    }
+
+    public String getDettagliallieviesterni() {
+        return dettagliallieviesterni;
+    }
+
+    public void setDettagliallieviesterni(String dettagliallieviesterni) {
+        this.dettagliallieviesterni = dettagliallieviesterni;
     }
 
     public Long getIdesamefinale() {
@@ -461,13 +510,7 @@ public class Esamefinale implements Serializable {
         this.nomesottoscrittore = nomesottoscrittore;
     }
 
-    public String getRuolososttoscrittore() {
-        return ruolososttoscrittore;
-    }
-
-    public void setRuolososttoscrittore(String ruolososttoscrittore) {
-        this.ruolososttoscrittore = ruolososttoscrittore;
-    }
+    
 
     @Override
     public int hashCode() {

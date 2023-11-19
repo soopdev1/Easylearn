@@ -10,6 +10,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpSession;
+import org.joda.time.DateTime;
+import org.joda.time.Years;
 import static rc.soop.sic.Utils.estraiEccezione;
 import static rc.soop.sic.Utils.fd;
 import rc.soop.sic.jpa.Allievi;
@@ -317,7 +319,17 @@ public class Engine {
         } catch (Exception ex) {
             trackingAction("service", estraiEccezione(ex));
         }
-            return 100.00;
+        return 100.00;
+
+    }
+
+    public static int calcolaEta(DateTime datanascita) {
+        try {
+            return Years.yearsBetween(datanascita, new DateTime()).getYears();
+        } catch (Exception ex) {
+            trackingAction("service", estraiEccezione(ex));
+        }
+        return 0;
 
     }
 }

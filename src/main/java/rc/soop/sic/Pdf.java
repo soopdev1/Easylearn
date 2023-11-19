@@ -4,6 +4,10 @@
  */
 package rc.soop.sic;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.DecodeHintType;
 import com.google.zxing.RGBLuminanceSource;
@@ -17,6 +21,8 @@ import com.itextpdf.forms.fields.PdfFormField;
 import static com.itextpdf.kernel.colors.ColorConstants.BLACK;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfDocumentInfo;
+import com.itextpdf.kernel.pdf.PdfOutline;
 import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
@@ -50,8 +56,10 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.imageio.ImageIO;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
 import static org.apache.commons.io.FileUtils.readFileToByteArray;
 import static org.apache.commons.io.FilenameUtils.getExtension;
+import org.apache.commons.lang3.StringUtils;
 import static org.apache.commons.lang3.StringUtils.replace;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -86,12 +94,22 @@ import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.Store;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE4;
+import static rc.soop.sic.Constant.sdf_PATTERNDATE8;
+import static rc.soop.sic.Engine.getOretotalipresenza;
 import static rc.soop.sic.Utils.datemysqltoita;
 import static rc.soop.sic.Utils.estraiEccezione;
+import static rc.soop.sic.Utils.fd;
+import static rc.soop.sic.Utils.getRequestValue;
 import static rc.soop.sic.Utils.roundDoubleandFormat;
+import rc.soop.sic.jpa.Allievi;
+import rc.soop.sic.jpa.AllieviEsterni;
+import rc.soop.sic.jpa.AttestatiQualifica;
 import rc.soop.sic.jpa.Calendario_Formativo;
+import rc.soop.sic.jpa.CertificatiCompetenze;
 import rc.soop.sic.jpa.CommissioneEsame;
 import rc.soop.sic.jpa.Corsoavviato;
+import rc.soop.sic.jpa.Esamefinale;
+import rc.soop.sic.jpa.EsamefinaleDetails;
 import rc.soop.sic.jpa.PresidenteCommissione;
 import rc.soop.sic.jpa.TemplateDecretoAUT;
 import rc.soop.sic.jpa.TipoCorso;
@@ -680,13 +698,407 @@ public class Pdf {
 //    private static final String FUNZNOME = "Giulio Giuliani";
 //    private static final String DIRCARICA = "IL DIRIGENTE DEL SERVIZIO";
 //    private static final String DIRNOME = "Maria Josè Verde";
+    public static String GENERAATTESTATO(EntityOp ep, Corsoavviato ca, Allievi al1, AllieviEsterni al2, Esamefinale ef,
+            EsamefinaleDetails efd, AttestatiQualifica aq) {
+        try {
+
+            Path pathtemp = ep.getEm().find(Path.class, "path.temp");
+            Path template = ep.getEm().find(Path.class, "pdf.attestato.v1");
+            DateTime datael = new DateTime();
+
+            createDir(pathtemp.getDescrizione());
+
+            File pdfOut = new File(pathtemp.getDescrizione() + "ATTESTATOQUAL_" + ca.getIdcorsoavviato()
+                    + "_" + datael.toString(PATTERNDATE3) + ".V1.pdf");
+
+            try (InputStream is = new ByteArrayInputStream(Base64.decodeBase64(template.getDescrizione())); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
+
+                PdfDocumentInfo info = pdfDoc.getDocumentInfo();
+                info.setTitle(pdfOut.getName());
+
+                PdfAcroForm form = getAcroForm(pdfDoc, true);
+                form.setGenerateAppearance(true);
+                Map<String, PdfFormField> fields = form.getAllFormFields();
+
+                String cognome = (al1 == null) ? al2.getCognome() : al1.getCognome();
+                String nome = (al1 == null) ? al2.getNome() : al1.getNome();
+                String luogonascita = (al1 == null) ? al2.getLuogonascita() : al1.getLuogonascita();
+                String datanascita = (al1 == null) ? sdf_PATTERNDATE4.format(al2.getDatanascita()) : sdf_PATTERNDATE4.format(al1.getDatanascita());
+                
+                setFieldsValue(form, fields, "nomecorso", ca.getCorsobase().getRepertorio().getDenominazione());
+                setFieldsValue(form, fields, "areaprof", ca.getCorsobase().getRepertorio().getAreaprofessionale());
+                setFieldsValue(form, fields, "eqf", StringUtils.replace(ca.getCorsobase().getRepertorio().getLivelloeqf().getNome(), "EHF LIVELLO", "").trim());
+
+                setFieldsValue(form, fields, "cognome", cognome);
+                setFieldsValue(form, fields, "nome", nome);
+                setFieldsValue(form, fields, "luogonascita", luogonascita);
+                setFieldsValue(form, fields, "datanascita", datanascita);
+
+                setFieldsValue(form, fields, "ragionesociale", ca.getCorsobase().getSoggetto().getRAGIONESOCIALE());
+                setFieldsValue(form, fields, "sede", ca.getCorsobase().getSedescelta().getIndirizzo() + " - " + ca.getCorsobase().getSedescelta().getComune());
+
+                setFieldsValue(form, fields, "numeroattestato", String.valueOf(aq.getNumeroattestato()));
+                setFieldsValue(form, fields, "datarilascio", sdf_PATTERNDATE4.format(aq.getDatagenerazione()));
+                
+                
+                fields.forEach((t, u) -> {
+                    form.partialFormFlattening(t);
+                });
+                form.flattenFields();
+
+            }
+            return Base64.encodeBase64String(FileUtils.readFileToByteArray(pdfOut));
+        } catch (Exception ex0) {
+            LOGGER.severe(estraiEccezione(ex0));
+        }
+        return null;
+    }
+
+    public static String GENERACERTIFICATO(EntityOp ep, Corsoavviato ca, Allievi al1, AllieviEsterni al2, Esamefinale ef,
+            EsamefinaleDetails efd, CertificatiCompetenze cc) {
+
+        try {
+
+            Path pathtemp = ep.getEm().find(Path.class, "path.temp");
+            Path template = ep.getEm().find(Path.class, "pdf.certificato.v1");
+            DateTime datael = new DateTime();
+
+            createDir(pathtemp.getDescrizione());
+
+            File pdfOut = new File(pathtemp.getDescrizione() + "CERTIFICATOCOMP_" + ca.getIdcorsoavviato()
+                    + "_" + datael.toString(PATTERNDATE3) + ".V1.pdf");
+
+            try (InputStream is = new ByteArrayInputStream(Base64.decodeBase64(template.getDescrizione())); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
+
+                PdfDocumentInfo info = pdfDoc.getDocumentInfo();
+                info.setTitle(pdfOut.getName());
+
+                PdfAcroForm form = getAcroForm(pdfDoc, true);
+                form.setGenerateAppearance(true);
+                Map<String, PdfFormField> fields = form.getAllFormFields();
+
+                String cognomenome = (al1 == null) ? al2.getCognome() + " " + al2.getNome() : al1.getCognome() + " " + al1.getNome();
+                String luogonascita = (al1 == null) ? al2.getLuogonascita() : al1.getLuogonascita();
+                String datanascita = (al1 == null) ? sdf_PATTERNDATE4.format(al2.getDatanascita()) : sdf_PATTERNDATE4.format(al1.getDatanascita());
+                String nazionalita = "ITALIANA";
+                String codicefiscale = (al1 == null) ? al2.getCodicefiscale() : al1.getCodicefiscale();
+
+                setFieldsValue(form, fields, "nomecorso", ca.getCorsobase().getRepertorio().getDenominazione());
+                setFieldsValue(form, fields, "idcorso", ca.getCorsobase().getIdentificativocorso());
+                setFieldsValue(form, fields, "duratacorso", String.valueOf(ca.getCorsobase().getDurataore()));
+                setFieldsValue(form, fields, "datainizio", sdf_PATTERNDATE4.format(ca.getDatainizio()));
+                setFieldsValue(form, fields, "datafine", sdf_PATTERNDATE4.format(ca.getDatafine()));
+                setFieldsValue(form, fields, "eqf", StringUtils.replace(ca.getCorsobase().getRepertorio().getLivelloeqf().getNome(), "EHF LIVELLO", "").trim());
+
+                setFieldsValue(form, fields, "cognomenome", cognomenome);
+                setFieldsValue(form, fields, "luogonascita", luogonascita);
+                setFieldsValue(form, fields, "datanascita", datanascita);
+                setFieldsValue(form, fields, "nazionalita", nazionalita);
+                setFieldsValue(form, fields, "codicefiscale", codicefiscale);
+
+                setFieldsValue(form, fields, "ragionesociale", ca.getCorsobase().getSoggetto().getRAGIONESOCIALE());
+                setFieldsValue(form, fields, "sedelegale", ca.getCorsobase().getSoggetto().getSedelegale().getIndirizzo() + " - "
+                        + ca.getCorsobase().getSoggetto().getSedelegale().getComune());
+                setFieldsValue(form, fields, "ddg", ca.getCorsobase().getSoggetto().getDDGNUMERO());
+                setFieldsValue(form, fields, "ddgdata", ca.getCorsobase().getSoggetto().getDDGDATA());
+                setFieldsValue(form, fields, "cir", ca.getCorsobase().getSoggetto().getCIR());
+                setFieldsValue(form, fields, "sede", ca.getCorsobase().getSedescelta().getIndirizzo() + " - " + ca.getCorsobase().getSedescelta().getComune());
+                setFieldsValue(form, fields, "comunesede", ca.getCorsobase().getSedescelta().getComune());
+
+                setFieldsValue(form, fields, "numerocertificato", String.valueOf(cc.getNumerocertificato()));
+                setFieldsValue(form, fields, "datarilascio", sdf_PATTERNDATE4.format(cc.getDatagenerazione()));
+                setFieldsValue(form, fields, "nomesottoscrittore", ef.getNomesottoscrittore());
+                setFieldsValue(form, fields, "presidente", ef.getPresidentecommissione().getCognome() + " " + ef.getPresidentecommissione().getNome());
+
+                fields.forEach((t, u) -> {
+                    form.partialFormFlattening(t);
+                });
+                form.flattenFields();
+
+            }
+            return Base64.encodeBase64String(FileUtils.readFileToByteArray(pdfOut));
+        } catch (Exception ex0) {
+            LOGGER.severe(estraiEccezione(ex0));
+        }
+        return null;
+    }
+
+    public static File GENERAVERBALE(EntityOp ep, Corsoavviato ca) {
+
+        try {
+
+            Path pathtemp = ep.getEm().find(Path.class, "path.temp");
+            Path template = ep.getEm().find(Path.class, "pdf.verbale.v1");
+            Esamefinale ef1 = ep.getEsameFinaleCorso(ca);
+            List<Allievi> allievi = ep.getAllieviCorsoAvviato(ca);
+            List<AllieviEsterni> allieviesterni = ep.getAllieviEsterniCorsoAvviato(ca);
+            CommissioneEsame ce = ep.getCommissioneEsameCorso(ca);
+            PresidenteCommissione pc = ca.getPresidentecommissione();
+            DateTime datael = new DateTime();
+
+            createDir(pathtemp.getDescrizione());
+
+            File pdfOut = new File(pathtemp.getDescrizione() + "VERBALE_" + ca.getIdcorsoavviato() + "_" + ce.getIdcommissione()
+                    + "_" + datael.toString(PATTERNDATE3) + ".V2.pdf");
+
+            try (InputStream is = new ByteArrayInputStream(Base64.decodeBase64(template.getDescrizione())); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
+
+                PdfDocumentInfo info = pdfDoc.getDocumentInfo();
+                info.setTitle(pdfOut.getName());
+
+                PdfAcroForm form = getAcroForm(pdfDoc, true);
+                form.setGenerateAppearance(true);
+                Map<String, PdfFormField> fields = form.getAllFormFields();
+
+                setFieldsValue(form, fields, "tipocert", ca.getCorsobase().getRepertorio().getQualificarilasciata().getNome());
+                setFieldsValue(form, fields, "nomecorso", ca.getCorsobase().getRepertorio().getDenominazione());
+                setFieldsValue(form, fields, "idcorso", ca.getCorsobase().getIdentificativocorso());
+                setFieldsValue(form, fields, "ragionesociale", ca.getCorsobase().getSoggetto().getRAGIONESOCIALE());
+                setFieldsValue(form, fields, "sede", ca.getCorsobase().getSedescelta().getIndirizzo() + " - " + ca.getCorsobase().getSedescelta().getComune());
+                setFieldsValue(form, fields, "dds", ca.getCorsobase().getSoggetto().getDDGNUMERO() + " del " + ca.getCorsobase().getSoggetto().getDDGDATA());
+                setFieldsValue(form, fields, "datainizio", sdf_PATTERNDATE4.format(ca.getDatainizio()));
+                setFieldsValue(form, fields, "datafine", sdf_PATTERNDATE4.format(ca.getDatafine()));
+                setFieldsValue(form, fields, "presidente", pc.getCognome() + " " + pc.getNome());
+                setFieldsValue(form, fields, "titolare1", ce.getTitolare1().getCognome() + " " + ce.getTitolare1().getNome());
+                setFieldsValue(form, fields, "titolare2", ce.getTitolare2().getCognome() + " " + ce.getTitolare2().getNome());
+                setFieldsValue(form, fields, "esperto", ce.getEspertosettore());
+                setFieldsValue(form, fields, "sostituto1", ce.getSostituto1().getCognome() + " " + ce.getSostituto1().getNome());
+                setFieldsValue(form, fields, "sostituto2", ce.getSostituto2().getCognome() + " " + ce.getSostituto2().getNome());
+                try {
+                    if (ef1.getSostituzione1() != null) {
+                        setFieldsValue(form, fields, "sost_a1", ef1.getSostituzione1().getOriginale().getCognome() + " " + ef1.getSostituzione1().getOriginale().getNome());
+                        setFieldsValue(form, fields, "sost_b1", ef1.getSostituzione1().getSostituto().getCognome() + " " + ef1.getSostituzione1().getSostituto().getNome());
+                        setFieldsValue(form, fields, "sost_no1", ef1.getSostituzione1().getNotasostituzione());
+                        setFieldsValue(form, fields, "sost_d1", sdf_PATTERNDATE4.format(ef1.getSostituzione1().getDatanotasostituzione()));
+                    }
+                } catch (Exception ex1) {
+                    LOGGER.severe(estraiEccezione(ex1));
+                }
+                try {
+                    if (ef1.getSostituzione2() != null) {
+                        setFieldsValue(form, fields, "sost_a2", ef1.getSostituzione2().getOriginale().getCognome() + " " + ef1.getSostituzione2().getOriginale().getNome());
+                        setFieldsValue(form, fields, "sost_b2", ef1.getSostituzione2().getSostituto().getCognome() + " " + ef1.getSostituzione2().getSostituto().getNome());
+                        setFieldsValue(form, fields, "sost_no2", ef1.getSostituzione2().getNotasostituzione());
+                        setFieldsValue(form, fields, "sost_d2", sdf_PATTERNDATE4.format(ef1.getSostituzione2().getDatanotasostituzione()));
+                    }
+                } catch (Exception ex1) {
+                    LOGGER.severe(estraiEccezione(ex1));
+                }
+
+                setFieldsValue(form, fields, "iscritti", String.valueOf(ef1.getIscritti()));
+                setFieldsValue(form, fields, "ammessi", String.valueOf(ef1.getAmmessi()));
+                setFieldsValue(form, fields, "assenti", String.valueOf(ef1.getAssenti()));
+                setFieldsValue(form, fields, "esaminati", String.valueOf(ef1.getEsaminati()));
+                setFieldsValue(form, fields, "idonei", String.valueOf(ef1.getIdonei()));
+                setFieldsValue(form, fields, "nonidonei", String.valueOf(ef1.getNonidonei()));
+
+                setFieldsValue(form, fields, "commissione1", ef1.getCommissionenome1().getCognome() + " " + ef1.getCommissionenome1().getNome());
+                setFieldsValue(form, fields, "commissione2", ef1.getCommissionenome2().getCognome() + " " + ef1.getCommissionenome2().getNome());
+
+                setFieldsValue(form, fields, "nomesottoscrittore", ef1.getNomesottoscrittore());
+                setFieldsValue(form, fields, "ruolosottoscrittore", ef1.getRuolosottoscrittore());
+
+                setFieldsValue(form, fields, "numprotverbale", ef1.getProtocolloverbale());
+                setFieldsValue(form, fields, "dataprotverbale", sdf_PATTERNDATE4.format(ef1.getDataverbale()));
+
+                ObjectMapper om = new ObjectMapper();
+                om.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
+
+                List<EsamefinaleDetails> da_int = om.readValue(
+                        "[" + StringUtils.replace(ef1.getDettagliallieviinterni(), "}{", "},{") + "]",
+                        new TypeReference<List<EsamefinaleDetails>>() {
+                });
+
+                List<EsamefinaleDetails> da_est = om.readValue(
+                        "[" + StringUtils.replace(ef1.getDettagliallieviesterni(), "}{", "},{") + "]",
+                        new TypeReference<List<EsamefinaleDetails>>() {
+                });
+
+                AtomicInteger index = new AtomicInteger(1);
+
+                for (EsamefinaleDetails efd : da_int) {
+
+                    Allievi adet = allievi.stream().filter(a11 -> a11.getIdallievi().equals(efd.getIDALLIEVI())).findAny().orElse(null);
+
+                    if (adet != null) {
+                        setFieldsValue(form, fields, "al_indice_" + index.get(), String.valueOf(index.get()));
+                        setFieldsValue(form, fields, "al_nomeall_" + index.get(), adet.getCognome() + " " + adet.getNome());
+                        setFieldsValue(form, fields, "al_natoa_" + index.get(), adet.getLuogonascita());
+                        setFieldsValue(form, fields, "al_datanascita_" + index.get(), sdf_PATTERNDATE4.format(adet.getDatanascita()));
+                        setFieldsValue(form, fields, "al_cittares_" + index.get(), "");
+                        setFieldsValue(form, fields, "al_docid_" + index.get(), adet.getNumdocid());
+                        setFieldsValue(form, fields, "al_ore_" + index.get(),
+                                roundDoubleandFormat(getOretotalipresenza(ep, adet), 2));
+                        setFieldsValue(form, fields, "al_voto_" + index.get(), roundDoubleandFormat(fd(efd.getVOTOFINALE()), 0));
+                        setFieldsValue(form, fields, "al_votomax_" + index.get(), "100");
+                        setFieldsValue(form, fields, "al_esito_" + index.get(), efd.getESITO());
+                        index.addAndGet(1);
+                    } else {
+                        System.out.println("rc.soop.sic.Pdf.GENERAVERBALE(ERROR NULL ) " + efd.getIDALLIEVI());
+                    }
+
+                }
+                for (EsamefinaleDetails efd : da_est) {
+
+                    AllieviEsterni adet = allieviesterni.stream().filter(a11 -> a11.getIdallievi().equals(efd.getIDALLIEVI())).findAny().orElse(null);
+
+                    if (adet != null) {
+                        setFieldsValue(form, fields, "al_indice_" + index.get(), String.valueOf(index.get()));
+                        setFieldsValue(form, fields, "al_nomeall_" + index.get(), adet.getCognome() + " " + adet.getNome());
+                        setFieldsValue(form, fields, "al_natoa_" + index.get(), adet.getLuogonascita());
+                        setFieldsValue(form, fields, "al_datanascita_" + index.get(), sdf_PATTERNDATE4.format(adet.getDatanascita()));
+                        setFieldsValue(form, fields, "al_cittares_" + index.get(), "");
+                        setFieldsValue(form, fields, "al_docid_" + index.get(), adet.getNumdocid());
+                        setFieldsValue(form, fields, "al_ore_" + index.get(),
+                                "40");
+                        setFieldsValue(form, fields, "al_voto_" + index.get(), roundDoubleandFormat(fd(efd.getVOTOFINALE()), 0));
+                        setFieldsValue(form, fields, "al_votomax_" + index.get(), "100");
+                        setFieldsValue(form, fields, "al_esito_" + index.get(), efd.getESITO());
+                        index.addAndGet(1);
+                    } else {
+                        System.out.println("rc.soop.sic.Pdf.GENERAVERBALE(ERROR NULL EST) " + efd.getIDALLIEVI());
+                    }
+
+                }
+
+                fields.forEach((t, u) -> {
+                    form.partialFormFlattening(t);
+                });
+                form.flattenFields();
+
+            }
+            return pdfOut;
+        } catch (Exception ex0) {
+            LOGGER.severe(estraiEccezione(ex0));
+        }
+        return null;
+
+    }
+
+    public static File GENERAPRELIMINAREVERBALE(EntityOp ep, Corsoavviato ca) {
+        try {
+
+            Path pathtemp = ep.getEm().find(Path.class, "path.temp");
+            Path template = ep.getEm().find(Path.class, "pdf.preliminare.v1");
+            Esamefinale ef1 = ep.getEsameFinaleCorso(ca);
+
+            CommissioneEsame ce = ep.getCommissioneEsameCorso(ca);
+            PresidenteCommissione pc = ca.getPresidentecommissione();
+            DateTime datael = new DateTime();
+
+            createDir(pathtemp.getDescrizione());
+
+            File pdfOut = new File(pathtemp.getDescrizione() + "VERBALE.PRELIMINARE_" + ca.getIdcorsoavviato() + "_" + ce.getIdcommissione()
+                    + "_" + datael.toString(PATTERNDATE3) + ".V1.pdf");
+
+            try (InputStream is = new ByteArrayInputStream(Base64.decodeBase64(template.getDescrizione())); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
+                PdfDocumentInfo info = pdfDoc.getDocumentInfo();
+                info.setTitle(pdfOut.getName());
+                PdfAcroForm form = getAcroForm(pdfDoc, true);
+                form.setGenerateAppearance(true);
+                Map<String, PdfFormField> fields = form.getAllFormFields();
+
+                setFieldsValue(form, fields, "tipocert", ca.getCorsobase().getRepertorio().getQualificarilasciata().getNome());
+                setFieldsValue(form, fields, "nomecorso", ca.getCorsobase().getRepertorio().getDenominazione());
+                setFieldsValue(form, fields, "idcorso", ca.getCorsobase().getIdentificativocorso());
+                setFieldsValue(form, fields, "ragionesociale", ca.getCorsobase().getSoggetto().getRAGIONESOCIALE());
+
+                setFieldsValue(form, fields, "sede", ca.getCorsobase().getSedescelta().getIndirizzo() + " - " + ca.getCorsobase().getSedescelta().getComune());
+
+                setFieldsValue(form, fields, "giornoesame", sdf_PATTERNDATE4.format(ef1.getDataoraesame()));
+                setFieldsValue(form, fields, "oraesame", sdf_PATTERNDATE8.format(ef1.getDataoraesame()));
+
+                setFieldsValue(form, fields, "presidente", pc.getCognome() + " " + pc.getNome());
+                setFieldsValue(form, fields, "titolare1", ce.getTitolare1().getCognome() + " " + ce.getTitolare1().getNome());
+                setFieldsValue(form, fields, "titolare2", ce.getTitolare2().getCognome() + " " + ce.getTitolare2().getNome());
+                setFieldsValue(form, fields, "esperto", ce.getEspertosettore());
+                try {
+                    if (ef1.getSostituzione1() != null) {
+                        setFieldsValue(form, fields, "sost_a1", ef1.getSostituzione1().getOriginale().getCognome() + " " + ef1.getSostituzione1().getOriginale().getNome());
+                        setFieldsValue(form, fields, "sost_b1", ef1.getSostituzione1().getSostituto().getCognome() + " " + ef1.getSostituzione1().getSostituto().getNome());
+                        setFieldsValue(form, fields, "sost_no1", ef1.getSostituzione1().getNotasostituzione());
+                        setFieldsValue(form, fields, "sost_d1", sdf_PATTERNDATE4.format(ef1.getSostituzione1().getDatanotasostituzione()));
+                    }
+                } catch (Exception ex1) {
+                    LOGGER.severe(estraiEccezione(ex1));
+                }
+                try {
+                    if (ef1.getSostituzione2() != null) {
+                        setFieldsValue(form, fields, "sost_a2", ef1.getSostituzione2().getOriginale().getCognome() + " " + ef1.getSostituzione2().getOriginale().getNome());
+                        setFieldsValue(form, fields, "sost_b2", ef1.getSostituzione2().getSostituto().getCognome() + " " + ef1.getSostituzione2().getSostituto().getNome());
+                        setFieldsValue(form, fields, "sost_no2", ef1.getSostituzione2().getNotasostituzione());
+                        setFieldsValue(form, fields, "sost_d2", sdf_PATTERNDATE4.format(ef1.getSostituzione2().getDatanotasostituzione()));
+                    }
+                } catch (Exception ex1) {
+                    LOGGER.severe(estraiEccezione(ex1));
+                }
+
+                if (ef1.isVerificaintermedia()) {
+                    setFieldsValue(form, fields, "verificaintermedia", sdf_PATTERNDATE4.format(ef1.getDataverificaintermedia()));
+                } else {
+                    setFieldsValue(form, fields, "verificaintermedia", "NON AVVENUTA");
+                }
+
+                setFieldsValue(form, fields, "puntoa", ef1.getPuntoa());
+                setFieldsValue(form, fields, "puntob", ef1.getPuntob());
+                setFieldsValue(form, fields, "puntoe", ef1.getPuntoe());
+                setFieldsValue(form, fields, "puntof", ef1.getPuntof());
+                setFieldsValue(form, fields, "puntog", ef1.getPuntog());
+                setFieldsValue(form, fields, "puntoh", ef1.getPuntoh());
+
+                setFieldsValue(form, fields, "oraestrazione", ef1.getOraestrazione());
+                setFieldsValue(form, fields, "utenteestrazione", ef1.getUtenteestrazione());
+                setFieldsValue(form, fields, "primaprova", ef1.getPrimaprova());
+
+                if (ef1.getSecondaprova().equals("CONTESTUALE")) {
+                    setFieldsValue(form, fields, "secondaprova", "in modo contestuale alla prova pratica.");
+                } else {
+                    setFieldsValue(form, fields, "secondaprova", "in tempi diversi da quelli della prova pratica.");
+
+                }
+
+                setFieldsValue(form, fields, "ammessi", String.valueOf(ef1.getAmmessi()));
+                setFieldsValue(form, fields, "assenti", String.valueOf(ef1.getAssenti()));
+                setFieldsValue(form, fields, "esaminati", String.valueOf(ef1.getEsaminati()));
+                setFieldsValue(form, fields, "interni", String.valueOf(ef1.getInterni()));
+                setFieldsValue(form, fields, "esterni", String.valueOf(ef1.getEsterni()));
+                setFieldsValue(form, fields, "idonei", String.valueOf(ef1.getIdonei()));
+                setFieldsValue(form, fields, "nonidonei", String.valueOf(ef1.getNonidonei()));
+                setFieldsValue(form, fields, "underm", String.valueOf(ef1.getUnderM()));
+                setFieldsValue(form, fields, "underf", String.valueOf(ef1.getUnderF()));
+                setFieldsValue(form, fields, "totunder", String.valueOf((ef1.getUnderM() + ef1.getUnderF())));
+                setFieldsValue(form, fields, "overm", String.valueOf(ef1.getOverM()));
+                setFieldsValue(form, fields, "overf", String.valueOf(ef1.getOverF()));
+                setFieldsValue(form, fields, "totover", String.valueOf((ef1.getUnderM() + ef1.getUnderF())));
+                setFieldsValue(form, fields, "interniok", String.valueOf(ef1.getInterniOK()));
+                setFieldsValue(form, fields, "esterniok", String.valueOf(ef1.getEsterniOK()));
+
+                setFieldsValue(form, fields, "datachiusura", sdf_PATTERNDATE4.format(ef1.getDatachiusuraverbale()));
+                setFieldsValue(form, fields, "orechiusura", sdf_PATTERNDATE8.format(ef1.getDatachiusuraverbale()));
+
+                setFieldsValue(form, fields, "commissione1", ef1.getCommissionenome1().getCognome() + " " + ef1.getCommissionenome1().getNome());
+                setFieldsValue(form, fields, "commissione2", ef1.getCommissionenome2().getCognome() + " " + ef1.getCommissionenome2().getNome());
+
+                fields.forEach((t, u) -> {
+                    form.partialFormFlattening(t);
+                });
+                form.flattenFields();
+            }
+            System.out.println("rc.soop.sic.Pdf.GENERAPRELIMINAREVERBALE() " + pdfOut.getPath());
+            return pdfOut;
+        } catch (Exception ex0) {
+            LOGGER.severe(estraiEccezione(ex0));
+        }
+        return null;
+    }
+
     public static File GENERANOMINAPRES(EntityOp ep, Corsoavviato ca) {
         try {
 
             Path pathtemp = ep.getEm().find(Path.class, "path.temp");
             Path template = ep.getEm().find(Path.class, "pdf.nomina.v1");
             TemplateDecretoAUT templ1 = ep.getContentTemplateDescretoAUT();
-            
+
             CommissioneEsame ce = ep.getCommissioneEsameCorso(ca);
             DateTime datael = new DateTime();
 
@@ -744,10 +1156,7 @@ public class Pdf {
                 });
                 form.flattenFields();
             }
-
-            System.out.println("tester.T.GENERADECRETOAPPROVATIVO() " + pdfOut.getPath());
             return pdfOut;
-
         } catch (Exception ex0) {
             LOGGER.severe(estraiEccezione(ex0));
         }

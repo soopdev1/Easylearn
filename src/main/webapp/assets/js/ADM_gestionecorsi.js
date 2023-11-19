@@ -69,6 +69,83 @@ function refreshtable() {
     table.ajax.reload(null, false);
 }
 
+function archiviacorso(idcorso) {
+    var ok = false;
+    var messageko = "ERRORE GENERICO";
+    $.confirm({
+        title: 'Conferma Operazione',
+        content: "Confermi di aver rilasciato gli attestati di qualifica e di voler archiviare il corso con ID <b>" + idcorso + "</b> ? L'operazione non potrà essere annullata.",
+        theme: 'bootstrap',
+        columnClass: 'col-md-9',
+        buttons: {
+            confirm: {
+                btnClass: 'btn-success btn-lg',
+                text: "<i class='fa fa-check'></i> CONFERMO", // With spaces and symbols
+                action: function () {
+                    $.ajax({
+                        url: 'Operations',
+                        type: 'POST',
+                        data: {
+                            'type': 'ARCHIVIACORSO',
+                            'IDCORSO': idcorso
+                        },
+                        dataType: 'json',
+                        async: false,
+                        success: function (data) {
+                            //check
+                            if (data.result) {
+                                ok = true;
+                            } else {
+                                messageko = ("ERRORE: " + data.message);
+                            }
+                        },
+                        error: function (request, error) {
+                            messageko = ("ERRORE: " + error);
+                        }
+                    });
+
+                    if (ok) {
+                        $.alert({
+                            title: 'Operazione conclusa con successo!',
+                            content: '',
+                            type: 'success',
+                            typeAnimated: true,
+                            buttons: {
+                                confirm: {
+                                    text: 'OK',
+                                    btnClass: 'btn-success',
+                                    action: function () {
+                                        refreshtable();
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        $.alert({
+                            title: "Errore durante l'operazione!",
+                            content: messageko,
+                            type: 'red',
+                            typeAnimated: true,
+                            theme: 'bootstrap',
+                            columnClass: 'col-md-9',
+                            buttons: {
+                                confirm: {
+                                    text: 'OK',
+                                    btnClass: 'btn-red'
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            ,
+            cancel: {
+                btnClass: 'btn-danger btn-lg',
+                text: "<i class='fa fa-remove'></i> NO" // With spaces and symbols                
+            }
+        }
+    });
+}
 function approvacorso(idcorso) {
     var ok = false;
     var messageko = "ERRORE GENERICO";
