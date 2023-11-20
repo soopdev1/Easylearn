@@ -905,12 +905,12 @@ public class Pdf {
                 om.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
 
                 List<EsamefinaleDetails> da_int = om.readValue(
-                        "[" + StringUtils.replace(ef1.getDettagliallieviinterni(), "}{", "},{") + "]",
+                        StringUtils.replace(ef1.getDettagliallieviinterni(), "}{", "},{"),
                         new TypeReference<List<EsamefinaleDetails>>() {
                 });
 
                 List<EsamefinaleDetails> da_est = om.readValue(
-                        "[" + StringUtils.replace(ef1.getDettagliallieviesterni(), "}{", "},{") + "]",
+                        StringUtils.replace(ef1.getDettagliallieviesterni(), "}{", "},{"),
                         new TypeReference<List<EsamefinaleDetails>>() {
                 });
 

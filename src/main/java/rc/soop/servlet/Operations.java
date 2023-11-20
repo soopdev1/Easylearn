@@ -97,7 +97,6 @@ import rc.soop.sic.jpa.Corsoavviato;
 import rc.soop.sic.jpa.Docente;
 import rc.soop.sic.jpa.EnteStage;
 import rc.soop.sic.jpa.EntityOp;
-import rc.soop.sic.jpa.EntityServices;
 import rc.soop.sic.jpa.Esamefinale;
 import rc.soop.sic.jpa.EsamefinaleDetails;
 import rc.soop.sic.jpa.IncrementalCorso;
@@ -132,7 +131,7 @@ public class Operations extends HttpServlet {
 
     protected void ATTESTATI(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         String idcorso = Utils.dec_string(getRequestValue(request, "idcorso"));
 
         EntityOp ep1 = new EntityOp();
@@ -142,7 +141,7 @@ public class Operations extends HttpServlet {
             if (ca1 != null) {
                 List<AttestatiQualifica> lista = ep1.list_attestati(ca1);
                 Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
-                String zipname = "AT_"+Utils.generaId(50)
+                String zipname = "AT_" + Utils.generaId(50)
                         + EXTZIP;
 
                 File zip = new File(pathtemp.getDescrizione() + zipname);
@@ -192,7 +191,7 @@ public class Operations extends HttpServlet {
             redirect(request, response, "404.jsp");
         }
     }
-    
+
     protected void CERTIFICATI(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -205,7 +204,7 @@ public class Operations extends HttpServlet {
             if (ca1 != null) {
                 List<CertificatiCompetenze> lista = ep1.list_certificati(ca1);
                 Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
-                String zipname = "CE_"+Utils.generaId(50)
+                String zipname = "CE_" + Utils.generaId(50)
                         + EXTZIP;
 
                 File zip = new File(pathtemp.getDescrizione() + zipname);
@@ -310,8 +309,6 @@ public class Operations extends HttpServlet {
             redirect(request, response, "404.jsp");
         }
     }
-
-    
 
     protected void ESAMIFINALI(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -1312,7 +1309,7 @@ public class Operations extends HttpServlet {
             out.print(resp_out.toString());
         }
     }
-    
+
     protected void GENERACERTIFICATI(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JsonObject resp_out = new JsonObject();
         try {
@@ -1328,61 +1325,23 @@ public class Operations extends HttpServlet {
                 ObjectMapper om = new ObjectMapper();
                 om.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
 
-                List<EsamefinaleDetails> da_int = om.readValue(
-                        "[" + StringUtils.replace(ef1.getDettagliallieviinterni(), "}{", "},{") + "]",
-                        new TypeReference<List<EsamefinaleDetails>>() {
-                });
+                List<EsamefinaleDetails> da_int = new ArrayList<>();
+                List<EsamefinaleDetails> da_est = new ArrayList<>();
 
-                List<EsamefinaleDetails> da_est = om.readValue(
-                        "[" + StringUtils.replace(ef1.getDettagliallieviesterni(), "}{", "},{") + "]",
-                        new TypeReference<List<EsamefinaleDetails>>() {
-                });
+                try {
+                    da_int = om.readValue(StringUtils.replace(ef1.getDettagliallieviinterni(), "}{", "},{"), new TypeReference<List<EsamefinaleDetails>>() {
+                    });
+                } catch (Exception ex2) {
+                    EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), "INTERNI " + estraiEccezione(ex2));
+                    da_int = new ArrayList<>();
+                }
 
-                for (EsamefinaleDetails esterni : da_est) {
-
-                    if (esterni.getESITO().startsWith("IDONEO")) {
-                        AllieviEsterni adet = allieviesterni.stream().filter(a11 -> a11.getIdallievi().equals(esterni.getIDALLIEVI())).findAny().orElse(null);
-                        if (adet != null) {
-                            CertificatiCompetenze cc = new CertificatiCompetenze();
-                            cc.setAllievoesterno(adet);
-                            cc.setCorsodiriferimento(ca1);
-                            cc.setDatagenerazione(new DateTime().toDate());
-                            cc.setEsame(ef1);
-                            cc.setFilename("CERTIFICATOCOMPETENZE_" + prettystring(adet.getCognome() + adet.getNome()) + "_CORSO_"
-                                    + ca1.getIdcorsoavviato() + "_" + generateIdentifier(7) + EXTPDF);
-                            
-                            AttestatiQualifica aq = new AttestatiQualifica();
-                            cc.setAllievoesterno(adet);
-                            aq.setCorsodiriferimento(ca1);
-                            aq.setDatagenerazione(new DateTime().toDate());
-                            aq.setEsame(ef1);
-                            aq.setFilename("ATTESTATOQUALIFICA_" + prettystring(adet.getCognome() + adet.getNome()) + "_CORSO_"
-                                    + ca1.getIdcorsoavviato() + "_" + generateIdentifier(7) + EXTPDF);
-                            
-                            EntityOp ep2 = new EntityOp();
-                            ep2.begin();
-                            ep2.persist(cc);
-                            ep2.persist(aq);
-                            ep2.commit();
-                            ep2.close();
-                            
-                            String content = Pdf.GENERACERTIFICATO(ep1, ca1, null, adet, ef1, esterni, cc);
-                            cc.setContent(content);
-                            String contentat = Pdf.GENERAATTESTATO(ep1, ca1, null, adet, ef1, esterni, aq);
-                            aq.setContent(contentat);
-                            
-                            EntityOp ep3 = new EntityOp();
-                            ep3.begin();
-                            ep3.merge(cc);
-                            ep3.merge(aq);
-                            ep3.commit();
-                            ep3.close();
-                        } else {
-                            System.out.println(esterni.getIDALLIEVI() + " GENERACERTIFICATI(KO) NON TROVATO");
-                        }
-                    } else {
-                        System.out.println(esterni.getIDALLIEVI() + " GENERACERTIFICATI(KO) " + esterni.getESITO());
-                    }
+                try {
+                    da_est = om.readValue(StringUtils.replace(ef1.getDettagliallieviesterni(), "}{", "},{"), new TypeReference<List<EsamefinaleDetails>>() {
+                    });
+                } catch (Exception ex2) {
+                    EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), "ESTERNI " + estraiEccezione(ex2));
+                    da_est = new ArrayList<>();
                 }
 
                 for (EsamefinaleDetails interni : da_int) {
@@ -1399,7 +1358,7 @@ public class Operations extends HttpServlet {
                             cc.setEsame(ef1);
                             cc.setFilename("CERTIFICATOCOMPETENZE_" + prettystring(adet.getCognome() + adet.getNome()) + "_CORSO_"
                                     + ca1.getIdcorsoavviato() + "_" + generateIdentifier(7) + EXTPDF);
-                            
+
                             AttestatiQualifica aq = new AttestatiQualifica();
                             cc.setAllievointerno(adet);
                             aq.setCorsodiriferimento(ca1);
@@ -1407,7 +1366,7 @@ public class Operations extends HttpServlet {
                             aq.setEsame(ef1);
                             aq.setFilename("ATTESTATOQUALIFICA_" + prettystring(adet.getCognome() + adet.getNome()) + "_CORSO_"
                                     + ca1.getIdcorsoavviato() + "_" + generateIdentifier(7) + EXTPDF);
-                            
+
                             EntityOp ep2 = new EntityOp();
                             ep2.begin();
                             ep2.persist(cc);
@@ -1429,6 +1388,53 @@ public class Operations extends HttpServlet {
                         }
                     } else {
                         System.out.println(interni.getIDALLIEVI() + " GENERACERTIFICATI(KO) " + interni.getESITO());
+                    }
+                }
+                
+                for (EsamefinaleDetails esterni : da_est) {
+
+                    if (esterni.getESITO().startsWith("IDONEO")) {
+                        AllieviEsterni adet = allieviesterni.stream().filter(a11 -> a11.getIdallievi().equals(esterni.getIDALLIEVI())).findAny().orElse(null);
+                        if (adet != null) {
+                            CertificatiCompetenze cc = new CertificatiCompetenze();
+                            cc.setAllievoesterno(adet);
+                            cc.setCorsodiriferimento(ca1);
+                            cc.setDatagenerazione(new DateTime().toDate());
+                            cc.setEsame(ef1);
+                            cc.setFilename("CERTIFICATOCOMPETENZE_" + prettystring(adet.getCognome() + adet.getNome()) + "_CORSO_"
+                                    + ca1.getIdcorsoavviato() + "_" + generateIdentifier(7) + EXTPDF);
+
+                            AttestatiQualifica aq = new AttestatiQualifica();
+                            cc.setAllievoesterno(adet);
+                            aq.setCorsodiriferimento(ca1);
+                            aq.setDatagenerazione(new DateTime().toDate());
+                            aq.setEsame(ef1);
+                            aq.setFilename("ATTESTATOQUALIFICA_" + prettystring(adet.getCognome() + adet.getNome()) + "_CORSO_"
+                                    + ca1.getIdcorsoavviato() + "_" + generateIdentifier(7) + EXTPDF);
+
+                            EntityOp ep2 = new EntityOp();
+                            ep2.begin();
+                            ep2.persist(cc);
+                            ep2.persist(aq);
+                            ep2.commit();
+                            ep2.close();
+
+                            String content = Pdf.GENERACERTIFICATO(ep1, ca1, null, adet, ef1, esterni, cc);
+                            cc.setContent(content);
+                            String contentat = Pdf.GENERAATTESTATO(ep1, ca1, null, adet, ef1, esterni, aq);
+                            aq.setContent(contentat);
+
+                            EntityOp ep3 = new EntityOp();
+                            ep3.begin();
+                            ep3.merge(cc);
+                            ep3.merge(aq);
+                            ep3.commit();
+                            ep3.close();
+                        } else {
+                            System.out.println(esterni.getIDALLIEVI() + " GENERACERTIFICATI(KO) NON TROVATO");
+                        }
+                    } else {
+                        System.out.println(esterni.getIDALLIEVI() + " GENERACERTIFICATI(KO) " + esterni.getESITO());
                     }
                 }
 
