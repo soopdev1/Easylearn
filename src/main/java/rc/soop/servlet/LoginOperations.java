@@ -52,11 +52,7 @@ public class LoginOperations extends HttpServlet {
 
     protected void spid(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            
-            
             EntityOp eo1 = new EntityOp();
-            
-//            HttpRequestExecutor executor = new HttpUrlConnectionExecutor();
             OAuth2AuthorizationProvider provider = new BasicOAuth2AuthorizationProvider(
                     URI.create(eo1.getEm().find(Path.class, "spid.auth").getDescrizione()),
                     URI.create(eo1.getEm().find(Path.class, "spid.token").getDescrizione()),
@@ -71,12 +67,10 @@ public class LoginOperations extends HttpServlet {
             OAuth2InteractiveGrant grant = new AuthorizationCodeGrant(
                     client, new BasicScope("scope"));
             URI authorizationUrl = grant.authorizationUrl();
-            //            OAuth2AccessToken tk1 = grant.accessToken(executor);
-//            OAuth2AccessToken token = grant.withRedirect(new LazyUri(new Precoded("https://is-test.regione.sicilia.it/oauth2/token")))
-//                    .accessToken(executor);
-////            
-//            System.out.println("rc.soop.servlet.LoginOperations.spid() "+token.toString());
 
+//            OAuth2AccessToken tk1 = grant.accessToken(executor);
+//            OAuth2AccessToken token = grant.withRedirect(new LazyUri(new Precoded("https://is-test.regione.sicilia.it/oauth2/token"))).accessToken(executor);
+//            System.out.println("rc.soop.servlet.LoginOperations.spid() "+token.toString());
             redirect(request, response, authorizationUrl.toString());
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -45,6 +45,7 @@ import static rc.soop.sic.Constant.MIMEZIP;
 import static rc.soop.sic.Constant.PATTERNDATE3;
 import static rc.soop.sic.Constant.PATTERNDATE4;
 import static rc.soop.sic.Constant.PATTERNDATE5;
+import static rc.soop.sic.Constant.omSTANDARD;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE5;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE6;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE7;
@@ -1278,6 +1279,37 @@ public class Operations extends HttpServlet {
         }
     }
 
+    protected void ELIMINAMODULO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JsonObject resp_out = new JsonObject();
+        try {
+            String IDMODULO = getRequestValue(request, "IDMODULO");
+            EntityOp ep1 = new EntityOp();
+            Calendario_Formativo ca1 = ep1.getEm().find(Calendario_Formativo.class, Long.valueOf(IDMODULO));
+            if (ca1 != null) {
+                ep1.begin();
+                ep1.remove(ca1);
+                ep1.commit();
+                ep1.close();
+                resp_out.addProperty("result",
+                        true);
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "CORSO NON TROVATO.");
+            }
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+    }
+    
     protected void ARCHIVIACORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JsonObject resp_out = new JsonObject();
         try {
@@ -1322,14 +1354,12 @@ public class Operations extends HttpServlet {
                 Esamefinale ef1 = ep1.getEsameFinaleCorso(ca1);
                 List<Allievi> allievi = ep1.getAllieviCorsoAvviato(ca1);
                 List<AllieviEsterni> allieviesterni = ep1.getAllieviEsterniCorsoAvviato(ca1);
-                ObjectMapper om = new ObjectMapper();
-                om.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
-
+                
                 List<EsamefinaleDetails> da_int = new ArrayList<>();
                 List<EsamefinaleDetails> da_est = new ArrayList<>();
 
                 try {
-                    da_int = om.readValue(StringUtils.replace(ef1.getDettagliallieviinterni(), "}{", "},{"), new TypeReference<List<EsamefinaleDetails>>() {
+                    da_int = omSTANDARD.readValue(StringUtils.replace(ef1.getDettagliallieviinterni(), "}{", "},{"), new TypeReference<List<EsamefinaleDetails>>() {
                     });
                 } catch (Exception ex2) {
                     EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), "INTERNI " + estraiEccezione(ex2));
@@ -1337,7 +1367,7 @@ public class Operations extends HttpServlet {
                 }
 
                 try {
-                    da_est = om.readValue(StringUtils.replace(ef1.getDettagliallieviesterni(), "}{", "},{"), new TypeReference<List<EsamefinaleDetails>>() {
+                    da_est = omSTANDARD.readValue(StringUtils.replace(ef1.getDettagliallieviesterni(), "}{", "},{"), new TypeReference<List<EsamefinaleDetails>>() {
                     });
                 } catch (Exception ex2) {
                     EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), "ESTERNI " + estraiEccezione(ex2));
@@ -4019,6 +4049,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "ARCHIVIACORSO":
                     ARCHIVIACORSO(request, response);
+                    break;
+                case "ELIMINAMODULO":
+                    ELIMINAMODULO(request, response);
                     break;
                 default: {
                     String p = request.getContextPath();

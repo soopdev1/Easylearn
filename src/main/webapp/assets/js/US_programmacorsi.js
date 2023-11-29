@@ -17,10 +17,12 @@ function competenzetrasv() {
         inizio_ore += parseInt($(this).html());
     });
     $("#completeduration").html(inizio_ore);
+    $("#completeduration2").html(inizio_ore);
 
     //  calcolo ore pian
     var pianificate = 0.0;
     var pianificateel = 0.0;
+    var pianificatetec = 0.0;
 
     $(".value_ore").each(function () {
         pianificate += parseFloat($(this).val());
@@ -29,12 +31,19 @@ function competenzetrasv() {
     $(".value_oreel").each(function () {
         pianificateel += parseFloat($(this).val());
     });
+    $(".value_oretec").each(function () {
+        pianificatetec += parseFloat($(this).val());
+    });
+    
+    
+    
 
     $("#orepianificate").html(Number(pianificate).toLocaleString("it-IT", {minimumFractionDigits: 1}).replace(/[.,]0$/, ""));
     $("#orepianificateel").html(Number(pianificateel).toLocaleString("it-IT", {minimumFractionDigits: 1}).replace(/[.,]0$/, ""));
+    $("#orepianificatec").html(Number(pianificatetec).toLocaleString("it-IT", {minimumFractionDigits: 1}).replace(/[.,]0$/, ""));
 
     var orepian = parseFloat($("#orepianificate").html());
-    $("#totaleorecompl").html(Number(inizio_ore + stage_dur).toLocaleString("it-IT", {minimumFractionDigits: 1}).replace(/[.,]0$/, ""));
+    $("#totaleorecompl").html(Number(inizio_ore+stage_dur).toLocaleString("it-IT", {minimumFractionDigits: 1}).replace(/[.,]0$/, ""));
 
     var oredapianificare = inizio_ore - orepian;
     $("#oredapianificare").html(Number(oredapianificare).toLocaleString("it-IT", {minimumFractionDigits: 1}).replace(/[.,]0$/, ""));
@@ -116,3 +125,82 @@ $(document).ready(function () {
         numericInput: true
     }).mask(".decimalvalue");
 });
+
+
+function ELIMINAMODULO(idmodulo,nomemodulo) {
+    var ok = false;
+    var messageko = "ERRORE GENERICO";
+    $.confirm({
+        title: 'Conferma Operazione',
+        content: "Confermi di voler eliminare il modulo attualmente identificato come <b>" + nomemodulo + "</b> ? L'operazione non potrà essere annullata.",
+        theme: 'bootstrap',
+        columnClass: 'col-md-9',
+        buttons: {
+            confirm: {
+                btnClass: 'btn-success btn-lg',
+                text: "<i class='fa fa-check'></i> CONFERMO", // With spaces and symbols
+                action: function () {
+                    $.ajax({
+                        url: 'Operations',
+                        type: 'POST',
+                        data: {
+                            'type': 'ELIMINAMODULO',
+                            'IDMODULO': idmodulo
+                        },
+                        dataType: 'json',
+                        async: false,
+                        success: function (data) {
+                            //check
+                            if (data.result) {
+                                ok = true;
+                            } else {
+                                messageko = ("ERRORE: " + data.message);
+                            }
+                        },
+                        error: function (request, error) {
+                            messageko = ("ERRORE: " + error);
+                        }
+                    });
+
+                    if (ok) {
+                        $.alert({
+                            title: 'Operazione conclusa con successo!',
+                            content: '',
+                            type: 'success',
+                            typeAnimated: true,
+                            buttons: {
+                                confirm: {
+                                    text: 'OK',
+                                    btnClass: 'btn-success',
+                                    action: function () {
+                                         location.reload(true);
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        $.alert({
+                            title: "Errore durante l'operazione!",
+                            content: messageko,
+                            type: 'red',
+                            typeAnimated: true,
+                            theme: 'bootstrap',
+                            columnClass: 'col-md-9',
+                            buttons: {
+                                confirm: {
+                                    text: 'OK',
+                                    btnClass: 'btn-red'
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            ,
+            cancel: {
+                btnClass: 'btn-danger btn-lg',
+                text: "<i class='fa fa-remove'></i> NO" // With spaces and symbols                
+            }
+        }
+    });
+}

@@ -34,11 +34,11 @@ public class CorsoAvviato_AltroPersonale implements Serializable {
     @Column(name = "idcorsoavviatoaltropersonale")
     private CorsoAvviato_AltroPersonaleId idcorsoavviatoaltropersonale = new CorsoAvviato_AltroPersonaleId();
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @MapsId("idaltropersonale")
     private Altropersonale altropersonale;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @MapsId("idcorsoavviato")
     private Corsoavviato corsoavviato;
 

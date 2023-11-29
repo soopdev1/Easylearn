@@ -151,12 +151,23 @@ function saveistanza(idistanza) {
         content: "Confermi di voler salvare l'istanza con ID " + idistanza + " ? L'operazione non potrà essere annullata.",
         theme: 'bootstrap',
         columnClass: 'col-md-9',
+        onAction: function (btnName) {
+            if (btnName === "confirm") {
+                $(".jconfirm-buttons").LoadingOverlay("show");
+            }
+        },
         buttons: {
             confirm: {
                 btnClass: 'btn-success',
                 text: "<i class='fa fa-check'></i> CONFERMO", // With spaces and symbols
                 action: function () {
                     $.ajax({
+                        beforeSend: function () {
+                            $(".jconfirm-buttons").LoadingOverlay("show");
+                        },
+                        complete: function () {
+                            $(".jconfirm-buttons").LoadingOverlay("hide", true);
+                        },
                         url: 'Operations',
                         type: 'POST',
                         data: {

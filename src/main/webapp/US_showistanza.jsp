@@ -661,9 +661,7 @@
                                                                     </tr>
 
                                                                     <tr>
-                                                                        <th>Elearning Percentuale</th>
-                                                                        <th><%=c1.getElearningperc()%> %</th>
-                                                                        <th colspan="3">TOTALE COMPLESSIVO</th>
+                                                                        <th colspan="5">TOTALE COMPLESSIVO</th>
                                                                         <th><%=Utils.roundDoubleandFormat(t_compl + t_tot, 2)%></th>
                                                                     </tr>
                                                                 </tfoot>
@@ -867,7 +865,7 @@
                                                                         <td><%=d0.getCognome()%> <%=d0.getNome()%></td>
                                                                         <td><%=d0.getCodicefiscale()%></td>
                                                                         <td><%=Constant.sdf_PATTERNDATE4.format(d0.getDatanascita())%></td>
-                                                                        <td><%=md2.getOrepreviste()%></td>
+                                                                        <td><%=Utils.roundDoubleandFormat(md2.getOrepreviste(), 2)%></td>
                                                                         <td><%=d0.getTitolostudio()%></td>
                                                                         <td><%=cf1.getNomemodulo()%></td>
                                                                     </tr>   
@@ -925,7 +923,7 @@
                                                                 </thead>
                                                                 <tbody>
                                                                     <%
-                                                for (Attrezzature at1 : c1.getAttrezzature()) {%>
+                                                                        for (Attrezzature at1 : c1.getAttrezzature()) {%>
                                                                     <tr>
                                                                         <td><%=at1.getDescrizione()%></td>
                                                                         <td><%=at1.getModalita().name()%></td>

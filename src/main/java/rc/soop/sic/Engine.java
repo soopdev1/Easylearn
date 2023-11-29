@@ -203,7 +203,7 @@ public class Engine {
             orepian.addAndGet(Double.parseDouble(String.valueOf(c1.getOre())));
         });
 
-        double dapian = fd(String.valueOf(co1.getDurataore())) - orepian.get();
+        double dapian = fd(String.valueOf(co1.getDurataore() - co1.getStageore())) - orepian.get();
         return dapian == 0.0;
     }
 

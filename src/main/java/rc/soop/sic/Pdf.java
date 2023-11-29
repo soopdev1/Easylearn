@@ -93,6 +93,7 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.Store;
+import static rc.soop.sic.Constant.omSTANDARD;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE4;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE8;
 import static rc.soop.sic.Engine.getOretotalipresenza;
@@ -727,7 +728,7 @@ public class Pdf {
                 
                 setFieldsValue(form, fields, "nomecorso", ca.getCorsobase().getRepertorio().getDenominazione());
                 setFieldsValue(form, fields, "areaprof", ca.getCorsobase().getRepertorio().getAreaprofessionale());
-                setFieldsValue(form, fields, "eqf", StringUtils.replace(ca.getCorsobase().getRepertorio().getLivelloeqf().getNome(), "EHF LIVELLO", "").trim());
+                setFieldsValue(form, fields, "eqf", StringUtils.replace(ca.getCorsobase().getRepertorio().getLivelloeqf().getNome(), "EQF LIVELLO", "").trim());
 
                 setFieldsValue(form, fields, "cognome", cognome);
                 setFieldsValue(form, fields, "nome", nome);
@@ -788,7 +789,7 @@ public class Pdf {
                 setFieldsValue(form, fields, "duratacorso", String.valueOf(ca.getCorsobase().getDurataore()));
                 setFieldsValue(form, fields, "datainizio", sdf_PATTERNDATE4.format(ca.getDatainizio()));
                 setFieldsValue(form, fields, "datafine", sdf_PATTERNDATE4.format(ca.getDatafine()));
-                setFieldsValue(form, fields, "eqf", StringUtils.replace(ca.getCorsobase().getRepertorio().getLivelloeqf().getNome(), "EHF LIVELLO", "").trim());
+                setFieldsValue(form, fields, "eqf", StringUtils.replace(ca.getCorsobase().getRepertorio().getLivelloeqf().getNome(), "EQF LIVELLO", "").trim());
 
                 setFieldsValue(form, fields, "cognomenome", cognomenome);
                 setFieldsValue(form, fields, "luogonascita", luogonascita);
@@ -901,15 +902,15 @@ public class Pdf {
                 setFieldsValue(form, fields, "numprotverbale", ef1.getProtocolloverbale());
                 setFieldsValue(form, fields, "dataprotverbale", sdf_PATTERNDATE4.format(ef1.getDataverbale()));
 
-                ObjectMapper om = new ObjectMapper();
-                om.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
+//                ObjectMapper om = new ObjectMapper();
+//                om.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
 
-                List<EsamefinaleDetails> da_int = om.readValue(
+                List<EsamefinaleDetails> da_int = omSTANDARD.readValue(
                         StringUtils.replace(ef1.getDettagliallieviinterni(), "}{", "},{"),
                         new TypeReference<List<EsamefinaleDetails>>() {
                 });
 
-                List<EsamefinaleDetails> da_est = om.readValue(
+                List<EsamefinaleDetails> da_est = omSTANDARD.readValue(
                         StringUtils.replace(ef1.getDettagliallieviesterni(), "}{", "},{"),
                         new TypeReference<List<EsamefinaleDetails>>() {
                 });

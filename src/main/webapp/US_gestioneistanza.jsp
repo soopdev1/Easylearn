@@ -238,6 +238,8 @@
         <script type="text/javascript" src="assets/js/common.js"></script>
         <script src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
         <script type="text/javascript" src="assets/js/US_gestioneistanza.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
+        
         <!--end::Page Custom Javascript-->
 
 

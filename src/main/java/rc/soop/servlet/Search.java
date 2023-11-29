@@ -698,7 +698,7 @@ public class Search extends HttpServlet {
 
                 if (eliminaistanza) {
                     azioni += "<button type=\"button\"class=\"btn btn-sm btn-bg-light btn-danger\" data-bs-toggle=\"tooltip\" title=\"ELIMINA ISTANZA\" data-preload='false' " + ""
-                            + "onclick=\"return deleteistanza('<%=is1.getIdistanza()%>')\"><i class=\"fa fa-remove\"></i></button> | ";
+                            + "onclick=\"return deleteistanza('"+res.getIdistanza()+"')\"><i class=\"fa fa-remove\"></i></button> | ";
                 }
 
                 azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"" + labelallegati + "\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary\""

@@ -34,11 +34,11 @@ public class CorsoAvviato_Docenti implements Serializable {
     @Column(name = "idcorsoavviatodocenti")
     private CorsoAvviato_DocentiId idcorsoavviatodocenti = new CorsoAvviato_DocentiId();
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @MapsId("iddocente")
     private Docente docente;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @MapsId("idcorsoavviato")
     private Corsoavviato corsoavviato;
 
