@@ -101,6 +101,7 @@ import static rc.soop.sic.Utils.datemysqltoita;
 import static rc.soop.sic.Utils.estraiEccezione;
 import static rc.soop.sic.Utils.fd;
 import static rc.soop.sic.Utils.getRequestValue;
+import static rc.soop.sic.Utils.prettystring;
 import static rc.soop.sic.Utils.roundDoubleandFormat;
 import rc.soop.sic.jpa.Allievi;
 import rc.soop.sic.jpa.AllieviEsterni;
@@ -725,7 +726,7 @@ public class Pdf {
                 String nome = (al1 == null) ? al2.getNome() : al1.getNome();
                 String luogonascita = (al1 == null) ? al2.getLuogonascita() : al1.getLuogonascita();
                 String datanascita = (al1 == null) ? sdf_PATTERNDATE4.format(al2.getDatanascita()) : sdf_PATTERNDATE4.format(al1.getDatanascita());
-                
+
                 setFieldsValue(form, fields, "nomecorso", ca.getCorsobase().getRepertorio().getDenominazione());
                 setFieldsValue(form, fields, "areaprof", ca.getCorsobase().getRepertorio().getAreaprofessionale());
                 setFieldsValue(form, fields, "eqf", StringUtils.replace(ca.getCorsobase().getRepertorio().getLivelloeqf().getNome(), "EQF LIVELLO", "").trim());
@@ -740,8 +741,7 @@ public class Pdf {
 
                 setFieldsValue(form, fields, "numeroattestato", String.valueOf(aq.getNumeroattestato()));
                 setFieldsValue(form, fields, "datarilascio", sdf_PATTERNDATE4.format(aq.getDatagenerazione()));
-                
-                
+
                 fields.forEach((t, u) -> {
                     form.partialFormFlattening(t);
                 });
@@ -904,7 +904,6 @@ public class Pdf {
 
 //                ObjectMapper om = new ObjectMapper();
 //                om.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
-
                 List<EsamefinaleDetails> da_int = omSTANDARD.readValue(
                         StringUtils.replace(ef1.getDettagliallieviinterni(), "}{", "},{"),
                         new TypeReference<List<EsamefinaleDetails>>() {
@@ -1318,8 +1317,9 @@ public class Pdf {
                 form.flattenFields();
 
             }
+            String filename = (prettystring(DDS) + "_DDS DEL " + prettystring(DDSDATA) + "_" + prettystring(ista1.getSoggetto().getRAGIONESOCIALE())).toUpperCase() + Constant.EXTPDF;
 
-            File pdfOut_FINAL = new File(pathtemp.getDescrizione() + "DECRETO_APP_" + "_" + ista1.getCodiceistanza() + "_" + datael.toString(PATTERNDATE3) + ".F.pdf");
+            File pdfOut_FINAL = new File(pathtemp.getDescrizione() + filename);
 
             try (PdfDocument pdf = new PdfDocument(new PdfWriter(pdfOut_FINAL))) {
                 PdfMerger merger = new PdfMerger(pdf);
@@ -1342,12 +1342,8 @@ public class Pdf {
             }
 
             try {
-//                File fdef = convertPDFA(pdfOut_part1, "DECRETOAPPROVATIVO ISTANZA " + ista1.getCodiceistanza());
-//                if (fdef != null) {
-//                    pdfOut_part1.delete();
                 System.out.println("tester.T.GENERADECRETOAPPROVATIVO() " + pdfOut_FINAL.getPath());
                 return pdfOut_FINAL;
-//                }
             } catch (Exception ex1) {
                 LOGGER.severe(estraiEccezione(ex1));
             }

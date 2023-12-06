@@ -24,7 +24,8 @@ import javax.persistence.Table;
     @NamedQuery(name = "md.elencobydocente", query = "SELECT u FROM Moduli_Docenti u WHERE u.docente=:docente"),
     @NamedQuery(name = "md.elencobycalendarioformativo", query = "SELECT u FROM Moduli_Docenti u WHERE u.moduloformativo=:moduloformativo"),
     @NamedQuery(name = "md.elenco", query = "SELECT u FROM Moduli_Docenti u WHERE u.docente=:docente AND u.moduloformativo=:moduloformativo"),
-    @NamedQuery(name = "md.docenti", query = "SELECT DISTINCT u.docente FROM Moduli_Docenti u WHERE u.moduloformativo.corsodiriferimento=:corso")
+    @NamedQuery(name = "md.docenti", query = "SELECT DISTINCT u.docente FROM Moduli_Docenti u WHERE u.moduloformativo.corsodiriferimento=:corso"),
+    @NamedQuery(name = "md.docente.corso", query = "SELECT u FROM Moduli_Docenti u WHERE u.docente=:docente AND u.moduloformativo.corsodiriferimento=:corso")
 })
 @Entity
 @Table(name = "moduli_docenti")

@@ -226,6 +226,7 @@ function convalidalezione(idlezionecal) {
                             content: messageko,
                             type: 'red',
                             typeAnimated: true,
+                            columnClass: 'col-md-9',
                             buttons: {
                                 confirm: {
                                     text: 'OK',

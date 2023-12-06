@@ -5,6 +5,21 @@ var stage_max = 0;
 var eler_min = 0;
 var eler_max = 0;
 
+//ONCHANGE TIPO PERCORSO
+function modificalimiti() {
+    var max = 1;
+    try {
+        max = parseInt($('#scelta option:selected').attr('data-maxedizioni'));
+    } catch (e) {
+
+    }
+    document.getElementById('numeroedizionistringa').title = 'Selezione il numero di edizioni richieste (Max ' + max + ' per corso)';
+
+    for (var index = 1; index <= max; index++) {
+      $('#quantitarichiesta').append('<option value="' + index + '">' + index + '</option>');
+   }
+}
+
 //ON CHANGE SELEZIONA CORSO REPERTORIO
 function selezionaCorso() {
     var scelta_rep = $("#repertoriochoice").val().split(";")[0];
@@ -166,7 +181,7 @@ function validateForm() {
             const errorWrapper = document.querySelector('#errorMsgContainer');
             errorWrapper.innerHTML = '';
             errorWrapper.innerHTML = '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
-                    '<strong>Attenzione</strong> Le ore di eLearning non rientra nel range previsto dal corso (' 
+                    '<strong>Attenzione</strong> Le ore di eLearning non rientra nel range previsto dal corso ('
                     + el_mi1 + ' - ' + el_mx1 + '). Inserire un valore in questo range.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi avviso"></div>';
             errorWrapper.scrollIntoView();
             valid = false;

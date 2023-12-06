@@ -80,6 +80,16 @@
                             <button class="btn btn-lg btn-success"><i class="fa fa-save"></i> SALVA DATI</button>
                         </div>
                         <div class="card-body py-3">
+                            <%
+                                String esito = Utils.getRequestValue(request, "esito");
+                                if (esito.equals("KO3")) {%>
+                            <div class="row col-md-12 col-form-label">
+                                <div class="alert alert-danger">
+                                    ERRORE: LE ORE PREVISTE SUPERANO QUELLE TOTALI, SONO PRESENTI ALTRE ASSOCIAZIONI PER UNO DEI MODULI SELEZIONATI.
+                                </div>
+                            </div>
+                            <%}
+                            %>
                             <div class="row col-md-12 col-form-label">
                                 <div class="alert alert-danger"  id="messageerror" style="display: none;">
                                     ERRORE: 
@@ -116,7 +126,7 @@
                                                     <th class="p-2 w-50px">#</th>
                                                     <th class="p-2 w-50px">Tipologia</th>
                                                     <th class="p-2 w-150px">Descrizione</th>
-                                                    <th class="p-2 w-50px">Ore Associabili</th>
+                                                    <th class="p-2 w-50px">Ore</th>
                                                     <th class="p-2 w-50px">Associa Modulo</th>
                                                     <th class="p-2 w-50px">Numero ore previste per il docente</th>
                                                 </tr>
@@ -131,6 +141,7 @@
                                                         if (c1.getTipomodulo().equals("BASE")) {%>
                                             <input type="hidden" class="value_ore" 
                                                    id="ore_modules_<%=c1.getIdcalendarioformativo()%>" 
+                                                   name="ore_modules_<%=c1.getIdcalendarioformativo()%>"
                                                    value="<%=c1.getOre()%>" />
                                             <tr>
                                                 <td class="p-2 w-50px"><%=c1.getCodicemodulo()%></td>
@@ -155,6 +166,7 @@
                                             <input type="hidden" 
                                                    class="value_ore" 
                                                    id="ore_modules_<%=c1.getIdcalendarioformativo()%>"
+                                                   name="ore_modules_<%=c1.getIdcalendarioformativo()%>"
                                                    value="<%=c1.getOre()%>" />
                                             <tr>
                                                 <td class="p-2 w-50px"><%=c1.getCodicemodulo()%></td>

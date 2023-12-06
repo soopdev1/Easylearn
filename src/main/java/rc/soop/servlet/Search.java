@@ -198,7 +198,8 @@ public class Search extends HttpServlet {
                             .append("data-maxday='").append(c1.getDuratagiorni()).append("'")
                             .append("data-numall='").append(c1.getNumeroallievi()).append("'")
                             .append(" value='").append(c1.getIdcorso()).append("'>")
-                            .append(c1.getRepertorio().getDenominazione()).append(" - Edizioni richieste: ")
+                            .append(c1.getRepertorio().getDenominazione()).append(" - SEDE: ").append(c1.getSedescelta().getIndirizzo()).append(" ").append(c1.getSedescelta().getComune())
+                            .append(" - Edizioni richieste: ")
                             .append(edizionirichieste).append(" - Già Avviati: ").append(list.size())
                             .append("</option>");
                 }
@@ -281,8 +282,8 @@ public class Search extends HttpServlet {
                     case "46": {
                         azioni += "<button type=\"button\" data-bs-toggle=\"tooltip\" title=\"AUTORIZZA CAMBIO SEDE\" data-preload='false' class=\"btn btn-sm btn-bg-light btn-success\" "
                                 + "onclick=\"return approvacambiosede('" + res.getIdcorsoavviato() + "')\"><i class=\"fa fa-check-circle\"></i></button>"
-                                + "<a href='ADM_rigettacorso.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
-                                + " class=\"btn btn-sm btn-bg-light btn-danger fan1\" data-bs-toggle=\"tooltip\" title=\"RIGETTA CORSO\" data-preload='false' "
+                                + "<a href='ADM_rigettacambiosede.jsp?idcorso=" + Utils.enc_string(String.valueOf(res.getIdcorsoavviato())) + "' data-fancybox data-type='iframe' data-preload='false' data-width='75%' data-height='75%'"
+                                + " class=\"btn btn-sm btn-bg-light btn-danger fan1\" data-bs-toggle=\"tooltip\" title=\"RIGETTA RICHIESTA CAMBIO SEDE\" data-preload='false' "
                                 + "\"><i class=\"fa fa-remove\"></i></a>";
                         break;
                     }
@@ -1050,12 +1051,12 @@ public class Search extends HttpServlet {
                         + "data-bs-toggle=\"tooltip\" title=\"DETTAGLI\" "
                         + "data-preload='false' class=\"btn btn-sm btn-bg-light btn-primary fan1\">"
                         + "<i class=\"fa fa-user\"></i></a> | ";
-                if (modify.get() > 0) {
-                    azioni += "<a href=\"US_aggiungisedeente.jsp?idente=" + Utils.enc_string(String.valueOf(res.getIdentestage())) + "\" data-fancybox data-type='iframe' "
-                            + "data-bs-toggle=\"tooltip\" title=\"AGGIUNGI SEDE TIROCINIO/STAGE\" "
-                            + "data-preload='false' class=\"btn btn-sm btn-bg-light btn-warning fan1\">"
-                            + "<i class=\"fa fa-plus\"></i></a> | ";
-                }
+//                if (modify.get() > 0) {
+//                    azioni += "<a href=\"US_aggiungisedeente.jsp?idente=" + Utils.enc_string(String.valueOf(res.getIdentestage())) + "\" data-fancybox data-type='iframe' "
+//                            + "data-bs-toggle=\"tooltip\" title=\"AGGIUNGI SEDE TIROCINIO/STAGE\" "
+//                            + "data-preload='false' class=\"btn btn-sm btn-bg-light btn-warning fan1\">"
+//                            + "<i class=\"fa fa-plus\"></i></a> | ";
+//                }
                 azioni += "<a href=\"US_allegatiente.jsp?idente=" + Utils.enc_string(String.valueOf(res.getIdentestage())) + "\" data-fancybox data-type='iframe' "
                         + "data-bs-toggle=\"tooltip\" title=\"GESTIONE ALLEGATI\" "
                         + "data-preload='false' class=\"btn btn-sm btn-bg-light btn-secondary fan1\">"

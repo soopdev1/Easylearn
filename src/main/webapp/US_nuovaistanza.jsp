@@ -100,10 +100,10 @@
                                                             class="form-select form-select-solid form-select-lg fw-bold" 
                                                             name="scelta"
                                                             id="scelta"
-                                                            required>
+                                                            required onchange="return modificalimiti();">
                                                         <option value="">Scegli...</option>  
                                                         <%for (Tipologia_Percorso t1 : per1) {%>
-                                                        <option value="<%=t1.getIdtipopercorso()%>"><%=t1.getNometipologia()%></option>  
+                                                        <option value="<%=t1.getIdtipopercorso()%>" data-maxedizioni="<%=t1.getMaxedizioni()%>"><%=t1.getNometipologia()%></option>  
                                                         <%}%>
                                                     </select>
                                                 </div>
@@ -325,22 +325,19 @@
                                                     <!--begin::Label-->
                                                     <label class="col-lg-4 col-form-label fw-bold fs-6" >
                                                         <span class="required">Numero Edizioni</span>
-                                                        <a onclick="return false;" data-bs-toggle="tooltip" data-bs-placement="top" 
-                                                           title="Selezione il numero di edizioni richieste (Max 5 ad istanza)">
+                                                        <a id="numeroedizionistringa" onclick="return false;" data-bs-toggle="tooltip" data-bs-placement="top">
                                                             <i class="fas fa-exclamation-circle ms-1 fs-7"></i>
                                                         </a>
                                                     </label>
                                                     <!--end::Label-->
                                                     <!--begin::Col-->
                                                     <div class="col-lg-8 fv-row">
-                                                        <select name="quantitarichiesta" aria-label="Scegli..." 
+                                                        <select name="quantitarichiesta" id="quantitarichiesta" aria-label="Scegli..." 
                                                                 data-control="select2" data-placeholder="Scegli..." 
                                                                 class="form-select form-select-solid form-select-lg fw-bold" 
                                                                 required>
                                                             <option value="">Scegli...</option>
-                                                            <%for (int i = 1; i <= maxrichiesta; i++) {%>
-                                                            <option value="<%=i%>"><%=i%></option>
-                                                            <%}%>
+                                                            
                                                         </select>
                                                     </div>
                                                     <!--end::Col-->

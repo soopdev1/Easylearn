@@ -27,11 +27,13 @@ public class Constant {
     public static final String PATTERNDATE6 = "yyyy-MM-dd";
     public static final String PATTERNDATE7 = "yyyy-MM-dd'T'HH:mm";
     public static final String PATTERNDATE8 = "HH:mm";
+    public static final String PATTERNDATE9 = "yyyy-MM-dd HH:mm";
     public static SimpleDateFormat sdf_PATTERNDATE4 = new SimpleDateFormat(PATTERNDATE4);
     public static SimpleDateFormat sdf_PATTERNDATE5 = new SimpleDateFormat(PATTERNDATE5);
     public static SimpleDateFormat sdf_PATTERNDATE6 = new SimpleDateFormat(PATTERNDATE6);
     public static SimpleDateFormat sdf_PATTERNDATE7 = new SimpleDateFormat(PATTERNDATE7);
     public static SimpleDateFormat sdf_PATTERNDATE8 = new SimpleDateFormat(PATTERNDATE8);
+    public static SimpleDateFormat sdf_PATTERNDATE9 = new SimpleDateFormat(PATTERNDATE9);
     public static final String MIMEPDF = "application/pdf";
     public static final String EXTPDF = ".pdf";
     public static final String MIMEZIP = "application/zip";

@@ -398,7 +398,13 @@
                                                                         <td class="p-2 w-150px"><%=d2.getCognome()%> <%=d2.getNome()%></td>
                                                                         <td class="p-2 w-50px"><%=d2.getCodicefiscale()%></td>
                                                                         <td class="p-2 w-150px"><%=d2.formatElencomoduli()%></td>
-                                                                        <td class="p-2 w-150px"><i class='fa fa-hourglass'></i></td>      
+                                                                        <td class="p-2 w-150px">
+                                                                            <button onclick="return ELIMINAASSEGNAZIONEMODULO('<%=d2.getIddocente()%>','<%=idc1%>');"
+                                                                                    class="btn btn-danger btn-sm" 
+                                                               data-bs-toggle="tooltip" title="ELIMINA ASSOCIAZIONE" 
+                                                               data-preload='false' data-width='75%' data-height='75%' id="addcalendariobutton">
+                                                                <i class="fa fa-remove"></i></button>
+                                                                        </td>      
                                                                     </tr>
                                                                     <%}
                                                                     %>

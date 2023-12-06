@@ -4,6 +4,7 @@
  */
 package rc.soop.sic.jpa;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -222,6 +223,21 @@ public class EntityOp {
         q.setParameter("soggetto", s);
         q.setParameter("check", Stati.CHECK);
         return q.getResultList();
+    }
+
+    public List<EnteStage> list_enti_stage_tirocinio(List<Allievi> allievi, EntityOp eo) {
+        List<EnteStage> es1 = new ArrayList<>();
+        for (Allievi a1 : allievi) {
+            List<TirocinioStage> list_tirocini_allievo = eo.list_tirocini_allievo(a1);
+            if (!list_tirocini_allievo.isEmpty()) {
+                for (TirocinioStage ts : list_tirocini_allievo) {
+                    if (!es1.contains(ts.getEntestage())) {
+                        es1.add(ts.getEntestage());
+                    }
+                }
+            }
+        }
+        return es1;
     }
 
     public List<Allievi> getAllieviCorsoAvviato(Corsoavviato ca) {
@@ -571,6 +587,33 @@ public class EntityOp {
             trackingAction("SERVICE", estraiEccezione(ex0));
         }
         return null;
+    }
+
+    public double orepianificate_moduli_docenti(Calendario_Formativo moduloformativo) {
+        try {
+            TypedQuery<Moduli_Docenti> q = this.em.createNamedQuery("md.elencobycalendarioformativo", Moduli_Docenti.class);
+            q.setParameter("moduloformativo", moduloformativo);
+            AtomicDouble pianificate = new AtomicDouble(0.0);
+            q.getResultList().stream().map(m1 -> m1.getOrepreviste()).forEach(m2 -> {
+                pianificate.addAndGet(m2);
+            });
+            return pianificate.get();
+        } catch (Exception ex0) {
+            trackingAction("SERVICE", estraiEccezione(ex0));
+        }
+        return -1.0;
+    }
+
+    public List<Moduli_Docenti> list_moduli_docente(Docente docente, Corso corso) {
+        try {
+            TypedQuery<Moduli_Docenti> q = this.em.createNamedQuery("md.docente.corso", Moduli_Docenti.class);
+            q.setParameter("docente", docente);
+            q.setParameter("corso", corso);
+            return q.getResultList();
+        } catch (Exception ex0) {
+            trackingAction("SERVICE", estraiEccezione(ex0));
+        }
+        return new ArrayList<>();
     }
 
     public List<Docente> list_docenti_moduli(List<Docente> eldoc, List<Calendario_Formativo> calendar) {

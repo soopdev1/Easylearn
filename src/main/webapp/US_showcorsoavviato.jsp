@@ -3,6 +3,7 @@
     Created on : 18-feb-2022, 14.01.46
     Author     : raf
 --%>
+<%@page import="rc.soop.sic.jpa.EnteStage"%>
 <%@page import="rc.soop.sic.jpa.PresidenteCommissione"%>
 <%@page import="org.joda.time.DateTime"%>
 <%@page import="rc.soop.sic.jpa.User"%>
@@ -36,6 +37,8 @@
                 List<CorsoAvviato_Docenti> avv_doc = eo.list_cavv_docenti(is1);
                 List<CorsoAvviato_AltroPersonale> avv_altrop = eo.list_cavv_altropers(is1);
                 List<Allievi> allievi = eo.getAllieviCorsoAvviato(is1);
+                List<EnteStage> enstistage = eo.list_enti_stage_tirocinio(allievi, eo);
+
                 List<Calendario_Formativo> cal_istanza = eo.calendario_formativo_corso(is1.getCorsobase());
                 List<Calendario_Lezioni> lezioni = eo.calendario_lezioni_corso(is1);
                 Utils.confrontaLezioniCalendario(lezioni, cal_istanza);
@@ -223,6 +226,7 @@
                                                         <table class="table table-hover table-row-bordered">
                                                             <thead>
                                                                 <tr>
+                                                                    <th>DOC.</th>
                                                                     <th>Cognome</th>
                                                                     <th>Nome</th>
                                                                     <th>Codice Fiscale</th>
@@ -233,6 +237,11 @@
                                                             <tbody>
                                                                 <%for (Allievi a1 : allievi) {%>
                                                                 <tr>
+                                                                    <td>
+                                                                        <a href="US_allegatiallievi.jsp?idallievo=<%=Utils.enc_string(String.valueOf(a1.getIdallievi()))%>" data-fancybox data-type='iframe'
+                                                                           data-bs-toggle="tooltip" title="VISUALIZZA ALLEGATI" data-preload='false' class="btn btn-sm btn-bg-light btn-secondary fan1">
+                                                                            <i class="fa fa-file-clipboard"></i></a>
+                                                                    </td>
                                                                     <td>
                                                                         <%=a1.getCognome()%>
                                                                     </td>
@@ -249,6 +258,38 @@
                                                                         <%=Utils.getEtichettastato(a1.getStatoallievo())%>
                                                                     </td>
 
+                                                                </tr>
+                                                                <%}%>
+                                                            </tbody>
+                                                        </table>
+                                                    </label>
+                                                    <hr>
+                                                    <label class="col-md-2 col-form-label fw-bold fs-6">
+                                                        <span class="text-danger"><b>ELENCO ENTI TIROCINIO/STAGE ASSOCIATI AGLI ALLIEVI</b></span>
+                                                    </label>
+                                                    <label class="col-md-10 col-form-label">
+                                                        <table class="table table-hover table-row-bordered table-rounded">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>DOC.</th>
+                                                                    <th>Ragione Sociale</th>
+                                                                    <th>Partita IVA</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <%for (EnteStage a1 : enstistage) {%>
+                                                                <tr>
+                                                                    <td>
+                                                                        <a href="US_allegatiente.jsp?idente=<%=Utils.enc_string(String.valueOf(a1.getIdentestage()))%>" data-fancybox data-type='iframe'
+                                                                           data-bs-toggle="tooltip" title="VISUALIZZA ALLEGATI" data-preload='false' class="btn btn-sm btn-bg-light btn-secondary fan1">
+                                                                            <i class="fa fa-file-clipboard"></i></a>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%=a1.getRAGIONESOCIALE()%>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%=a1.getPARTITAIVA()%>
+                                                                    </td>
                                                                 </tr>
                                                                 <%}%>
                                                             </tbody>

@@ -37,6 +37,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.mime.MimeTypes;
 import org.joda.time.DateTime;
+import org.joda.time.Interval;
 import rc.soop.sic.Constant;
 import static rc.soop.sic.Constant.EXTPDF;
 import static rc.soop.sic.Constant.EXTZIP;
@@ -49,6 +50,7 @@ import static rc.soop.sic.Constant.omSTANDARD;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE5;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE6;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE7;
+import static rc.soop.sic.Constant.sdf_PATTERNDATE9;
 import rc.soop.sic.Engine;
 import rc.soop.sic.Pdf;
 import rc.soop.sic.SendMail;
@@ -94,6 +96,7 @@ import rc.soop.sic.jpa.CorsoAvviato_AltroPersonaleId;
 import rc.soop.sic.jpa.CorsoAvviato_Docenti;
 import rc.soop.sic.jpa.CorsoAvviato_DocentiId;
 import rc.soop.sic.jpa.CorsoStato;
+import rc.soop.sic.jpa.Corso_;
 import rc.soop.sic.jpa.Corsoavviato;
 import rc.soop.sic.jpa.Docente;
 import rc.soop.sic.jpa.EnteStage;
@@ -1279,6 +1282,43 @@ public class Operations extends HttpServlet {
         }
     }
 
+    protected void ELIMINAASSEGNAZIONEMODULO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JsonObject resp_out = new JsonObject();
+        try {
+            String IDDOCENTE = getRequestValue(request, "IDDOCENTE");
+            String IDCORSO = getRequestValue(request, "IDCORSO");
+            EntityOp ep1 = new EntityOp();
+
+            Corso ca1 = ep1.getEm().find(Corso.class, Long.valueOf(IDCORSO));
+            Docente d1 = ep1.getEm().find(Docente.class, Long.valueOf(IDDOCENTE));
+            if (ca1 != null && d1 != null) {
+                ep1.begin();
+                List<Moduli_Docenti> lm = ep1.list_moduli_docente(d1, ca1);
+                for (Moduli_Docenti md : lm) {
+                    ep1.remove(md);
+                }
+                ep1.commit();
+                ep1.close();
+                resp_out.addProperty("result",
+                        true);
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "CORSO NON TROVATO.");
+            }
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+    }
+
     protected void ELIMINAMODULO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JsonObject resp_out = new JsonObject();
         try {
@@ -1309,7 +1349,7 @@ public class Operations extends HttpServlet {
             out.print(resp_out.toString());
         }
     }
-    
+
     protected void ARCHIVIACORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JsonObject resp_out = new JsonObject();
         try {
@@ -1354,7 +1394,7 @@ public class Operations extends HttpServlet {
                 Esamefinale ef1 = ep1.getEsameFinaleCorso(ca1);
                 List<Allievi> allievi = ep1.getAllieviCorsoAvviato(ca1);
                 List<AllieviEsterni> allieviesterni = ep1.getAllieviEsterniCorsoAvviato(ca1);
-                
+
                 List<EsamefinaleDetails> da_int = new ArrayList<>();
                 List<EsamefinaleDetails> da_est = new ArrayList<>();
 
@@ -1420,7 +1460,7 @@ public class Operations extends HttpServlet {
                         System.out.println(interni.getIDALLIEVI() + " GENERACERTIFICATI(KO) " + interni.getESITO());
                     }
                 }
-                
+
                 for (EsamefinaleDetails esterni : da_est) {
 
                     if (esterni.getESITO().startsWith("IDONEO")) {
@@ -2315,6 +2355,54 @@ public class Operations extends HttpServlet {
         }
     }
 
+    protected void RIGETTACAMBIOSEDE(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        if (isAdmin(request.getSession())) {
+            String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
+            String idcorso = getRequestValue(request, "idcorso");
+
+            EntityOp ep1 = new EntityOp();
+
+            try {
+                Corsoavviato is1 = ep1.getEm().find(Corsoavviato.class, Long.valueOf(idcorso));
+                if (is1 != null) {
+                    boolean soccorsoistr = getRequestValue(request, "soccorsoistr").equalsIgnoreCase("on");
+                    String motivazione = getRequestValue(request, "motivazione");
+                    List<Allegati> la = ep1.list_allegati(null, null, is1, null, null, null);
+                    List<Long> idko = new ArrayList<>();
+                    for (Allegati a1 : la) {
+                        String checkallegato = getRequestValue(request, "soc_ko_" + a1.getIdallegati());
+                        if (checkallegato.equalsIgnoreCase("on")) {
+                            idko.add(a1.getIdallegati());
+                        }
+                    }
+                    ep1.begin();
+                    if (soccorsoistr) {
+                        for (Long idko1 : idko) {
+                            Allegati a1 = ep1.getEm().find(Allegati.class, idko1);
+                            if (a1 != null) {
+                                a1.setStato(ep1.getEm().find(CorsoStato.class, "31"));
+                                ep1.merge(a1);
+                            }
+                        }
+                    }
+                    is1.setStatocorso(ep1.getEm().find(CorsoStato.class, "44"));
+                    ep1.merge(is1);
+                    ep1.commit();
+                    ep1.close();
+                    redirect(request, response, "Page_message.jsp?esito=OKRI_IS1");
+                } else {
+                    redirect(request, response, "Page_message.jsp?esito=KORI_CO1");
+                }
+            } catch (Exception ex1) {
+                EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+                redirect(request, response, "Page_message.jsp?esito=KORI_CO2");
+            }
+        } else {
+            redirect(request, response, "404.jsp");
+        }
+
+    }
+
     protected void RIGETTACORSO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (isAdmin(request.getSession())) {
             String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
@@ -2851,87 +2939,87 @@ public class Operations extends HttpServlet {
 
     protected void UPLGENERIC(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 //        Utils.printRequest(request);
-        if (isAdmin(request.getSession())) {
+//        if (isAdmin(request.getSession())) {
 
-            try {
+        try {
 
-                EntityOp ep1 = new EntityOp();
-                String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
+            EntityOp ep1 = new EntityOp();
+            String utentecaricamento = (String) request.getSession().getAttribute("us_cod");
 //            SoggettoProponente so = ((User) request.getSession().getAttribute("us_cod")).getSoggetto();
-                Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
-                FileItemFactory factory = new DiskFileItemFactory();
-                ServletFileUpload upload = new ServletFileUpload(factory);
-                File nomefile = null;
-                List<FileItem> items = upload.parseRequest(request);
-                Iterator<FileItem> iterator = items.iterator();
-                String IDIST = null;
-                String DESCRIZIONE = null;
-                String MIME = null;
-                String codiceDOC = generateIdentifier(6);
-                while (iterator.hasNext()) {
-                    FileItem item = (FileItem) iterator.next();
-                    if (item.isFormField()) {
-                        if (item.getFieldName().equals("idist")) {
-                            IDIST = item.getString();
-                        } else if (item.getFieldName().equals("DESCRIZIONE")) {
-                            DESCRIZIONE = normalizeUTF8(normalize(item.getString()));
-                        }
-                    } else {
-                        String fileName = item.getName();
-                        String estensione = fileName.substring(fileName.lastIndexOf("."));
-                        String nome = codiceDOC + new DateTime().toString(PATTERNDATE3)
-                                + RandomStringUtils.randomAlphabetic(15) + estensione;
-                        try {
-                            nomefile = new File(pathtemp.getDescrizione() + nome);
-                            item.write(nomefile);
-                            MIME = getMimeType(nomefile);
-                        } catch (Exception ex) {
-                            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
-                            nomefile = null;
-                        }
-                    }
-                }
-
-                if (nomefile != null) {
-
-                    if (IDIST != null) {
-                        request.getSession().setAttribute("ses_idist", Utils.enc_string(IDIST));
-                        Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(IDIST));
-                        if (is1 != null) {
-
-                            Allegati al1 = new Allegati();
-                            al1.setIstanza(is1);
-                            al1.setCodiceallegati(codiceDOC);
-                            al1.setContent(Base64.encodeBase64String(FileUtils.readFileToByteArray(nomefile)));
-                            al1.setDescrizione(DESCRIZIONE);
-                            al1.setStato(ep1.getEm().find(CorsoStato.class, "30"));
-                            al1.setMimetype(MIME);
-                            al1.setUtentecaricamento(utentecaricamento);
-                            al1.setDatacaricamento(new Date());
-
-                            ep1.begin();
-                            ep1.persist(al1);
-                            ep1.commit();
-                            ep1.close();
-                            redirect(request, response, "US_gestioneallegati.jsp");
-                        } else {
-                            redirect(request, response, "Page_message.jsp?esito=KOUP_IS1");
-                        }
-                    } else {
-                        redirect(request, response, "Page_message.jsp?esito=KOUP_IS2");
+            Path pathtemp = ep1.getEm().find(Path.class, "path.temp");
+            FileItemFactory factory = new DiskFileItemFactory();
+            ServletFileUpload upload = new ServletFileUpload(factory);
+            File nomefile = null;
+            List<FileItem> items = upload.parseRequest(request);
+            Iterator<FileItem> iterator = items.iterator();
+            String IDIST = null;
+            String DESCRIZIONE = null;
+            String MIME = null;
+            String codiceDOC = generateIdentifier(6);
+            while (iterator.hasNext()) {
+                FileItem item = (FileItem) iterator.next();
+                if (item.isFormField()) {
+                    if (item.getFieldName().equals("idist")) {
+                        IDIST = item.getString();
+                    } else if (item.getFieldName().equals("DESCRIZIONE")) {
+                        DESCRIZIONE = normalizeUTF8(normalize(item.getString()));
                     }
                 } else {
-                    redirect(request, response, "Page_message.jsp?esito=KOUP_IS3");
+                    String fileName = item.getName();
+                    String estensione = fileName.substring(fileName.lastIndexOf("."));
+                    String nome = codiceDOC + new DateTime().toString(PATTERNDATE3)
+                            + RandomStringUtils.randomAlphabetic(15) + estensione;
+                    try {
+                        nomefile = new File(pathtemp.getDescrizione() + nome);
+                        item.write(nomefile);
+                        MIME = getMimeType(nomefile);
+                    } catch (Exception ex) {
+                        EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex));
+                        nomefile = null;
+                    }
                 }
-
-            } catch (Exception ex1) {
-                ex1.printStackTrace();
-                EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
-                redirect(request, response, "Page_message.jsp?esito=KOUP_IS4");
             }
-        } else {
-            redirect(request, response, "404.jsp");
+
+            if (nomefile != null) {
+
+                if (IDIST != null) {
+                    request.getSession().setAttribute("ses_idist", Utils.enc_string(IDIST));
+                    Istanza is1 = ep1.getEm().find(Istanza.class, Long.valueOf(IDIST));
+                    if (is1 != null) {
+
+                        Allegati al1 = new Allegati();
+                        al1.setIstanza(is1);
+                        al1.setCodiceallegati(codiceDOC);
+                        al1.setContent(Base64.encodeBase64String(FileUtils.readFileToByteArray(nomefile)));
+                        al1.setDescrizione(DESCRIZIONE);
+                        al1.setStato(ep1.getEm().find(CorsoStato.class, "30"));
+                        al1.setMimetype(MIME);
+                        al1.setUtentecaricamento(utentecaricamento);
+                        al1.setDatacaricamento(new Date());
+
+                        ep1.begin();
+                        ep1.persist(al1);
+                        ep1.commit();
+                        ep1.close();
+                        redirect(request, response, "US_gestioneallegati.jsp");
+                    } else {
+                        redirect(request, response, "Page_message.jsp?esito=KOUP_IS1");
+                    }
+                } else {
+                    redirect(request, response, "Page_message.jsp?esito=KOUP_IS2");
+                }
+            } else {
+                redirect(request, response, "Page_message.jsp?esito=KOUP_IS3");
+            }
+
+        } catch (Exception ex1) {
+            ex1.printStackTrace();
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+            redirect(request, response, "Page_message.jsp?esito=KOUP_IS4");
         }
+//        } else {
+//            redirect(request, response, "404.jsp");
+//        }
 
     }
 
@@ -3207,13 +3295,38 @@ public class Operations extends HttpServlet {
             Calendario_Lezioni is1 = ep1.getEm().find(Calendario_Lezioni.class, Long.valueOf(getRequestValue(request, "IDLEZIONE")));
 
             if (is1 != null) {
-                ep1.begin();
-                is1.setStatolezione(ep1.getEm().find(CorsoStato.class, "61"));
-                ep1.merge(is1);
-                ep1.commit();
-                ep1.close();
-                resp_out.addProperty("result",
-                        true);
+
+                boolean ok = true;
+                List<Calendario_Lezioni> lezioni = ep1.calendario_lezioni_corso(is1.getCorsodiriferimento()).stream().filter(l1 -> l1.getStatolezione() != null
+                        && l1.getStatolezione().getCodicestatocorso().equals("61")).collect(Collectors.toList());
+                Interval tocheck = new Interval(new DateTime(sdf_PATTERNDATE9.parse(sdf_PATTERNDATE6.format(is1.getDatalezione()) + " " + is1.getOrainizio())),
+                        new DateTime(sdf_PATTERNDATE9.parse(sdf_PATTERNDATE6.format(is1.getDatalezione()) + " " + is1.getOrafine())));
+                for (Calendario_Lezioni conv : lezioni) {
+                    String datainizio = sdf_PATTERNDATE6.format(conv.getDatalezione()) + " " + conv.getOrainizio();
+                    String datafine = sdf_PATTERNDATE6.format(conv.getDatalezione()) + " " + conv.getOrafine();
+                    Interval p1 = new Interval(new DateTime(sdf_PATTERNDATE9.parse(datainizio)), new DateTime(sdf_PATTERNDATE9.parse(datafine)));
+                    if (tocheck.overlaps(p1)) {
+                        ok = false;
+                        break;
+                    }
+                }
+
+                if (ok) {
+                    ep1.begin();
+                    is1.setStatolezione(ep1.getEm().find(CorsoStato.class, "61"));
+                    ep1.merge(is1);
+                    ep1.commit();
+                    ep1.close();
+                    resp_out.addProperty("result",
+                            true);
+
+                } else {
+                    resp_out.addProperty("result",
+                            false);
+                    resp_out.addProperty("message",
+                            "IMPOSSIBILE CONVALIDARE LEZIONE. ESISTE GIA' UNA LEZIONE CONVALIDATA NELL'INTERVALLO TEMPORALE INDICATO. CONTROLLARE.");
+                }
+
             } else {
                 resp_out.addProperty("result",
                         false);
@@ -3583,24 +3696,40 @@ public class Operations extends HttpServlet {
             Docente d1 = ep1.getEm().find(Docente.class, Long.valueOf(getRequestValue(request, "docente")));
             if (d1 != null) {
                 ep1.begin();
+                boolean error = false;
                 List<Calendario_Formativo> calendar = ep1.calendario_formativo_corso(co1);
                 for (Calendario_Formativo c1 : calendar) {
                     String checkbox = getRequestValue(request, "CH_" + c1.getIdcalendarioformativo());
                     if (checkbox != null && checkbox.equalsIgnoreCase("on")) {
+                        double oremax = fd((Utils.getRequestValue(request, "ore_modules_" + c1.getIdcalendarioformativo())));
                         double orepreviste = fd(formatDoubleforMysql(Utils.getRequestValue(request, "ORE_" + c1.getIdcalendarioformativo())));
-                        Moduli_Docenti md = new Moduli_Docenti();
-                        md.setIdmodulidocenti(new Moduli_DocentiId(d1.getIddocente(), c1.getIdcalendarioformativo()));
-                        md.setDocente(d1);
-                        md.setModuloformativo(c1);
-                        md.setOrepreviste(orepreviste);
-                        ep1.persist(md);
+                        double oregiapianificate = ep1.orepianificate_moduli_docenti(c1);
+                        
+                        if (orepreviste > (oremax - oregiapianificate)) {
+                            error = true;
+                            break;
+                        } else {
+                            Moduli_Docenti md = new Moduli_Docenti();
+                            md.setIdmodulidocenti(new Moduli_DocentiId(d1.getIddocente(), c1.getIdcalendarioformativo()));
+                            md.setDocente(d1);
+                            md.setModuloformativo(c1);
+                            md.setOrepreviste(orepreviste);
+                            ep1.persist(md);
+                        }
                     }
                 }
-
-                ep1.commit();
-                ep1.close();
                 request.getSession().setAttribute("ses_idcorso", Utils.enc_string(getRequestValue(request, "idcorsodasalvare")));
-                redirect(request, response, "Page_message.jsp?esito=OK_SMD");
+                if (!error) {
+                    ep1.commit();
+                    ep1.close();
+                    redirect(request, response, "Page_message.jsp?esito=OK_SMD");
+
+                } else {
+                    ep1.rollBack();
+                    ep1.close();
+                    redirect(request, response, "US_programmacorsi_docenti.jsp?esito=KO3");
+                }
+
             } else {
                 request.getSession().setAttribute("ses_idcorso", Utils.enc_string(getRequestValue(request, "idcorsodasalvare")));
                 redirect(request, response, "US_programmacorsi_docenti.jsp?esito=KO1");
@@ -3752,11 +3881,7 @@ public class Operations extends HttpServlet {
                 try (PrintWriter pw = response.getWriter()) {
                     pw.print(re.toString() + "@@@" + sa.toString());
                 }
-            } else {
-
             }
-        } else {
-
         }
 
     }
@@ -3927,6 +4052,9 @@ public class Operations extends HttpServlet {
                 case "RIGETTACORSO":
                     RIGETTACORSO(request, response);
                     break;
+                case "RIGETTACAMBIOSEDE":
+                    RIGETTACAMBIOSEDE(request, response);
+                    break;
                 case "PROTOCOLLAISTANZA":
                     PROTOCOLLAISTANZA(request, response);
                     break;
@@ -4052,6 +4180,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "ELIMINAMODULO":
                     ELIMINAMODULO(request, response);
+                    break;
+                case "ELIMINAASSEGNAZIONEMODULO":
+                    ELIMINAASSEGNAZIONEMODULO(request, response);
                     break;
                 default: {
                     String p = request.getContextPath();

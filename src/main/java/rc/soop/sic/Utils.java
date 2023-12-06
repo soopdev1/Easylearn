@@ -688,6 +688,8 @@ public class Utils {
             ing = ing.replaceAll("”", "");
             ing = ing.replaceAll("\"", "");
             ing = ing.replaceAll(" ", "_");
+            ing = ing.replaceAll("/", "");
+            ing = ing.replaceAll("//", "");
             return ing.replaceAll("\"", "").trim();
         } else {
             return "";

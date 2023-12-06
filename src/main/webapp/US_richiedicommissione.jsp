@@ -174,6 +174,7 @@
         <script src="assets/js/scripts.bundle.js"></script>
         <script src="assets/fontawesome-6.0.0/js/all.js"></script>
         <script type="text/javascript" src="assets/plugins/jquery-confirm.min3.3.2.js"></script>
+        <script type="text/javascript" src="assets/js/US_richiedicommissione.js"></script>
 
         <!--end::Page Custom Javascript-->
         <!--end::Javascript-->
