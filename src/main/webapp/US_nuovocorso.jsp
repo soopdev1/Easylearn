@@ -4,6 +4,8 @@
     Author     : raf
 --%>
 
+<%@page import="rc.soop.sic.jpa.Corsoavviato"%>
+<%@page import="rc.soop.sic.jpa.Corso"%>
 <%@page import="rc.soop.sic.jpa.Altropersonale"%>
 <%@page import="rc.soop.sic.jpa.Allievi"%>
 <%@page import="rc.soop.sic.jpa.User"%>
@@ -115,6 +117,26 @@
                                                                                 if (is1.getDecreto() == null) {
                                                                                     continue;
                                                                                 }
+                                                                                boolean corsiresidui = false;
+                                                                                List<Corso> res1 = en.getCorsiIstanza(is1, so);
+                                                                                for (Corso c1 : res1) {
+                                                                                    int edizionirichieste = c1.getQuantitarichiesta();
+                                                                                    List<Corsoavviato> list = en.getCorsiAvviati_Corsobase(c1);
+                                                                                    if (edizionirichieste > list.size()) {
+                                                                                        corsiresidui = true;
+                                                                                        break;
+                                                                                    }
+                                                                                }
+                                                                                if (!corsiresidui) {
+                                                                                    continue;
+                                                                                }
+
+                                                                                boolean giorniattivi = Utils.istanzaAttiva(is1.getDecreto());
+
+                                                                                if (!giorniattivi) {
+                                                                                    continue;
+                                                                                }
+
                                                                                 String DDS = is1.getDecreto().split("§")[0];
                                                                                 String DDSDATA = Utils.datemysqltoita(is1.getDecreto().split("§")[1]);
                                                                         %>
@@ -252,9 +274,9 @@
                                                         <!--begin::Col-->
                                                         <div class="col-lg-8 fv-row">
                                                             <input type="text" name="DIRETTORE" id="DIRETTORE" 
-                                                                           class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" 
-                                                                           required/>
-                                                                    <small class="form-text text-muted">Inserire Cognome e Nome del Direttore del Corso</small>
+                                                                   class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" 
+                                                                   required/>
+                                                            <small class="form-text text-muted">Inserire Cognome e Nome del Direttore del Corso</small>
                                                         </div>
                                                         <!--end::Col-->
                                                     </div>        

@@ -52,11 +52,13 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import org.apache.commons.lang3.StringUtils;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.joda.time.Minutes;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
 import static rc.soop.sic.Constant.PATTERNDATE2;
 import static rc.soop.sic.Constant.PATTERNDATE3;
+import static rc.soop.sic.Constant.sdf_PATTERNDATE6;
 import rc.soop.sic.jpa.Allievi;
 import rc.soop.sic.jpa.AllieviEsterni;
 import rc.soop.sic.jpa.Calendario_Formativo;
@@ -530,6 +532,7 @@ public class Utils {
     public static void ricavaDatidaCF(Allievi al1) {
         ricavaDatidaCF(al1, null);
     }
+
     public static void ricavaDatidaCF_EST(AllieviEsterni al2) {
         ricavaDatidaCF(null, al2);
     }
@@ -675,7 +678,7 @@ public class Utils {
         }
         return new String(password);
     }
-    
+
     public static String prettystring(String ing) {
         if (ing != null) {
             ing = ing.replaceAll("\\\\", "");
@@ -695,6 +698,18 @@ public class Utils {
             return "";
         }
     }
-    
+
+    public static boolean istanzaAttiva(String d1) {
+        try {
+            String data1 = d1.split("§")[1];
+            DateTime d2 = new DateTime(sdf_PATTERNDATE6.parse(data1).getTime());
+            DateTime d3 = new DateTime().withMillisOfDay(0);
+            int giornipassati = Days.daysBetween(d2, d3).getDays();
+            return giornipassati <= 365;
+        } catch (Exception ex) {
+            Constant.LOGGER.severe(estraiEccezione(ex));
+        }
+        return false;
+    }
 
 }

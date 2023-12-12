@@ -1282,6 +1282,37 @@ public class Operations extends HttpServlet {
         }
     }
 
+    protected void ELIMINAATTREZZATURA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JsonObject resp_out = new JsonObject();
+        try {
+            String IDATTREZZATURA = getRequestValue(request, "IDATTREZZATURA");
+            EntityOp ep1 = new EntityOp();
+            Attrezzature ca1 = ep1.getEm().find(Attrezzature.class, Long.valueOf(IDATTREZZATURA));
+            if (ca1 != null) {
+                ep1.begin();
+                ep1.remove(ca1);
+                ep1.commit();
+                ep1.close();
+                resp_out.addProperty("result",
+                        true);
+            } else {
+                resp_out.addProperty("result",
+                        false);
+                resp_out.addProperty("message",
+                        "CORSO NON TROVATO.");
+            }
+        } catch (Exception ex1) {
+            resp_out.addProperty("result",
+                    false);
+            resp_out.addProperty("message",
+                    "Errore: " + estraiEccezione(ex1));
+            EntityOp.trackingAction(request.getSession().getAttribute("us_cod").toString(), estraiEccezione(ex1));
+        }
+        try (PrintWriter out = response.getWriter()) {
+            out.print(resp_out.toString());
+        }
+    }
+
     protected void ELIMINAASSEGNAZIONEMODULO(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JsonObject resp_out = new JsonObject();
         try {
@@ -3704,7 +3735,7 @@ public class Operations extends HttpServlet {
                         double oremax = fd((Utils.getRequestValue(request, "ore_modules_" + c1.getIdcalendarioformativo())));
                         double orepreviste = fd(formatDoubleforMysql(Utils.getRequestValue(request, "ORE_" + c1.getIdcalendarioformativo())));
                         double oregiapianificate = ep1.orepianificate_moduli_docenti(c1);
-                        
+
                         if (orepreviste > (oremax - oregiapianificate)) {
                             error = true;
                             break;
@@ -4183,6 +4214,9 @@ public class Operations extends HttpServlet {
                     break;
                 case "ELIMINAASSEGNAZIONEMODULO":
                     ELIMINAASSEGNAZIONEMODULO(request, response);
+                    break;
+                case "ELIMINAATTREZZATURA":
+                    ELIMINAATTREZZATURA(request, response);
                     break;
                 default: {
                     String p = request.getContextPath();

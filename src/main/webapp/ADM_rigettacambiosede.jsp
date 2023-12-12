@@ -128,14 +128,14 @@
                                                                 <td class="p-2 w-50px"><%=Constant.sdf_PATTERNDATE5.format(d2.getDatacaricamento())%></td>
                                                                 <td class="p-2 w-50px"><%=d2.getMimetype()%></td>
                                                                 <td class="p-2 w-50px">
-                                                                    <form method="POST" action="Operations" target="_blank">
-                                                                        <input type="hidden" name="type" value="VISUALDOC"/>
-                                                                        <input type="hidden" name="iddocument" value="<%=d2.getIdallegati()%>" />
-                                                                        <button type="submit" class="btn btn-sm btn-bg-light btn-success"
-                                                                                data-bs-toggle="tooltip" title="VISUALIZZA DOCUMENTO" 
-                                                                                data-preload='false'
+                                                                     <button type="button" class="btn btn-sm btn-bg-light btn-success"
+                                                                                data-bs-toggle="tooltip" title="VISUALIZZA DOCUMENTO"  data-preload='false' 
+                                                                                onclick="return document.getElementById('visualdoc_<%=d2.getIdallegati()%>').submit()"
                                                                                 ><i class="fa fa-file-alt"></i>
                                                                         </button>
+                                                                    <form method="POST" action="Operations" target="_blank" id="visualdoc_<%=d2.getIdallegati()%>">
+                                                                        <input type="hidden" name="type" value="VISUALDOC"/>
+                                                                        <input type="hidden" name="iddocument" value="<%=d2.getIdallegati()%>" />
                                                                     </form>
                                                                 </td>
                                                                 <td class="p-2 w-50px">

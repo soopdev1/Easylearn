@@ -110,7 +110,7 @@
                                                 <!--begin::Header-->
                                                 <div class="card-header border-0 pt-5">
                                                     <h3 class="card-title align-items-start flex-column">
-                                                        <span class="card-label fw-bolder fs-3 mb-1">ISTANZA ID <%=co1.getIstanza().getIdistanza()%> - Cordo di formazione: Progettazione di Dettaglio ed Unità Formative - <%=co1.getStatocorso().getHtmlicon()%></span>
+                                                        <span class="card-label fw-bolder fs-3 mb-1">ISTANZA ID <%=co1.getIstanza().getIdistanza()%> - Corso di formazione: Progettazione di Dettaglio ed Unità Formative - <%=co1.getStatocorso().getHtmlicon()%></span>
                                                     </h3>
                                                 </div>
                                                 <div class="card-body py-3">
@@ -338,7 +338,7 @@
                                                                         <td class="p-2 w-50px">
                                                                             <button onclick="return ELIMINAMODULO('<%=c1.getIdcalendarioformativo()%>','<%=c1.getCodicemodulo()%>');" class="btn btn-danger btn-sm" 
                                                                data-bs-toggle="tooltip" title="ELIMINA MODULO FORMATIVO" 
-                                                               data-preload='false' data-width='75%' data-height='75%' id="addcalendariobutton">
+                                                               data-preload='false' data-width='75%' data-height='75%'>
                                                                 <i class="fa fa-remove"></i></button>
                                                                         </td>
                                                                     </tr>
@@ -460,7 +460,12 @@
                                                                         <td class="p-2 w-50px"><%=at1.getQuantita()%></td>
                                                                         <td class="p-2 w-50px"><%=Constant.sdf_PATTERNDATE4.format(at1.getDatainizio())%></td>
                                                                         <td class="p-2 w-150px"><%=at1.getRegistroinventario()%></td>
-                                                                        <td class="p-2 w-50px"><i class='fa fa-hourglass'></i></td>
+                                                                        <td class="p-2 w-50px">
+                                                                            <button onclick="return ELIMINAATTREZZATURA('<%=at1.getIdattrezzature()%>');"
+                                                                                    class="btn btn-danger btn-sm" 
+                                                               data-bs-toggle="tooltip" title="ELIMINA ATTREZZATURA" 
+                                                               data-preload='false' data-width='75%' data-height='75%'>
+                                                                <i class="fa fa-remove"></i></button></td>
                                                                     </tr>
                                                                     <%}
                                                                     %>

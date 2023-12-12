@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.joda.time.Interval;
 import org.joda.time.Period;
+import rc.soop.sic.Constant;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE6;
 import static rc.soop.sic.Constant.sdf_PATTERNDATE9;
 import static rc.soop.sic.Utils.getRequestValue;
@@ -26,31 +28,34 @@ public class T {
 
         try {
 
-            long lezione = 13L;
-
-            EntityOp ep1 = new EntityOp();
-            Calendario_Lezioni is1 = ep1.getEm().find(Calendario_Lezioni.class, lezione);
-            if (is1 != null) {
-                boolean ok = true;
-                List<Calendario_Lezioni> lezioni = ep1.calendario_lezioni_corso(is1.getCorsodiriferimento()).stream().filter(l1 -> l1.getStatolezione() != null
-                        && l1.getStatolezione().getCodicestatocorso().equals("61")).collect(Collectors.toList());
-                Interval tocheck = new Interval(new DateTime(sdf_PATTERNDATE9.parse(sdf_PATTERNDATE6.format(is1.getDatalezione()) + " " + is1.getOrainizio())),
-                        new DateTime(sdf_PATTERNDATE9.parse(sdf_PATTERNDATE6.format(is1.getDatalezione()) + " " + is1.getOrafine())));
-                for (Calendario_Lezioni conv : lezioni) {
-                    String datainizio = sdf_PATTERNDATE6.format(conv.getDatalezione()) + " " + conv.getOrainizio();
-                    String datafine = sdf_PATTERNDATE6.format(conv.getDatalezione()) + " " + conv.getOrafine();
-                    Interval p1 = new Interval(new DateTime(sdf_PATTERNDATE9.parse(datainizio)), new DateTime(sdf_PATTERNDATE9.parse(datafine)));
-                    if(tocheck.overlaps(p1)){
-                        ok = false;
-                        System.out.println("tester.T.main(SOVRAPPOSIZIONE)");
-                        break;
-                    }
-                }
-                
-                System.out.println("tester.T.main() "+ok);
-
-            }
-
+            
+            String d1 = "2587/2§2022-08-01";
+            
+            
+//            long lezione = 13L;
+//
+//            EntityOp ep1 = new EntityOp();
+//            Calendario_Lezioni is1 = ep1.getEm().find(Calendario_Lezioni.class, lezione);
+//            if (is1 != null) {
+//                boolean ok = true;
+//                List<Calendario_Lezioni> lezioni = ep1.calendario_lezioni_corso(is1.getCorsodiriferimento()).stream().filter(l1 -> l1.getStatolezione() != null
+//                        && l1.getStatolezione().getCodicestatocorso().equals("61")).collect(Collectors.toList());
+//                Interval tocheck = new Interval(new DateTime(sdf_PATTERNDATE9.parse(sdf_PATTERNDATE6.format(is1.getDatalezione()) + " " + is1.getOrainizio())),
+//                        new DateTime(sdf_PATTERNDATE9.parse(sdf_PATTERNDATE6.format(is1.getDatalezione()) + " " + is1.getOrafine())));
+//                for (Calendario_Lezioni conv : lezioni) {
+//                    String datainizio = sdf_PATTERNDATE6.format(conv.getDatalezione()) + " " + conv.getOrainizio();
+//                    String datafine = sdf_PATTERNDATE6.format(conv.getDatalezione()) + " " + conv.getOrafine();
+//                    Interval p1 = new Interval(new DateTime(sdf_PATTERNDATE9.parse(datainizio)), new DateTime(sdf_PATTERNDATE9.parse(datafine)));
+//                    if(tocheck.overlaps(p1)){
+//                        ok = false;
+//                        System.out.println("tester.T.main(SOVRAPPOSIZIONE)");
+//                        break;
+//                    }
+//                }
+//                
+//                System.out.println("tester.T.main() "+ok);
+//
+//            }
 //            String dataesame = "2018-06-12T19:30";
 //            
 //            String format = "yyyy-MM-dd'T'HH:mm";

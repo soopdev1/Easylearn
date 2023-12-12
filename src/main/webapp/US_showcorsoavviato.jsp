@@ -160,7 +160,7 @@
                                                         <a class="btn btn-warning btn-sm fan1" href="US_modificasedecorso.jsp"
                                                            data-fancybox data-type='iframe' 
                                                            data-bs-toggle="tooltip" title="RICHIEDI CAMBIO SEDE FORMATIVA" 
-                                                           data-preload='false' data-width='75%' data-height='75%' id="addcalendariobutton">
+                                                           data-preload='false' data-width='75%' data-height='75%'>
                                                             <i class="fa fa-edit" ></i></a>
                                                             <%}%>
                                                     </label>
@@ -393,7 +393,7 @@
                                                         <a class="btn btn-primary btn-sm fan1" href="US_calendariolezioni.jsp"
                                                            data-fancybox data-type='iframe' 
                                                            data-bs-toggle="tooltip" title="INSERISCI NUOVA LEZIONE" 
-                                                           data-preload='false' data-width='75%' data-height='75%' id="addcalendariobutton">
+                                                           data-preload='false' data-width='75%' data-height='75%'>
                                                             <i class="fa fa-plus-circle" ></i> Aggiungi lezione</a><%}%>
                                                     </label>
                                                     <div class="row col-md-12">
