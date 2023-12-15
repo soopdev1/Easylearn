@@ -125,6 +125,7 @@
                                 <input type="hidden" name="type" value="AGGIUNGIPRESENZELEZIONE"/>
                                 <input type="hidden" name="idcalendariolezione" value="<%=cl1.getIdcalendariolezioni()%>"/>
                                 <input type="hidden" name="idpresenza" value="<%=idpresenza%>"/>
+                                <input type="hidden" id="orastandardlezione" value="<%=cl1.getOre()%>"/>
                                 <div class="row col-md-12">
                                     <label class="col-md-3 col-form-label fw-bold fs-6">
                                         <span class="text-danger"><b>DATA EFFETTIVA LEZIONE:</b></span>
@@ -244,6 +245,9 @@
 
                                                         boolean modifyallievo = false;
                                                         String allievo_presente = "1";
+                                                        if (a1.getStatoallievo().equals(Stati.RITIRATO)) {
+                                                            allievo_presente = "0";
+                                                        }
                                                         String allievo_orai = "";
                                                         String allievo_oraf = "";
 
@@ -255,9 +259,9 @@
                                                                 allievo_oraf = pla.getOrafine();
                                                             }
                                                         }
-
+                                                        
                                                 %>
-                                            <input type="hidden" name="modify_<%=a1.getIdallievi()%>" value="<%=modifyallievo%>" />
+                                            <input type="hidden" id="modify_<%=a1.getIdallievi()%>" name="modify_<%=a1.getIdallievi()%>" value="<%=modifyallievo%>" />
                                             <input type="hidden" id="startoi_<%=a1.getIdallievi()%>" value="<%=allievo_orai%>" />
                                             <input type="hidden" id="startof_<%=a1.getIdallievi()%>" value="<%=allievo_oraf%>" />
                                             <tr>
@@ -269,9 +273,18 @@
                                                 </td>
                                                 <td>
                                                     <%=Utils.getEtichettastato(a1.getStatoallievo())%>
+                                                    <input type="hidden" id="statusall_<%=a1.getIdallievi()%>" name="statusall_<%=a1.getIdallievi()%>" value="<%=a1.getStatoallievo()%>" />
                                                 </td>
                                                 <td>
-                                                    <%if (modify) {%>
+                                                    <%if (modify) {
+                                                    
+                                                    
+                                                    
+                                                    if (a1.getStatoallievo().equals(Stati.RITIRATO)) {
+                                                            allievo_presente = "0";
+                                                        }
+                                                    
+                                                    %>
                                                     <select 
                                                         id="sino_<%=a1.getIdallievi()%>"
                                                         name="sino_<%=a1.getIdallievi()%>" aria-label="..." 
@@ -303,9 +316,9 @@
                                                                 class="form-select sel-presenza" required>
                                                                 <option value="<%=orainizio%>" selected><%=orainizio%></option>
                                                             </select>
-                                                            <%} else if(allievo_presente.equals("1")){%>
+                                                            <%} else if (allievo_presente.equals("1")) {%>
                                                             <span class="text-dark"><b><%=orainizio%></b></span>
-                                                                    <%}else{%>
+                                                                    <%} else {%>
                                                             <span class="text-dark"></span>
                                                             <%}%>
                                                         </div>
@@ -316,11 +329,11 @@
                                                                 name="oraf_<%=a1.getIdallievi()%>" aria-label="Scegli..." 
                                                                 data-control="select2" data-placeholder="Ora Fine" 
                                                                 class="form-select sel-presenza" required>
-                                                                <option value="<%=orafine%>" selected><%=orafine%></option>                                        
+                                                                <option value="<%=orafine%>" selected ><%=orafine%></option>                                        
                                                             </select>
-                                                            <%} else if(allievo_presente.equals("1")){%>
+                                                            <%} else if (allievo_presente.equals("1")) {%>
                                                             <span class="text-dark"><b><%=orafine%></b></span>
-                                                                    <%}else{%>
+                                                                    <%} else {%>
                                                             <span class="text-dark"></span>
                                                             <%}%>
                                                         </div>

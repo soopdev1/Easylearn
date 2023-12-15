@@ -3,6 +3,7 @@
     Created on : 18-feb-2022, 14.01.46
     Author     : raf
 --%>
+<%@page import="rc.soop.sic.jpa.Presenze_Lezioni"%>
 <%@page import="rc.soop.sic.jpa.EnteStage"%>
 <%@page import="rc.soop.sic.jpa.PresidenteCommissione"%>
 <%@page import="org.joda.time.DateTime"%>
@@ -423,13 +424,18 @@
                                                                             String orenorm = Utils.roundDoubleandFormat(c1.getOre(), 1);
                                                                             oretotl += c1.getOre();
                                                                             indice++;
+                                                                            String dataora = Constant.sdf_PATTERNDATE4.format(c1.getDatalezione()) + " (" + c1.getOrainizio() + " - " + c1.getOrafine() + ")";
+                                                                            if(c1.getStatolezione() != null){
+                                                                                Presenze_Lezioni pl1 = eo.getPresenzeLezione(c1);
+                                                                                dataora = Constant.sdf_PATTERNDATE4.format(pl1.getDatarealelezione()) + " (" + pl1.getOrainizio()+ " - " + pl1.getOrafine() + ")";
+                                                                            }
 
                                                                     %>
 
 
                                                                     <tr>
                                                                         <td class="p-2 w-10px"><%=indice%></td>
-                                                                        <td class="p-2 w-50px"><%=Constant.sdf_PATTERNDATE4.format(c1.getDatalezione())%> (<%=c1.getOrainizio()%> - <%=c1.getOrafine()%>)</td>
+                                                                        <td class="p-2 w-50px"><%=dataora%></td>
                                                                         <td class="p-2 w-50px"><%=c1.getDocente().getCognome()%> <%=c1.getDocente().getNome()%></td>
                                                                         <td class="p-2 w-50px"><%=c1.getCalendarioformativo().getNomemodulo()%></td>
                                                                         <td class="p-2 w-50px"><%=orenorm%> <%=tl%> 

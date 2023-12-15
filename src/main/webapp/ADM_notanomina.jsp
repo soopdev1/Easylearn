@@ -158,6 +158,16 @@
                             </div>
                             <%} else {%>
                             <hr>
+                            <div class="row col-md-12">
+                                <form method="POST" action="Operations" target="_blank">
+                                    <input type="hidden" name="type" value="VISUALNOTANOMINA"/>
+                                    <input type="hidden" name="IDCORSOAVVIATO" value="<%=is1.getIdcorsoavviato()%>" />
+                                    <button type="submit" class="btn btn-dark btn-sm col-md-2"
+                                            data-bs-toggle="tooltip" title="SCARICA NOTA NOMINA" 
+                                            data-preload='false'> <i class="fa fa-file-alt" ></i> SCARICA NOTA NOMINA</button>
+                                </form>
+                            </div>
+                            <hr>
                             <form action="Operations" method="POST">
                                 <input type="hidden" name="type" value="GENERANOTANOMINA" />
                                 <input type="hidden" ID="IDCORSOVALUE" name="IDCORSO" value="<%=is1.getIdcorsoavviato()%>" />

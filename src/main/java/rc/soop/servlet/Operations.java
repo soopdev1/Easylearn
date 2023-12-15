@@ -2,7 +2,6 @@ package rc.soop.servlet;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.AtomicDouble;
 import com.google.gson.JsonObject;
@@ -96,7 +95,6 @@ import rc.soop.sic.jpa.CorsoAvviato_AltroPersonaleId;
 import rc.soop.sic.jpa.CorsoAvviato_Docenti;
 import rc.soop.sic.jpa.CorsoAvviato_DocentiId;
 import rc.soop.sic.jpa.CorsoStato;
-import rc.soop.sic.jpa.Corso_;
 import rc.soop.sic.jpa.Corsoavviato;
 import rc.soop.sic.jpa.Docente;
 import rc.soop.sic.jpa.EnteStage;
@@ -3069,6 +3067,23 @@ public class Operations extends HttpServlet {
                 response.setContentLength(-1);
                 try (OutputStream outStream = response.getOutputStream()) {
                     outStream.write(Base64.decodeBase64(a1.getPdfnomina()));
+                }
+            } else if (a1 != null && a1.getPdfnomina() == null) {
+                //generare nota
+                File f1 = Pdf.GENERANOMINAPRES(eo, a1);
+                if (f1 != null) {
+                    response.setContentType(MIMEPDF);
+                    String headerKey = "Content-Disposition";
+                    String headerValue = format("attach; filename=\"%s\"",
+                            Utils.generaId(50)
+                            + EXTPDF);
+                    response.setHeader(headerKey, headerValue);
+                    response.setContentLength(-1);
+                    try (OutputStream outStream = response.getOutputStream()) {
+                        outStream.write(FileUtils.readFileToByteArray(f1));
+                    }
+                } else {
+                    redirect(request, response, "404.jsp");
                 }
             }
         } catch (Exception ex1) {

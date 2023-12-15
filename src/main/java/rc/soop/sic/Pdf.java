@@ -1113,8 +1113,12 @@ public class Pdf {
                 form.setGenerateAppearance(true);
                 Map<String, PdfFormField> fields = form.getAllFormFields();
 
-                setFieldsValue(form, fields, "protdata", sdf_PATTERNDATE4.format(ca.getDataprotnomina()));
-                setFieldsValue(form, fields, "protnum", ca.getProtnomina());
+                if (ca.getProtnomina() == null || ca.getDataprotnomina() == null) {
+
+                } else {
+                    setFieldsValue(form, fields, "protdata", sdf_PATTERNDATE4.format(ca.getDataprotnomina()));
+                    setFieldsValue(form, fields, "protnum", ca.getProtnomina());
+                }
 
                 setFieldsValue(form, fields, "idcorso", ca.getCorsobase().getIdentificativocorso());
                 setFieldsValue(form, fields, "corso", ca.getCorsobase().getRepertorio().getDenominazione());
@@ -1141,7 +1145,7 @@ public class Pdf {
 
                 setFieldsValue(form, fields, "protgabdata", sdf_PATTERNDATE4.format(ca.getDataprotgab()));
                 setFieldsValue(form, fields, "protgab", ca.getProtgab());
-                setFieldsValue(form, fields, "protgabanno", ca.getProtgab() + "/" + new DateTime(ca.getDataprotgab()).year().toString());
+                setFieldsValue(form, fields, "protgabanno", ca.getProtgab() + "/" + new DateTime(ca.getDataprotgab()).year().getAsText());
 
                 setFieldsValue(form, fields, "dataprotrichiesta", sdf_PATTERNDATE4.format(ce.getDataprotrichiesta()));
                 setFieldsValue(form, fields, "protrichiesta", ce.getNumprotrichiesta());

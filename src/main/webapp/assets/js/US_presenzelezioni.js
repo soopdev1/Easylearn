@@ -1,4 +1,5 @@
 $(document).ready(function () {
+
     populatedatafine(document.getElementById('orai'));
     checkorariomax();
 });
@@ -8,7 +9,6 @@ function checkorariomax() {
     var oraf = $('#oraf').val();
     $('.sel-presenza').each(function (i, obj) {
         if (obj.id !== "") {
-            //$('#' + obj.id).val(null).trigger('change');
             $('#' + obj.id).empty();
         }
     });
@@ -29,19 +29,19 @@ function checkorariomax() {
                 $('#' + idoggetto).prop('disabled', false);
 
                 var idallievo = idoggetto.split('_')[1];
+                //var attivo = $('#statusall_' + idallievo).val();
                 var sino = $('#sino_' + idallievo).val();
                 var startoi = $('#startoi_' + idallievo).val();
                 var startof = $('#startof_' + idallievo).val();
-
+                
+//                alert(attivo);
+                
                 if (sino === "0") {
                     var no1 = new Option("--", "--", false, false);
                     $('#' + idoggetto).append(no1);
                     $('#' + idoggetto).select2("enable", false);
                     $('#' + idoggetto).prop('disabled', true);
                 } else {
-
-
-
                     if (idoggetto.startsWith("oraf")) {
                         $('#' + idoggetto).val(null).trigger('change');
                     }
@@ -94,20 +94,27 @@ function checkorariomax() {
                     if (idoggetto.startsWith("oraf")) {
                         $('#' + idoggetto).val(selectedind).trigger('change');
                     }
+                }
+                
+                
 
-
-
-
-
+                if($('#modify_' + idallievo).val()){
+                    
+                    if (startoi !== "" && idoggetto.startsWith("orai")) {
+                        $('#' + idoggetto).val(startoi).trigger('change');
+                    }
+                    if (startof !== "" && idoggetto.startsWith("oraf")) {
+                        $('#' + idoggetto).val(startof).trigger('change');
+                    }
                 }
 
-                if (startoi !== "" && idoggetto.startsWith("orai")) {
-                    $('#' + idoggetto).val(startoi).trigger('change');
-                }
 
-                if (startof !== "" && idoggetto.startsWith("oraf")) {
-                    $('#' + idoggetto).val(startof).trigger('change');
-                }
+             //   if (startoi !== "" && idoggetto.startsWith("orai")) {
+             //       $('#' + idoggetto).val(startoi).trigger('change');
+             //   }
+//                if (startof !== "" && idoggetto.startsWith("oraf")) {
+//                    $('#' + idoggetto).val(startof).trigger('change');
+//                }
             }
         });
 
@@ -186,33 +193,36 @@ function populatedatafine(component) {
 
     var start = component.value;
     if (start !== "") {
-        for (var i = 8; i < 21; i++) {
-            var v0 = new Date('1/1/2000 ' + start + ':00');
-            var v1 = new Date('1/1/2000 ' + i + ':00:00');
-            var v2 = new Date('1/1/2000 ' + i + ':30:00');
 
-            if (v1 > v0) {
-                var out1 = i + ":00";
-                if (i < 10) {
-                    out1 = "0" + i + ":00";
-                }
-                var newOption = new Option(out1, out1, false, false);
-                $('#oraf').append(newOption).trigger('change');
-            }
-            if (v2 > v0) {
-                var out1 = i + ":30";
-                if (i < 10) {
-                    out1 = "0" + i + ":30";
-                }
-                var newOption = new Option(out1, out1, false, false);
-                $('#oraf').append(newOption).trigger('change');
-            }
+        var hh = start.split(":")[0];
+        var mm = start.split(":")[1];
 
+        var hhdest = parseInt(hh, 10) + parseInt($('#orastandardlezione').val(), 10);
+
+        if (hhdest > 20) {
+            $.alert({
+                title: "Errore durante l'operazione!",
+                content: "Ora di inizio errata, in quanto non consentirebbe di completare la lezione nell'intervallo orario prestabilito dall'ufficio (08 - 21). Controllare.",
+                type: 'red',
+                typeAnimated: true,
+                theme: 'bootstrap',
+                columnClass: 'col-md-9',
+                buttons: {
+                    confirm: {
+                        text: 'OK',
+                        btnClass: 'btn-red'
+                    }
+                }
+            });
+            return false;
+        } else if (hhdest < 10) {
+            hhdest = "0" + hhdest;
         }
+        var out1 = hhdest + ":" + mm;
+        var newOption = new Option(out1, out1, false, false);
+        $('#oraf').append(newOption).trigger('change');
         $('#oraf').on("change", function (e) {
             checkorariomax();
         });
-//        checkorariomax();
     }
-
 }

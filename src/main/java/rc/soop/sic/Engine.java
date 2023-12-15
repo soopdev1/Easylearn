@@ -297,11 +297,11 @@ public class Engine {
                     }
                 }
             }
-//            return Long.valueOf(duratamillis/3600000L).doubleValue();
+            return Long.valueOf(duratamillis/3600000L).doubleValue();
         } catch (Exception ex) {
             trackingAction("service", estraiEccezione(ex));
         }
-        return 40.00;
+        return 0.0;
     }
 
     public static double getOretotalitirocinio(EntityOp eo, Allievi a1) {
@@ -315,11 +315,12 @@ public class Engine {
                 String presenzeconvalid = Utils.countOreTirocinio(lpr, "61");
                 total += fd(presenzeconvalid);
             }
-//            return total;
+            return total;
         } catch (Exception ex) {
             trackingAction("service", estraiEccezione(ex));
         }
-        return 100.00;
+        return 0.0;
+//        return 100.00;
 
     }
 
